@@ -4,4 +4,9 @@ API Documentation
 .. autosummary::
    :toctree: autosummary
 
-   cvlib.canvas
+   cvlib.RadiusOfGyration
+   cvlib.SquareRadiusOfGyration
+
+.. testsetup::
+
+    from nonbondedslicing import *
