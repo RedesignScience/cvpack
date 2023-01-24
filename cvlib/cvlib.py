@@ -54,7 +54,7 @@ class SquareRadiusOfGyration(openmm.CustomBondForce, AbstractCollectiveVariable)
 
     Parameters
     ----------
-        atoms : List[int]
+        atoms
             The indices of the atoms in the group.
 
     Example
@@ -63,15 +63,19 @@ class SquareRadiusOfGyration(openmm.CustomBondForce, AbstractCollectiveVariable)
         >>> import cvlib
         >>> from openmmtools import testsystems
         >>> model = testsystems.AlanineDipeptideVacuum()
-        >>> RgSq = cvlib.SquareRadiusOfGyration(range(model.system.getNumParticles()))
+        >>> num_atoms = model.system.getNumParticles()
+        >>> atoms = list(range(num_atoms))
+        >>> RgSq = cvlib.SquareRadiusOfGyration(atoms)
         >>> model.system.addForce(RgSq)
         5
         >>> platform = openmm.Platform.getPlatformByName('Reference')
         >>> context = openmm.Context(model.system, openmm.CustomIntegrator(0), platform)
         >>> context.setPositions(model.positions)
-        >>> RgSqValue = RgSq.evaluate(context)
-        >>> print(RgSqValue)
-        0.08710942354090084 nm
+        >>> print(RgSq.evaluate(context))
+        0.08710942354090084 nm**2
+        >>> r = model.positions[atoms, :]
+        >>> print(((r - r.mean(axis=0))**2).sum()/num_atoms)
+        0.08710942354090087 nm**2
 
     """
 
@@ -80,7 +84,7 @@ class SquareRadiusOfGyration(openmm.CustomBondForce, AbstractCollectiveVariable)
         self.setUsesPeriodicBoundaryConditions(False)
         for i, j in itertools.combinations(atoms, 2):
             self.addBond(i, j)
-        self.setUnit(unit.nanometers)
+        self.setUnit(unit.nanometers**2)
 
 
 class RadiusOfGyration(openmm.CustomCVForce, AbstractCollectiveVariable):
@@ -95,24 +99,28 @@ class RadiusOfGyration(openmm.CustomCVForce, AbstractCollectiveVariable):
 
     Parameters
     ----------
-        group : list(int)
+        atoms
             The indices of the atoms in the group.
 
     Example
     -------
         >>> import openmm
         >>> import cvlib
+        >>> from openmm import unit
         >>> from openmmtools import testsystems
         >>> model = testsystems.AlanineDipeptideVacuum()
-        >>> Rg = cvlib.RadiusOfGyration(range(model.system.getNumParticles()))
-        >>> Rg.setForceGroup(1)
+        >>> num_atoms = model.system.getNumParticles()
+        >>> atoms = list(range(num_atoms))
+        >>> Rg = cvlib.RadiusOfGyration(atoms)
         >>> model.system.addForce(Rg)
         5
         >>> platform = openmm.Platform.getPlatformByName('Reference')
         >>> context = openmm.Context(model.system, openmm.CustomIntegrator(0), platform)
         >>> context.setPositions(model.positions)
-        >>> RgValue = Rg.evaluate(context)
-        >>> print(RgValue)
+        >>> print(Rg.evaluate(context))
+        0.295143056060787 nm
+        >>> r = model.positions[atoms, :]
+        >>> print(unit.sqrt(((r - r.mean(axis=0))**2).sum()/num_atoms))
         0.295143056060787 nm
 
     """

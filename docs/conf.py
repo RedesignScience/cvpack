@@ -55,7 +55,7 @@ extensions = [
 
 autosummary_generate = True
 napoleon_google_docstring = False
-napoleon_use_param = False
+napoleon_use_param = True
 napoleon_use_ivar = True
 
 # Add any paths that contain templates here, relative to this directory.
@@ -171,5 +171,6 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
-
 # -- Extension configuration -------------------------------------------------
+autodoc_typehints = 'both'
+autodoc_typehints_description_target = 'documented'

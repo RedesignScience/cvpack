@@ -6,7 +6,8 @@ dependencies:
   - python
   - pip
   - openmm
+  - sphinx
+  - sphinxcontrib-bibtex
 
     # Pip-only installs
-  #- pip:
-
+  # - pip:
