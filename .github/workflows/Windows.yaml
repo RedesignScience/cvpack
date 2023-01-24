@@ -55,7 +55,7 @@ jobs:
         # conda setup requires this special shell
         shell: bash -l {0}
         run: |
-          pytest -v --cov=cvlib --cov-report=xml --color=yes cvlib/tests/
+          pytest -v --cov=cvlib --cov-report=xml --color=yes --doctest-modules cvlib/tests/
 
       - name: CodeCov
         uses: codecov/codecov-action@v1

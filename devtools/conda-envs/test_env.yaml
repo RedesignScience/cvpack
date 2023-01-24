@@ -6,6 +6,7 @@ dependencies:
   - python
   - pip
   - openmm
+  - openmmtools
 
     # Testing
   - pytest
