@@ -1,43 +1,48 @@
 """
 .. module:: cvlib
-   :platform: Unix, Windows
+   :platform: Unix, MacOS, Windows
    :synopsis: Useful Collective Variables for OpenMM
 
 .. moduleauthor:: Charlles Abreu <craabreu@gmail.com>
 
-.. _Context: http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html
-.. _CustomCVForce: http://docs.openmm.org/latest/api-python/generated/openmm.openmm.CustomCVForce.html
-.. _CustomIntegrator: http://docs.openmm.org/latest/api-python/generated/openmm.openmm.CustomIntegrator.html
-.. _Force: http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Force.html
-.. _NonbondedForce: http://docs.openmm.org/latest/api-python/generated/openmm.openmm.NonbondedForce.html
-.. _System: http://docs.openmm.org/latest/api-python/generated/openmm.openmm.System.html
-.. _coordination: https://www.plumed.org/doc-v2.6/user-doc/html/_c_o_o_r_d_i_n_a_t_i_o_n.html
-.. _PLUMED: https://www.plumed.org
-
 """
 
-import re
 import itertools
-import math
 import openmm
 
 from openmm import unit
+from typing import List
 
 
-def _in_md_units(quantity):
+def _in_md_units(quantity: unit.Quantity) -> float:
     """
     Returns the numerical value of a quantity in a unit of measurement compatible with the
     Molecular Dynamics unit system (mass in Da, distance in nm, time in ps, temperature in K,
     energy in kJ/mol, angle in rad).
 
     """
-    if unit.is_quantity(quantity):
-        return quantity.value_in_unit_system(unit.md_unit_system)
-    else:
-        return quantity
+    return quantity.value_in_unit_system(unit.md_unit_system)
 
 
-class SquareRadiusOfGyration(openmm.CustomBondForce):
+class AbstractCollectiveVariable(openmm.Force):
+    def setUnit(self, unit: unit.Unit):
+        self._unit = unit
+
+    def getUnit(self) -> unit.Unit:
+        return self._unit
+
+    def evaluate(self, context: openmm.Context) -> unit.Quantity:
+        forces = context.getSystem().getForces()
+        free_groups = set(range(32)) - set(f.getForceGroup() for f in forces)
+        old_group = self.getForceGroup()
+        new_group = next(iter(free_groups))
+        self.setForceGroup(new_group)
+        state = context.getState(getEnergy=True, groups={new_group})
+        self.setForceGroup(old_group)
+        return _in_md_units(state.getPotentialEnergy())*self.getUnit()
+
+
+class SquareRadiusOfGyration(openmm.CustomBondForce, AbstractCollectiveVariable):
     """
     The square of the radius of gyration of a group of atoms, defined as:
 
@@ -49,35 +54,36 @@ class SquareRadiusOfGyration(openmm.CustomBondForce):
 
     Parameters
     ----------
-        group : list(int)
+        atoms : List[int]
             The indices of the atoms in the group.
 
     Example
     -------
         >>> import openmm
-        >>> import ufedmm
-        >>> from ufedmm import cvlib
-        >>> model = ufedmm.AlanineDipeptideModel()
+        >>> import cvlib
+        >>> from openmmtools import testsystems
+        >>> model = testsystems.AlanineDipeptideVacuum()
         >>> RgSq = cvlib.SquareRadiusOfGyration(range(model.system.getNumParticles()))
-        >>> RgSq.setForceGroup(1)
         >>> model.system.addForce(RgSq)
-        4
+        5
         >>> platform = openmm.Platform.getPlatformByName('Reference')
         >>> context = openmm.Context(model.system, openmm.CustomIntegrator(0), platform)
         >>> context.setPositions(model.positions)
-        >>> context.getState(getEnergy=True, groups={1}).getPotentialEnergy()._value
-        0.08711416289256209
+        >>> RgSqValue = RgSq.evaluate(context)
+        >>> print(RgSqValue)
+        0.08710942354090084 nm
 
     """
 
-    def __init__(self, group):
-        super().__init__(f'r^2/{len(group)**2}')
+    def __init__(self, atoms: List[int]):
+        super().__init__(f'r^2/{len(atoms)**2}')
         self.setUsesPeriodicBoundaryConditions(False)
-        for i, j in itertools.combinations(group, 2):
+        for i, j in itertools.combinations(atoms, 2):
             self.addBond(i, j)
+        self.setUnit(unit.nanometers)
 
 
-class RadiusOfGyration(openmm.CustomCVForce):
+class RadiusOfGyration(openmm.CustomCVForce, AbstractCollectiveVariable):
     """
     The radius of gyration of a group of atoms, defined as:
 
@@ -95,25 +101,27 @@ class RadiusOfGyration(openmm.CustomCVForce):
     Example
     -------
         >>> import openmm
-        >>> import ufedmm
-        >>> from ufedmm import cvlib
-        >>> model = ufedmm.AlanineDipeptideModel()
+        >>> import cvlib
+        >>> from openmmtools import testsystems
+        >>> model = testsystems.AlanineDipeptideVacuum()
         >>> Rg = cvlib.RadiusOfGyration(range(model.system.getNumParticles()))
         >>> Rg.setForceGroup(1)
         >>> model.system.addForce(Rg)
-        4
+        5
         >>> platform = openmm.Platform.getPlatformByName('Reference')
         >>> context = openmm.Context(model.system, openmm.CustomIntegrator(0), platform)
         >>> context.setPositions(model.positions)
-        >>> context.getState(getEnergy=True, groups={1}).getPotentialEnergy()._value
-        0.2951510848575048
+        >>> RgValue = Rg.evaluate(context)
+        >>> print(RgValue)
+        0.295143056060787 nm
 
     """
 
-    def __init__(self, group):
+    def __init__(self, atoms: List[int]):
         RgSq = openmm.CustomBondForce('r^2')
         RgSq.setUsesPeriodicBoundaryConditions(False)
-        for i, j in itertools.combinations(group, 2):
+        for i, j in itertools.combinations(atoms, 2):
             RgSq.addBond(i, j)
-        super().__init__(f'sqrt(RgSq)/{len(group)}')
+        super().__init__(f'sqrt(RgSq)/{len(atoms)}')
         self.addCollectiveVariable('RgSq', RgSq)
+        self.setUnit(unit.nanometers)
