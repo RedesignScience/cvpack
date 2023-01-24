@@ -1,4 +1,4 @@
-name: CI
+name: Linux
 
 on:
   # GitHub has started calling new repo's first branch "main" https://github.com/github/renaming
@@ -21,7 +21,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macOS-latest, ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
         python-version: [3.8, 3.9, "3.10"]
 
     steps:
