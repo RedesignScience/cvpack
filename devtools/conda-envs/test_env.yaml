@@ -1,13 +1,11 @@
 name: test
 channels:
-
   - conda-forge
-
-  - defaults
 dependencies:
     # Base depends
   - python
   - pip
+  - openmm
 
     # Testing
   - pytest
@@ -17,4 +15,3 @@ dependencies:
     # Pip-only installs
   #- pip:
   #  - codecov
-
