@@ -4,6 +4,7 @@ Collective Variable Library
 [![GitHub Actions Build Status](https://github.com/craabreu/cvlib/workflows/Linux/badge.svg)](https://github.com/craabreu/cvlib/actions?query=workflow%3ALinux)
 [![GitHub Actions Build Status](https://github.com/craabreu/cvlib/workflows/MacOS/badge.svg)](https://github.com/craabreu/cvlib/actions?query=workflow%3AMacOS)
 [![GitHub Actions Build Status](https://github.com/craabreu/cvlib/workflows/Windows/badge.svg)](https://github.com/craabreu/cvlib/actions?query=workflow%3AWindows)
+[![GitHub Super-Linter](https://github.com/craabreu/cvlib/workflows/Linter/badge.svg)](https://github.com/marketplace/actions/super-linter)
 [![codecov](https://codecov.io/gh/craabreu/cvlib/branch/main/graph/badge.svg)](https://codecov.io/gh/craabreu/cvlib/branch/main)
 [![Documentation Status](https://readthedocs.org/projects/cvlib-for-openmm/badge/?style=flat)](https://readthedocs.org/projects/cvlib-for-openmm)
 

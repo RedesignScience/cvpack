@@ -1,0 +1,8 @@
+[MAIN]
+
+ignored-modules=openmm.unit
+ignore=_version.py
+
+[BASIC]
+
+method-naming-style=camelCase
