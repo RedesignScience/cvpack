@@ -1,0 +1,14 @@
+name: linter
+channels:
+  - conda-forge
+dependencies:
+    # Base depends
+  - python
+  - openmm
+  - openmmtools
+
+    # Linting
+  - flake8
+  - black
+  - isort
+  - pylint
