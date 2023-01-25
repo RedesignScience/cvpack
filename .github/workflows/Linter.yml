@@ -12,7 +12,7 @@ on:
 
 jobs:
   linter:
-    name: Linter Code Base
+    name: Linter
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -46,8 +46,16 @@ jobs:
           micromamba list
 
       - name: Run flake8
-        uses: suo/flake8-github-action@releases/v1
-        with:
-          checkName: 'linter'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash -l {0}
+        run: |
+          flake8
+
+      - name: Run black
+        shell: bash -l {0}
+        run: |
+          black --check --diff --color cvlib/
+
+      - name: Run isort
+        shell: bash -l {0}
+        run: |
+          isort --check-only cvlib/
