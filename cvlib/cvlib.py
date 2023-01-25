@@ -41,7 +41,7 @@ class AbstractCollectiveVariable:
         Gets the unit of measurement this collective variable.
 
         """
-        return self._unit if hasattr(self, '_unit') else unit.dimensionless
+        return self._unit if hasattr(self, "_unit") else unit.dimensionless
 
     def evaluateInContext(self, context: openmm.Context) -> unit.Quantity:
         """
@@ -64,7 +64,7 @@ class AbstractCollectiveVariable:
         self.setForceGroup(new_group)
         state = context.getState(getEnergy=True, groups={new_group})
         self.setForceGroup(old_group)
-        return _in_md_units(state.getPotentialEnergy())*self.getUnit()
+        return _in_md_units(state.getPotentialEnergy()) * self.getUnit()
 
 
 class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):
@@ -111,11 +111,13 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
     def __init__(self, atoms: List[int]):
         num_atoms = len(atoms)
         num_groups = num_atoms + 1
-        rgSq = '+'.join([f'distance(g{i+1}, g{num_groups})^2' for i in range(num_atoms)])
-        super().__init__(num_groups, f'sqrt(({rgSq})/{num_atoms})')
+        rgSq = "+".join(
+            [f"distance(g{i+1}, g{num_groups})^2" for i in range(num_atoms)]
+        )
+        super().__init__(num_groups, f"sqrt(({rgSq})/{num_atoms})")
         for atom in atoms:
             self.addGroup([atom], [1])
-        self.addGroup(atoms, [1]*num_atoms)
+        self.addGroup(atoms, [1] * num_atoms)
         self.addBond(list(range(num_groups)), [])
         self.setUsesPeriodicBoundaryConditions(False)
         self.setUnit(unit.nanometers)
