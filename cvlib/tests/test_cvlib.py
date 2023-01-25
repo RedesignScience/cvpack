@@ -56,17 +56,12 @@ def test_radius_of_gyration():
         RgSqVal += dr.x**2 + dr.y**2 + dr.z**2
     RgSqVal /= N
 
-    RgSq = cvlib.SquareRadiusOfGyration(range(topology._numAtoms))
-    RgSq.setForceGroup(1)
-    system.addForce(RgSq)
     Rg = cvlib.RadiusOfGyration(range(topology._numAtoms))
-    Rg.setForceGroup(2)
+    Rg.setForceGroup(1)
     system.addForce(Rg)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName('Reference')
     context = openmm.Context(system, integrator, platform)
     context.setPositions(positions)
-    RgSq = context.getState(getEnergy=True, groups={1}).getPotentialEnergy()._value
-    assert RgSq == pytest.approx(RgSqVal)
-    Rg = context.getState(getEnergy=True, groups={2}).getPotentialEnergy()._value
+    Rg = context.getState(getEnergy=True, groups={1}).getPotentialEnergy()._value
     assert Rg*Rg == pytest.approx(RgSqVal)

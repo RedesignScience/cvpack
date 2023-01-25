@@ -5,7 +5,6 @@ Python API
     :titlesonly:
 
     RadiusOfGyration
-    SquareRadiusOfGyration
 
 .. testsetup::
 

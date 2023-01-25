@@ -29,6 +29,11 @@ class AbstractCollectiveVariable:
         """
         Sets the unit of measurement this collective variable.
 
+        Parameters
+        ----------
+            unit
+                The unit of measurement of this collective variable
+
         """
         self._unit = unit
 
@@ -46,11 +51,11 @@ class AbstractCollectiveVariable:
         Parameters
         ----------
             context
-                A context for which to evaluate this collective variable.
+                A context for which to evaluate this collective variable
 
         Returns
         -------
-            The value of this collective variable in the given context.
+            The value of this collective variable in the given context
 
         """
         forces = context.getSystem().getForces()
@@ -63,65 +68,23 @@ class AbstractCollectiveVariable:
         return _in_md_units(state.getPotentialEnergy())*self.getUnit()
 
 
-class SquareRadiusOfGyration(AbstractCollectiveVariable, openmm.CustomBondForce):
-    """
-    The square of the radius of gyration of a group of atoms, defined as:
-
-    .. math::
-        R_g^2 = \\frac{1}{n^2} \\sum_i \\sum_{j>i} r_{i,j}^2,
-
-    where :math:`n` is the number of atoms in the group and :math:`r_{i,j}` is the distance between
-    atoms `i` and `j`.
-
-    Parameters
-    ----------
-        atoms
-            The indices of the atoms in the group.
-
-    Example
-    -------
-        >>> import openmm
-        >>> import cvlib
-        >>> from openmmtools import testsystems
-        >>> model = testsystems.AlanineDipeptideVacuum()
-        >>> num_atoms = model.system.getNumParticles()
-        >>> atoms = list(range(num_atoms))
-        >>> RgSq = cvlib.SquareRadiusOfGyration(atoms)
-        >>> model.system.addForce(RgSq)
-        5
-        >>> platform = openmm.Platform.getPlatformByName('Reference')
-        >>> context = openmm.Context(model.system, openmm.CustomIntegrator(0), platform)
-        >>> context.setPositions(model.positions)
-        >>> print(RgSq.evaluate(context))
-        0.08710942354090084 nm**2
-        >>> r = model.positions[atoms, :]
-        >>> print(((r - r.mean(axis=0))**2).sum()/num_atoms)
-        0.08710942354090087 nm**2
-
-    """
-
-    def __init__(self, atoms: List[int]):
-        super().__init__(f'r^2/{len(atoms)**2}')
-        self.setUsesPeriodicBoundaryConditions(False)
-        for i, j in itertools.combinations(atoms, 2):
-            self.addBond(i, j)
-        self.setUnit(unit.nanometers**2)
-
-
-class RadiusOfGyration(AbstractCollectiveVariable, openmm.CustomCVForce):
+class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):
     """
     The radius of gyration of a group of atoms, defined as:
 
     .. math::
-        R_g = \\frac{1}{n} \\sqrt{\\sum_i \\sum_{j>i} r_{i,j}^2},
+        R_g = \\sqrt{ \\frac{1}{n} \\sum_{i=1}^n \\|\\mathbf{r}_i - \\mathbf{r}_{\\rm mean}\\|^2 },
 
-    where :math:`n` is the number of atoms in the group and :math:`r_{i,j}` is the distance between
-    atoms `i` and `j`.
+    where :math:`n` is the number of atoms in the group, :math:`\\mathbf{r}_i` is the coordinate of
+    atom `i`, and :math:`\\mathbf{r}_{\\rm mean}` is the centroid of the group of atoms, that is,
+
+    .. math::
+        \\mathbf{r}_{\\rm mean} = \\frac{1}{n} \\sum_{i=1}^n \\mathbf{r}_i.
 
     Parameters
     ----------
         atoms
-            The indices of the atoms in the group.
+            The indices of the atoms in the group
 
     Example
     -------
@@ -147,10 +110,13 @@ class RadiusOfGyration(AbstractCollectiveVariable, openmm.CustomCVForce):
     """
 
     def __init__(self, atoms: List[int]):
-        RgSq = openmm.CustomBondForce('r^2')
-        RgSq.setUsesPeriodicBoundaryConditions(False)
-        for i, j in itertools.combinations(atoms, 2):
-            RgSq.addBond(i, j)
-        super().__init__(f'sqrt(RgSq)/{len(atoms)}')
-        self.addCollectiveVariable('RgSq', RgSq)
+        num_atoms = len(atoms)
+        num_groups = num_atoms + 1
+        rgSq = '+'.join([f'distance(g{i+1}, g{num_groups})^2' for i in range(num_atoms)])
+        super().__init__(num_groups, f'sqrt(({rgSq})/{num_atoms})')
+        for atom in atoms:
+            self.addGroup([atom], [1])
+        self.addGroup(atoms, [1]*num_atoms)
+        self.addBond(list(range(num_groups)), [])
+        self.setUsesPeriodicBoundaryConditions(False)
         self.setUnit(unit.nanometers)

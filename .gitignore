@@ -64,7 +64,6 @@ instance/
 
 # Sphinx documentation
 docs/_build/
-docs/autosummary/
 
 # PyBuilder
 target/
