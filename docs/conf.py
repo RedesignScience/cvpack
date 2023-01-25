@@ -38,10 +38,24 @@ def create_rst_file(cls):
         ])
 
 
-for item in cvlib.__dict__.values():
-    if isinstance(item, type) and item is not cvlib.AbstractCollectiveVariable:
-        create_rst_file(item)
-
+with open(f'api/index.rst', 'w') as f:
+    f.write(
+        'Python API\n'
+        '==========\n'
+        '\n'
+        '.. toctree::\n'
+        '    :titlesonly:\n\n'
+    )
+    for item in cvlib.__dict__.values():
+        if isinstance(item, type) and item is not cvlib.AbstractCollectiveVariable:
+            f.write(f'    {item.__name__}\n')
+            create_rst_file(item)
+    f.write(
+        '\n'
+        '.. testsetup::\n'
+        '\n'
+        '    from cvlib import *'
+    )
 
 # -- Project information -----------------------------------------------------
 
