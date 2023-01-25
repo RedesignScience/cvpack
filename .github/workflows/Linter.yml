@@ -23,6 +23,16 @@ jobs:
           # list of changed files within `super-linter`
           fetch-depth: 0
 
+      - name: Install dependencies
+        uses: mamba-org/provision-with-micromamba@main
+        with:
+          environment-file: devtools/conda-envs/test_env.yaml
+          environment-name: test
+          channels: conda-forge,defaults
+          extra-specs: |
+            python=3.10
+
+
       - name: Lint Code Base
         uses: github/super-linter@v4
         env:

@@ -7,28 +7,35 @@ import sys
 
 import openmm
 import pytest
+from openmm import unit
 from openmmtools import testsystems
 
 import cvlib
 
 
 def test_cvlib_imported():
-    """Sample test, will always pass so long as import statement worked."""
+    """
+    Sample test, will always pass so long as import statement worked.
+
+    """
     assert "cvlib" in sys.modules
 
 
 def test_radius_of_gyration():
-    model = testsystems.AlanineDipeptideVacuum()
-    r = model.positions._value
-    rmean = r.mean(axis=0)
-    rgsq = ((r - rmean) ** 2).sum() / model.system.getNumParticles()
+    """
+    Test whether the radius of gyration is computed correctly.
 
-    cv = cvlib.RadiusOfGyration(range(model.topology._numAtoms))
-    cv.setForceGroup(1)
-    model.system.addForce(cv)
+    """
+    model = testsystems.AlanineDipeptideVacuum()
+    positions = model.positions
+    centroid = positions.mean(axis=0)
+    rgsq = ((positions - centroid) ** 2).sum() / model.system.getNumParticles()
+    rg_cv = cvlib.RadiusOfGyration(range(model.system.getNumParticles()))
+    rg_cv.setForceGroup(1)
+    model.system.addForce(rg_cv)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
     context.setPositions(model.positions)
-    rg = context.getState(getEnergy=True, groups={1}).getPotentialEnergy()._value
-    assert rg * rg == pytest.approx(rgsq)
+    rgval = rg_cv.evaluateInContext(context).value_in_unit_system(unit.md_unit_system)
+    assert rgval ** 2 == pytest.approx(rgsq)

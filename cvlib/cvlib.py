@@ -101,17 +101,17 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         >>> model = testsystems.AlanineDipeptideVacuum()
         >>> num_atoms = model.system.getNumParticles()
         >>> atoms = list(range(num_atoms))
-        >>> rg = cvlib.RadiusOfGyration(atoms)
-        >>> model.system.addForce(rg)
+        >>> rg_cv = cvlib.RadiusOfGyration(atoms)
+        >>> model.system.addForce(rg_cv)
         5
         >>> platform = openmm.Platform.getPlatformByName('Reference')
         >>> context = openmm.Context(model.system, openmm.CustomIntegrator(0), platform)
         >>> context.setPositions(model.positions)
-        >>> print(rg.evaluateInContext(context))
+        >>> print(rg_cv.evaluateInContext(context))
         0.295143056060787 nm
-        >>> r = model.positions[atoms, :]
-        >>> rmean = r.mean(axis=0)
-        >>> print(unit.sqrt(((r - rmean) ** 2).sum() / num_atoms))
+        >>> positions = model.positions[atoms, :]
+        >>> centroid = positions.mean(axis=0)
+        >>> print(unit.sqrt(((positions - centroid) ** 2).sum() / num_atoms))
         0.295143056060787 nm
 
     """
