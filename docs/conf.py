@@ -20,11 +20,33 @@ sys.path.insert(0, os.path.abspath('..'))
 import cvlib
 
 
+def create_rst_file(cls):
+    name = cls.__name__
+    attributes = filter(lambda name: not name.startswith('_'), dir(cvlib.AbstractCollectiveVariable))
+    methods = [name for name in attributes if callable(getattr(cls, name))]
+    with open(f'api/{name}.rst', 'w') as f:
+        f.writelines([
+            f'{name}\n',
+            f'='*len(name)+'\n\n',
+            f'.. currentmodule:: cvlib\n',
+            f'.. autoclass:: {name}\n',
+            f'    :members:\n',
+            f'    :member-order: bysource\n\n',
+            f'    .. rubric:: Methods\n\n',
+        ] + [
+            f'    .. automethod:: {method}\n' for method in methods
+        ])
+
+
+for item in cvlib.__dict__.values():
+    if isinstance(item, type) and item is not cvlib.AbstractCollectiveVariable:
+        create_rst_file(item)
+
+
 # -- Project information -----------------------------------------------------
 
-project = 'Collective Variable Library'
-copyright = ("2023, Charlles Abreu. Project structure based on the "
-             "Computational Molecular Science Python Cookiecutter version 1.1")
+project = 'CV Library'
+copyright = ("2023, Charlles Abreu | CMS Cookiecutter v1.1")
 author = 'Charlles Abreu'
 
 # The short X.Y version
@@ -53,7 +75,7 @@ extensions = [
     'sphinx.ext.extlinks',
 ]
 
-autosummary_generate = True
+autosummary_generate = False
 napoleon_google_docstring = False
 napoleon_use_param = True
 napoleon_use_ivar = True
@@ -92,6 +114,24 @@ pygments_style = 'default'
 # a list of builtin themes.
 #
 html_theme = 'alabaster'
+html_static_path = ['_static']
+html_theme_options = {
+    # 'logo': 'logo_small.png',
+    # 'logo_name': True,
+    'github_button': False,
+    'github_user': 'craabreu',
+    'github_repo': 'cvlib',
+}
+html_sidebars = {
+   '**': ['about.html', 'globaltoc.html', 'searchbox.html'],
+}
+html_use_smartypants = True
+html_last_updated_fmt = '%b %d, %Y'
+html_split_index = False
+html_short_title = '%s-%s' % (project, version)
+
+def setup(app):
+    app.add_css_file('css/custom.css')
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -102,7 +142,7 @@ html_theme = 'alabaster'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+# html_static_path = ['_static']
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -172,5 +212,5 @@ texinfo_documents = [
 ]
 
 # -- Extension configuration -------------------------------------------------
-autodoc_typehints = 'both'
+autodoc_typehints = 'description'
 autodoc_typehints_description_target = 'documented'

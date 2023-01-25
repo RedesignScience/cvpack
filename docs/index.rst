@@ -1,17 +1,26 @@
-.. cvlib documentation master file, created by
-   sphinx-quickstart on Thu Mar 15 13:55:56 2018.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+===========================
+Collective Variable Library
+===========================
 
-Welcome to Collective Variable Library's documentation!
-=========================================================
+.. image:: https://badgen.net/badge/icon/github?icon=github&label
+   :target: https://github.com/craabreu/cvlib
+
+.. image:: https://img.shields.io/badge/License-MIT-green.svg
+   :target: https://github.com/craabreu/cvlib/blob/main/LICENSE.md
+
+.. raw:: html
+
+   <a class="github-button" href="https://github.com/craabreu/cvlib" data-show-count="true" aria-label="Star craabreu/cvlib on GitHub">Star</a>
+
+
+Contents
+========
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
    getting_started
-   api
+   api/index
 
 
 
@@ -21,3 +30,7 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+.. raw:: html
+
+   <script async defer src="https://buttons.github.io/buttons.js"></script>

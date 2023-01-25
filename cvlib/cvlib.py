@@ -24,14 +24,35 @@ def _in_md_units(quantity: unit.Quantity) -> float:
     return quantity.value_in_unit_system(unit.md_unit_system)
 
 
-class AbstractCollectiveVariable(openmm.Force):
+class AbstractCollectiveVariable:
     def setUnit(self, unit: unit.Unit):
+        """
+        Sets the unit of measurement this collective variable.
+
+        """
         self._unit = unit
 
     def getUnit(self) -> unit.Unit:
+        """
+        Gets the unit of measurement this collective variable.
+
+        """
         return self._unit
 
     def evaluate(self, context: openmm.Context) -> unit.Quantity:
+        """
+        Evaluates this collective variable for a given context.
+
+        Parameters
+        ----------
+            context
+                A context for which to evaluate this collective variable.
+
+        Returns
+        -------
+            The value of this collective variable in the given context.
+
+        """
         forces = context.getSystem().getForces()
         free_groups = set(range(32)) - set(f.getForceGroup() for f in forces)
         old_group = self.getForceGroup()
@@ -42,7 +63,7 @@ class AbstractCollectiveVariable(openmm.Force):
         return _in_md_units(state.getPotentialEnergy())*self.getUnit()
 
 
-class SquareRadiusOfGyration(openmm.CustomBondForce, AbstractCollectiveVariable):
+class SquareRadiusOfGyration(AbstractCollectiveVariable, openmm.CustomBondForce):
     """
     The square of the radius of gyration of a group of atoms, defined as:
 
@@ -87,7 +108,7 @@ class SquareRadiusOfGyration(openmm.CustomBondForce, AbstractCollectiveVariable)
         self.setUnit(unit.nanometers**2)
 
 
-class RadiusOfGyration(openmm.CustomCVForce, AbstractCollectiveVariable):
+class RadiusOfGyration(AbstractCollectiveVariable, openmm.CustomCVForce):
     """
     The radius of gyration of a group of atoms, defined as:
 
