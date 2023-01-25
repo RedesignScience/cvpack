@@ -1,0 +1,7 @@
+[MAIN]
+
+ignored-modules=openmm.unit
+
+[BASIC]
+
+method-naming-style=camelCase

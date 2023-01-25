@@ -23,8 +23,15 @@ def _in_md_units(quantity: unit.Quantity) -> float:
     return quantity.value_in_unit_system(unit.md_unit_system)
 
 
-class AbstractCollectiveVariable:
-    def setUnit(self, unit: unit.Unit):
+class AbstractCollectiveVariable(openmm.Force):
+    """
+    Docstring.
+
+    """
+
+    _unit = unit.dimensionless
+
+    def setUnit(self, cv_unit: unit.Unit):
         """
         Sets the unit of measurement this collective variable.
 
@@ -34,14 +41,14 @@ class AbstractCollectiveVariable:
                 The unit of measurement of this collective variable
 
         """
-        self._unit = unit
+        self._unit = cv_unit
 
     def getUnit(self) -> unit.Unit:
         """
         Gets the unit of measurement this collective variable.
 
         """
-        return self._unit if hasattr(self, "_unit") else unit.dimensionless
+        return self._unit
 
     def evaluateInContext(self, context: openmm.Context) -> unit.Quantity:
         """
@@ -94,16 +101,17 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         >>> model = testsystems.AlanineDipeptideVacuum()
         >>> num_atoms = model.system.getNumParticles()
         >>> atoms = list(range(num_atoms))
-        >>> Rg = cvlib.RadiusOfGyration(atoms)
-        >>> model.system.addForce(Rg)
+        >>> rg = cvlib.RadiusOfGyration(atoms)
+        >>> model.system.addForce(rg)
         5
         >>> platform = openmm.Platform.getPlatformByName('Reference')
         >>> context = openmm.Context(model.system, openmm.CustomIntegrator(0), platform)
         >>> context.setPositions(model.positions)
-        >>> print(Rg.evaluateInContext(context))
+        >>> print(rg.evaluateInContext(context))
         0.295143056060787 nm
         >>> r = model.positions[atoms, :]
-        >>> print(unit.sqrt(((r - r.mean(axis=0))**2).sum()/num_atoms))
+        >>> rmean = r.mean(axis=0)
+        >>> print(unit.sqrt(((r - rmean) ** 2).sum() / num_atoms))
         0.295143056060787 nm
 
     """
@@ -111,10 +119,10 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
     def __init__(self, atoms: List[int]):
         num_atoms = len(atoms)
         num_groups = num_atoms + 1
-        rgSq = "+".join(
+        rgsq = "+".join(
             [f"distance(g{i+1}, g{num_groups})^2" for i in range(num_atoms)]
         )
-        super().__init__(num_groups, f"sqrt(({rgSq})/{num_atoms})")
+        super().__init__(num_groups, f"sqrt(({rgsq})/{num_atoms})")
         for atom in atoms:
             self.addGroup([atom], [1])
         self.addGroup(atoms, [1] * num_atoms)
