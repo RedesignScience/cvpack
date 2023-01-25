@@ -7,11 +7,10 @@
 
 """
 
-import itertools
-import openmm
-
-from openmm import app, unit
 from typing import List
+
+import openmm
+from openmm import unit
 
 
 def _in_md_units(quantity: unit.Quantity) -> float:
@@ -42,9 +41,9 @@ class AbstractCollectiveVariable:
         Gets the unit of measurement this collective variable.
 
         """
-        return self._unit
+        return self._unit if hasattr(self, '_unit') else unit.dimensionless
 
-    def evaluate(self, context: openmm.Context) -> unit.Quantity:
+    def evaluateInContext(self, context: openmm.Context) -> unit.Quantity:
         """
         Evaluates this collective variable for a given context.
 
@@ -101,7 +100,7 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         >>> platform = openmm.Platform.getPlatformByName('Reference')
         >>> context = openmm.Context(model.system, openmm.CustomIntegrator(0), platform)
         >>> context.setPositions(model.positions)
-        >>> print(Rg.evaluate(context))
+        >>> print(Rg.evaluateInContext(context))
         0.295143056060787 nm
         >>> r = model.positions[atoms, :]
         >>> print(unit.sqrt(((r - r.mean(axis=0))**2).sum()/num_atoms))

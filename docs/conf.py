@@ -12,12 +12,13 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
-# Incase the project was not installed
 import os
 import sys
-sys.path.insert(0, os.path.abspath('..'))
 
+# Incase the project was not installed
 import cvlib
+
+sys.path.insert(0, os.path.abspath('..'))
 
 
 def create_rst_file(cls):
@@ -26,19 +27,19 @@ def create_rst_file(cls):
     methods = [name for name in attributes if callable(getattr(cls, name))]
     with open(f'api/{name}.rst', 'w') as f:
         f.writelines([
-            f'{name}\n',
-            f'='*len(name)+'\n\n',
-            f'.. currentmodule:: cvlib\n',
-            f'.. autoclass:: {name}\n',
-            f'    :members:\n',
-            f'    :member-order: bysource\n\n',
-            f'    .. rubric:: Methods\n\n',
+            f'{name}\n'
+            '='*len(name)+'\n\n'
+            '.. currentmodule:: cvlib\n'
+            '.. autoclass:: {name}\n'
+            '    :members:\n'
+            '    :member-order: bysource\n\n'
+            '    .. rubric:: Methods\n\n'
         ] + [
             f'    .. automethod:: {method}\n' for method in methods
         ])
 
 
-with open(f'api/index.rst', 'w') as f:
+with open('api/index.rst', 'w') as f:
     f.write(
         'Python API\n'
         '==========\n'
@@ -142,8 +143,10 @@ html_last_updated_fmt = '%b %d, %Y'
 html_split_index = False
 html_short_title = '%s-%s' % (project, version)
 
+
 def setup(app):
     app.add_css_file('css/custom.css')
+
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
