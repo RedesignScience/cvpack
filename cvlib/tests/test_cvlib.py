@@ -27,15 +27,14 @@ def test_radius_of_gyration():
 
     """
     model = testsystems.AlanineDipeptideVacuum()
-    positions = model.positions
+    positions = model.positions.value_in_unit(unit.nanometers)
     centroid = positions.mean(axis=0)
     rgsq = ((positions - centroid) ** 2).sum() / model.system.getNumParticles()
     rg_cv = cvlib.RadiusOfGyration(range(model.system.getNumParticles()))
-    rg_cv.setForceGroup(1)
     model.system.addForce(rg_cv)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
     context.setPositions(model.positions)
-    rgval = rg_cv.evaluateInContext(context).value_in_unit_system(unit.md_unit_system)
-    assert rgval ** 2 == pytest.approx(rgsq)
+    rgval = rg_cv.evaluateInContext(context).value_in_unit(unit.nanometers)
+    assert rgval**2 == pytest.approx(rgsq)

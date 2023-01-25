@@ -32,7 +32,6 @@ jobs:
           extra-specs: |
             python=3.10
 
-
       - name: Lint Code Base
         uses: github/super-linter@v4
         env:
