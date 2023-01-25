@@ -21,7 +21,7 @@ Contents
 
    getting_started
    api/index
-
+   references
 
 
 Indices and tables

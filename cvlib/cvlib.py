@@ -10,7 +10,7 @@
 import itertools
 import openmm
 
-from openmm import unit
+from openmm import app, unit
 from typing import List
 
 

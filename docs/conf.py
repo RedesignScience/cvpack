@@ -42,8 +42,7 @@ with open(f'api/index.rst', 'w') as f:
     f.write(
         'Python API\n'
         '==========\n'
-        '\n'
-        '.. toctree::\n'
+        '\n.. toctree::\n'
         '    :titlesonly:\n\n'
     )
     for item in cvlib.__dict__.values():
@@ -51,10 +50,8 @@ with open(f'api/index.rst', 'w') as f:
             f.write(f'    {item.__name__}\n')
             create_rst_file(item)
     f.write(
-        '\n'
-        '.. testsetup::\n'
-        '\n'
-        '    from cvlib import *'
+        '\n.. testsetup::\n'
+        '\n    from cvlib import *'
     )
 
 # -- Project information -----------------------------------------------------
@@ -87,6 +84,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.intersphinx',
     'sphinx.ext.extlinks',
+    'sphinxcontrib.bibtex',
 ]
 
 autosummary_generate = False
@@ -228,3 +226,10 @@ texinfo_documents = [
 # -- Extension configuration -------------------------------------------------
 autodoc_typehints = 'description'
 autodoc_typehints_description_target = 'documented'
+
+# Bibliography file
+bibtex_bibfiles = ['refs.bib']
+
+# External links
+extlinks = {'OpenMM': ('http://docs.openmm.org/latest/api-python/generated/openmm.openmm.%s.html',
+                       'openmm.%s')}
