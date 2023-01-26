@@ -52,7 +52,7 @@ class AbstractCollectiveVariable(openmm.Force):
 
     def setUnit(self, unit: mmunit.Unit) -> None:
         """
-        Set the unit of measurement this collective variable.
+        Set the unit of measurement of this collective variable.
 
         Parameters
         ----------
@@ -64,14 +64,14 @@ class AbstractCollectiveVariable(openmm.Force):
 
     def getUnit(self) -> mmunit.Unit:
         """
-        Get the unit of measurement this collective variable.
+        Get the unit of measurement of this collective variable.
 
         """
         return self._unit
 
     def evaluateInContext(self, context: openmm.Context) -> mmunit.Quantity:
         """
-        Evaluate this collective variable at a given context.
+        Evaluate this collective variable at a given :OpenMM:`Context`.
 
         Parameters
         ----------
@@ -88,7 +88,7 @@ class AbstractCollectiveVariable(openmm.Force):
 
     def effectiveMassInContext(self, context: openmm.Context) -> mmunit.Quantity:
         """
-        Compute the effective mass of this collective variable at a given context.
+        Compute the effective mass of this collective variable at a given :OpenMM:`Context`.
 
         The effective mass of a collective variable :math:`q(\\mathbf{r})` is defined as
         :cite:`Chipot_2007`:
