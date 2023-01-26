@@ -148,6 +148,7 @@ class Distance(openmm.CustomBondForce, AbstractCollectiveVariable):
         1.7320508075688772 nm
 
     """
+
     def __init__(self, atom1: int, atom2: int) -> None:
         super().__init__("r")
         self.addBond(atom1, atom2, [])
@@ -186,6 +187,7 @@ class Angle(openmm.CustomAngleForce, AbstractCollectiveVariable):
         1.5707963267948966 rad
 
     """
+
     def __init__(self, atom1: int, atom2: int, atom3: int) -> None:
         super().__init__("theta")
         self.addAngle(atom1, atom2, atom3, [])
@@ -226,6 +228,7 @@ class Torsion(openmm.CustomTorsionForce, AbstractCollectiveVariable):
         1.5707963267948966 rad
 
     """
+
     def __init__(self, atom1: int, atom2: int, atom3: int, atom4: int) -> None:
         super().__init__("theta")
         self.addTorsion(atom1, atom2, atom3, atom4, [])
