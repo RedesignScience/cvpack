@@ -45,17 +45,9 @@ jobs:
           python -m pip install . --no-deps
           micromamba list
 
-      - name: Run flake8
+      - name: Lint Code Base
         shell: bash -l {0}
-        run: |
-          flake8
-
-      - name: Run black
-        shell: bash -l {0}
-        run: |
-          black --check --diff --color cvlib/
-
-      - name: Run isort
-        shell: bash -l {0}
-        run: |
-          isort --check-only cvlib/
+        run: flake8
+        run: black --check --diff --color cvlib/
+        run: isort --check-only cvlib/
+        run: pylint --rcfile=devtools/linters/pylintrc cvlib/
