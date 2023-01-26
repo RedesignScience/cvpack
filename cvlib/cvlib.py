@@ -156,6 +156,45 @@ class Distance(openmm.CustomBondForce, AbstractCollectiveVariable):
         self.setUnit(mmunit.nanometers)
 
 
+class Angle(openmm.CustomAngleForce, AbstractCollectiveVariable):
+    """
+    The angle formed by three atoms.
+
+    Parameters
+    ----------
+        atom1
+            The index of the first atom
+        atom2
+            The index of the second atom
+        atom3
+            The index of the third atom
+
+    Example:
+        >>> import cvlib
+        >>> import openmm as mm
+        >>> system = mm.System()
+        >>> list(map(system.addParticle, [1] * 3))
+        [0, 1, 2]
+        >>> angle = cvlib.Angle(0, 1, 2)
+        >>> system.addForce(angle)
+        0
+        >>> integrator = mm.CustomIntegrator(0)
+        >>> platform = mm.Platform.getPlatformByName('Reference')
+        >>> context = mm.Context(system, integrator, platform)
+        >>> positions = [[0, 0, 0], [1, 0, 0], [1, 1, 0]]
+        >>> context.setPositions([mm.Vec3(*pos) for pos in positions])
+        >>> print(angle.evaluateInContext(context))
+        1.5707963267948966 rad
+
+    """
+
+    def __init__(self, atom1: int, atom2: int, atom3: int) -> None:
+        super().__init__("theta")
+        self.addAngle(atom1, atom2, atom3, [])
+        self.setName("Angle")
+        self.setUnit(mmunit.radians)
+
+
 class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):
     """
     The radius of gyration of a group of atoms, defined as:
