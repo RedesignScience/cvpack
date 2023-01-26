@@ -21,6 +21,23 @@ def test_cvlib_imported():
     assert "cvlib" in sys.modules
 
 
+def test_effective_mass():
+    """
+    Test effective mass evaluation at a given context.
+
+    """
+    model = testsystems.AlanineDipeptideVacuum()
+    rg_cv = cvlib.RadiusOfGyration(range(model.system.getNumParticles()))
+    model.system.addForce(rg_cv)
+    integrator = openmm.CustomIntegrator(0)
+    platform = openmm.Platform.getPlatformByName("Reference")
+    context = openmm.Context(model.system, integrator, platform)
+    context.setPositions(model.positions)
+    effective_mass = rg_cv.effectiveMassInContext(context)
+    print(effective_mass)
+    # assert rgval**2 == pytest.approx(rgsq)
+
+
 def test_radius_of_gyration():
     """
     Test whether the radius of gyration is computed correctly.

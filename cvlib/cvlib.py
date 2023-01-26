@@ -1,6 +1,6 @@
 """
 .. module:: cvlib
-   :platform: Unix, MacOS, Windows
+   :platform: Linux, MacOS, Windows
    :synopsis: Useful Collective Variables for OpenMM
 
 .. moduleauthor:: Charlles Abreu <craabreu@gmail.com>
@@ -9,6 +9,7 @@
 
 from typing import List
 
+import numpy as np
 import openmm
 from openmm import unit
 
@@ -25,43 +26,18 @@ def _in_md_units(quantity: unit.Quantity) -> float:
 
 class AbstractCollectiveVariable(openmm.Force):
     """
-    Docstring.
+    An abstract class with common attributes and method for all CVs.
 
     """
 
     _unit = unit.dimensionless
 
-    def setUnit(self, cv_unit: unit.Unit):
+    def _getSingleForceState(
+        self, context: openmm.Context, getEnergy: bool = False, getForces: bool = False
+    ) -> openmm.State:
         """
-        Sets the unit of measurement this collective variable.
-
-        Parameters
-        ----------
-            unit
-                The unit of measurement of this collective variable
-
-        """
-        self._unit = cv_unit
-
-    def getUnit(self) -> unit.Unit:
-        """
-        Gets the unit of measurement this collective variable.
-
-        """
-        return self._unit
-
-    def evaluateInContext(self, context: openmm.Context) -> unit.Quantity:
-        """
-        Evaluates this collective variable for a given context.
-
-        Parameters
-        ----------
-            context
-                A context for which to evaluate this collective variable
-
-        Returns
-        -------
-            The value of this collective variable in the given context
+        Get an OpenMM State containing the potential energy and/or force values computed from this
+        single force object.
 
         """
         forces = context.getSystem().getForces()
@@ -69,9 +45,77 @@ class AbstractCollectiveVariable(openmm.Force):
         old_group = self.getForceGroup()
         new_group = next(iter(free_groups))
         self.setForceGroup(new_group)
-        state = context.getState(getEnergy=True, groups={new_group})
+        state = context.getState(
+            getEnergy=getEnergy, getForces=getForces, groups={new_group}
+        )
         self.setForceGroup(old_group)
+        return state
+
+    def setUnit(self, cvUnit: unit.Unit) -> None:
+        """
+        Set the unit of measurement this collective variable.
+
+        Parameters
+        ----------
+            cvUnit
+                The unit of measurement of this collective variable
+
+        """
+        self._unit = cvUnit
+
+    def getUnit(self) -> unit.Unit:
+        """
+        Get the unit of measurement this collective variable.
+
+        """
+        return self._unit
+
+    def evaluateInContext(self, context: openmm.Context) -> unit.Quantity:
+        """
+        Evaluate this collective variable at a given context.
+
+        Parameters
+        ----------
+            context
+                The context at which this collective variable should be evaluated
+
+        Returns
+        -------
+            The value of this collective variable at the given context
+
+        """
+        state = self._getSingleForceState(context, getEnergy=True)
         return _in_md_units(state.getPotentialEnergy()) * self.getUnit()
+
+    def effectiveMassInContext(self, context: openmm.Context) -> unit.Quantity:
+        """
+        Compute the effective mass of this collective variable at a given context.
+
+        The effective mass of a collective variable :math:`q(\\mathbf{r})` is defined as
+        :cite:`Chipot_2007`:
+
+        .. math::
+            m_\\mathrm{eff} = \\left(
+                \\sum_{j=1}^N \\frac{1}{m_j} \\left\\|\\frac{dq}{d\\mathbf{r}_j}\\right\\|^2
+            \\right)^{-1}
+
+        Parameters
+        ----------
+            context
+                The context at which this collective variable's effective mass should be evaluated
+
+        Returns
+        -------
+            The value of this collective variable's effective mass at the given context
+
+        """
+        state = self._getSingleForceState(context, getForces=True)
+        force_values = _in_md_units(state.getForces(asNumpy=True))
+        indices = np.arange(context.getSystem().getNumParticles())
+        masses_with_units = map(context.getSystem().getParticleMass, indices)
+        mass_values = np.array(list(map(_in_md_units, masses_with_units)))
+        effective_mass = 1.0 / np.sum(np.sum(force_values**2, axis=1) / mass_values)
+        return effective_mass * unit.dalton * (unit.nanometers / self.getUnit()) ** 2
 
 
 class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):

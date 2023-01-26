@@ -6,3 +6,4 @@ ignore=_version.py
 [BASIC]
 
 method-naming-style=camelCase
+argument-naming-style=camelCase
