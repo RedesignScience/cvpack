@@ -2,6 +2,8 @@
 Unit and regression test for the cvlib package.
 """
 
+import io
+
 # Import package, test suite, and other packages as needed
 import sys
 
@@ -38,14 +40,33 @@ def test_effective_mass():
     assert effective_mass / effective_mass.unit == pytest.approx(30.946932)
 
 
-def perform_common_tests(collectiveVariable: cvlib.AbstractCollectiveVariable) -> None:
+def perform_common_tests(
+    collectiveVariable: cvlib.AbstractCollectiveVariable, context: openmm.Context
+) -> None:
     """
     Function to be called in every individual cv test.
 
     """
+    # Default name must match the class name
     assert collectiveVariable.getName() == collectiveVariable.__class__.__name__
+
+    # Unit must conform to the default OpenMM system
     unity = 1 * collectiveVariable.getUnit()
     assert unity.value_in_unit_system(unit.md_unit_system) == 1
+
+    # Test serialization/deserialization
+    pipe = io.StringIO()
+    cvlib.serialization.serialize(collectiveVariable, pipe)
+    pipe.seek(0)
+    new_cv = cvlib.serialization.deserialize(pipe)
+    context.getSystem().addForce(new_cv)
+    context.reinitialize(preserveState=True)
+    value1 = collectiveVariable.evaluateInContext(context)
+    value2 = new_cv.evaluateInContext(context)
+    assert value1 / value1.unit == value2 / value2.unit
+    mass1 = collectiveVariable.effectiveMassInContext(context)
+    mass2 = new_cv.effectiveMassInContext(context)
+    assert mass1 / mass1.unit == mass2 / mass2.unit
 
 
 def test_distance():
@@ -56,7 +77,6 @@ def test_distance():
     model = testsystems.AlanineDipeptideVacuum()
     atom1, atom2 = 0, 5
     distance = cvlib.Distance(atom1, atom2)
-    perform_common_tests(distance)
     model.system.addForce(distance)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -65,6 +85,7 @@ def test_distance():
     value1 = distance.evaluateInContext(context).value_in_unit(distance.getUnit())
     value2 = np.sqrt(np.sum(((model.positions[atom1] - model.positions[atom2]) ** 2)))
     assert value1 == pytest.approx(value2)
+    perform_common_tests(distance, context)
 
 
 def test_angle():
@@ -75,7 +96,6 @@ def test_angle():
     model = testsystems.AlanineDipeptideVacuum()
     atoms = [0, 5, 10]
     angle = cvlib.Angle(*atoms)
-    perform_common_tests(angle)
     model.system.addForce(angle)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -89,6 +109,7 @@ def test_angle():
     denominator = np.linalg.norm(delta[0]) * np.linalg.norm(delta[1])
     value2 = np.arccos(numerator / denominator)
     assert value1 == pytest.approx(value2)
+    perform_common_tests(angle, context)
 
 
 def test_torsion():
@@ -99,7 +120,6 @@ def test_torsion():
     model = testsystems.AlanineDipeptideVacuum()
     atoms = [0, 5, 10, 15]
     torsion = cvlib.Torsion(*atoms)
-    perform_common_tests(torsion)
     model.system.addForce(torsion)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -116,6 +136,7 @@ def test_torsion():
     denominator = np.dot(np.cross(delta[0], delta[1]), np.cross(delta[1], delta[2]))
     value2 = np.arctan2(numerator, denominator)
     assert value1 == pytest.approx(value2)
+    perform_common_tests(torsion, context)
 
 
 def test_radius_of_gyration():
@@ -128,7 +149,6 @@ def test_radius_of_gyration():
     centroid = positions.mean(axis=0)
     rgsq = np.sum((positions - centroid) ** 2) / model.system.getNumParticles()
     rg_cv = cvlib.RadiusOfGyration(range(model.system.getNumParticles()))
-    perform_common_tests(rg_cv)
     model.system.addForce(rg_cv)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -136,3 +156,4 @@ def test_radius_of_gyration():
     context.setPositions(model.positions)
     rgval = rg_cv.evaluateInContext(context).value_in_unit(unit.nanometers)
     assert rgval**2 == pytest.approx(rgsq)
+    perform_common_tests(rg_cv, context)
