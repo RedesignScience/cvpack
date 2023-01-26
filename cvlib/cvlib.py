@@ -11,17 +11,17 @@ from typing import List
 
 import numpy as np
 import openmm
-from openmm import unit
+from openmm import unit as mmunit
 
 
-def _in_md_units(quantity: unit.Quantity) -> float:
+def _in_md_units(quantity: mmunit.Quantity) -> float:
     """
     Returns the numerical value of a quantity in a unit of measurement compatible with the
     Molecular Dynamics unit system (mass in Da, distance in nm, time in ps, temperature in K,
     energy in kJ/mol, angle in rad).
 
     """
-    return quantity.value_in_unit_system(unit.md_unit_system)
+    return quantity.value_in_unit_system(mmunit.md_unit_system)
 
 
 class AbstractCollectiveVariable(openmm.Force):
@@ -29,8 +29,7 @@ class AbstractCollectiveVariable(openmm.Force):
     An abstract class with common attributes and method for all CVs.
 
     """
-
-    _unit = unit.dimensionless
+    _unit = mmunit.dimensionless
 
     def _getSingleForceState(
         self, context: openmm.Context, getEnergy: bool = False, getForces: bool = False
@@ -51,26 +50,26 @@ class AbstractCollectiveVariable(openmm.Force):
         self.setForceGroup(old_group)
         return state
 
-    def setUnit(self, cvUnit: unit.Unit) -> None:
+    def setUnit(self, unit: mmunit.Unit) -> None:
         """
         Set the unit of measurement this collective variable.
 
         Parameters
         ----------
-            cvUnit
+            unit
                 The unit of measurement of this collective variable
 
         """
-        self._unit = cvUnit
+        self._unit = unit
 
-    def getUnit(self) -> unit.Unit:
+    def getUnit(self) -> mmunit.Unit:
         """
         Get the unit of measurement this collective variable.
 
         """
         return self._unit
 
-    def evaluateInContext(self, context: openmm.Context) -> unit.Quantity:
+    def evaluateInContext(self, context: openmm.Context) -> mmunit.Quantity:
         """
         Evaluate this collective variable at a given context.
 
@@ -87,7 +86,7 @@ class AbstractCollectiveVariable(openmm.Force):
         state = self._getSingleForceState(context, getEnergy=True)
         return _in_md_units(state.getPotentialEnergy()) * self.getUnit()
 
-    def effectiveMassInContext(self, context: openmm.Context) -> unit.Quantity:
+    def effectiveMassInContext(self, context: openmm.Context) -> mmunit.Quantity:
         """
         Compute the effective mass of this collective variable at a given context.
 
@@ -115,7 +114,7 @@ class AbstractCollectiveVariable(openmm.Force):
         masses_with_units = map(context.getSystem().getParticleMass, indices)
         mass_values = np.array(list(map(_in_md_units, masses_with_units)))
         effective_mass = 1.0 / np.sum(np.sum(force_values**2, axis=1) / mass_values)
-        return effective_mass * unit.dalton * (unit.nanometers / self.getUnit()) ** 2
+        return effective_mass * mmunit.dalton * (mmunit.nanometers / self.getUnit()) ** 2
 
 
 class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):
@@ -155,12 +154,12 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         0.295143056060787 nm
         >>> positions = model.positions[atoms, :]
         >>> centroid = positions.mean(axis=0)
-        >>> print(unit.sqrt(((positions - centroid) ** 2).sum() / num_atoms))
+        >>> print(mmunit.sqrt(((positions - centroid) ** 2).sum() / num_atoms))
         0.295143056060787 nm
 
     """
 
-    def __init__(self, atoms: List[int]):
+    def __init__(self, atoms: List[int]) -> None:
         num_atoms = len(atoms)
         num_groups = num_atoms + 1
         rgsq = "+".join(
@@ -171,5 +170,6 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
             self.addGroup([atom], [1])
         self.addGroup(atoms, [1] * num_atoms)
         self.addBond(list(range(num_groups)), [])
+        self.setName('RadiusOfGyration')
+        self.setUnit(mmunit.nanometers)
         self.setUsesPeriodicBoundaryConditions(False)
-        self.setUnit(unit.nanometers)

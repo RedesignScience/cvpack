@@ -30,25 +30,25 @@ def create_rst_file(cls):
     with open(f"api/{name}.rst", "w") as f:
         f.writelines(
             [
-                f"{name}\n"
-                "=" * len(name) + "\n\n"
-                ".. currentmodule:: cvlib\n"
-                ".. autoclass:: {name}\n"
-                "    :members:\n"
-                "    :member-order: bysource\n\n"
-                "    .. rubric:: Methods\n\n"
+                f"{name}\n",
+                "=" * len(name) + "\n\n",
+                ".. currentmodule:: cvlib\n",
+                f".. autoclass:: {name}\n",
+                "    :members:\n",
+                "    :member-order: bysource\n\n",
+                "    .. rubric:: Methods\n\n",
             ]
             + [f"    .. automethod:: {method}\n" for method in methods]
         )
 
 
 with open("api/index.rst", "w") as f:
-    f.write("Python API\n" "==========\n" "\n.. toctree::\n" "    :titlesonly:\n\n")
+    f.write("Python API\n==========\n\n.. toctree::\n    :titlesonly:\n\n")
     for item in cvlib.__dict__.values():
         if isinstance(item, type) and item is not cvlib.AbstractCollectiveVariable:
             f.write(f"    {item.__name__}\n")
             create_rst_file(item)
-    f.write("\n.. testsetup::\n" "\n    from cvlib import *")
+    f.write("\n.. testsetup::\n\n    from cvlib import *")
 
 # -- Project information -----------------------------------------------------
 

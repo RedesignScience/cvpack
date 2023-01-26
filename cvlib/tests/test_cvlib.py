@@ -28,14 +28,14 @@ def test_effective_mass():
     """
     model = testsystems.AlanineDipeptideVacuum()
     rg_cv = cvlib.RadiusOfGyration(range(model.system.getNumParticles()))
+    assert rg_cv.getName() == 'RadiusOfGyration'
     model.system.addForce(rg_cv)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
     context.setPositions(model.positions)
     effective_mass = rg_cv.effectiveMassInContext(context)
-    print(effective_mass)
-    # assert rgval**2 == pytest.approx(rgsq)
+    assert effective_mass/effective_mass.unit == pytest.approx(30.946932)
 
 
 def test_radius_of_gyration():
