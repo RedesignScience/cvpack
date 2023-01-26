@@ -34,7 +34,7 @@ def test_effective_mass():
     context = openmm.Context(model.system, integrator, platform)
     context.setPositions(model.positions)
     effective_mass = rg_cv.effectiveMassInContext(context)
-    assert effective_mass/effective_mass.unit == pytest.approx(30.946932)
+    assert effective_mass / effective_mass.unit == pytest.approx(30.946932)
 
 
 def perform_common_tests(collectiveVariable: cvlib.AbstractCollectiveVariable) -> None:
@@ -43,7 +43,9 @@ def perform_common_tests(collectiveVariable: cvlib.AbstractCollectiveVariable) -
 
     """
     assert collectiveVariable.getName() == collectiveVariable.__class__.__name__
-    assert (1*collectiveVariable.getUnit()).value_in_unit_system(unit.md_unit_system) == 1
+    assert (1 * collectiveVariable.getUnit()).value_in_unit_system(
+        unit.md_unit_system
+    ) == 1
 
 
 def test_radius_of_gyration():
