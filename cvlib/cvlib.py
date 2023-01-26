@@ -148,7 +148,6 @@ class Distance(openmm.CustomBondForce, AbstractCollectiveVariable):
         1.7320508075688772 nm
 
     """
-
     def __init__(self, atom1: int, atom2: int) -> None:
         super().__init__("r")
         self.addBond(atom1, atom2, [])
@@ -187,11 +186,50 @@ class Angle(openmm.CustomAngleForce, AbstractCollectiveVariable):
         1.5707963267948966 rad
 
     """
-
     def __init__(self, atom1: int, atom2: int, atom3: int) -> None:
         super().__init__("theta")
         self.addAngle(atom1, atom2, atom3, [])
         self.setName("Angle")
+        self.setUnit(mmunit.radians)
+
+
+class Torsion(openmm.CustomTorsionForce, AbstractCollectiveVariable):
+    """
+    The torsion angle formed by four atoms.
+
+    Parameters
+    ----------
+        atom1
+            The index of the first atom
+        atom2
+            The index of the second atom
+        atom3
+            The index of the third atom
+        atom4
+            The index of the fourth atom
+
+    Example:
+        >>> import cvlib
+        >>> import openmm as mm
+        >>> system = mm.System()
+        >>> list(map(system.addParticle, [1] * 4))
+        [0, 1, 2, 3]
+        >>> torsion = cvlib.Torsion(0, 1, 2, 3)
+        >>> system.addForce(torsion)
+        0
+        >>> integrator = mm.CustomIntegrator(0)
+        >>> platform = mm.Platform.getPlatformByName('Reference')
+        >>> context = mm.Context(system, integrator, platform)
+        >>> positions = [[0, 0, 0], [1, 0, 0], [1, 1, 0], [1, 1, 1]]
+        >>> context.setPositions([mm.Vec3(*pos) for pos in positions])
+        >>> print(torsion.evaluateInContext(context))
+        1.5707963267948966 rad
+
+    """
+    def __init__(self, atom1: int, atom2: int, atom3: int, atom4: int) -> None:
+        super().__init__("theta")
+        self.addTorsion(atom1, atom2, atom3, atom4, [])
+        self.setName("Torsion")
         self.setUnit(mmunit.radians)
 
 
