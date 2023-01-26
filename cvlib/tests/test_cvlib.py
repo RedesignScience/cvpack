@@ -37,13 +37,13 @@ def test_effective_mass():
     assert effective_mass/effective_mass.unit == pytest.approx(30.946932)
 
 
-def perform_common_tests(cv: cvlib.AbstractCollectiveVariable) -> None:
+def perform_common_tests(collectiveVariable: cvlib.AbstractCollectiveVariable) -> None:
     """
     Function to be called in every individual cv test.
 
     """
-    assert cv.getName() == cv.__class__.__name__
-    assert (1*cv.getUnit()).value_in_unit_system(unit.md_unit_system) == 1
+    assert collectiveVariable.getName() == collectiveVariable.__class__.__name__
+    assert (1*collectiveVariable.getUnit()).value_in_unit_system(unit.md_unit_system) == 1
 
 
 def test_radius_of_gyration():
