@@ -10,11 +10,14 @@ Collective Variable Library
 
 ### Overview
 
-In [OpenMM](https://openmm.org), a collective variable (CV) involved in a CustomCVForce is nothing but an instance of some Force or CustomForce child class. CVlib provides with several predefined CVs, such as:
+In [OpenMM], collective variables (CV) involved in a [CustomCVForce] are nothing but OpenMM [Force]
+objects. This CV Library provides several CVs of common use in molecular dynamics simulations, such
+as:
 
-* Square radius of gyration of a group of atoms
-* Number of contacts between two groups of atoms
-* Different flavors of alpha-helix content measures, based on angles, dihedrals, and hydrogen bonds
+* [Distance](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Distance.html)
+* [Angle](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Angle.html)
+* [Torsion](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Torsion.html)
+* [Radius of gyration](https://cvlib-for-openmm.readthedocs.io/en/latest/api/RadiusOfGyration.html)
 
 ### Copyright
 
@@ -23,5 +26,10 @@ Copyright (c) 2023, Charlles Abreu
 
 #### Acknowledgements
 
-Project based on the
-[CMS Cookiecutter](https://github.com/molssi/cookiecutter-cms) version 1.1.
+Project based on the [CMS Cookiecutter] version 1.1.
+
+
+[CMS Cookiecutter]: https://github.com/molssi/cookiecutter-cms
+[CustomCVForce]:    http://docs.openmm.org/latest/api-python/generated/openmm.openmm.CustomCVForce.html
+[Force]:            http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Force.html
+[OpenMM]:           https://openmm.org

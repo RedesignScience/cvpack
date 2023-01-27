@@ -3,7 +3,6 @@ Unit and regression test for the cvlib package.
 """
 
 import io
-# Import package, test suite, and other packages as needed
 import sys
 
 import numpy as np
