@@ -3,7 +3,6 @@ Unit and regression test for the cvlib package.
 """
 
 import io
-
 # Import package, test suite, and other packages as needed
 import sys
 
@@ -104,7 +103,7 @@ def test_angle():
     value1 = angle.evaluateInContext(context).value_in_unit(angle.getUnit())
     r21 = model.positions[atoms[0]] - model.positions[atoms[1]]
     r23 = model.positions[atoms[2]] - model.positions[atoms[1]]
-    value2 = np.arccos(np.dot(r21, r23) / np.linalg.norm(r21) * np.linalg.norm(r23))
+    value2 = np.arccos(np.dot(r21, r23) / (np.linalg.norm(r21) * np.linalg.norm(r23)))
     assert value1 == pytest.approx(value2)
     perform_common_tests(angle, context)
 
