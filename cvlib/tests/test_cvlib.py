@@ -2,6 +2,7 @@
 Unit and regression test for the cvlib package.
 """
 
+import inspect
 import io
 import sys
 
@@ -38,8 +39,27 @@ def test_effective_mass():
     assert effective_mass / effective_mass.unit == pytest.approx(30.946932)
 
 
+def test_argument_inspection():
+    """
+    Test argument inspection of a arbitrary AbstractCollectiveVariable subclass
+
+    """
+    # pylint: disable=missing-class-docstring, unused-argument
+    class Test(cvlib.cvlib.AbstractCollectiveVariable):
+        def __init__(self, first: int, second: float, third: str = "3"):
+            super().__init__(self)
+
+    # pylint: enable=missing-class-docstring, unused-argument
+
+    args, defaults = Test.getArguments()
+    assert args["first"] is int
+    assert args["second"] is float
+    assert args["third"] is str
+    assert defaults["third"] == "3"
+
+
 def perform_common_tests(
-    collectiveVariable: cvlib.AbstractCollectiveVariable, context: openmm.Context
+    collectiveVariable: cvlib.cvlib.AbstractCollectiveVariable, context: openmm.Context
 ) -> None:
     """
     Function to be called in every individual cv test.
@@ -51,6 +71,11 @@ def perform_common_tests(
     # Unit must conform to the default OpenMM system
     unity = 1 * collectiveVariable.getUnit()
     assert unity.value_in_unit_system(unit.md_unit_system) == 1
+
+    # Class must have full type annotation (except for argument `self`)
+    args, _ = collectiveVariable.getArguments()
+    for _, annotation in args.items():
+        assert annotation is not inspect.Parameter.empty
 
     # Test serialization/deserialization
     pipe = io.StringIO()

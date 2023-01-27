@@ -17,6 +17,7 @@ import sys
 
 # Incase the project was not installed
 import cvlib
+from cvlib.cvlib import AbstractCollectiveVariable
 
 sys.path.insert(0, os.path.abspath(".."))
 
@@ -24,7 +25,7 @@ sys.path.insert(0, os.path.abspath(".."))
 def create_rst_file(cls):
     name = cls.__name__
     attributes = filter(
-        lambda name: not name.startswith("_"), dir(cvlib.AbstractCollectiveVariable)
+        lambda name: not name.startswith("_"), dir(AbstractCollectiveVariable)
     )
     methods = [name for name in attributes if callable(getattr(cls, name))]
     with open(f"api/{name}.rst", "w") as f:
@@ -45,7 +46,7 @@ def create_rst_file(cls):
 with open("api/index.rst", "w") as f:
     f.write("Python API\n==========\n\n.. toctree::\n    :titlesonly:\n\n")
     for item in cvlib.__dict__.values():
-        if isinstance(item, type) and item is not cvlib.AbstractCollectiveVariable:
+        if isinstance(item, type) and item is not cvlib.cvlib.AbstractCollectiveVariable:
             f.write(f"    {item.__name__}\n")
             create_rst_file(item)
     f.write("\n.. testsetup::\n\n    from cvlib import *")

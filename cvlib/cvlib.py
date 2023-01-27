@@ -7,7 +7,9 @@
 
 """
 
-from typing import Dict, List
+import inspect
+from collections import OrderedDict
+from typing import Dict, List, Tuple
 
 import numpy as np
 import openmm
@@ -50,6 +52,45 @@ class AbstractCollectiveVariable(openmm.Force):
         )
         self.setForceGroup(old_group)
         return state
+
+    @classmethod
+    def getArguments(cls) -> Tuple[OrderedDict, OrderedDict]:
+        """
+        Inspect the arguments needed for constructing an instance of this collective
+        variable.
+
+        Returns
+        -------
+            arguments
+                An ordered dictionary containing the type annotations of all arguments
+            defaults
+                An ordered dictionary containing default values of optional arguments
+
+        Example
+        =======
+            >>> import cvlib
+            >>> args, defaults = cvlib.Distance.getArguments()
+            >>> print(*args.items())
+            ('atom1', <class 'int'>) ('atom2', <class 'int'>)
+            >>> print(*defaults.items())
+            <BLANKLINE>
+
+        Example
+        =======
+            >>> import cvlib
+            >>> radius_of_gyration = cvlib.RadiusOfGyration([1, 2, 3])
+            >>> args, _ = radius_of_gyration.getArguments()
+            >>> print(*args.items())
+            ('group', typing.List[int])
+
+        """
+        arguments = OrderedDict()
+        defaults = OrderedDict()
+        for name, parameter in inspect.signature(cls).parameters.items():
+            arguments[name] = parameter.annotation
+            if parameter.default is not inspect.Parameter.empty:
+                defaults[name] = parameter.default
+        return arguments, defaults
 
     def setUnit(self, unit: mmunit.Unit) -> None:
         """
