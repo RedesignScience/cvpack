@@ -140,12 +140,12 @@ class Distance(openmm.CustomBondForce, AbstractCollectiveVariable):
         >>> import cvlib
         >>> import openmm as mm
         >>> system = mm.System()
-        >>> list(map(system.addParticle, [1] * 2))
+        >>> [system.addParticle(1) for i in range(2)]
         [0, 1]
         >>> distance = cvlib.Distance(0, 1)
         >>> system.addForce(distance)
         0
-        >>> integrator = mm.CustomIntegrator(0)
+        >>> integrator = mm.VerletIntegrator(0)
         >>> platform = mm.Platform.getPlatformByName('Reference')
         >>> context = mm.Context(system, integrator, platform)
         >>> context.setPositions([mm.Vec3(0, 0, 0), mm.Vec3(1, 1, 1)])
@@ -196,12 +196,12 @@ class Angle(openmm.CustomAngleForce, AbstractCollectiveVariable):
         >>> import cvlib
         >>> import openmm as mm
         >>> system = mm.System()
-        >>> list(map(system.addParticle, [1] * 3))
+        >>> [system.addParticle(1) for i in range(3)]
         [0, 1, 2]
         >>> angle = cvlib.Angle(0, 1, 2)
         >>> system.addForce(angle)
         0
-        >>> integrator = mm.CustomIntegrator(0)
+        >>> integrator = mm.VerletIntegrator(0)
         >>> platform = mm.Platform.getPlatformByName('Reference')
         >>> context = mm.Context(system, integrator, platform)
         >>> positions = [[0, 0, 0], [1, 0, 0], [1, 1, 0]]
@@ -239,8 +239,9 @@ class Torsion(openmm.CustomTorsionForce, AbstractCollectiveVariable):
                                                    ({\\bf r}_{3,4} \\cdot {\\bf u}_{2,3})
         }\\right),
 
-    where :math:`{\\bf r}_{i,j} = {\\bf r}_j - {\\bf r}_i` and
-    :math:`{\\bf u}_{2,3} = {\\bf r}_{2,3}/\\|{\\bf r}_{2,3}\\|`.
+    where :math:`{\\bf r}_{i,j} = {\\bf r}_j - {\\bf r}_i`,
+    :math:`{\\bf u}_{2,3} = {\\bf r}_{2,3}/\\|{\\bf r}_{2,3}\\|`,
+    and `atan2 <https://en.wikipedia.org/wiki/Atan2>`_ is the 2-argument arctangent function.
 
     Parameters
     ----------
@@ -257,12 +258,12 @@ class Torsion(openmm.CustomTorsionForce, AbstractCollectiveVariable):
         >>> import cvlib
         >>> import openmm as mm
         >>> system = mm.System()
-        >>> list(map(system.addParticle, [1] * 4))
+        >>> [system.addParticle(1) for i in range(4)]
         [0, 1, 2, 3]
         >>> torsion = cvlib.Torsion(0, 1, 2, 3)
         >>> system.addForce(torsion)
         0
-        >>> integrator = mm.CustomIntegrator(0)
+        >>> integrator = mm.VerletIntegrator(0)
         >>> platform = mm.Platform.getPlatformByName('Reference')
         >>> context = mm.Context(system, integrator, platform)
         >>> positions = [[0, 0, 0], [1, 0, 0], [1, 1, 0], [1, 1, 1]]
@@ -298,51 +299,46 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
 
     Parameters
     ----------
-        atoms
+        group
             The indices of the atoms in the group
 
     Example
     -------
-        >>> import openmm
         >>> import cvlib
-        >>> from openmm import unit
+        >>> import openmm as mm
         >>> from openmmtools import testsystems
         >>> model = testsystems.AlanineDipeptideVacuum()
         >>> num_atoms = model.system.getNumParticles()
-        >>> atoms = list(range(num_atoms))
-        >>> rg_cv = cvlib.RadiusOfGyration(atoms)
-        >>> model.system.addForce(rg_cv)
+        >>> radius_of_gyration = cvlib.RadiusOfGyration(list(range(num_atoms)))
+        >>> model.system.addForce(radius_of_gyration)
         5
-        >>> platform = openmm.Platform.getPlatformByName('Reference')
-        >>> context = openmm.Context(model.system, openmm.CustomIntegrator(0), platform)
+        >>> platform = mm.Platform.getPlatformByName('Reference')
+        >>> integrator = mm.VerletIntegrator(0)
+        >>> context = mm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
-        >>> print(rg_cv.evaluateInContext(context))
-        0.295143056060787 nm
-        >>> positions = model.positions[atoms, :]
-        >>> centroid = positions.mean(axis=0)
-        >>> print(mmunit.sqrt(((positions - centroid) ** 2).sum() / num_atoms))
+        >>> print(radius_of_gyration.evaluateInContext(context))
         0.295143056060787 nm
 
     """
 
-    def __init__(self, atoms: List[int]) -> None:
-        self._atoms = atoms
-        num_atoms = len(atoms)
+    def __init__(self, group: List[int]) -> None:
+        self._group = group
+        num_atoms = len(group)
         num_groups = num_atoms + 1
         rgsq = "+".join(
             [f"distance(g{i+1}, g{num_groups})^2" for i in range(num_atoms)]
         )
         super().__init__(num_groups, f"sqrt(({rgsq})/{num_atoms})")
-        for atom in atoms:
+        for atom in group:
             self.addGroup([atom], [1])
-        self.addGroup(atoms, [1] * num_atoms)
+        self.addGroup(group, [1] * num_atoms)
         self.addBond(list(range(num_groups)), [])
         self.setUsesPeriodicBoundaryConditions(False)
         self.setName("RadiusOfGyration")
         self.setUnit(mmunit.nanometers)
 
     def __getstate__(self) -> Dict[str, List[int]]:
-        return dict(atoms=self._atoms)
+        return dict(group=self._group)
 
     def __setstate__(self, kw: Dict[str, List[int]]) -> None:
         self.__init__(**kw)

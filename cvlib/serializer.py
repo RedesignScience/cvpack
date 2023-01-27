@@ -33,7 +33,7 @@ def serialize(obj: Any, iostream: IO) -> None:
         >>> serializer.serialize(radius_of_gyration, iostream)
         >>> print(iostream.getvalue())
         !!python/object:cvlib.cvlib.RadiusOfGyration
-        atoms:
+        group:
         - 0
         - 1
         - 2
