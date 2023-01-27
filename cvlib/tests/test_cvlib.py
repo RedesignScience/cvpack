@@ -54,9 +54,9 @@ def perform_common_tests(
 
     # Test serialization/deserialization
     pipe = io.StringIO()
-    cvlib.serialization.serialize(collectiveVariable, pipe)
+    cvlib.serializer.serialize(collectiveVariable, pipe)
     pipe.seek(0)
-    new_cv = cvlib.serialization.deserialize(pipe)
+    new_cv = cvlib.serializer.deserialize(pipe)
     context.getSystem().addForce(new_cv)
     context.reinitialize(preserveState=True)
     value1 = collectiveVariable.evaluateInContext(context)
