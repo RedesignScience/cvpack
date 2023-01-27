@@ -29,6 +29,7 @@ class AbstractCollectiveVariable(openmm.Force):
     An abstract class with common attributes and method for all CVs.
 
     """
+
     _unit = mmunit.dimensionless
 
     def _getSingleForceState(
@@ -114,7 +115,125 @@ class AbstractCollectiveVariable(openmm.Force):
         masses_with_units = map(context.getSystem().getParticleMass, indices)
         mass_values = np.array(list(map(_in_md_units, masses_with_units)))
         effective_mass = 1.0 / np.sum(np.sum(force_values**2, axis=1) / mass_values)
-        return effective_mass * mmunit.dalton * (mmunit.nanometers / self.getUnit()) ** 2
+        return (
+            effective_mass * mmunit.dalton * (mmunit.nanometers / self.getUnit()) ** 2
+        )
+
+
+class Distance(openmm.CustomBondForce, AbstractCollectiveVariable):
+    """
+    The distance between two atoms.
+
+    Parameters
+    ----------
+        atom1
+            The index of the first atom
+        atom2
+            The index of the second atom
+
+    Example:
+        >>> import cvlib
+        >>> import openmm as mm
+        >>> system = mm.System()
+        >>> list(map(system.addParticle, [1] * 2))
+        [0, 1]
+        >>> distance = cvlib.Distance(0, 1)
+        >>> system.addForce(distance)
+        0
+        >>> integrator = mm.CustomIntegrator(0)
+        >>> platform = mm.Platform.getPlatformByName('Reference')
+        >>> context = mm.Context(system, integrator, platform)
+        >>> context.setPositions([mm.Vec3(0, 0, 0), mm.Vec3(1, 1, 1)])
+        >>> print(distance.evaluateInContext(context))
+        1.7320508075688772 nm
+
+    """
+
+    def __init__(self, atom1: int, atom2: int) -> None:
+        super().__init__("r")
+        self.addBond(atom1, atom2, [])
+        self.setName("Distance")
+        self.setUnit(mmunit.nanometers)
+
+
+class Angle(openmm.CustomAngleForce, AbstractCollectiveVariable):
+    """
+    The angle formed by three atoms.
+
+    Parameters
+    ----------
+        atom1
+            The index of the first atom
+        atom2
+            The index of the second atom
+        atom3
+            The index of the third atom
+
+    Example:
+        >>> import cvlib
+        >>> import openmm as mm
+        >>> system = mm.System()
+        >>> list(map(system.addParticle, [1] * 3))
+        [0, 1, 2]
+        >>> angle = cvlib.Angle(0, 1, 2)
+        >>> system.addForce(angle)
+        0
+        >>> integrator = mm.CustomIntegrator(0)
+        >>> platform = mm.Platform.getPlatformByName('Reference')
+        >>> context = mm.Context(system, integrator, platform)
+        >>> positions = [[0, 0, 0], [1, 0, 0], [1, 1, 0]]
+        >>> context.setPositions([mm.Vec3(*pos) for pos in positions])
+        >>> print(angle.evaluateInContext(context))
+        1.5707963267948966 rad
+
+    """
+
+    def __init__(self, atom1: int, atom2: int, atom3: int) -> None:
+        super().__init__("theta")
+        self.addAngle(atom1, atom2, atom3, [])
+        self.setName("Angle")
+        self.setUnit(mmunit.radians)
+
+
+class Torsion(openmm.CustomTorsionForce, AbstractCollectiveVariable):
+    """
+    The torsion angle formed by four atoms.
+
+    Parameters
+    ----------
+        atom1
+            The index of the first atom
+        atom2
+            The index of the second atom
+        atom3
+            The index of the third atom
+        atom4
+            The index of the fourth atom
+
+    Example:
+        >>> import cvlib
+        >>> import openmm as mm
+        >>> system = mm.System()
+        >>> list(map(system.addParticle, [1] * 4))
+        [0, 1, 2, 3]
+        >>> torsion = cvlib.Torsion(0, 1, 2, 3)
+        >>> system.addForce(torsion)
+        0
+        >>> integrator = mm.CustomIntegrator(0)
+        >>> platform = mm.Platform.getPlatformByName('Reference')
+        >>> context = mm.Context(system, integrator, platform)
+        >>> positions = [[0, 0, 0], [1, 0, 0], [1, 1, 0], [1, 1, 1]]
+        >>> context.setPositions([mm.Vec3(*pos) for pos in positions])
+        >>> print(torsion.evaluateInContext(context))
+        1.5707963267948966 rad
+
+    """
+
+    def __init__(self, atom1: int, atom2: int, atom3: int, atom4: int) -> None:
+        super().__init__("theta")
+        self.addTorsion(atom1, atom2, atom3, atom4, [])
+        self.setName("Torsion")
+        self.setUnit(mmunit.radians)
 
 
 class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):
@@ -170,6 +289,6 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
             self.addGroup([atom], [1])
         self.addGroup(atoms, [1] * num_atoms)
         self.addBond(list(range(num_groups)), [])
-        self.setName('RadiusOfGyration')
-        self.setUnit(mmunit.nanometers)
         self.setUsesPeriodicBoundaryConditions(False)
+        self.setName("RadiusOfGyration")
+        self.setUnit(mmunit.nanometers)
