@@ -102,12 +102,9 @@ def test_angle():
     context = openmm.Context(model.system, integrator, platform)
     context.setPositions(model.positions)
     value1 = angle.evaluateInContext(context).value_in_unit(angle.getUnit())
-    delta = [
-        model.positions[atoms[i + 1]] - model.positions[atoms[i]] for i in range(2)
-    ]
-    numerator = -np.dot(delta[0], delta[1])
-    denominator = np.linalg.norm(delta[0]) * np.linalg.norm(delta[1])
-    value2 = np.arccos(numerator / denominator)
+    r21 = model.positions[atoms[0]] - model.positions[atoms[1]]
+    r23 = model.positions[atoms[2]] - model.positions[atoms[1]]
+    value2 = np.arccos(np.dot(r21, r23) / np.linalg.norm(r21) * np.linalg.norm(r23))
     assert value1 == pytest.approx(value2)
     perform_common_tests(angle, context)
 
@@ -126,15 +123,13 @@ def test_torsion():
     context = openmm.Context(model.system, integrator, platform)
     context.setPositions(model.positions)
     value1 = torsion.evaluateInContext(context).value_in_unit(torsion.getUnit())
-    delta = [
-        model.positions[atoms[i + 1]] - model.positions[atoms[i]] for i in range(3)
-    ]
-    numerator = np.dot(
-        np.cross(np.cross(delta[0], delta[1]), np.cross(delta[1], delta[2])),
-        delta[1] / np.linalg.norm(delta[1]),
+    r21 = model.positions[atoms[0]] - model.positions[atoms[1]]
+    u23 = model.positions[atoms[2]] - model.positions[atoms[1]]
+    u23 /= np.linalg.norm(u23)
+    r34 = model.positions[atoms[3]] - model.positions[atoms[2]]
+    value2 = np.arctan2(
+        np.cross(r21, r34).dot(u23), r21.dot(r34) - r21.dot(u23) * r34.dot(u23)
     )
-    denominator = np.dot(np.cross(delta[0], delta[1]), np.cross(delta[1], delta[2]))
-    value2 = np.arctan2(numerator, denominator)
     assert value1 == pytest.approx(value2)
     perform_common_tests(torsion, context)
 

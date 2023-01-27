@@ -7,7 +7,6 @@
 
 """
 
-from collections import OrderedDict
 from typing import Dict, List
 
 import numpy as np
@@ -32,7 +31,6 @@ class AbstractCollectiveVariable(openmm.Force):
     """
 
     _unit = mmunit.dimensionless
-    _args = OrderedDict()
 
     def _getSingleForceState(
         self, context: openmm.Context, getEnergy: bool = False, getForces: bool = False
@@ -93,12 +91,13 @@ class AbstractCollectiveVariable(openmm.Force):
         """
         Compute the effective mass of this collective variable at a given :OpenMM:`Context`.
 
-        The effective mass of a collective variable :math:`q(\\mathbf{r})` is defined as
+        The effective mass of a collective variable :math:`q({\\bf r})` is defined as
         :cite:`Chipot_2007`:
 
         .. math::
-            m_\\mathrm{eff} = \\left(
-                \\sum_{j=1}^N \\frac{1}{m_j} \\left\\|\\frac{dq}{d\\mathbf{r}_j}\\right\\|^2
+
+            m_\\mathrm{eff}({\\bf r}) = \\left(
+                \\sum_{i=1}^N \\frac{1}{m_i} \\left\\|\\frac{dq}{d{\\bf r}_i}\\right\\|^2
             \\right)^{-1}
 
         Parameters
@@ -124,7 +123,11 @@ class AbstractCollectiveVariable(openmm.Force):
 
 class Distance(openmm.CustomBondForce, AbstractCollectiveVariable):
     """
-    The distance between two atoms.
+    The distance between two atoms:
+
+    .. math::
+
+        d({\\bf r}) = \\| {\\bf r}_2 - {\\bf r}_1 \\|.
 
     Parameters
     ----------
@@ -168,7 +171,17 @@ class Distance(openmm.CustomBondForce, AbstractCollectiveVariable):
 
 class Angle(openmm.CustomAngleForce, AbstractCollectiveVariable):
     """
-    The angle formed by three atoms.
+    The angle formed by three atoms:
+
+    .. math::
+
+        \\theta({\\bf r}) =
+            \\mathrm{acos}\\left(
+                \\frac{{\\bf r}_{2,1} \\cdot {\\bf r}_{2,3} }
+                       {\\| {\\bf r}_{2,1} \\| \\| {\\bf r}_{2,3} \\|}
+            \\right),
+
+    where :math:`{\\bf r}_{i,j} = {\\bf r}_j - {\\bf r}_i`.
 
     Parameters
     ----------
@@ -215,7 +228,19 @@ class Angle(openmm.CustomAngleForce, AbstractCollectiveVariable):
 
 class Torsion(openmm.CustomTorsionForce, AbstractCollectiveVariable):
     """
-    The torsion angle formed by four atoms.
+    The torsion angle formed by four atoms:
+
+    .. math::
+
+        \\varphi({\\bf r}) = \\mathrm{atan2}\\left(\\frac{
+            ({\\bf r}_{2,1} \\times {\\bf r}_{3,4}) \\cdot {\\bf u}_{2,3}
+        }{
+            {\\bf r}_{2,1} \\cdot {\\bf r}_{3,4} - ({\\bf r}_{2,1} \\cdot {\\bf u}_{2,3})
+                                                   ({\\bf r}_{3,4} \\cdot {\\bf u}_{2,3})
+        }\\right),
+
+    where :math:`{\\bf r}_{i,j} = {\\bf r}_j - {\\bf r}_i` and
+    :math:`{\\bf u}_{2,3} = {\\bf r}_{2,3}/\\|{\\bf r}_{2,3}\\|`.
 
     Parameters
     ----------
@@ -264,16 +289,12 @@ class Torsion(openmm.CustomTorsionForce, AbstractCollectiveVariable):
 
 class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):
     """
-    The radius of gyration of a group of atoms, defined as:
+    The radius of gyration of a group of :math:`n` atoms:
 
     .. math::
-        R_g = \\sqrt{ \\frac{1}{n} \\sum_{i=1}^n \\|\\mathbf{r}_i - \\mathbf{r}_{\\rm mean}\\|^2 },
 
-    where :math:`n` is the number of atoms in the group, :math:`\\mathbf{r}_i` is the coordinate of
-    atom `i`, and :math:`\\mathbf{r}_{\\rm mean}` is the centroid of the group of atoms, that is,
-
-    .. math::
-        \\mathbf{r}_{\\rm mean} = \\frac{1}{n} \\sum_{i=1}^n \\mathbf{r}_i.
+        r_g({\\bf r}) = \\sqrt{ \\frac{1}{n} \\sum_{i=1}^n \\left\\|{\\bf r}_i -
+                                \\frac{1}{n} \\sum_{i=j}^n {\\bf r}_j \\right\\|^2 }.
 
     Parameters
     ----------
