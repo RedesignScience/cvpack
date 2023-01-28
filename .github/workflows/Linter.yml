@@ -47,11 +47,11 @@ jobs:
 
       - name: Run flake8
         shell: bash -l {0}
-        run: flake8
+        run: flake8 cvlib/
 
       - name: Run black
         shell: bash -l {0}
-        run: black --diff --color cvlib/
+        run: black --line-length 100 --diff --color cvlib/
 
       - name: Run isort
         shell: bash -l {0}

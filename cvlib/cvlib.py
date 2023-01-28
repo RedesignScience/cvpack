@@ -47,9 +47,7 @@ class AbstractCollectiveVariable(openmm.Force):
         old_group = self.getForceGroup()
         new_group = next(iter(free_groups))
         self.setForceGroup(new_group)
-        state = context.getState(
-            getEnergy=getEnergy, getForces=getForces, groups={new_group}
-        )
+        state = context.getState(getEnergy=getEnergy, getForces=getForces, groups={new_group})
         self.setForceGroup(old_group)
         return state
 
@@ -157,9 +155,7 @@ class AbstractCollectiveVariable(openmm.Force):
         masses_with_units = map(context.getSystem().getParticleMass, indices)
         mass_values = np.array(list(map(_in_md_units, masses_with_units)))
         effective_mass = 1.0 / np.sum(np.sum(force_values**2, axis=1) / mass_values)
-        return (
-            effective_mass * mmunit.dalton * (mmunit.nanometers / self.getUnit()) ** 2
-        )
+        return effective_mass * mmunit.dalton * (mmunit.nanometers / self.getUnit()) ** 2
 
 
 class Distance(openmm.CustomBondForce, AbstractCollectiveVariable):
@@ -366,9 +362,7 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         self._group = group
         num_atoms = len(group)
         num_groups = num_atoms + 1
-        rgsq = "+".join(
-            [f"distance(g{i+1}, g{num_groups})^2" for i in range(num_atoms)]
-        )
+        rgsq = "+".join([f"distance(g{i+1}, g{num_groups})^2" for i in range(num_atoms)])
         super().__init__(num_groups, f"sqrt(({rgsq})/{num_atoms})")
         for atom in group:
             self.addGroup([atom], [1])

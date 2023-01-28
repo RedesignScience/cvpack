@@ -150,9 +150,7 @@ def test_torsion():
     u23 = model.positions[atoms[2]] - model.positions[atoms[1]]
     u23 /= np.linalg.norm(u23)
     r34 = model.positions[atoms[3]] - model.positions[atoms[2]]
-    value2 = np.arctan2(
-        np.cross(r21, r34).dot(u23), r21.dot(r34) - r21.dot(u23) * r34.dot(u23)
-    )
+    value2 = np.arctan2(np.cross(r21, r34).dot(u23), r21.dot(r34) - r21.dot(u23) * r34.dot(u23))
     assert value1 == pytest.approx(value2)
     perform_common_tests(torsion, context)
 
