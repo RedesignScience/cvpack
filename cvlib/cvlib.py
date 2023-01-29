@@ -9,7 +9,7 @@
 
 import inspect
 from collections import OrderedDict
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 import openmm
@@ -33,6 +33,25 @@ class AbstractCollectiveVariable(openmm.Force):
     """
 
     _unit = mmunit.dimensionless
+    _args = {}
+
+    def __getstate__(self) -> Dict[str, Any]:
+        return self._args
+
+    def __setstate__(self, kw: Dict[str, Any]) -> None:
+        self.__init__(**kw)
+
+    def _registerCV(self, unit: mmunit.Unit, *args: Any) -> None:
+        """
+        Register the newly created AbstractCollectiveVariable subclass instance.
+
+        This method must always be called from Subclass.__init__.
+
+        """
+        self.setName(self.__class__.__name__)
+        self.setUnit(unit)
+        arguments, _ = self.getArguments()
+        self._args = dict(zip(arguments, args))
 
     def _getSingleForceState(
         self, context: openmm.Context, getEnergy: bool = False, getForces: bool = False
@@ -192,18 +211,9 @@ class Distance(openmm.CustomBondForce, AbstractCollectiveVariable):
     """
 
     def __init__(self, atom1: int, atom2: int) -> None:
-        self._atoms = atom1, atom2
         super().__init__("r")
         self.addBond(atom1, atom2, [])
-        self.setName("Distance")
-        self.setUnit(mmunit.nanometers)
-
-    def __getstate__(self) -> Dict[str, int]:
-        atom1, atom2 = self._atoms
-        return dict(atom1=atom1, atom2=atom2)
-
-    def __setstate__(self, kw: Dict[str, int]) -> None:
-        self.__init__(**kw)
+        self._registerCV(mmunit.nanometers, atom1, atom2)
 
 
 class Angle(openmm.CustomAngleForce, AbstractCollectiveVariable):
@@ -249,18 +259,9 @@ class Angle(openmm.CustomAngleForce, AbstractCollectiveVariable):
     """
 
     def __init__(self, atom1: int, atom2: int, atom3: int) -> None:
-        self._atoms = atom1, atom2, atom3
         super().__init__("theta")
         self.addAngle(atom1, atom2, atom3, [])
-        self.setName("Angle")
-        self.setUnit(mmunit.radians)
-
-    def __getstate__(self) -> Dict[str, int]:
-        atom1, atom2, atom3 = self._atoms
-        return dict(atom1=atom1, atom2=atom2, atom3=atom3)
-
-    def __setstate__(self, kw: Dict[str, int]) -> None:
-        self.__init__(**kw)
+        self._registerCV(mmunit.radians, atom1, atom2, atom3)
 
 
 class Torsion(openmm.CustomTorsionForce, AbstractCollectiveVariable):
@@ -311,18 +312,9 @@ class Torsion(openmm.CustomTorsionForce, AbstractCollectiveVariable):
     """
 
     def __init__(self, atom1: int, atom2: int, atom3: int, atom4: int) -> None:
-        self._atoms = atom1, atom2, atom3, atom4
         super().__init__("theta")
         self.addTorsion(atom1, atom2, atom3, atom4, [])
-        self.setName("Torsion")
-        self.setUnit(mmunit.radians)
-
-    def __getstate__(self) -> Dict[str, int]:
-        atom1, atom2, atom3, atom4 = self._atoms
-        return dict(atom1=atom1, atom2=atom2, atom3=atom3, atom4=atom4)
-
-    def __setstate__(self, kw: Dict[str, int]) -> None:
-        self.__init__(**kw)
+        self._registerCV(mmunit.radians, atom1, atom2, atom3, atom4)
 
 
 class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):
@@ -369,11 +361,4 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         self.addGroup(group, [1] * num_atoms)
         self.addBond(list(range(num_groups)), [])
         self.setUsesPeriodicBoundaryConditions(False)
-        self.setName("RadiusOfGyration")
-        self.setUnit(mmunit.nanometers)
-
-    def __getstate__(self) -> Dict[str, List[int]]:
-        return dict(group=self._group)
-
-    def __setstate__(self, kw: Dict[str, List[int]]) -> None:
-        self.__init__(**kw)
+        self._registerCV(mmunit.nanometers, group)
