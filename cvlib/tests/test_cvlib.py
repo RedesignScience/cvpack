@@ -173,3 +173,45 @@ def test_radius_of_gyration():
     rgval = rg_cv.evaluateInContext(context).value_in_unit(unit.nanometers)
     assert rgval**2 == pytest.approx(rgsq)
     perform_common_tests(rg_cv, context)
+
+
+def test_principal_component_angle():
+    """
+    Test whether a principal component angle is computed correctly.
+
+    """
+    model = testsystems.AlanineDipeptideVacuum()
+    num_atoms = model.system.getNumParticles()
+    atoms = list(range(num_atoms))
+    group1 = atoms[:num_atoms//2]
+    group2 = atoms[num_atoms//2:]
+    pc_angle = cvlib.PrincipalComponentAngle(group1, group2)
+    model.system.addForce(pc_angle)
+    platform = openmm.Platform.getPlatformByName('Reference')
+    integrator = openmm.VerletIntegrator(0)
+    context = openmm.Context(model.system, integrator, platform)
+    context.setPositions(model.positions)
+    state = context.getState(getPositions=True)
+    positions = state.getPositions(asNumpy=True).value_in_unit(unit.nanometers)
+
+    deltas = positions[group1, :] - positions[group1, :].mean(axis=0)
+    cov_mat = (deltas.T @ deltas)/len(group1)
+    _, eigvecs1 = np.linalg.eigh(cov_mat)
+
+    print(eigvecs1[:, 0])
+
+    deltas = positions[group2, :] - positions[group2, :].mean(axis=0)
+    cov_mat = (deltas.T @ deltas)/len(group2)
+    _, eigvecs2 = np.linalg.eigh(cov_mat)
+
+    print(eigvecs2[:, 0])
+
+
+
+    print()
+    # print('centroid = ', centroid)
+    # print('deltas = ', deltas)
+    # print('centroid(deltas) = ', deltas.mean(axis=0))
+    # print('cov_mat = ', cov_mat)
+    # print('eigvals = ', eigvals)
+    print(pc_angle.evaluateInContext(context))

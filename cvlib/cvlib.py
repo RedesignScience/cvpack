@@ -8,6 +8,7 @@
 """
 
 import inspect
+import re
 from collections import OrderedDict
 from typing import Any, Dict, List, Tuple
 
@@ -351,7 +352,6 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
     """
 
     def __init__(self, group: List[int]) -> None:
-        self._group = group
         num_atoms = len(group)
         num_groups = num_atoms + 1
         rgsq = "+".join([f"distance(g{i+1}, g{num_groups})^2" for i in range(num_atoms)])
@@ -362,3 +362,125 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         self.addBond(list(range(num_groups)), [])
         self.setUsesPeriodicBoundaryConditions(False)
         self._registerCV(mmunit.nanometers, group)
+
+
+class PrincipalComponentAngle(openmm.CustomCVForce, AbstractCollectiveVariable):
+    """
+    Method for computing PCs :cite:`Sarabandi_2020`:
+
+    Eigenvalues :cite:`Smith_1961`
+
+    Eigenvectors :cite:`Franca_1989`
+
+    Example
+    -------
+        >>> import cvlib
+        >>> import openmm as mm
+        >>> from openmmtools import testsystems
+        >>> model = testsystems.AlanineDipeptideVacuum()
+        >>> num_atoms = model.system.getNumParticles()
+        >>> atoms = list(range(num_atoms))
+        >>> pca = cvlib.cvlib.PCA(atoms[:num_atoms//2], atoms[num_atoms//2:])
+        >>> model.system.addForce(pca)
+        5
+        >>> platform = mm.Platform.getPlatformByName('Reference')
+        >>> integrator = mm.VerletIntegrator(0)
+        >>> context = mm.Context(model.system, integrator, platform)
+        >>> context.setPositions(model.positions)
+        >>> print(round(pca.evaluateInContext(context), 10))
+        0.0327870952
+
+    """
+
+    def __init__(self, group1: List[int], group2: List[int]) -> None:
+        assert len(group1) > 1 and len(group2) > 1
+        super().__init__("")
+        definitions_a = self._addPrincipalComponentCalculation(0, group1, "_1")
+        definitions_b = self._addPrincipalComponentCalculation(0, group2, "_2")
+        energy = ";".join(["v0_1", definitions_a, definitions_b])
+        print(energy)
+        self.setEnergyFunction(energy)
+        self._registerCV(1, group1, group2)
+
+    def _principalComponent(self, order: int, number: int) -> Tuple[OrderedDict, OrderedDict]:
+        """
+        Get the variables and forces needed for computating the principal component vector of given
+        order for a given number of coordinates.
+
+        Parameters
+        ----------
+            order
+                The order of the principal component vector. Valid values are 0, 1, and 2.
+            number
+                The number of coordinates
+
+        """
+        matrix = [["Cxx", "Cxy", "Cxz"], ["Cxy", "Cyy", "Cyz"], ["Cxz", "Cyz", "Czz"]]
+        matrix_sq = list(
+            ["+".join(f"{matrix[i][k]}*{matrix[k][j]}" for k in range(3)) for j in range(3)]
+            for i in range(3)
+        )
+        variables = OrderedDict(
+            v0=f"({(order == 0)*'b0 + '}b1*{matrix[0][order]} - b2*({matrix_sq[0][order]}))/s{order}",
+            v1=f"({(order == 1)*'b0 + '}b1*{matrix[1][order]} - b2*({matrix_sq[1][order]}))/s{order}",
+            v2=f"({(order == 2)*'b0 + '}b1*{matrix[2][order]} - b2*({matrix_sq[2][order]}))/s{order}",
+            b0="a0*a2*b2",
+            b1="(a2^2 - a1)*b2",
+            b2="1/(a1*a2 - a0)",
+            a0="s0*s1*s2",
+            a1="s0*(s1 + s2) + s1*s2",
+            a2="s0 + s1 + s2",
+            s0="sqrt(m + 2*alpha)",  # sqrt(eig1)
+            s1="sqrt(m - alpha + delta)",  # sqrt(eig2)
+            s2="sqrt(m - alpha - delta)",  # sqrt(eig3)
+            eig1="m + 2*alpha",  # delete when ready
+            eig2="m - alpha + delta",  # delete when ready
+            eig3="m - alpha - delta",  # delete when ready
+            delta="sqrt(3*(p - alpha^2))",
+            alpha="sqrt(p)*cos(phi/3)",
+            phi="atan2(sqrt(p^3 - q^2), q)",
+            p="(Axx^2 + Ayy^2 + Azz^2)/6 + (Cxy^2 + Cxz^2 + Cyz^2)/3",
+            q="(Axx*(Ayy*Azz - Cyz^2) - Cxy*(Cxy*Azz - Cxz*Cyz) + Cxz*(Cxy*Cyz - Cxz*Ayy))/2",
+            Axx="Cxx - m",
+            Ayy="Cyy - m",
+            Azz="Czz - m",
+            m="(Cxx + Cyy + Czz)/3",
+        )
+
+        axes = ["x", "y", "z"]
+        forces = OrderedDict()
+        for i, ax1 in enumerate(axes):
+            forces[f"S{ax1}"] = openmm.CustomExternalForce(ax1)
+            for ax2 in axes[i:]:
+                variables[f"C{ax1}{ax2}"] = f"({number}*S{ax1}{ax2} - S{ax1}*S{ax2})/{number**2}"
+                forces[f"S{ax1}{ax2}"] = openmm.CustomExternalForce(f"{ax1}*{ax2}")
+
+        return variables, forces
+
+    def _addPrincipalComponentCalculation(self, order: int, group: List[int], suffix: str) -> str:
+        """
+        Add computation of the principal component vector of given order for a given set of
+        atoms.
+
+        Parameters
+        ----------
+            order
+                The order of the principal component vector. Valid values are 0, 1, and 2.
+            group
+                The group of atoms
+            suffix
+                A suffix to distinguish this computation from others of the same kind
+
+        """
+        variables, forces = self._principalComponent(order, len(group))
+
+        for var, force in forces.items():
+            for i in group:
+                force.addParticle(i)
+            self.addCollectiveVariable(f"{var}{suffix}", force)
+
+        definitions = ";".join(f"\n{var} = {expr}" for var, expr in variables.items())
+        for var in list(variables.keys()) + list(forces.keys()):
+            definitions = re.sub(rf"\b{var}\b", f"{var}{suffix}", definitions)
+
+        return definitions
