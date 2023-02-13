@@ -21,7 +21,7 @@ as:
 
 ### Copyright
 
-Copyright (c) 2023, Charlles Abreu
+Copyright (c) 2023, Charlles Abreu & Redesign Science
 
 
 #### Acknowledgements
