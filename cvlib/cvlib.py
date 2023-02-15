@@ -381,8 +381,8 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
     where :math:`r_0` is the threshold distance for defining a contact and :math:`S(x)` is a step
     function equal to 1 if a contact is made or equal to 0 otherwise. In analysis, it is fine to
     make :math:`S(x) = H(1-x)`, where `H` is the `Heaviside step function
-    <https://en.wikipedia.org/wiki/Heaviside_step_function>`_. In simulation, however, :math:`S(x)`
-    should be a continuous approximation for :math:`H(1-x)`.
+    <https://en.wikipedia.org/wiki/Heaviside_step_function>`_. In a simulation, however,
+    :math:`S(x)` should be a continuous approximation for :math:`H(1-x)`.
 
     Atom pairs are ignored for distances beyond a cutoff :math:`r_c`. To avoid discontinuities,
     a switching function is applied at :math:`r_s \\leq r \\leq r_c` to make :math:`S(r/r_0)`
@@ -390,8 +390,9 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
 
     .. note::
 
-        The two groups can overlap. In this case, terms with :math:`j = i` (self-contacts) are
-        ignored and each combination with :math:`j \\neq i` is counted only once.
+        The two groups are allowed to overlap. In this case, terms with :math:`j = i`
+        (self-contacts) are ignored and each combination with :math:`j \\neq i` is counted
+        only once.
 
     Parameters
     ----------
@@ -402,12 +403,12 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
         numAtoms
             The total number of atoms in the system (required by OpenMM)
         stepFunction
-            The function ``"step(1-x)"`` (for analysis) or a continuous approximation thereof
-            (for simulation)
+            The function "step(1-x)" (for analysis only) or a continuous approximation
+            thereof
         pbc
             Whether the system has periodic boundary conditions
         thresholdDistance
-            The threshold distance for two atoms to be considered as being in contact
+            The threshold distance for considering two atoms as being in contact
         cutoffDistance
             The distance beyond which an atom pair will be ignored
         switchingDistance
@@ -422,7 +423,8 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
         >>> model = testsystems.AlanineDipeptideVacuum()
         >>> carbons = [a.index for a in model.topology.atoms() if a.element == app.element.carbon]
         >>> num_atoms = model.topology.getNumAtoms()
-        >>> nc = cvlib.NumberOfContacts(carbons, carbons, num_atoms, stepFunction="step(1-x)")
+        >>> optionals = {"stepFunction": "step(1-x)", "pbc": False}
+        >>> nc = cvlib.NumberOfContacts(carbons, carbons, num_atoms, **optionals)
         >>> model.system.addForce(nc)
         5
         >>> platform = openmm.Platform.getPlatformByName('Reference')

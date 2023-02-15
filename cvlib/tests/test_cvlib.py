@@ -4,12 +4,13 @@ Unit and regression test for the cvlib package.
 
 import inspect
 import io
+import itertools
 import sys
 
 import numpy as np
 import openmm
 import pytest
-from openmm import unit
+from openmm import app, unit
 from openmmtools import testsystems
 
 import cvlib
@@ -173,3 +174,32 @@ def test_radius_of_gyration():
     rgval = rg_cv.evaluateInContext(context).value_in_unit(unit.nanometers)
     assert rgval**2 == pytest.approx(rgsq)
     perform_common_tests(rg_cv, context)
+
+
+def test_number_of_contacts():
+    """
+    Test whether a number of contacts is computed correctly.
+
+    """
+    model = testsystems.AlanineDipeptideVacuum()
+    pos = model.positions
+    group1 = [a.index for a in model.topology.atoms() if a.element == app.element.carbon]
+    group2 = [a.index for a in model.topology.atoms() if a.element == app.element.oxygen]
+    pairs = set()
+    for i, j in itertools.product(group1, group2):
+        if j != i and (j, i) not in pairs:
+            pairs.add((i, j))
+    threshold = 0.3
+    contacts = [np.linalg.norm(pos[i] - pos[j]) <= threshold for i, j in pairs]
+    num_atoms = model.topology.getNumAtoms()
+    number_of_contacts = cvlib.NumberOfContacts(
+        group1, group2, num_atoms, stepFunction="step(1-x)", thresholdDistance=threshold
+    )
+    model.system.addForce(number_of_contacts)
+    integrator = openmm.CustomIntegrator(0)
+    platform = openmm.Platform.getPlatformByName("Reference")
+    context = openmm.Context(model.system, integrator, platform)
+    context.setPositions(model.positions)
+    nc_value = number_of_contacts.evaluateInContext(context)
+    assert nc_value / nc_value.unit == pytest.approx(sum(contacts))
+    perform_common_tests(number_of_contacts, context)
