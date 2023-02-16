@@ -18,6 +18,7 @@ as:
 * [Distance](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Distance.html)
 * [Number of contacts](https://cvlib-for-openmm.readthedocs.io/en/latest/api/NumberOfContacts.html)
 * [Radius of gyration](https://cvlib-for-openmm.readthedocs.io/en/latest/api/RadiusOfGyration.html)
+* [Root-Mean-Square Deviation](https://cvlib-for-openmm.readthedocs.io/en/latest/api/RootMeanSquareDeviation.html)
 * [Torsion](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Torsion.html)
 
 ### Copyright
