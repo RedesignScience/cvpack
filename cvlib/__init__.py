@@ -7,5 +7,6 @@ from .cvlib import (  # noqa: F401
     Distance,
     NumberOfContacts,
     RadiusOfGyration,
+    RootMeanSquareDeviation,
     Torsion,
 )

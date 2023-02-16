@@ -6,12 +6,14 @@ import inspect
 import io
 import itertools
 import sys
+from typing import List
 
 import numpy as np
 import openmm
 import pytest
 from openmm import app, unit
 from openmmtools import testsystems
+from scipy.spatial.transform import Rotation
 
 import cvlib
 
@@ -203,3 +205,63 @@ def test_number_of_contacts():
     nc_value = number_of_contacts.evaluateInContext(context)
     assert nc_value / nc_value.unit == pytest.approx(sum(contacts))
     perform_common_tests(number_of_contacts, context)
+
+
+def run_rmsd_test(
+    coordinates: np.ndarray,
+    group: List[int],
+    passGroupOnly: bool,
+    passVec3: bool,
+) -> None:
+    """
+    Performs a specific RMSD test
+
+    """
+    model = testsystems.AlanineDipeptideVacuum()
+    num_atoms = model.topology.getNumAtoms()
+    reference = np.array(model.positions.value_in_unit(unit.nanometers))
+    group_ref = reference[group, :] - reference[group, :].mean(axis=0)
+    if passVec3:
+        reference = [openmm.Vec3(*row) for row in reference]
+    rmsd = cvlib.RootMeanSquareDeviation(
+        group_ref if passGroupOnly else reference,
+        group,
+        num_atoms,
+    )
+    model.system.addForce(rmsd)
+    integrator = openmm.VerletIntegrator(0)
+    platform = openmm.Platform.getPlatformByName("Reference")
+    context = openmm.Context(model.system, integrator, platform)
+    context.setPositions(coordinates)
+    group_coords = coordinates[group, :] - coordinates[group, :].mean(axis=0)
+    _, rssd = Rotation.align_vectors(group_coords, group_ref)
+    rmsd_value = rmsd.evaluateInContext(context)
+    assert rmsd_value / rmsd_value.unit == pytest.approx(rssd / np.sqrt(len(group)))
+
+
+def test_root_mean_square_deviation():
+    """
+    Test whether an RMSD is computed correctly.
+
+    """
+    model = testsystems.AlanineDipeptideVacuum()
+    num_atoms = model.topology.getNumAtoms()
+    rmsd = cvlib.RootMeanSquareDeviation(model.positions, np.arange(num_atoms), num_atoms)
+    model.system.addForce(rmsd)
+    integrator = openmm.VerletIntegrator(2 * unit.femtosecond)
+    integrator.setIntegrationForceGroups({0})
+    platform = openmm.Platform.getPlatformByName("Reference")
+    context = openmm.Context(model.system, integrator, platform)
+    context.setPositions(model.positions)
+    context.setVelocitiesToTemperature(300 * unit.kelvin, 1234)
+    context.getIntegrator().step(10000)
+    state = context.getState(getPositions=True)  # pylint: disable=unexpected-keyword-arg
+    coordinates = state.getPositions(asNumpy=True).value_in_unit(unit.nanometers)
+    for pass_vec3 in [False, True]:
+        for pass_group_only in [False, True]:
+            group = np.arange(num_atoms)
+            run_rmsd_test(coordinates, group, pass_group_only, pass_vec3)
+            run_rmsd_test(coordinates, group[: num_atoms // 2], pass_group_only, pass_vec3)
+            np.random.shuffle(group)
+            run_rmsd_test(coordinates, group[: num_atoms // 2], pass_group_only, pass_vec3)
+    perform_common_tests(rmsd, context)
