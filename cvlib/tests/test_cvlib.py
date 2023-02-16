@@ -255,7 +255,7 @@ def test_root_mean_square_deviation():
     context.setPositions(model.positions)
     context.setVelocitiesToTemperature(300 * unit.kelvin, 1234)
     context.getIntegrator().step(10000)
-    state = context.getState(getPositions=True)
+    state = context.getState(getPositions=True)  # pylint: disable=unexpected-keyword-arg
     coordinates = state.getPositions(asNumpy=True).value_in_unit(unit.nanometers)
     for pass_vec3 in [False, True]:
         for pass_group_only in [False, True]:
