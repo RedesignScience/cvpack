@@ -10,7 +10,7 @@
 import inspect
 from collections import OrderedDict
 from typing import Any, Dict, List, Tuple, Union
-from numpy.typing import ArrayLike
+
 import numpy as np
 import openmm
 from openmm import unit as mmunit
@@ -477,7 +477,7 @@ class RootMeanSquareDeviation(openmm.RMSDForce, AbstractCollectiveVariable):
     .. math::
 
         RMSD({\\bf r}) = \\sqrt{
-            \\frac{1}{n} \\sum_{i=1}^n \\| {\\bf r}_i - {\\bf R} {\\bf r}_i^{\\rf ref} \\|^2
+            \\frac{1}{n} \\sum_{i=1}^n \\| {\\bf r}_i - {\\bf R} {\\bf r}_i^{\\rm ref} \\|^2
         }
 
     Parameters
@@ -486,10 +486,29 @@ class RootMeanSquareDeviation(openmm.RMSDForce, AbstractCollectiveVariable):
             The index of the atoms in the group
         numAtoms
             The total number of atoms in the system (required by OpenMM)
-        referenceCoordinates
-            The reference coordinates
+        referencePositions
+            The reference coordinates. If there are ``numAtoms`` coordinates, they must refer to the
+            the system atoms and be sorted accordingly. Otherwise, if there are ``n`` coordinates,
+            with ``n=len(group)``, they must refer to the group atoms in the same order as they
+            appear in ``group``. The first criterion has precedence when ``n == numAtoms``.
 
     """
 
-    def __init__(self, group: List[int], referenceCoordinates: ArrayLike) -> None:
-        super().__init__("r")
+    def __init__(
+        self,
+        group: List[int],
+        numAtoms: int,
+        referencePositions: Union[np.ndarray, List[openmm.Vec3], mmunit.Quantity],
+    ) -> None:
+        coords = _in_md_units(referencePositions)
+        num_coords = coords.shape[0] if isinstance(coords, np.ndarray) else len(coords)
+        assert num_coords == len(group) or num_coords == numAtoms
+        if num_coords == numAtoms:
+            positions = coords.copy()
+            coords = np.array([positions[atom] for atom in group])
+        else:
+            positions = np.zeros((numAtoms, 3))
+            for i, atom in enumerate(group):
+                positions[atom, :] = np.array(coords[i][j] for j in range(3))
+        super().__init__(group, positions)
+        self._registerCV(mmunit.nanometers, group, numAtoms, coords)
