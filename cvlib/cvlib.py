@@ -10,7 +10,7 @@
 import inspect
 from collections import OrderedDict
 from typing import Any, Dict, List, Tuple, Union
-
+from numpy.typing import ArrayLike
 import numpy as np
 import openmm
 from openmm import unit as mmunit
@@ -467,3 +467,29 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
             _in_md_units(cutoffDistance),
             _in_md_units(switchingDistance),
         )
+
+
+class RootMeanSquareDeviation(openmm.RMSDForce, AbstractCollectiveVariable):
+    """
+    The root-mean-square deviation (RMSD) between the current and reference coordinates of a
+    group of `n` atoms:
+
+    .. math::
+
+        RMSD({\\bf r}) = \\sqrt{
+            \\frac{1}{n} \\sum_{i=1}^n \\| {\\bf r}_i - {\\bf R} {\\bf r}_i^{\\rf ref} \\|^2
+        }
+
+    Parameters
+    ----------
+        group
+            The index of the atoms in the group
+        numAtoms
+            The total number of atoms in the system (required by OpenMM)
+        referenceCoordinates
+            The reference coordinates
+
+    """
+
+    def __init__(self, group: List[int], referenceCoordinates: ArrayLike) -> None:
+        super().__init__("r")
