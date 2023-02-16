@@ -218,7 +218,7 @@ class Distance(openmm.CustomBondForce, AbstractCollectiveVariable):
 
     """
 
-    def __init__(self, atom1: int, atom2: int, pbc: bool=True) -> None:
+    def __init__(self, atom1: int, atom2: int, pbc: bool = True) -> None:
         super().__init__("r")
         self.addBond(atom1, atom2, [])
         self.setUsesPeriodicBoundaryConditions(pbc)
