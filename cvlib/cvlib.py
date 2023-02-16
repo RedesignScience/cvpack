@@ -514,8 +514,9 @@ class RootMeanSquareDeviation(openmm.RMSDForce, AbstractCollectiveVariable):
         >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
         >>> integrator.step(1000)
-        >>> print(rmsd.evaluateInContext(context))
-        0.12313832156222626 nm
+        >>> value = rmsd.evaluateInContext(context)
+        >>> round(value/value.unit, 7)
+        0.1231383
 
     """
 
