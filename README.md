@@ -14,10 +14,11 @@ In [OpenMM], collective variables (CV) involved in a [CustomCVForce] are nothing
 objects. This CV Library provides several CVs of common use in molecular dynamics simulations, such
 as:
 
-* [Distance](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Distance.html)
 * [Angle](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Angle.html)
-* [Torsion](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Torsion.html)
+* [Distance](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Distance.html)
+* [Number of contacts](https://cvlib-for-openmm.readthedocs.io/en/latest/api/NumberOfContacts.html)
 * [Radius of gyration](https://cvlib-for-openmm.readthedocs.io/en/latest/api/RadiusOfGyration.html)
+* [Torsion](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Torsion.html)
 
 ### Copyright
 
