@@ -6,7 +6,7 @@ dependencies:
   - python
   - pip
   - openmm
-  - numpy
+  - numpy<1.24
   - pyyaml
 
     # Testing
