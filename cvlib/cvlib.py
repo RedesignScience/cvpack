@@ -494,6 +494,26 @@ class RootMeanSquareDeviation(openmm.RMSDForce, AbstractCollectiveVariable):
         numAtoms
             The total number of atoms in the system (required by OpenMM)
 
+    Example
+    -------
+        >>> import cvlib
+        >>> import openmm as mm
+        >>> from openmm import app, unit
+        >>> from openmmtools import testsystems
+        >>> model = testsystems.AlanineDipeptideImplicit()
+        >>> num_atoms = model.topology.getNumAtoms()
+        >>> group = list(range(num_atoms))
+        >>> rmsd = cvlib.RootMeanSquareDeviation(model.positions, group, num_atoms)
+        >>> model.system.addForce(rmsd)
+        6
+        >>> platform = openmm.Platform.getPlatformByName('Reference')
+        >>> integrator = openmm.VerletIntegrator(2*unit.femtoseconds)
+        >>> context = openmm.Context(model.system, integrator, platform)
+        >>> context.setPositions(model.positions)
+        >>> integrator.step(1000)
+        >>> print(rmsd.evaluateInContext(context))
+        0.12313832156222626 nm
+
     """
 
     def __init__(

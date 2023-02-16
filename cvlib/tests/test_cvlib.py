@@ -261,7 +261,7 @@ def test_root_mean_square_deviation():
         for pass_group_only in [False, True]:
             group = np.arange(num_atoms)
             run_rmsd_test(coordinates, group, pass_group_only, pass_vec3)
-            run_rmsd_test(coordinates, group[:num_atoms//2], pass_group_only, pass_vec3)
+            run_rmsd_test(coordinates, group[: num_atoms // 2], pass_group_only, pass_vec3)
             np.random.shuffle(group)
-            run_rmsd_test(coordinates, group[:num_atoms//2], pass_group_only, pass_vec3)
+            run_rmsd_test(coordinates, group[: num_atoms // 2], pass_group_only, pass_vec3)
     perform_common_tests(rmsd, context)
