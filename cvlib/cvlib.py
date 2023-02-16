@@ -471,34 +471,36 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
 
 class RootMeanSquareDeviation(openmm.RMSDForce, AbstractCollectiveVariable):
     """
-    The root-mean-square deviation (RMSD) between the current and reference coordinates of a
+    The minimum root-mean-square deviation (RMSD) between the current and reference coordinates of a
     group of `n` atoms:
 
     .. math::
 
         RMSD({\\bf r}) = \\sqrt{
-            \\frac{1}{n} \\sum_{i=1}^n \\| {\\bf r}_i - {\\bf R} {\\bf r}_i^{\\rm ref} \\|^2
+            \\frac{1}{n} \\sum_{i=1}^n \\| {\\bf r}_i - {\\bf R}(\\bf r) {\\bf r}_i^{\\rm ref} \\|^2
         }
+
+    where :math:`{\\bf R}(\\bf r)` is the rotation matrix that minimizes the RMSD.
 
     Parameters
     ----------
-        group
-            The index of the atoms in the group
-        numAtoms
-            The total number of atoms in the system (required by OpenMM)
         referencePositions
             The reference coordinates. If there are ``numAtoms`` coordinates, they must refer to the
             the system atoms and be sorted accordingly. Otherwise, if there are ``n`` coordinates,
             with ``n=len(group)``, they must refer to the group atoms in the same order as they
             appear in ``group``. The first criterion has precedence when ``n == numAtoms``.
+        group
+            The index of the atoms in the group
+        numAtoms
+            The total number of atoms in the system (required by OpenMM)
 
     """
 
     def __init__(
         self,
+        referencePositions: Union[np.ndarray, List[openmm.Vec3], mmunit.Quantity],
         group: List[int],
         numAtoms: int,
-        referencePositions: Union[np.ndarray, List[openmm.Vec3], mmunit.Quantity],
     ) -> None:
         coords = _in_md_units(referencePositions)
         num_coords = coords.shape[0] if isinstance(coords, np.ndarray) else len(coords)
@@ -509,6 +511,6 @@ class RootMeanSquareDeviation(openmm.RMSDForce, AbstractCollectiveVariable):
         else:
             positions = np.zeros((numAtoms, 3))
             for i, atom in enumerate(group):
-                positions[atom, :] = np.array(coords[i][j] for j in range(3))
-        super().__init__(group, positions)
-        self._registerCV(mmunit.nanometers, group, numAtoms, coords)
+                positions[atom, :] = np.array([coords[i][j] for j in range(3)])
+        super().__init__(positions, group)
+        self._registerCV(mmunit.nanometers, coords, group, numAtoms)

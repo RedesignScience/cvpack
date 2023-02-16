@@ -6,10 +6,12 @@ dependencies:
   - python
   - pip
   - openmm
-  - openmmtools
+  - numpy
   - pyyaml
 
     # Testing
+  - scipy
+  - openmmtools
   - pytest
   - pytest-cov
   - codecov

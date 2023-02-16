@@ -2,10 +2,10 @@
 
 # Add imports here
 from ._version import __version__  # noqa: F401
-from .cvlib import (
+from .cvlib import (  # noqa: F401
     Angle,
     Distance,
-    NumberOfContacts,  # noqa: F401
+    NumberOfContacts,
     RadiusOfGyration,
     RootMeanSquareDeviation,
     Torsion,
