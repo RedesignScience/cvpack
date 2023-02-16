@@ -85,3 +85,6 @@ default-tag = "0.0.0"
 
 [tool.versioningit.write]
 file = "cvlib/_version.py"
+
+[tool.isort]
+profile = "black"
