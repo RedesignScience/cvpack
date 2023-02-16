@@ -193,7 +193,7 @@ def test_number_of_contacts():
     contacts = [np.linalg.norm(pos[i] - pos[j]) <= threshold for i, j in pairs]
     num_atoms = model.topology.getNumAtoms()
     number_of_contacts = cvlib.NumberOfContacts(
-        group1, group2, num_atoms, stepFunction="step(1-x)", thresholdDistance=threshold
+        group1, group2, num_atoms, pbc=False, stepFunction="step(1-x)", thresholdDistance=threshold
     )
     model.system.addForce(number_of_contacts)
     integrator = openmm.CustomIntegrator(0)

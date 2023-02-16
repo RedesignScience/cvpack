@@ -94,9 +94,9 @@ class AbstractCollectiveVariable(openmm.Force):
             >>> import cvlib
             >>> args, defaults = cvlib.Distance.getArguments()
             >>> print(*args.items())
-            ('atom1', <class 'int'>) ('atom2', <class 'int'>)
+            ('atom1', <class 'int'>) ('atom2', <class 'int'>) ('pbc', <class 'bool'>)
             >>> print(*defaults.items())
-            <BLANKLINE>
+            ('pbc', True)
 
         Example
         =======
@@ -197,6 +197,8 @@ class Distance(openmm.CustomBondForce, AbstractCollectiveVariable):
             The index of the first atom
         atom2
             The index of the second atom
+        pbc
+            Whether to use periodic boundary conditions
 
     Example:
         >>> import cvlib
@@ -216,9 +218,10 @@ class Distance(openmm.CustomBondForce, AbstractCollectiveVariable):
 
     """
 
-    def __init__(self, atom1: int, atom2: int) -> None:
+    def __init__(self, atom1: int, atom2: int, pbc: bool=True) -> None:
         super().__init__("r")
         self.addBond(atom1, atom2, [])
+        self.setUsesPeriodicBoundaryConditions(pbc)
         self._registerCV(mmunit.nanometers, atom1, atom2)
 
 
@@ -402,11 +405,11 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
             The indices of the atoms in the second group
         numAtoms
             The total number of atoms in the system (required by OpenMM)
+        pbc
+            Whether the system has periodic boundary conditions
         stepFunction
             The function "step(1-x)" (for analysis only) or a continuous approximation
             thereof
-        pbc
-            Whether the system has periodic boundary conditions
         thresholdDistance
             The threshold distance for considering two atoms as being in contact
         cutoffDistance
@@ -423,7 +426,7 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
         >>> model = testsystems.AlanineDipeptideVacuum()
         >>> carbons = [a.index for a in model.topology.atoms() if a.element == app.element.carbon]
         >>> num_atoms = model.topology.getNumAtoms()
-        >>> optionals = {"stepFunction": "step(1-x)", "pbc": False}
+        >>> optionals = {"pbc": False, "stepFunction": "step(1-x)"}
         >>> nc = cvlib.NumberOfContacts(carbons, carbons, num_atoms, **optionals)
         >>> model.system.addForce(nc)
         5
@@ -440,8 +443,8 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
         group1: List[int],
         group2: List[int],
         numAtoms: int,
-        stepFunction: str = "1/(1+x^6)",
         pbc: bool = True,
+        stepFunction: str = "1/(1+x^6)",
         thresholdDistance: QuantityOrFloat = 0.3,
         cutoffDistance: QuantityOrFloat = 0.6,
         switchingDistance: QuantityOrFloat = 0.5,
@@ -461,8 +464,8 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
             group1,
             group2,
             numAtoms,
-            stepFunction,
             pbc,
+            stepFunction,
             _in_md_units(thresholdDistance),
             _in_md_units(cutoffDistance),
             _in_md_units(switchingDistance),
