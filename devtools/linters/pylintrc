@@ -7,3 +7,6 @@ ignore=_version.py
 
 method-naming-style=camelCase
 argument-naming-style=camelCase
+
+[FORMAT]
+good-names=i,j,k,_,x,y,z

@@ -13,6 +13,7 @@ from typing import Any, Dict, List, Tuple, Union
 
 import numpy as np
 import openmm
+from openmm import app as mmapp
 from openmm import unit as mmunit
 
 QuantityOrFloat = Union[mmunit.Quantity, float]
@@ -538,3 +539,100 @@ class RootMeanSquareDeviation(openmm.RMSDForce, AbstractCollectiveVariable):
                 positions[atom, :] = np.array([coords[i][j] for j in range(3)])
         super().__init__(positions, group)
         self._registerCV(mmunit.nanometers, coords, group, numAtoms)
+
+
+class HelixRamachandranContent(openmm.CustomTorsionForce, AbstractCollectiveVariable):
+    """
+     Fractional alpha-helix Ramachandran content of a sequence of `n` residues:
+
+    .. math::
+
+        \\alpha_{\\phi,\\psi}({\\bf r}) = \\frac{1}{2(n-2)} \\sum_{i=2}^{n-1} \\left[
+            S\\left(
+                \\frac{\\phi_i(\\bf r) - \\phi_{\\rm ref}}{\\theta_{\\rm tol}}
+            \\right) +
+            S\\left(
+                \\frac{\\psi_i(\\bf r) - \\psi_{\\rm ref}}{\\theta_{\\rm tol}}
+            \\right)
+        \\right]
+
+    where :math:`phi_i(\\bf r)` and :math:`psi_i(\\bf r)` are the Ramachandran dihedral angles of
+    residue :math:`i`, :math:`\\phi_{\\rm ref}` and :math:`\\psi_{\\rm ref}` are their reference
+    values in an alpha helix :cite:`Hovmoller_2002`, and :math:`\\theta_{\\rm tol}` is the threshold
+    tolerance around these refenrences. The function :math:`S(x)` is a step function:
+
+    .. math::
+        S(x) = \\frac{1}{1 + x^{2m}}
+
+    where :math:`m` is an integer parameter that controls its steepness.
+
+    Parameters
+    ----------
+        residues
+            The residues in the sequence
+        phiReference
+            The reference value of the phi dihedral angle in an alpha helix
+        psiReference
+            The reference value of the psi dihedral angle in an alpha helix
+        tolerance
+            The threshold tolerance around the reference values
+        halfExponent
+            The parameter :math:`m` of the step function
+
+    Example
+    -------
+        >>> import cvlib
+        >>> import openmm as mm
+        >>> from openmm import app, unit
+        >>> from openmmtools import testsystems
+        >>> model = testsystems.LysozymeImplicit()
+        >>> residues = [r for r in model.topology.residues() if 59 <= r.index <= 79]
+        >>> print(*[r.name for r in residues])
+        LYS ASP GLU ALA GLU LYS LEU PHE ASN GLN ASP VAL ASP ALA ALA VAL ARG GLY ILE LEU ARG
+        >>> helix_content = cvlib.HelixRamachandranContent(residues)
+        >>> model.system.addForce(helix_content)
+        6
+        >>> platform = openmm.Platform.getPlatformByName('Reference')
+        >>> integrator = openmm.VerletIntegrator(0)
+        >>> context = openmm.Context(model.system, integrator, platform)
+        >>> context.setPositions(model.positions)
+        >>> quantity = helix_content.evaluateInContext(context)
+        >>> print(quantity)
+        0.9185709875095293 dimensionless
+
+    """
+
+    def __init__(  # pylint: disable=too-many-arguments
+        self,
+        residues: List[mmapp.topology.Residue],
+        phiReference: QuantityOrFloat = -63.8 * mmunit.degrees,
+        psiReference: QuantityOrFloat = -41.1 * mmunit.degrees,
+        tolerance: QuantityOrFloat = 25 * mmunit.degrees,
+        halfExponent: int = 3,
+    ):
+        def find_atom(residue: mmapp.topology.Residue, name: str) -> int:
+            for atom in residue.atoms():
+                if atom.name == name:
+                    return atom.index
+            raise ValueError(f"Could not find atom {name} in residue {residue.name}{residue.id}")
+
+        phi_ref, psi_ref, tol = map(_in_md_units, [phiReference, psiReference, tolerance])
+        num_torsions = 2 * (len(residues) - 2)
+        super().__init__(f"{1/num_torsions}/(1+x^{2*halfExponent}); x=(theta-theta_ref)/{tol}")
+        self.addPerTorsionParameter("theta_ref")
+        for i in range(1, len(residues) - 1):
+            self.addTorsion(
+                find_atom(residues[i - 1], "C"),
+                find_atom(residues[i], "N"),
+                find_atom(residues[i], "CA"),
+                find_atom(residues[i], "C"),
+                [phi_ref],
+            )
+            self.addTorsion(
+                find_atom(residues[i], "N"),
+                find_atom(residues[i], "CA"),
+                find_atom(residues[i], "C"),
+                find_atom(residues[i + 1], "N"),
+                [psi_ref],
+            )
+        self._registerCV(mmunit.dimensionless, residues, phi_ref, psi_ref, tol, halfExponent)

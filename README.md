@@ -16,6 +16,7 @@ as:
 
 * [Angle](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Angle.html)
 * [Distance](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Distance.html)
+* [Helix Ramachandran Content](https://cvlib-for-openmm.readthedocs.io/en/latest/api/HelixRamachandranContent.html)
 * [Number of contacts](https://cvlib-for-openmm.readthedocs.io/en/latest/api/NumberOfContacts.html)
 * [Radius of gyration](https://cvlib-for-openmm.readthedocs.io/en/latest/api/RadiusOfGyration.html)
 * [Root-Mean-Square Deviation](https://cvlib-for-openmm.readthedocs.io/en/latest/api/RootMeanSquareDeviation.html)

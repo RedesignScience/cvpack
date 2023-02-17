@@ -8,6 +8,7 @@ import itertools
 import sys
 from typing import List
 
+import mdtraj
 import numpy as np
 import openmm
 import pytest
@@ -265,3 +266,30 @@ def test_root_mean_square_deviation():
             np.random.shuffle(group)
             run_rmsd_test(coordinates, group[: num_atoms // 2], pass_group_only, pass_vec3)
     perform_common_tests(rmsd, context)
+
+
+def test_helix_ramachandran_content():
+    """
+    Test whether a helix ramachandran content is computed correctly.
+
+    """
+    model = testsystems.LysozymeImplicit()
+
+    positions = model.positions.value_in_unit(unit.nanometers)
+    traj = mdtraj.Trajectory(positions, mdtraj.Topology.from_openmm(model.topology))
+    _, phi = mdtraj.compute_phi(traj)
+    _, psi = mdtraj.compute_psi(traj)
+    x = (np.rad2deg(phi.ravel()[:-1]) + 63.8) / 25
+    y = (np.rad2deg(psi.ravel()[1:]) + 41.1) / 25
+    computed_value = np.sum(1 / (1 + x**6) + 1 / (1 + y**6)) / (len(x) + len(y))
+
+    residues = list(model.topology.residues())
+    helix_content = cvlib.HelixRamachandranContent(residues[0:-1])
+    model.system.addForce(helix_content)
+    integrator = openmm.VerletIntegrator(0)
+    platform = openmm.Platform.getPlatformByName("Reference")
+    context = openmm.Context(model.system, integrator, platform)
+    context.setPositions(model.positions)
+    cv_value = helix_content.evaluateInContext(context)
+
+    assert cv_value / cv_value.unit == pytest.approx(computed_value)
