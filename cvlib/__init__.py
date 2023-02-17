@@ -5,6 +5,7 @@ from ._version import __version__  # noqa: F401
 from .cvlib import (  # noqa: F401
     Angle,
     Distance,
+    HelixRamachandranContent,
     NumberOfContacts,
     RadiusOfGyration,
     RootMeanSquareDeviation,
