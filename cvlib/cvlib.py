@@ -197,6 +197,22 @@ class AbstractCollectiveVariable(openmm.Force):
         -------
             The value of this collective variable's effective mass at the given context
 
+        Example
+        -------
+            >>> import cvlib
+            >>> import openmm as mm
+            >>> from openmmtools import testsystems
+            >>> model = testsystems.AlanineDipeptideImplicit()
+            >>> peptide = [a.index for a in model.topology.atoms() if a.residue.name != 'HOH']
+            >>> radius_of_gyration = cvlib.RadiusOfGyration(peptide)
+            >>> model.system.addForce(radius_of_gyration)
+            6
+            >>> platform = mm.Platform.getPlatformByName('Reference')
+            >>> context = mm.Context(model.system, mm.VerletIntegrator(0), platform)
+            >>> context.setPositions(model.positions)
+            >>> print(radius_of_gyration.effectiveMassInContext(context, 6))
+            30.946932 Da
+
         """
         state = self._getSingleForceState(context, getForces=True)
         force_values = _in_md_units(state.getForces(asNumpy=True))

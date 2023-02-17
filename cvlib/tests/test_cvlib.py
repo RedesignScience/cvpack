@@ -191,19 +191,17 @@ def test_number_of_contacts():
     for i, j in itertools.product(group1, group2):
         if j != i and (j, i) not in pairs:
             pairs.add((i, j))
-    threshold = 0.3
-    contacts = [np.linalg.norm(pos[i] - pos[j]) <= threshold for i, j in pairs]
+    distances = np.array([np.linalg.norm(pos[i] - pos[j]) for i, j in pairs])
+    contacts = np.where(distances <= 0.6, 1 / (1 + (distances / 0.3) ** 6), 0)
     num_atoms = model.topology.getNumAtoms()
-    number_of_contacts = cvlib.NumberOfContacts(
-        group1, group2, num_atoms, pbc=False, stepFunction="step(1-x)", thresholdDistance=threshold
-    )
+    number_of_contacts = cvlib.NumberOfContacts(group1, group2, num_atoms, pbc=False)
     model.system.addForce(number_of_contacts)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
     context.setPositions(model.positions)
     nc_value = number_of_contacts.evaluateInContext(context)
-    assert nc_value / nc_value.unit == pytest.approx(sum(contacts))
+    assert nc_value / nc_value.unit == pytest.approx(contacts.sum())
     perform_common_tests(number_of_contacts, context)
 
 
