@@ -222,7 +222,7 @@ def run_rmsd_test(
     group_ref = reference[group, :] - reference[group, :].mean(axis=0)
     if passVec3:
         reference = [openmm.Vec3(*row) for row in reference]
-    rmsd = cvlib.RootMeanSquareDeviation(
+    rmsd = cvlib.RMSD(
         group_ref if passGroupOnly else reference,
         group,
         num_atoms,
@@ -238,14 +238,14 @@ def run_rmsd_test(
     assert rmsd_value / rmsd_value.unit == pytest.approx(rssd / np.sqrt(len(group)))
 
 
-def test_root_mean_square_deviation():
+def test_rmsd():
     """
     Test whether an RMSD is computed correctly.
 
     """
     model = testsystems.AlanineDipeptideVacuum()
     num_atoms = model.topology.getNumAtoms()
-    rmsd = cvlib.RootMeanSquareDeviation(model.positions, np.arange(num_atoms), num_atoms)
+    rmsd = cvlib.RMSD(model.positions, np.arange(num_atoms), num_atoms)
     model.system.addForce(rmsd)
     integrator = openmm.VerletIntegrator(2 * unit.femtosecond)
     integrator.setIntegrationForceGroups({0})
@@ -266,7 +266,7 @@ def test_root_mean_square_deviation():
     perform_common_tests(rmsd, context)
 
 
-def test_helix_ramachandran_content():
+def test_helix_torsion_content():
     """
     Test whether a helix ramachandran content is computed correctly.
 
@@ -282,7 +282,7 @@ def test_helix_ramachandran_content():
     computed_value = np.sum(1 / (1 + x**6) + 1 / (1 + y**6)) / (len(x) + len(y))
 
     residues = list(model.topology.residues())
-    helix_content = cvlib.HelixRamachandranContent(residues[0:-1])
+    helix_content = cvlib.HelixTorsionContent(residues[0:-1])
     model.system.addForce(helix_content)
     integrator = openmm.VerletIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")

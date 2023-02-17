@@ -32,7 +32,7 @@ def serialize(obj: Any, iostream: IO) -> None:
         >>> iostream = io.StringIO()
         >>> serializer.serialize(radius_of_gyration, iostream)
         >>> print(iostream.getvalue())
-        !!python/object:cvlib.cvlib.RadiusOfGyration
+        !!python/object:cvlib.radius_of_gyration.RadiusOfGyration
         group:
         - 0
         - 1
@@ -69,7 +69,7 @@ def deserialize(iostream: IO) -> Any:
         0
         >>> new_object = serializer.deserialize(iostream)
         >>> print(type(new_object))
-        <class 'cvlib.cvlib.RadiusOfGyration'>
+        <class 'cvlib.radius_of_gyration.RadiusOfGyration'>
 
     """
     return yaml.load(iostream.read(), Loader=yaml.CLoader)

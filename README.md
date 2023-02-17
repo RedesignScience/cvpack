@@ -16,10 +16,10 @@ as:
 
 * [Angle](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Angle.html)
 * [Distance](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Distance.html)
-* [Helix Ramachandran Content](https://cvlib-for-openmm.readthedocs.io/en/latest/api/HelixRamachandranContent.html)
+* [Helix Ramachandran Content](https://cvlib-for-openmm.readthedocs.io/en/latest/api/HelixTorsionContent.html)
 * [Number of contacts](https://cvlib-for-openmm.readthedocs.io/en/latest/api/NumberOfContacts.html)
 * [Radius of gyration](https://cvlib-for-openmm.readthedocs.io/en/latest/api/RadiusOfGyration.html)
-* [Root-Mean-Square Deviation](https://cvlib-for-openmm.readthedocs.io/en/latest/api/RootMeanSquareDeviation.html)
+* [Root-Mean-Square Deviation](https://cvlib-for-openmm.readthedocs.io/en/latest/api/RMSD.html)
 * [Torsion](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Torsion.html)
 
 ### Copyright
