@@ -614,7 +614,7 @@ class HelixRamachandranContent(openmm.CustomTorsionForce, AbstractCollectiveVari
             for atom in residue.atoms():
                 if atom.name == name:
                     return atom.index
-            raise ValueError(f"Could not find atom {name} in residue {residue.name}")
+            raise ValueError(f"Could not find atom {name} in residue {residue.name}{residue.id}")
 
         phi_ref, psi_ref, tol = map(_in_md_units, [phiReference, psiReference, tolerance])
         num_torsions = 2 * (len(residues) - 2)

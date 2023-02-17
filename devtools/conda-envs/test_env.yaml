@@ -12,6 +12,7 @@ dependencies:
     # Testing
   - scipy
   - openmmtools
+  - mdtraj
   - pytest
   - pytest-cov
   - codecov
