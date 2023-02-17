@@ -9,7 +9,7 @@
 
 import inspect
 from collections import OrderedDict
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import openmm
@@ -23,6 +23,15 @@ def _in_md_units(quantity: QuantityOrFloat) -> float:
     Returns the numerical value of a quantity in a unit of measurement compatible with the
     Molecular Dynamics unit system (mass in Da, distance in nm, time in ps, temperature in K,
     energy in kJ/mol, angle in rad).
+
+    Parameters
+    ----------
+        quantity
+            The quantity to be converted
+
+    Returns
+    -------
+        The numerical value of the quantity in the MD unit system
 
     """
     if mmunit.is_quantity(quantity):
@@ -134,14 +143,21 @@ class AbstractCollectiveVariable(openmm.Force):
         """
         return self._unit
 
-    def evaluateInContext(self, context: openmm.Context) -> mmunit.Quantity:
+    def evaluateInContext(
+        self, context: openmm.Context, digits: Optional[int] = None
+    ) -> mmunit.Quantity:
         """
         Evaluate this collective variable at a given :OpenMM:`Context`.
+
+        Optionally, the value of this collective variable can be rounded to a specified number of
+        digits.
 
         Parameters
         ----------
             context
                 The context at which this collective variable should be evaluated
+            digits
+                The number of digits to round to
 
         Returns
         -------
@@ -149,9 +165,12 @@ class AbstractCollectiveVariable(openmm.Force):
 
         """
         state = self._getSingleForceState(context, getEnergy=True)
-        return _in_md_units(state.getPotentialEnergy()) * self.getUnit()
+        value = _in_md_units(state.getPotentialEnergy())
+        return (round(value, digits) if digits else value) * self.getUnit()
 
-    def effectiveMassInContext(self, context: openmm.Context) -> mmunit.Quantity:
+    def effectiveMassInContext(
+        self, context: openmm.Context, digits: Optional[int] = None
+    ) -> mmunit.Quantity:
         """
         Compute the effective mass of this collective variable at a given :OpenMM:`Context`.
 
@@ -164,10 +183,15 @@ class AbstractCollectiveVariable(openmm.Force):
                 \\sum_{i=1}^N \\frac{1}{m_i} \\left\\|\\frac{dq}{d{\\bf r}_i}\\right\\|^2
             \\right)^{-1}
 
+        Optionally, the value of the effective mass of this collective variable can be rounded to a
+        specified number of digits.
+
         Parameters
         ----------
             context
                 The context at which this collective variable's effective mass should be evaluated
+            digits
+                The number of digits to round to
 
         Returns
         -------
@@ -180,7 +204,8 @@ class AbstractCollectiveVariable(openmm.Force):
         masses_with_units = map(context.getSystem().getParticleMass, indices)
         mass_values = np.array(list(map(_in_md_units, masses_with_units)))
         effective_mass = 1.0 / np.sum(np.sum(force_values**2, axis=1) / mass_values)
-        return effective_mass * mmunit.dalton * (mmunit.nanometers / self.getUnit()) ** 2
+        unit = mmunit.dalton * (mmunit.nanometers / self.getUnit()) ** 2
+        return (round(effective_mass, digits) if digits else effective_mass) * unit
 
 
 class Distance(openmm.CustomBondForce, AbstractCollectiveVariable):
@@ -213,8 +238,8 @@ class Distance(openmm.CustomBondForce, AbstractCollectiveVariable):
         >>> platform = mm.Platform.getPlatformByName('Reference')
         >>> context = mm.Context(system, integrator, platform)
         >>> context.setPositions([mm.Vec3(0, 0, 0), mm.Vec3(1, 1, 1)])
-        >>> print(distance.evaluateInContext(context))
-        1.7320508075688772 nm
+        >>> print(distance.evaluateInContext(context, 5))
+        1.73205 nm
 
     """
 
@@ -262,8 +287,8 @@ class Angle(openmm.CustomAngleForce, AbstractCollectiveVariable):
         >>> context = mm.Context(system, integrator, platform)
         >>> positions = [[0, 0, 0], [1, 0, 0], [1, 1, 0]]
         >>> context.setPositions([mm.Vec3(*pos) for pos in positions])
-        >>> print(angle.evaluateInContext(context))
-        1.5707963267948966 rad
+        >>> print(angle.evaluateInContext(context, 6))
+        1.570796 rad
 
     """
 
@@ -315,8 +340,8 @@ class Torsion(openmm.CustomTorsionForce, AbstractCollectiveVariable):
         >>> context = mm.Context(system, integrator, platform)
         >>> positions = [[0, 0, 0], [1, 0, 0], [1, 1, 0], [1, 1, 1]]
         >>> context.setPositions([mm.Vec3(*pos) for pos in positions])
-        >>> print(torsion.evaluateInContext(context))
-        1.5707963267948966 rad
+        >>> print(torsion.evaluateInContext(context, 6))
+        1.570796 rad
 
     """
 
@@ -354,8 +379,8 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         >>> integrator = mm.VerletIntegrator(0)
         >>> context = mm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
-        >>> print(radius_of_gyration.evaluateInContext(context))
-        0.295143056060787 nm
+        >>> print(radius_of_gyration.evaluateInContext(context, 6))
+        0.295143 nm
 
     """
 
@@ -433,7 +458,7 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
         >>> platform = openmm.Platform.getPlatformByName('Reference')
         >>> context = openmm.Context(model.system, openmm.CustomIntegrator(0), platform)
         >>> context.setPositions(model.positions)
-        >>> print(nc.evaluateInContext(context))
+        >>> print(nc.evaluateInContext(context, 6))
         6.0 dimensionless
 
     """
