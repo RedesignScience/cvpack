@@ -63,6 +63,15 @@ class AbstractCollectiveVariable(openmm.Force):
 
         This method must always be called from Subclass.__init__.
 
+        Parameters
+        ----------
+            unit
+                The unit of measurement of this collective variable. It must be a unit in the MD
+                unit system (mass in Da, distance in nm, time in ps, temperature in K, energy in
+                kJ/mol, angle in rad).
+            args
+                The arguments needed to construct this collective variable
+
         """
         self.setName(self.__class__.__name__)
         self.setUnit(unit)
@@ -76,8 +85,29 @@ class AbstractCollectiveVariable(openmm.Force):
         Get an OpenMM State containing the potential energy and/or force values computed from this
         single force object.
 
+        Parameters
+        ----------
+            context
+                The context from which the state should be extracted
+            getEnergy
+                If True, the potential energy will be computed
+            getForces
+                If True, the forces will be computed
+
+        Returns
+        -------
+            The state containing the potential energy and/or force values computed from this single
+            force object
+
+        Raises
+        ------
+            ValueError
+                If this force is not part of the system in the given context
+
         """
         forces = context.getSystem().getForces()
+        if not any(force.this == self.this for force in forces):
+            raise ValueError("This force is not part of the system in the given context.")
         free_groups = set(range(32)) - set(f.getForceGroup() for f in forces)
         old_group = self.getForceGroup()
         new_group = next(iter(free_groups))
@@ -100,7 +130,7 @@ class AbstractCollectiveVariable(openmm.Force):
                 An ordered dictionary containing default values of optional arguments
 
         Example
-        =======
+        -------
             >>> import cvlib
             >>> args, defaults = cvlib.Distance.getArguments()
             >>> print(*args.items())
@@ -109,7 +139,7 @@ class AbstractCollectiveVariable(openmm.Force):
             ('pbc', True)
 
         Example
-        =======
+        -------
             >>> import cvlib
             >>> radius_of_gyration = cvlib.RadiusOfGyration([1, 2, 3])
             >>> args, _ = radius_of_gyration.getArguments()
@@ -321,7 +351,7 @@ class Torsion(openmm.CustomTorsionForce, AbstractCollectiveVariable):
 
     .. math::
 
-        \\varphi({\\bf r}) = \\mathrm{atan2}\\left(\\frac{
+        \\varphi({\\bf r}) = {\\rm atan2}\\left(\\frac{
             ({\\bf r}_{2,1} \\times {\\bf r}_{3,4}) \\cdot {\\bf u}_{2,3}
         }{
             {\\bf r}_{2,1} \\cdot {\\bf r}_{3,4} - ({\\bf r}_{2,1} \\cdot {\\bf u}_{2,3})
@@ -330,7 +360,8 @@ class Torsion(openmm.CustomTorsionForce, AbstractCollectiveVariable):
 
     where :math:`{\\bf r}_{i,j} = {\\bf r}_j - {\\bf r}_i`,
     :math:`{\\bf u}_{2,3} = {\\bf r}_{2,3}/\\|{\\bf r}_{2,3}\\|`,
-    and `atan2 <https://en.wikipedia.org/wiki/Atan2>`_ is the 2-argument arctangent function.
+    and `atan2 <https://en.wikipedia.org/wiki/Atan2>`_ is the arctangent function that receives
+    the numerator and denominator above as separate arguments.
 
     Parameters
     ----------
@@ -427,7 +458,7 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
     function equal to 1 if a contact is made or equal to 0 otherwise. In analysis, it is fine to
     make :math:`S(x) = H(1-x)`, where `H` is the `Heaviside step function
     <https://en.wikipedia.org/wiki/Heaviside_step_function>`_. In a simulation, however,
-    :math:`S(x)` should be a continuous approximation for :math:`H(1-x)`.
+    :math:`S(x)` should continuously approximate :math:`H(1-x)` for :math:`x \\geq 0`.
 
     Atom pairs are ignored for distances beyond a cutoff :math:`r_c`. To avoid discontinuities,
     a switching function is applied at :math:`r_s \\leq r \\leq r_c` to make :math:`S(r/r_0)`
@@ -521,8 +552,10 @@ class RootMeanSquareDeviation(openmm.RMSDForce, AbstractCollectiveVariable):
 
     .. math::
 
-        RMSD({\\bf r}) = \\sqrt{
-            \\frac{1}{n} \\sum_{i=1}^n \\| {\\bf r}_i - {\\bf R}(\\bf r) {\\bf r}_i^{\\rm ref} \\|^2
+        d_{\\rm rms}({\\bf r}) = \\sqrt{
+            \\frac{1}{n} \\sum_{i=1}^n \\left\\|
+                {\\bf r}_i - {\\bf R}({\\bf r}) {\\bf r}_i^{\\rm ref}
+            \\right\\|^2
         }
 
     where :math:`{\\bf R}(\\bf r)` is the rotation matrix that minimizes the RMSD.
@@ -584,28 +617,35 @@ class RootMeanSquareDeviation(openmm.RMSDForce, AbstractCollectiveVariable):
 
 class HelixRamachandranContent(openmm.CustomTorsionForce, AbstractCollectiveVariable):
     """
-     Fractional alpha-helix Ramachandran content of a sequence of `n` residues:
+     Fractional :math:`\\alpha`-helix Ramachandran content of a sequence of `n` residues:
 
     .. math::
 
         \\alpha_{\\phi,\\psi}({\\bf r}) = \\frac{1}{2(n-2)} \\sum_{i=2}^{n-1} \\left[
-            S\\left(
+            B\\left(
                 \\frac{\\phi_i(\\bf r) - \\phi_{\\rm ref}}{\\theta_{\\rm tol}}
             \\right) +
-            S\\left(
+            B\\left(
                 \\frac{\\psi_i(\\bf r) - \\psi_{\\rm ref}}{\\theta_{\\rm tol}}
             \\right)
         \\right]
 
-    where :math:`phi_i(\\bf r)` and :math:`psi_i(\\bf r)` are the Ramachandran dihedral angles of
-    residue :math:`i`, :math:`\\phi_{\\rm ref}` and :math:`\\psi_{\\rm ref}` are their reference
+    where :math:`\\phi_i(\\bf r)` and :math:`\\psi_i(\\bf r)` are the Ramachandran dihedral angles
+    of residue :math:`i`, :math:`\\phi_{\\rm ref}` and :math:`\\psi_{\\rm ref}` are their reference
     values in an alpha helix :cite:`Hovmoller_2002`, and :math:`\\theta_{\\rm tol}` is the threshold
-    tolerance around these refenrences. The function :math:`S(x)` is a step function:
+    tolerance around these refenrences. The function :math:`B(x)` is a smooth `boxcar function
+    <https://en.wikipedia.org/wiki/Boxcar_function>`_:
 
     .. math::
-        S(x) = \\frac{1}{1 + x^{2m}}
+        B(x) = \\frac{1}{1 + x^{2m}}
 
     where :math:`m` is an integer parameter that controls its steepness.
+
+    .. note::
+
+        The residues must be from a single chain and be ordered in sequence. The :math:`\\phi` and
+        :math:`\\psi` angles of the first and last residues are not considered. They are used to
+        compute the dihedral angles of the second and penultimate residues, respectively.
 
     Parameters
     ----------
@@ -618,7 +658,12 @@ class HelixRamachandranContent(openmm.CustomTorsionForce, AbstractCollectiveVari
         tolerance
             The threshold tolerance around the reference values
         halfExponent
-            The parameter :math:`m` of the step function
+            The parameter :math:`m` of the boxcar function
+
+        Raises
+        ------
+            ValueError
+                If any residue
 
     Example
     -------
@@ -637,9 +682,8 @@ class HelixRamachandranContent(openmm.CustomTorsionForce, AbstractCollectiveVari
         >>> integrator = openmm.VerletIntegrator(0)
         >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
-        >>> quantity = helix_content.evaluateInContext(context)
-        >>> print(quantity)
-        0.9185709875095293 dimensionless
+        >>> print(helix_content.evaluateInContext(context, 6))
+        0.918571 dimensionless
 
     """
 
