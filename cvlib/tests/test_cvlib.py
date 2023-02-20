@@ -282,6 +282,9 @@ def test_helix_torsion_content():
     computed_value = np.sum(1 / (1 + x**6) + 1 / (1 + y**6)) / (len(x) + len(y))
 
     residues = list(model.topology.residues())
+    with pytest.raises(ValueError) as excinfo:
+        helix_content = cvlib.HelixTorsionContent(residues)
+    assert str(excinfo.value) == "Could not find atom N in residue TMP163"
     helix_content = cvlib.HelixTorsionContent(residues[0:-1])
     model.system.addForce(helix_content)
     integrator = openmm.VerletIntegrator(0)
