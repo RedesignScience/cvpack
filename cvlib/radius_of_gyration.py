@@ -7,7 +7,7 @@
 
 """
 
-from typing import List
+from typing import Iterable
 
 import openmm
 from openmm import unit as mmunit
@@ -48,7 +48,7 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
 
     """
 
-    def __init__(self, group: List[int]) -> None:
+    def __init__(self, group: Iterable[int]) -> None:
         self._group = group
         num_atoms = len(group)
         num_groups = num_atoms + 1

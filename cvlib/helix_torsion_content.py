@@ -7,7 +7,7 @@
 
 """
 
-from typing import List
+from typing import Iterable
 
 import openmm
 from openmm import app as mmapp
@@ -90,7 +90,7 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        residues: List[mmapp.topology.Residue],
+        residues: Iterable[mmapp.topology.Residue],
         phiReference: QuantityOrFloat = -63.8 * mmunit.degrees,
         psiReference: QuantityOrFloat = -41.1 * mmunit.degrees,
         tolerance: QuantityOrFloat = 25 * mmunit.degrees,

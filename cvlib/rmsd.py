@@ -7,7 +7,7 @@
 
 """
 
-from typing import List, Union
+from typing import Iterable, Union
 
 import numpy as np
 import openmm
@@ -68,8 +68,8 @@ class RMSD(openmm.RMSDForce, AbstractCollectiveVariable):
 
     def __init__(
         self,
-        referencePositions: Union[np.ndarray, List[openmm.Vec3], mmunit.Quantity],
-        group: List[int],
+        referencePositions: Union[np.ndarray, Iterable[openmm.Vec3], mmunit.Quantity],
+        group: Iterable[int],
         numAtoms: int,
     ) -> None:
         coords = in_md_units(referencePositions)

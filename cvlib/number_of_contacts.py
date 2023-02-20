@@ -7,7 +7,7 @@
 
 """
 
-from typing import List
+from typing import Iterable
 
 import openmm
 from openmm import unit as mmunit
@@ -82,8 +82,8 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        group1: List[int],
-        group2: List[int],
+        group1: Iterable[int],
+        group2: Iterable[int],
         numAtoms: int,
         pbc: bool = True,
         stepFunction: str = "1/(1+x^6)",

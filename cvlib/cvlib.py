@@ -143,7 +143,7 @@ class AbstractCollectiveVariable(openmm.Force):
             >>> radius_of_gyration = cvlib.RadiusOfGyration([1, 2, 3])
             >>> args, _ = radius_of_gyration.getArguments()
             >>> print(*args.items())
-            ('group', typing.List[int])
+            ('group', typing.Iterable[int])
 
         """
         arguments = OrderedDict()
