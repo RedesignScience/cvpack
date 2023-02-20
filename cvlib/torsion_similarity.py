@@ -29,6 +29,11 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, AbstractCollectiveVariab
     where :math:`\\phi^{\\rm kth}_i` is the torsion angle at position :math:`i` in the :math:`k`-th
     list.
 
+    .. note::
+
+        In `PLUMED <https://www.plumed.org/doc-v2.8/user-doc/html/_colvar.html>`_, this collective
+        variable is called ``DIHCOR``.
+
     Parameters
     ----------
         firstList
