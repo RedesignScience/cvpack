@@ -61,10 +61,10 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
         halfExponent
             The parameter :math:`m` of the boxcar function
 
-        Raises
-        ------
-            ValueError
-                If any residue
+    Raises
+    ------
+        ValueError
+            If some residue does not contain a :math:`\\phi` or :math:`\\psi` angle
 
     Example
     -------
