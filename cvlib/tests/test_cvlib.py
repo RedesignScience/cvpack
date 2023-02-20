@@ -96,6 +96,22 @@ def perform_common_tests(
     assert mass1 / mass1.unit == mass2 / mass2.unit
 
 
+def test_cv_is_in_context():
+    """
+    Test whether a collective variable is in a context.
+
+    """
+    model = testsystems.AlanineDipeptideVacuum()
+    rg_cv = cvlib.RadiusOfGyration(range(model.system.getNumParticles()))
+    integrator = openmm.CustomIntegrator(0)
+    platform = openmm.Platform.getPlatformByName("Reference")
+    context = openmm.Context(model.system, integrator, platform)
+    context.setPositions(model.positions)
+    with pytest.raises(RuntimeError) as excinfo:
+        rg_cv.evaluateInContext(context)
+    assert str(excinfo.value) == "This force is not part of the system in the given context."
+
+
 def test_distance():
     """
     Test whether a distance is computed correctly.

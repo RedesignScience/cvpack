@@ -106,7 +106,7 @@ class AbstractCollectiveVariable(openmm.Force):
         """
         forces = context.getSystem().getForces()
         if not any(force.this == self.this for force in forces):
-            raise ValueError("This force is not part of the system in the given context.")
+            raise RuntimeError("This force is not part of the system in the given context.")
         free_groups = set(range(32)) - set(f.getForceGroup() for f in forces)
         old_group = self.getForceGroup()
         new_group = next(iter(free_groups))
