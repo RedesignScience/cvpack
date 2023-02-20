@@ -16,7 +16,6 @@ from openmm import unit as mmunit
 from .cvlib import AbstractCollectiveVariable
 
 
-
 class TorsionSimilarity(openmm.CustomCompoundBondForce, AbstractCollectiveVariable):
     """
     The degree of similarity between `n` pairs of torsion angles:
@@ -49,13 +48,9 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, AbstractCollectiveVariab
         >>> model = testsystems.LysozymeImplicit()
         >>> traj = mdtraj.Trajectory(model.positions, mdtraj.Topology.from_openmm(model.topology))
         >>> phi_atoms, _ = mdtraj.compute_phi(traj)
-        >>> psi_atoms, _ = mdtraj.compute_psi(traj)
         >>> valid_atoms = traj.top.select("resid 59 to 79 and backbone")
         >>> phi_atoms = [phi for phi in phi_atoms if all(atom in valid_atoms for atom in phi)]
-        >>> psi_atoms = [psi for psi in psi_atoms if all(atom in valid_atoms for atom in psi)]
-        >>> first_list = phi_atoms[1:] + psi_atoms[1:]
-        >>> second_list = phi_atoms[:-1] + psi_atoms[:-1]
-        >>> torsion_similarity = cvlib.TorsionSimilarity(first_list, second_list)
+        >>> torsion_similarity = cvlib.TorsionSimilarity(phi_atoms[1:], phi_atoms[:-1])
         >>> model.system.addForce(torsion_similarity)
         6
         >>> integrator = mm.VerletIntegrator(0)
@@ -63,10 +58,12 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, AbstractCollectiveVariab
         >>> context = mm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
         >>> print(torsion_similarity.evaluateInContext(context, 6))
-        37.443932 dimensionless
+        18.659917 dimensionless
     """
 
-    def __init__(self, firstList: Iterable[Iterable[int]], secondList: Iterable[Iterable[int]]) -> None:
+    def __init__(
+        self, firstList: Iterable[Iterable[int]], secondList: Iterable[Iterable[int]]
+    ) -> None:
         assert all(len(torsion) == 4 for torsion in firstList)  # each torsion must have 4 atoms
         assert all(len(torsion) == 4 for torsion in secondList)  # each torsion must have 4 atoms
         energy = f"0.5*(1 + cos(min(delta, {2*np.pi} - delta)))"
