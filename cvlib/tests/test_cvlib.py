@@ -291,3 +291,29 @@ def test_helix_torsion_content():
     cv_value = helix_content.evaluateInContext(context)
 
     assert cv_value / cv_value.unit == pytest.approx(computed_value)
+
+
+def test_helix_torsion_similarity():
+    """
+    Test whether a torsion similarity CV is computed correctly.
+
+    """
+    model = testsystems.LysozymeImplicit()
+    positions = model.positions.value_in_unit(unit.nanometers)
+    traj = mdtraj.Trajectory(positions, mdtraj.Topology.from_openmm(model.topology))
+    phi_atoms, phi = mdtraj.compute_phi(traj)
+    psi_atoms, psi = mdtraj.compute_psi(traj)
+    torsion_similarity = cvlib.TorsionSimilarity(
+        np.vstack([phi_atoms[1:], psi_atoms[1:]]), np.vstack([phi_atoms[:-1], psi_atoms[:-1]])
+    )
+    model.system.addForce(torsion_similarity)
+    context = openmm.Context(
+        model.system, openmm.VerletIntegrator(0), openmm.Platform.getPlatformByName("Reference")
+    )
+    context.setPositions(model.positions)
+    cv_value = torsion_similarity.evaluateInContext(context)
+    phi = phi.ravel()
+    psi = psi.ravel()
+    deltas = np.hstack([phi[1:], psi[1:]]) - np.hstack([phi[:-1], psi[:-1]])
+    deltas = np.array([min(delta, 2 * np.pi - delta) for delta in deltas])
+    assert cv_value / cv_value.unit == pytest.approx(np.sum(0.5 * (1 + np.cos(deltas))))
