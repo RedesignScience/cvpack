@@ -22,18 +22,18 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
 
     .. math::
 
-        \\alpha_{\\theta}({\\bf r}) = \\frac{1}{n-2} \\sum_{i=2}^{n-1} B\\left(
+        \\alpha_{\\theta}({\\bf r}) = \\frac{1}{n-2} \\sum_{i=2}^{n-1} B_m\\left(
             \\frac{\\theta^\\alpha_i({\\bf r}) - \\theta_{\\rm ref}}{\\theta_{\\rm tol}}
         \\right)
 
     where :math:`\\theta^\\alpha_i` is the angle formed by the alpha-carbon atoms of residues
     :math:`i-1`, :math:`i`, and :math:`i+1`, :math:`\\theta_{\\rm ref}` is its reference value in
     an alpha helix, and :math:`\\theta_{\\rm tol}` is the threshold tolerance around this
-    reference. The function :math:`B(x)` is a smooth `boxcar function
+    reference. The function :math:`B_m(x)` is a smooth `boxcar function
     <https://en.wikipedia.org/wiki/Boxcar_function>`_
 
     .. math::
-        B(x) = \\frac{1}{1 + x^{2m}}
+        B_m(x) = \\frac{1}{1 + x^{2m}}
 
     where :math:`m` is an integer parameter that controls its steepness.
 
@@ -76,13 +76,13 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
 
     """
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(
         self,
         residues: Iterable[mmapp.topology.Residue],
         thetaReference: QuantityOrFloat = 88 * mmunit.degrees,
         tolerance: QuantityOrFloat = 15 * mmunit.degrees,
         halfExponent: int = 3,
-    ):
+    ) -> None:
         def find_alpha_carbon(residue: mmapp.topology.Residue) -> int:
             for atom in residue.atoms():
                 if atom.name == "CA":

@@ -17,6 +17,7 @@ as:
 * [Angle](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Angle.html)
 * [Distance](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Distance.html)
 * [Helix angle content](https://cvlib-for-openmm.readthedocs.io/en/latest/api/HelixAngleContent.html)
+* [Helix H-bond content](https://cvlib-for-openmm.readthedocs.io/en/latest/api/HelixHBondContent.html)
 * [Helix torsion content](https://cvlib-for-openmm.readthedocs.io/en/latest/api/HelixTorsionContent.html)
 * [Number of contacts](https://cvlib-for-openmm.readthedocs.io/en/latest/api/NumberOfContacts.html)
 * [Radius of gyration](https://cvlib-for-openmm.readthedocs.io/en/latest/api/RadiusOfGyration.html)
