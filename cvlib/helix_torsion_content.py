@@ -18,7 +18,7 @@ from .cvlib import AbstractCollectiveVariable, QuantityOrFloat, in_md_units
 
 class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable):
     """
-     Fractional :math:`\\alpha`-helix Ramachandran content of a sequence of `n` residues:
+    Fractional :math:`\\alpha`-helix Ramachandran content of a sequence of `n` residues:
 
     .. math::
 

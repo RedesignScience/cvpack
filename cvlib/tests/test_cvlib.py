@@ -312,6 +312,35 @@ def test_helix_torsion_content():
     assert cv_value / cv_value.unit == pytest.approx(computed_value)
 
 
+def test_helix_angle_content():
+    """
+    Test whether a helix ramachandran content is computed correctly.
+
+    """
+    model = testsystems.LysozymeImplicit()
+
+    positions = model.positions.value_in_unit(unit.nanometers)
+    traj = mdtraj.Trajectory(positions, mdtraj.Topology.from_openmm(model.topology))
+    alpha_carbons = traj.top.select("name CA")
+    angle_atoms = np.array([alpha_carbons[:-2], alpha_carbons[1:-1], alpha_carbons[2:]]).T
+    angles = mdtraj.compute_angles(traj, angle_atoms)
+    x = (np.rad2deg(angles.ravel()) - 88) / 15
+    computed_value = np.sum(1 / (1 + x**6)) / len(x)
+
+    residues = list(model.topology.residues())
+    with pytest.raises(ValueError) as excinfo:
+        helix_content = cvlib.HelixAngleContent(residues)
+    assert str(excinfo.value) == "Could not find atom CA in residue TMP163"
+    helix_content = cvlib.HelixAngleContent(residues[0:-1])
+    model.system.addForce(helix_content)
+    integrator = openmm.VerletIntegrator(0)
+    platform = openmm.Platform.getPlatformByName("Reference")
+    context = openmm.Context(model.system, integrator, platform)
+    context.setPositions(model.positions)
+    cv_value = helix_content.evaluateInContext(context)
+    assert cv_value / cv_value.unit == pytest.approx(computed_value)
+
+
 def test_helix_torsion_similarity():
     """
     Test whether a torsion similarity CV is computed correctly.
