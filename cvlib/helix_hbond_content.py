@@ -30,8 +30,14 @@ class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
     where :math:`{\\bf r}^{\\rm H}_k` and :math:`{\\bf r}^{\\rm O}_k` are the positions of the
     hydrogen and oxygen atoms, respectively bonded to the backbone nitrogen and carbon atoms of
     residue :math:`k`, :math:`d_{\\rm HB}` is the threshold distance for a hydrogen bond, and
-    :math:`S(x)` is a continuous approximation of :math:`H(1-x)`, where :math:`H(x)` is the
-    `Heaviside step function <https://en.wikipedia.org/wiki/Heaviside_step_function>`_.
+    :math:`S(x)` is a step function equal to 1 if a contact is made or equal to 0 otherwise. In
+    analysis, it is fine to make :math:`S(x) = H(1-x)`, where `H` is the `Heaviside step function
+    <https://en.wikipedia.org/wiki/Heaviside_step_function>`_. In a simulation, however,
+    :math:`S(x)` should continuously approximate :math:`H(1-x)` for :math:`x \\geq 0`.
+
+    .. note::
+
+        The residues must be from a single chain and be ordered in sequence.
 
     Parameters
     ----------

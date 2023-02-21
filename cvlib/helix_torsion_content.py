@@ -40,7 +40,8 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
     .. math::
         B_m(x) = \\frac{1}{1 + x^{2m}}
 
-    where :math:`m` is an integer parameter that controls its steepness.
+    where :math:`m` is an integer parameter that controls its steepness. Note that :math:`x` is
+    always elevated to an even power.
 
     .. note::
 
