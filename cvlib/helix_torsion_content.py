@@ -35,7 +35,7 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
     angles of residue :math:`i`, :math:`\\phi_{\\rm ref}` and :math:`\\psi_{\\rm ref}` are their
     reference values in an alpha helix :cite:`Hovmoller_2002`, and :math:`\\theta_{\\rm tol}` is
     the threshold tolerance around these refenrences. The function :math:`B(x)` is a smooth `boxcar
-    function <https://en.wikipedia.org/wiki/Boxcar_function>`_:
+    function <https://en.wikipedia.org/wiki/Boxcar_function>`_
 
     .. math::
         B(x) = \\frac{1}{1 + x^{2m}}

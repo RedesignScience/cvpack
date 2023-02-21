@@ -22,15 +22,15 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
 
     .. math::
 
-        \\alpha_{\\theta}({\\bf r}) = \\frac{1}{2(n-2)} \\sum_{i=2}^{n-1} B\\left(
-            \\frac{\\theta^{{\\rm C}_\\alpha}_i({\\bf r}) - \\theta_{\\rm ref}}{\\theta_{\\rm tol}}
+        \\alpha_{\\theta}({\\bf r}) = \\frac{1}{n-2} \\sum_{i=2}^{n-1} B\\left(
+            \\frac{\\theta^\\alpha_i({\\bf r}) - \\theta_{\\rm ref}}{\\theta_{\\rm tol}}
         \\right)
 
-    where :math:`\\theta^{{\\rm C}_\\alpha}_i` is the angle formed by the alpha-carbon atoms of
-    residues :math:`i-1`, :math:`i`, and :math:`i+1`, :math:`\\theta_{\\rm ref}` is its reference
-    value in an alpha helix, and :math:`\\theta_{\\rm tol}` is the threshold tolerance around this
+    where :math:`\\theta^\\alpha_i` is the angle formed by the alpha-carbon atoms of residues
+    :math:`i-1`, :math:`i`, and :math:`i+1`, :math:`\\theta_{\\rm ref}` is its reference value in
+    an alpha helix, and :math:`\\theta_{\\rm tol}` is the threshold tolerance around this
     reference. The function :math:`B(x)` is a smooth `boxcar function
-    <https://en.wikipedia.org/wiki/Boxcar_function>`_:
+    <https://en.wikipedia.org/wiki/Boxcar_function>`_
 
     .. math::
         B(x) = \\frac{1}{1 + x^{2m}}
