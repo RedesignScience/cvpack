@@ -398,7 +398,7 @@ def test_helix_torsion_similarity():
 
 def test_atomic_function():
     """
-    Test whether an AtomicFunction CV is computed correctly.
+    Test whether an atomic-function CV is computed correctly.
 
     """
     model = testsystems.AlanineDipeptideVacuum()
@@ -406,6 +406,9 @@ def test_atomic_function():
     atoms = np.arange(num_atoms)
     np.random.shuffle(atoms)
     function = "+".join(f"distance(p{i+1}, p{i+2})" for i in range(num_atoms - 1))
+    with pytest.raises(ValueError) as excinfo:
+        colvar = cvlib.AtomicFunction(function, atoms, unit.angstrom)
+    assert str(excinfo.value) == "Unit angstrom is not compatible with the MD unit system."
     colvar = cvlib.AtomicFunction(function, atoms, unit.nanometers)
     model.system.addForce(colvar)
     context = openmm.Context(
@@ -418,6 +421,41 @@ def test_atomic_function():
         [
             np.linalg.norm(positions[atoms[i + 1]] - positions[atoms[i]])
             for i in range(num_atoms - 1)
+        ]
+    )
+    assert cv_value / cv_value.unit == pytest.approx(computed_value)
+    perform_common_tests(colvar, context)
+
+
+def test_centroid_function():
+    """
+    Test whether a centroid-function CV is computed correctly.
+
+    """
+    model = testsystems.AlanineDipeptideVacuum()
+    num_atoms = model.system.getNumParticles()
+    atoms = np.arange(num_atoms)
+    np.random.shuffle(atoms)
+    num_groups = num_atoms // 3
+    groups = np.reshape(atoms[: 3 * num_groups], (num_groups, 3))
+    function = "+".join(f"distance(g{i+1}, g{i+2})" for i in range(num_groups - 1))
+    with pytest.raises(ValueError) as excinfo:
+        colvar = cvlib.CentroidFunction(function, groups, unit.angstrom)
+    assert str(excinfo.value) == "Unit angstrom is not compatible with the MD unit system."
+    colvar = cvlib.CentroidFunction(function, groups, unit.nanometers, weighByMass=False)
+    model.system.addForce(colvar)
+    context = openmm.Context(
+        model.system, openmm.VerletIntegrator(0), openmm.Platform.getPlatformByName("Reference")
+    )
+    context.setPositions(model.positions)
+    cv_value = colvar.evaluateInContext(context)
+    positions = model.positions.value_in_unit(unit.nanometers)
+    computed_value = np.sum(
+        [
+            np.linalg.norm(
+                np.mean(positions[groups[i + 1]], axis=0) - np.mean(positions[groups[i]], axis=0)
+            )
+            for i in range(num_groups - 1)
         ]
     )
     assert cv_value / cv_value.unit == pytest.approx(computed_value)
