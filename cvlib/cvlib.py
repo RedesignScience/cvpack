@@ -7,6 +7,7 @@
 
 """
 
+import ast
 import inspect
 from collections import OrderedDict
 from typing import Any, Dict, Optional, Tuple, Union
@@ -16,6 +17,7 @@ import openmm
 from openmm import unit as mmunit
 
 QuantityOrFloat = Union[mmunit.Quantity, float]
+UnitOrStr = Union[mmunit.Unit, str]
 
 
 def in_md_units(quantity: QuantityOrFloat) -> float:
@@ -39,6 +41,44 @@ def in_md_units(quantity: QuantityOrFloat) -> float:
     else:
         value = quantity
     return value
+
+
+def str_to_unit(unitStr: str) -> mmunit.Unit:
+    """
+    Returns an OpenMM unit of measurement from its string representation.
+
+    Parameters
+    ----------
+        unitStr
+            The string representation of the unit to be converted
+
+    Returns
+    -------
+        The OpenMM unit of measurement
+
+    """
+
+    class NodeTransformer(ast.NodeTransformer):
+        """
+        A child class of ast.NodeTransformer that replaces all instances of ast.Name with
+        an ast.Attribute with the value "mmunit" and the attribute name equal to the original
+        id of the ast.Name.
+
+        """
+
+        def visit_Name(self, node: ast.Name) -> ast.Attribute:  # pylint: disable=invalid-name
+            """
+            Replace an instance of ast.Name with an ast.Attribute with the value "mmunit" and
+            the attribute name equal to the original id of the ast.Name.
+
+            """
+            mod = ast.Name(id="mmunit", ctx=ast.Load())
+            return ast.Attribute(value=mod, attr=node.id, ctx=ast.Load())
+
+    tree = NodeTransformer().visit(ast.parse(unitStr, mode="eval"))
+    return eval(  # pylint: disable=eval-used
+        compile(ast.fix_missing_locations(tree), "", mode="eval")
+    )
 
 
 class AbstractCollectiveVariable(openmm.Force):

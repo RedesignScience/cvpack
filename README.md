@@ -15,6 +15,8 @@ objects. This CV Library provides several CVs of common use in molecular dynamic
 as:
 
 * [Angle](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Angle.html)
+* [Atomic Function](https://cvlib-for-openmm.readthedocs.io/en/latest/api/AtomicFunction.html)
+* [Centroid Function](https://cvlib-for-openmm.readthedocs.io/en/latest/api/CentroidFunction.html)
 * [Distance](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Distance.html)
 * [Helix angle content](https://cvlib-for-openmm.readthedocs.io/en/latest/api/HelixAngleContent.html)
 * [Helix H-bond content](https://cvlib-for-openmm.readthedocs.io/en/latest/api/HelixHBondContent.html)
