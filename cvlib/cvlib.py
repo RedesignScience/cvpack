@@ -181,9 +181,11 @@ class AbstractCollectiveVariable(openmm.Force):
         -------
             >>> import cvlib
             >>> radius_of_gyration = cvlib.RadiusOfGyration([1, 2, 3])
-            >>> args, _ = radius_of_gyration.getArguments()
+            >>> args, defaults = radius_of_gyration.getArguments()
             >>> print(*args.items())
-            ('group', typing.Iterable[int])
+            ('group', typing.Iterable[int]) ('pbc', <class 'bool'>) ('weighByMass', <class 'bool'>)
+            >>> print(*defaults.items())
+            ('pbc', True) ('weighByMass', False)
 
         """
         arguments = OrderedDict()
