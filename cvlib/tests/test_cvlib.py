@@ -314,7 +314,7 @@ def test_helix_torsion_content():
 
 def test_helix_angle_content():
     """
-    Test whether a helix ramachandran content is computed correctly.
+    Test whether a helix angle content is computed correctly.
 
     """
     model = testsystems.LysozymeImplicit()
@@ -332,6 +332,34 @@ def test_helix_angle_content():
         helix_content = cvlib.HelixAngleContent(residues)
     assert str(excinfo.value) == "Could not find atom CA in residue TMP163"
     helix_content = cvlib.HelixAngleContent(residues[0:-1])
+    model.system.addForce(helix_content)
+    integrator = openmm.VerletIntegrator(0)
+    platform = openmm.Platform.getPlatformByName("Reference")
+    context = openmm.Context(model.system, integrator, platform)
+    context.setPositions(model.positions)
+    cv_value = helix_content.evaluateInContext(context)
+    assert cv_value / cv_value.unit == pytest.approx(computed_value)
+
+
+def test_helix_hbond_content():
+    """
+    Test whether a helix hydrogen-bond content is computed correctly.
+
+    """
+    model = testsystems.LysozymeImplicit()
+
+    positions = model.positions.value_in_unit(unit.nanometers)
+    traj = mdtraj.Trajectory(positions, mdtraj.Topology.from_openmm(model.topology))
+    hydrogens = traj.top.select("resSeq 59 to 79 and name H")
+    oxygens = traj.top.select("resSeq 59 to 79 and name O")
+    distances = mdtraj.compute_distances(traj, np.array([hydrogens[4:], oxygens[:-4]]).T)
+    x = distances.ravel() / 0.33
+    computed_value = np.sum(1 / (1 + x**6)) / len(x)
+
+    residues = list(model.topology.residues())
+    with pytest.raises(ValueError):
+        helix_content = cvlib.HelixHBondContent(residues)
+    helix_content = cvlib.HelixHBondContent(residues[58:79])
     model.system.addForce(helix_content)
     integrator = openmm.VerletIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")

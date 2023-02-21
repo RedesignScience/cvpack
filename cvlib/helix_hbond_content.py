@@ -75,7 +75,11 @@ class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
             for atom in residue.atoms():
                 if regex.match(pattern, atom.name):
                     return atom.index
-            raise ValueError(f"Could not find atom {pattern} in residue {residue.name}{residue.id}")
+            raise ValueError(
+                f"Could not find atom matching regex "
+                f"'{pattern.pattern}'"
+                f" in residue {residue.name}{residue.id}"
+            )
 
         threshold = in_md_units(thresholdDistance)
         super().__init__(f"({stepFunction})/{len(residues) - 4}; x=r/{threshold}")
