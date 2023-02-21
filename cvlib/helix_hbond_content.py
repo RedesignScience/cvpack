@@ -8,7 +8,7 @@
 """
 
 import re as regex
-from typing import Iterable
+from typing import Iterable, Pattern
 
 import openmm
 from openmm import app as mmapp
@@ -77,7 +77,7 @@ class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
         thresholdDistance: QuantityOrFloat = 0.33 * mmunit.nanometers,
         stepFunction: str = "1/(1+x^6)",
     ) -> None:
-        def find_atom(residue: mmapp.topology.Residue, pattern: regex.Pattern) -> int:
+        def find_atom(residue: mmapp.topology.Residue, pattern: Pattern) -> int:
             for atom in residue.atoms():
                 if regex.match(pattern, atom.name):
                     return atom.index
