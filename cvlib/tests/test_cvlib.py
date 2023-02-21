@@ -393,3 +393,32 @@ def test_helix_torsion_similarity():
     deltas = np.hstack([phi[1:], psi[1:]]) - np.hstack([phi[:-1], psi[:-1]])
     deltas = np.array([min(delta, 2 * np.pi - delta) for delta in deltas])
     assert cv_value / cv_value.unit == pytest.approx(np.sum(0.5 * (1 + np.cos(deltas))))
+    perform_common_tests(torsion_similarity, context)
+
+
+def test_atomic_function():
+    """
+    Test whether an AtomicFunction CV is computed correctly.
+
+    """
+    model = testsystems.AlanineDipeptideVacuum()
+    num_atoms = model.system.getNumParticles()
+    atoms = np.arange(num_atoms)
+    np.random.shuffle(atoms)
+    function = "+".join(f"distance(p{i+1}, p{i+2})" for i in range(num_atoms - 1))
+    colvar = cvlib.AtomicFunction(function, atoms, unit.nanometers)
+    model.system.addForce(colvar)
+    context = openmm.Context(
+        model.system, openmm.VerletIntegrator(0), openmm.Platform.getPlatformByName("Reference")
+    )
+    context.setPositions(model.positions)
+    cv_value = colvar.evaluateInContext(context)
+    positions = model.positions.value_in_unit(unit.nanometers)
+    computed_value = np.sum(
+        [
+            np.linalg.norm(positions[atoms[i + 1]] - positions[atoms[i]])
+            for i in range(num_atoms - 1)
+        ]
+    )
+    assert cv_value / cv_value.unit == pytest.approx(computed_value)
+    perform_common_tests(colvar, context)

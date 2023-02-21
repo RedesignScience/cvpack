@@ -10,9 +10,8 @@
 from typing import Iterable
 
 import openmm
-from openmm import unit as mmunit
 
-from .cvlib import AbstractCollectiveVariable, UnitOrStr, str_to_unit, in_md_units
+from .cvlib import AbstractCollectiveVariable, UnitOrStr, in_md_units, str_to_unit
 
 
 class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable):
@@ -30,20 +29,21 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
     ----------
         function
             The function to be evaluated. It must be a valid :OpenMM:`CustomCompoundBondForce`
-            expression.
+            expression
         group
-            The group of atoms to be used in the function.
+            The group of atoms to be used in the function
         unit
             The unit of measurement of the collective variable. It must be compatible with the
             MD unit system (mass in `daltons`, distance in `nanometers`, time in `picoseconds`,
-            temperature in `kelvin`, energy in `kilojoules_per_mol`, angle in `radians`).
+            temperature in `kelvin`, energy in `kilojoules_per_mol`, angle in `radians`). If the
+            collective variables does not have a unit, use `dimensionless`
         pbc
-            Whether to use periodic boundary conditions.
+            Whether to use periodic boundary conditions
 
     Raises
     ------
         ValueError
-            If the collective variable is not compatible with the MD unit system.
+            If the collective variable is not compatible with the MD unit system
 
     Example
     -------
@@ -69,7 +69,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         self,
         function: str,
         group: Iterable[int],
-        unit: UnitOrStr = mmunit.dimensionless,
+        unit: UnitOrStr,
         pbc: bool = True,
     ) -> None:
         super().__init__(len(group), function)
@@ -78,4 +78,4 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         cv_unit = str_to_unit(unit) if isinstance(unit, str) else unit
         if in_md_units(1 * cv_unit) != 1:
             raise ValueError(f"Unit {cv_unit} is not compatible with the MD unit system.")
-        self._registerCV(cv_unit, str(unit), function, group, pbc)
+        self._registerCV(cv_unit, function, group, str(unit), pbc)

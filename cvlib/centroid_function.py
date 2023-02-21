@@ -10,9 +10,8 @@
 from typing import Iterable
 
 import openmm
-from openmm import unit as mmunit
 
-from .cvlib import AbstractCollectiveVariable, UnitOrStr, str_to_unit, in_md_units
+from .cvlib import AbstractCollectiveVariable, UnitOrStr, in_md_units, str_to_unit
 
 
 class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):
@@ -48,21 +47,22 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
     ----------
         function
             The function to be evaluated. It must be a valid :OpenMM:`CustomCentroidBondForce`
-            expression.
+            expression
         groups
             The groups of atoms to be used in the function. Each group must be a list of atom
-            indices.
+            indices
         unit
             The unit of measurement of the collective variable. It must be compatible with the
             MD unit system (mass in `daltons`, distance in `nanometers`, time in `picoseconds`,
-            temperature in `kelvin`, energy in `kilojoules_per_mol`, angle in `radians`).
+            temperature in `kelvin`, energy in `kilojoules_per_mol`, angle in `radians`). If
+            the collective variables does not have a unit, use `dimensionless`
         pbc
-            Whether to use periodic boundary conditions.
+            Whether to use periodic boundary conditions
 
     Raises
     ------
         ValueError
-            If the collective variable is not compatible with the MD unit system.
+            If the collective variable is not compatible with the MD unit system
 
     Example
     -------
@@ -94,7 +94,7 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         self,
         function: str,
         groups: Iterable[Iterable[int]],
-        unit: UnitOrStr = mmunit.dimensionless,
+        unit: UnitOrStr,
         pbc: bool = False,
         weighByMass: bool = False,
     ) -> None:
@@ -107,4 +107,4 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         cv_unit = str_to_unit(unit) if isinstance(unit, str) else unit
         if in_md_units(1 * cv_unit) != 1:
             raise ValueError(f"Unit {cv_unit} is not compatible with the MD unit system.")
-        self._registerCV(cv_unit, str(unit), function, groups, pbc)
+        self._registerCV(cv_unit, function, groups, str(unit), pbc)
