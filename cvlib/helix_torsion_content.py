@@ -18,15 +18,15 @@ from .cvlib import AbstractCollectiveVariable, QuantityOrFloat, in_md_units
 
 class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable):
     """
-     Fractional :math:`\\alpha`-helix Ramachandran content of a sequence of `n` residues:
+    Fractional :math:`\\alpha`-helix Ramachandran content of a sequence of `n` residues:
 
     .. math::
 
         \\alpha_{\\phi,\\psi}({\\bf r}) = \\frac{1}{2(n-2)} \\sum_{i=2}^{n-1} \\left[
-            B\\left(
+            B_m\\left(
                 \\frac{\\phi_i({\\bf r}) - \\phi_{\\rm ref}}{\\theta_{\\rm tol}}
             \\right) +
-            B\\left(
+            B_m\\left(
                 \\frac{\\psi_i({\\bf r}) - \\psi_{\\rm ref}}{\\theta_{\\rm tol}}
             \\right)
         \\right]
@@ -34,13 +34,14 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
     where :math:`\\phi_i({\\bf r})` and :math:`\\psi_i({\\bf r})` are the Ramachandran dihedral
     angles of residue :math:`i`, :math:`\\phi_{\\rm ref}` and :math:`\\psi_{\\rm ref}` are their
     reference values in an alpha helix :cite:`Hovmoller_2002`, and :math:`\\theta_{\\rm tol}` is
-    the threshold tolerance around these refenrences. The function :math:`B(x)` is a smooth `boxcar
-    function <https://en.wikipedia.org/wiki/Boxcar_function>`_:
+    the threshold tolerance around these refenrences. The function :math:`B_m(x)` is a smooth
+    `boxcar function <https://en.wikipedia.org/wiki/Boxcar_function>`_
 
     .. math::
-        B(x) = \\frac{1}{1 + x^{2m}}
+        B_m(x) = \\frac{1}{1 + x^{2m}}
 
-    where :math:`m` is an integer parameter that controls its steepness.
+    where :math:`m` is an integer parameter that controls its steepness. Note that :math:`x` is
+    always elevated to an even power.
 
     .. note::
 
@@ -95,7 +96,7 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
         psiReference: QuantityOrFloat = -41.1 * mmunit.degrees,
         tolerance: QuantityOrFloat = 25 * mmunit.degrees,
         halfExponent: int = 3,
-    ):
+    ) -> None:
         def find_atom(residue: mmapp.topology.Residue, name: str) -> int:
             for atom in residue.atoms():
                 if atom.name == name:
