@@ -14,18 +14,30 @@ In [OpenMM], collective variables (CV) involved in a [CustomCVForce] are nothing
 objects. This CV Library provides several CVs of common use in molecular dynamics simulations, such
 as:
 
-* [Angle](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Angle.html)
-* [Atomic Function](https://cvlib-for-openmm.readthedocs.io/en/latest/api/AtomicFunction.html)
+* [Angle](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Angle.html):
+    The angle formed by three atoms.
+* [Atomic Function](https://cvlib-for-openmm.readthedocs.io/en/latest/api/AtomicFunction.html):
+    A user-defined function of the coordinates of a group of atoms.
 * [Centroid Function](https://cvlib-for-openmm.readthedocs.io/en/latest/api/CentroidFunction.html)
-* [Distance](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Distance.html)
-* [Helix angle content](https://cvlib-for-openmm.readthedocs.io/en/latest/api/HelixAngleContent.html)
-* [Helix H-bond content](https://cvlib-for-openmm.readthedocs.io/en/latest/api/HelixHBondContent.html)
-* [Helix torsion content](https://cvlib-for-openmm.readthedocs.io/en/latest/api/HelixTorsionContent.html)
-* [Number of contacts](https://cvlib-for-openmm.readthedocs.io/en/latest/api/NumberOfContacts.html)
-* [Radius of gyration](https://cvlib-for-openmm.readthedocs.io/en/latest/api/RadiusOfGyration.html)
-* [RMSD](https://cvlib-for-openmm.readthedocs.io/en/latest/api/RMSD.html)
-* [Torsion](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Torsion.html)
-* [Torsion similarity](https://cvlib-for-openmm.readthedocs.io/en/latest/api/TorsionSimilarity.html)
+    A user-defined function of the centroids of groups of atoms.
+* [Distance](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Distance.html):
+    The distance between two atoms.
+* [Helix angle content](https://cvlib-for-openmm.readthedocs.io/en/latest/api/HelixAngleContent.html):
+    The fractional alpha-helix angle content of a sequence of residues.
+* [Helix H-bond content](https://cvlib-for-openmm.readthedocs.io/en/latest/api/HelixHBondContent.html):
+    The fractional alpha-helix hydrogen-bond content of a sequence of residues.
+* [Helix torsion content](https://cvlib-for-openmm.readthedocs.io/en/latest/api/HelixTorsionContent.html):
+    The fractional alpha-helix Ramachandran content of a sequence of residues.
+* [Number of contacts](https://cvlib-for-openmm.readthedocs.io/en/latest/api/NumberOfContacts.html):
+    The number of contacts between two groups of atoms.
+* [Radius of gyration](https://cvlib-for-openmm.readthedocs.io/en/latest/api/RadiusOfGyration.html):
+    The radius of gyration of a group of atoms.
+* [RMSD](https://cvlib-for-openmm.readthedocs.io/en/latest/api/RMSD.html):
+    The RMSD of a group of atoms with respect to a reference structure.
+* [Torsion](https://cvlib-for-openmm.readthedocs.io/en/latest/api/Torsion.html):
+    The torsion angle formed by four atoms.
+* [Torsion similarity](https://cvlib-for-openmm.readthedocs.io/en/latest/api/TorsionSimilarity.html):
+    The degree of similarity between pairs of torsion angles.
 
 ### Copyright
 

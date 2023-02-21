@@ -1,7 +1,7 @@
 """
 .. class:: DihedralSimilarity
    :platform: Linux, MacOS, Windows
-   :synopsis: The degree of correlation between pairs of dihedral angles.
+   :synopsis: The degree of similarity between pairs of torsion angles.
 
 .. classauthor:: Charlles Abreu <craabreu@gmail.com>
 
