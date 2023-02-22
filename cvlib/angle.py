@@ -35,6 +35,8 @@ class Angle(openmm.CustomAngleForce, AbstractCollectiveVariable):
             The index of the second atom
         atom3
             The index of the third atom
+        pbc
+            Whether to use periodic boundary conditions
 
     Example:
         >>> import cvlib
@@ -55,7 +57,8 @@ class Angle(openmm.CustomAngleForce, AbstractCollectiveVariable):
 
     """
 
-    def __init__(self, atom1: int, atom2: int, atom3: int) -> None:
+    def __init__(self, atom1: int, atom2: int, atom3: int, pbc: bool = False) -> None:
         super().__init__("theta")
         self.addAngle(atom1, atom2, atom3, [])
-        self._registerCV(mmunit.radians, atom1, atom2, atom3)
+        self.setUsesPeriodicBoundaryConditions(pbc)
+        self._registerCV(mmunit.radians, atom1, atom2, atom3, pbc)

@@ -85,7 +85,7 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
         group1: Iterable[int],
         group2: Iterable[int],
         numAtoms: int,
-        pbc: bool = True,
+        pbc: bool = False,
         stepFunction: str = "1/(1+x^6)",
         thresholdDistance: QuantityOrFloat = 0.3,
         cutoffDistance: QuantityOrFloat = 0.6,

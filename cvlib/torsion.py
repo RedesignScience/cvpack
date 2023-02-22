@@ -41,6 +41,8 @@ class Torsion(openmm.CustomTorsionForce, AbstractCollectiveVariable):
             The index of the third atom
         atom4
             The index of the fourth atom
+        pbc
+            Whether to use periodic boundary conditions
 
     Example:
         >>> import cvlib
@@ -48,7 +50,7 @@ class Torsion(openmm.CustomTorsionForce, AbstractCollectiveVariable):
         >>> system = mm.System()
         >>> [system.addParticle(1) for i in range(4)]
         [0, 1, 2, 3]
-        >>> torsion = cvlib.Torsion(0, 1, 2, 3)
+        >>> torsion = cvlib.Torsion(0, 1, 2, 3, pbc=False)
         >>> system.addForce(torsion)
         0
         >>> integrator = mm.VerletIntegrator(0)
@@ -61,7 +63,10 @@ class Torsion(openmm.CustomTorsionForce, AbstractCollectiveVariable):
 
     """
 
-    def __init__(self, atom1: int, atom2: int, atom3: int, atom4: int) -> None:
+    def __init__(  # pylint: disable=too-many-arguments
+        self, atom1: int, atom2: int, atom3: int, atom4: int, pbc: bool = True
+    ) -> None:
         super().__init__("theta")
         self.addTorsion(atom1, atom2, atom3, atom4, [])
-        self._registerCV(mmunit.radians, atom1, atom2, atom3, atom4)
+        self.setUsesPeriodicBoundaryConditions(pbc)
+        self._registerCV(mmunit.radians, atom1, atom2, atom3, atom4, pbc)

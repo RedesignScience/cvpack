@@ -68,7 +68,7 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
 
     """
 
-    def __init__(self, group: Iterable[int], pbc: bool = True, weighByMass:bool = False) -> None:
+    def __init__(self, group: Iterable[int], pbc: bool = False, weighByMass: bool = False) -> None:
         self._group = group
         num_atoms = len(group)
         num_groups = num_atoms + 1

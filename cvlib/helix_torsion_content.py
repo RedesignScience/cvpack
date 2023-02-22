@@ -53,6 +53,8 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
     ----------
         residues
             The residues in the sequence
+        pbc
+            Whether to use periodic boundary conditions
         phiReference
             The reference value of the phi dihedral angle in an alpha helix
         psiReference
@@ -92,6 +94,7 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
     def __init__(  # pylint: disable=too-many-arguments
         self,
         residues: Iterable[mmapp.topology.Residue],
+        pbc: bool = False,
         phiReference: QuantityOrFloat = -63.8 * mmunit.degrees,
         psiReference: QuantityOrFloat = -41.1 * mmunit.degrees,
         tolerance: QuantityOrFloat = 25 * mmunit.degrees,
@@ -122,4 +125,5 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
                 find_atom(residues[i + 1], "N"),
                 [psi_ref],
             )
-        self._registerCV(mmunit.dimensionless, residues, phi_ref, psi_ref, tol, halfExponent)
+        self.setUsesPeriodicBoundaryConditions(pbc)
+        self._registerCV(mmunit.dimensionless, residues, pbc, phi_ref, psi_ref, tol, halfExponent)

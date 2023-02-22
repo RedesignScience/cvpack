@@ -46,6 +46,8 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
     ----------
         residues
             The residues in the sequence
+        pbc
+            Whether to use periodic boundary conditions
         thetaReference
             The reference value of the :math:`{\\rm C}_\\alpha{\\rm -C}_\\alpha{\\rm -C}_\\alpha`
             angle in an alpha helix
@@ -81,9 +83,10 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
 
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         residues: Iterable[mmapp.topology.Residue],
+        pbc: bool = False,
         thetaReference: QuantityOrFloat = 88 * mmunit.degrees,
         tolerance: QuantityOrFloat = 15 * mmunit.degrees,
         halfExponent: int = 3,
@@ -104,4 +107,5 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
                 find_alpha_carbon(residues[i + 1]),
                 [],
             )
-        self._registerCV(mmunit.dimensionless, residues, theta_ref, tol, halfExponent)
+        self.setUsesPeriodicBoundaryConditions(pbc)
+        self._registerCV(mmunit.dimensionless, residues, pbc, theta_ref, tol, halfExponent)

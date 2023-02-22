@@ -31,13 +31,21 @@ class RMSD(openmm.RMSDForce, AbstractCollectiveVariable):
 
     where :math:`{\\bf R}(\\bf r)` is the rotation matrix that minimizes the RMSD.
 
+    .. warning::
+
+        Periodic boundary conditions are not supported (see OpenMM issue `#2392
+        <https://github.com/openmm/openmm/issues/2913>`_). This is not a problem if all atoms belong
+        to the same molecule. If they do not, a way to circumvent a possible error is to call
+        :func:`getFakeBondForce` and add the resulting force to the system in addition to this CV.
+
     Parameters
     ----------
         referencePositions
             The reference coordinates. If there are ``numAtoms`` coordinates, they must refer to the
             the system atoms and be sorted accordingly. Otherwise, if there are ``n`` coordinates,
             with ``n=len(group)``, they must refer to the group atoms in the same order as they
-            appear in ``group``. The first criterion has precedence when ``n == numAtoms``.
+            appear in ``group``. The first criterion has precedence over the second when
+            ``n == numAtoms``.
         group
             The index of the atoms in the group
         numAtoms
@@ -84,3 +92,39 @@ class RMSD(openmm.RMSDForce, AbstractCollectiveVariable):
                 positions[atom, :] = np.array([coords[i][j] for j in range(3)])
         super().__init__(positions, group)
         self._registerCV(mmunit.nanometers, coords, group, numAtoms)
+
+    def getFakeBondForce(self) -> openmm.HarmonicBondForce:
+        """
+        Get a bond force that does not contribute to the energy but, if added to the same system,
+        can guarantee that this collective variable is computed correctly when the atoms in the
+        group do not belong to the same molecule.
+
+        Returns
+        -------
+            A null bond force that creates a connected graph with all the atoms in the group.
+
+        Example
+        -------
+            >>> import cvlib
+            >>> import openmm as mm
+            >>> from openmm import app, unit
+            >>> from openmmtools import testsystems
+            >>> model = testsystems.WaterBox(box_edge=10*unit.angstroms, cutoff=5*unit.angstroms)
+            >>> group = [atom.index for atom in model.topology.atoms() if atom.residue.index < 3]
+            >>> rmsd = cvlib.RMSD(model.positions, group, model.topology.getNumAtoms())
+            >>> [model.system.addForce(f) for f in [rmsd, rmsd.getFakeBondForce()]]
+            [3, 4]
+            >>> integrator = openmm.VerletIntegrator(2*unit.femtoseconds)
+            >>> platform = openmm.Platform.getPlatformByName('Reference')
+            >>> context = openmm.Context(model.system, integrator, platform)
+            >>> context.setPositions(model.positions)
+            >>> integrator.step(100)
+            >>> print(rmsd.evaluateInContext(context, 6))
+            0.104363 nm
+
+        """
+        force = openmm.HarmonicBondForce()
+        group = self._args["group"]
+        for i in range(len(group) - 1):
+            force.addBond(group[i], group[i + 1], 0.0, 0.0)
+        return force

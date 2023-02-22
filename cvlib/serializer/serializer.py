@@ -37,7 +37,7 @@ def serialize(obj: Any, iostream: IO) -> None:
         - 0
         - 1
         - 2
-        pbc: true
+        pbc: false
         weighByMass: false
         <BLANKLINE>
 

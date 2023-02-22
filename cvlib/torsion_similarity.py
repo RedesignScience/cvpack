@@ -42,6 +42,8 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, AbstractCollectiveVariab
         secondList
             A list of :math:`n` tuples of four atom indices defining the second torsion angle in
             each pair.
+        pbc
+            Whether to use periodic boundary conditions
 
     Example
     -------
@@ -67,7 +69,10 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, AbstractCollectiveVariab
     """
 
     def __init__(
-        self, firstList: Iterable[Iterable[int]], secondList: Iterable[Iterable[int]]
+        self,
+        firstList: Iterable[Iterable[int]],
+        secondList: Iterable[Iterable[int]],
+        pbc: bool = False,
     ) -> None:
         assert all(len(torsion) == 4 for torsion in firstList)  # each torsion must have 4 atoms
         assert all(len(torsion) == 4 for torsion in secondList)  # each torsion must have 4 atoms
@@ -76,4 +81,5 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, AbstractCollectiveVariab
         super().__init__(8, f"{energy}; {definition}")
         for first, second in zip(firstList, secondList):
             self.addBond([*first, *second], [])
+        self.setUsesPeriodicBoundaryConditions(pbc)
         self._registerCV(mmunit.dimensionless, firstList, secondList)

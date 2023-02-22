@@ -43,6 +43,8 @@ class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
     ----------
         residues
             The residues in the sequence
+        pbc
+            Whether to use periodic boundary conditions
         thresholdDistance
             The threshold distance for a hydrogen bond
         stepFunction
@@ -74,6 +76,7 @@ class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
     def __init__(
         self,
         residues: Iterable[mmapp.topology.Residue],
+        pbc: bool = False,
         thresholdDistance: QuantityOrFloat = 0.33 * mmunit.nanometers,
         stepFunction: str = "1/(1+x^6)",
     ) -> None:
@@ -97,4 +100,5 @@ class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
                 find_atom(residues[i], hydrogen_pattern),
                 [],
             )
-        self._registerCV(mmunit.dimensionless, residues, threshold, stepFunction)
+        self.setUsesPeriodicBoundaryConditions(pbc)
+        self._registerCV(mmunit.dimensionless, residues, pbc, threshold, stepFunction)

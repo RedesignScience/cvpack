@@ -175,7 +175,7 @@ class AbstractCollectiveVariable(openmm.Force):
             >>> print(*args.items())
             ('atom1', <class 'int'>) ('atom2', <class 'int'>) ('pbc', <class 'bool'>)
             >>> print(*defaults.items())
-            ('pbc', True)
+            ('pbc', False)
 
         Example
         -------
@@ -185,7 +185,7 @@ class AbstractCollectiveVariable(openmm.Force):
             >>> print(*args.items())
             ('group', typing.Iterable[int]) ('pbc', <class 'bool'>) ('weighByMass', <class 'bool'>)
             >>> print(*defaults.items())
-            ('pbc', True) ('weighByMass', False)
+            ('pbc', False) ('weighByMass', False)
 
         """
         arguments = OrderedDict()
