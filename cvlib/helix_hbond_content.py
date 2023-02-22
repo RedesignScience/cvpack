@@ -33,12 +33,17 @@ class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
         \\right)
 
     where :math:`{\\bf r}^{\\rm H}_k` and :math:`{\\bf r}^{\\rm O}_k` are the positions of the
-    hydrogen and oxygen atoms, respectively bonded to the backbone nitrogen and carbon atoms of
-    residue :math:`k`, :math:`d_{\\rm HB}` is the threshold distance for a hydrogen bond, and
-    :math:`S(x)` is a step function equal to 1 if a contact is made or equal to 0 otherwise. In
-    analysis, it is fine to make :math:`S(x) = H(1-x)`, where `H` is the `Heaviside step function
-    <https://en.wikipedia.org/wiki/Heaviside_step_function>`_. In a simulation, however,
-    :math:`S(x)` should continuously approximate :math:`H(1-x)` for :math:`x \\geq 0`.
+    hydrogen and oxygen atoms bonded, respectively, to the backbone nitrogen and carbon atoms of
+    residue :math:`k`. In addition, :math:`d_{\\rm HB}` is the threshold distance for a hydrogen
+    bond and :math:`S(x)` is a step function equal to 1 if a contact is made or equal to 0
+    otherwise. In analysis, it is fine to make :math:`S(x) = H(1-x)`, where `H` is the `Heaviside
+    step function <https://en.wikipedia.org/wiki/Heaviside_step_function>`_. In a simulation,
+    however, :math:`S(x)` should continuously approximate :math:`H(1-x)` for :math:`x \\geq 0`. By
+    default :cite:`Iannuzzi_2003`,
+
+    .. math::
+
+        S(x) = \\frac{1-x^6}{1-x^{12}} = \\frac{1}{1+x^6}
 
     .. note::
 
@@ -73,7 +78,7 @@ class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
         >>> integrator = openmm.VerletIntegrator(0)
         >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
-        >>> print(helix_content.getValue(context, 6))
+        >>> print(helix_content.getValue(context, digits=6))
         0.93414 dimensionless
 
     """

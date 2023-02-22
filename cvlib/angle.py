@@ -52,7 +52,7 @@ class Angle(openmm.CustomAngleForce, AbstractCollectiveVariable):
         >>> context = mm.Context(system, integrator, platform)
         >>> positions = [[0, 0, 0], [1, 0, 0], [1, 1, 0]]
         >>> context.setPositions([mm.Vec3(*pos) for pos in positions])
-        >>> print(angle.getValue(context, 6))
+        >>> print(angle.getValue(context, digits=6))
         1.570796 rad
 
     """

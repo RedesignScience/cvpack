@@ -64,7 +64,7 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, AbstractCollectiveVariab
         >>> platform = mm.Platform.getPlatformByName("Reference")
         >>> context = mm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
-        >>> print(torsion_similarity.getValue(context, 6))
+        >>> print(torsion_similarity.getValue(context, digits=6))
         18.659917 dimensionless
     """
 

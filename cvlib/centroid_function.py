@@ -84,9 +84,9 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         >>> platform = mm.Platform.getPlatformByName('Reference')
         >>> context = mm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
-        >>> print(rg.getValue(context, 6))
+        >>> print(rg.getValue(context, digits=6))
         0.295143 nm
-        >>> print(colvar.getValue(context, 6))
+        >>> print(colvar.getValue(context, digits=6))
         0.295143 nm
     """
 

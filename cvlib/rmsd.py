@@ -119,7 +119,7 @@ class RMSD(openmm.RMSDForce, AbstractCollectiveVariable):
             >>> context = openmm.Context(model.system, integrator, platform)
             >>> context.setPositions(model.positions)
             >>> integrator.step(100)
-            >>> print(rmsd.getValue(context, 6))
+            >>> print(rmsd.getValue(context, digits=6))
             0.104363 nm
 
         """

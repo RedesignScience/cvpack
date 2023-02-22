@@ -27,7 +27,12 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
     function equal to 1 if a contact is made or equal to 0 otherwise. In analysis, it is fine to
     make :math:`S(x) = H(1-x)`, where `H` is the `Heaviside step function
     <https://en.wikipedia.org/wiki/Heaviside_step_function>`_. In a simulation, however,
-    :math:`S(x)` should continuously approximate :math:`H(1-x)` for :math:`x \\geq 0`.
+    :math:`S(x)` should continuously approximate :math:`H(1-x)` for :math:`x \\geq 0`. By default
+    :cite:`Iannuzzi_2003`,
+
+    .. math::
+
+        S(x) = \\frac{1-x^6}{1-x^{12}} = \\frac{1}{1+x^6}
 
     Atom pairs are ignored for distances beyond a cutoff :math:`r_c`. To avoid discontinuities,
     a switching function is applied at :math:`r_s \\leq r \\leq r_c` to make :math:`S(r/r_0)`
@@ -75,7 +80,7 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
         >>> platform = openmm.Platform.getPlatformByName('Reference')
         >>> context = openmm.Context(model.system, openmm.CustomIntegrator(0), platform)
         >>> context.setPositions(model.positions)
-        >>> print(nc.getValue(context, 6))
+        >>> print(nc.getValue(context, digits=6))
         6.0 dimensionless
 
     """

@@ -149,11 +149,6 @@ class AbstractCollectiveVariable(openmm.Force):
             getForces
                 If True, the forces will be computed
 
-        Returns
-        -------
-            The state containing the potential energy and/or force values computed from this single
-            force object
-
         Raises
         ------
             ValueError
@@ -174,30 +169,18 @@ class AbstractCollectiveVariable(openmm.Force):
     @classmethod
     def getArguments(cls) -> Tuple[OrderedDict, OrderedDict]:
         """
-        Inspect the arguments needed for constructing an instance of this collective
-        variable.
+        Inspect the arguments needed for constructing an instance of this collective variable.
 
         Returns
         -------
-            arguments
-                An ordered dictionary containing the type annotations of all arguments
-            defaults
-                An ordered dictionary containing default values of optional arguments
+            A dictionary with the type annotations of all arguments
+
+            A dictionary with the default values of optional arguments
 
         Example
         -------
             >>> import cvlib
-            >>> args, defaults = cvlib.Distance.getArguments()
-            >>> print(*args.items())
-            ('atom1', <class 'int'>) ('atom2', <class 'int'>) ('pbc', <class 'bool'>)
-            >>> print(*defaults.items())
-            ('pbc', False)
-
-        Example
-        -------
-            >>> import cvlib
-            >>> radius_of_gyration = cvlib.RadiusOfGyration([1, 2, 3])
-            >>> args, defaults = radius_of_gyration.getArguments()
+            >>> args, defaults = cvlib.RadiusOfGyration.getArguments()
             >>> print(*args.items())
             ('group', typing.Iterable[int]) ('pbc', <class 'bool'>) ('weighByMass', <class 'bool'>)
             >>> print(*defaults.items())
@@ -235,8 +218,7 @@ class AbstractCollectiveVariable(openmm.Force):
         """
         Evaluate this collective variable at a given :OpenMM:`Context`.
 
-        Optionally, the value of this collective variable can be rounded to a specified number of
-        digits.
+        Optionally, the value can be rounded to a specified number of digits.
 
         Parameters
         ----------
@@ -247,8 +229,6 @@ class AbstractCollectiveVariable(openmm.Force):
 
         Returns
         -------
-            The value of this collective variable at the given context
-
         """
         state = self._getSingleForceState(context, getEnergy=True)
         value = in_md_units(state.getPotentialEnergy())
@@ -281,7 +261,6 @@ class AbstractCollectiveVariable(openmm.Force):
 
         Returns
         -------
-            The value of this collective variable's effective mass at the given context
 
         Example
         -------
@@ -296,7 +275,7 @@ class AbstractCollectiveVariable(openmm.Force):
             >>> platform = mm.Platform.getPlatformByName('Reference')
             >>> context = mm.Context(model.system, mm.VerletIntegrator(0), platform)
             >>> context.setPositions(model.positions)
-            >>> print(radius_of_gyration.getEffectiveMass(context, 6))
+            >>> print(radius_of_gyration.getEffectiveMass(context, digits=6))
             30.946932 Da
 
         """

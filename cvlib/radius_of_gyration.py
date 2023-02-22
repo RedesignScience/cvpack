@@ -63,7 +63,7 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         >>> integrator = mm.VerletIntegrator(0)
         >>> context = mm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
-        >>> print(radius_of_gyration.getValue(context, 6))
+        >>> print(radius_of_gyration.getValue(context, digits=6))
         0.295143 nm
 
     """

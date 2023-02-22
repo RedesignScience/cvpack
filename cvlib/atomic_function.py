@@ -59,9 +59,9 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         >>> platform = mm.Platform.getPlatformByName('Reference')
         >>> context = mm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
-        >>> print(angle.getValue(context, 6))
+        >>> print(angle.getValue(context, digits=6))
         2.318322 rad
-        >>> print(colvar.getValue(context, 6))
+        >>> print(colvar.getValue(context, digits=6))
         2.318322 rad
     """
 

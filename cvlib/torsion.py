@@ -58,7 +58,7 @@ class Torsion(openmm.CustomTorsionForce, AbstractCollectiveVariable):
         >>> context = mm.Context(system, integrator, platform)
         >>> positions = [[0, 0, 0], [1, 0, 0], [1, 1, 0], [1, 1, 1]]
         >>> context.setPositions([mm.Vec3(*pos) for pos in positions])
-        >>> print(torsion.getValue(context, 6))
+        >>> print(torsion.getValue(context, digits=6))
         1.570796 rad
 
     """
