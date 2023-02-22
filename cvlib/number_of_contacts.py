@@ -75,7 +75,7 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
         >>> platform = openmm.Platform.getPlatformByName('Reference')
         >>> context = openmm.Context(model.system, openmm.CustomIntegrator(0), platform)
         >>> context.setPositions(model.positions)
-        >>> print(nc.evaluateInContext(context, 6))
+        >>> print(nc.getValue(context, 6))
         6.0 dimensionless
 
     """

@@ -39,7 +39,7 @@ def test_effective_mass():
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
     context.setPositions(model.positions)
-    effective_mass = rg_cv.effectiveMassInContext(context)
+    effective_mass = rg_cv.getEffectiveMass(context)
     assert effective_mass / effective_mass.unit == pytest.approx(30.946932)
 
 
@@ -88,11 +88,11 @@ def perform_common_tests(
     new_cv = cvlib.serializer.deserialize(pipe)
     context.getSystem().addForce(new_cv)
     context.reinitialize(preserveState=True)
-    value1 = collectiveVariable.evaluateInContext(context)
-    value2 = new_cv.evaluateInContext(context)
+    value1 = collectiveVariable.getValue(context)
+    value2 = new_cv.getValue(context)
     assert value1 / value1.unit == value2 / value2.unit
-    mass1 = collectiveVariable.effectiveMassInContext(context)
-    mass2 = new_cv.effectiveMassInContext(context)
+    mass1 = collectiveVariable.getEffectiveMass(context)
+    mass2 = new_cv.getEffectiveMass(context)
     assert mass1 / mass1.unit == mass2 / mass2.unit
 
 
@@ -108,7 +108,7 @@ def test_cv_is_in_context():
     context = openmm.Context(model.system, integrator, platform)
     context.setPositions(model.positions)
     with pytest.raises(RuntimeError) as excinfo:
-        rg_cv.evaluateInContext(context)
+        rg_cv.getValue(context)
     assert str(excinfo.value) == "This force is not part of the system in the given context."
 
 
@@ -125,7 +125,7 @@ def test_distance():
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
     context.setPositions(model.positions)
-    value1 = distance.evaluateInContext(context).value_in_unit(distance.getUnit())
+    value1 = distance.getValue(context).value_in_unit(distance.getUnit())
     value2 = np.sqrt(np.sum(((model.positions[atom1] - model.positions[atom2]) ** 2)))
     assert value1 == pytest.approx(value2)
     perform_common_tests(distance, context)
@@ -144,7 +144,7 @@ def test_angle():
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
     context.setPositions(model.positions)
-    value1 = angle.evaluateInContext(context).value_in_unit(angle.getUnit())
+    value1 = angle.getValue(context).value_in_unit(angle.getUnit())
     r21 = model.positions[atoms[0]] - model.positions[atoms[1]]
     r23 = model.positions[atoms[2]] - model.positions[atoms[1]]
     value2 = np.arccos(np.dot(r21, r23) / (np.linalg.norm(r21) * np.linalg.norm(r23)))
@@ -165,7 +165,7 @@ def test_torsion():
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
     context.setPositions(model.positions)
-    value1 = torsion.evaluateInContext(context).value_in_unit(torsion.getUnit())
+    value1 = torsion.getValue(context).value_in_unit(torsion.getUnit())
     r21 = model.positions[atoms[0]] - model.positions[atoms[1]]
     u23 = model.positions[atoms[2]] - model.positions[atoms[1]]
     u23 /= np.linalg.norm(u23)
@@ -190,7 +190,7 @@ def test_radius_of_gyration():
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
     context.setPositions(model.positions)
-    rgval = rg_cv.evaluateInContext(context).value_in_unit(unit.nanometers)
+    rgval = rg_cv.getValue(context).value_in_unit(unit.nanometers)
     assert rgval**2 == pytest.approx(rgsq)
     perform_common_tests(rg_cv, context)
 
@@ -217,7 +217,7 @@ def test_number_of_contacts():
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
     context.setPositions(model.positions)
-    nc_value = number_of_contacts.evaluateInContext(context)
+    nc_value = number_of_contacts.getValue(context)
     assert nc_value / nc_value.unit == pytest.approx(contacts.sum())
     perform_common_tests(number_of_contacts, context)
 
@@ -250,7 +250,7 @@ def run_rmsd_test(
     context.setPositions(coordinates)
     group_coords = coordinates[group, :] - coordinates[group, :].mean(axis=0)
     _, rssd = Rotation.align_vectors(group_coords, group_ref)
-    rmsd_value = rmsd.evaluateInContext(context)
+    rmsd_value = rmsd.getValue(context)
     assert rmsd_value / rmsd_value.unit == pytest.approx(rssd / np.sqrt(len(group)))
 
 
@@ -307,7 +307,7 @@ def test_helix_torsion_content():
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
     context.setPositions(model.positions)
-    cv_value = helix_content.evaluateInContext(context)
+    cv_value = helix_content.getValue(context)
 
     assert cv_value / cv_value.unit == pytest.approx(computed_value)
     perform_common_tests(helix_content, context)
@@ -338,7 +338,7 @@ def test_helix_angle_content():
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
     context.setPositions(model.positions)
-    cv_value = helix_content.evaluateInContext(context)
+    cv_value = helix_content.getValue(context)
     assert cv_value / cv_value.unit == pytest.approx(computed_value)
     perform_common_tests(helix_content, context)
 
@@ -367,7 +367,7 @@ def test_helix_hbond_content():
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
     context.setPositions(model.positions)
-    cv_value = helix_content.evaluateInContext(context)
+    cv_value = helix_content.getValue(context)
     assert cv_value / cv_value.unit == pytest.approx(computed_value)
     perform_common_tests(helix_content, context)
 
@@ -390,7 +390,7 @@ def test_helix_torsion_similarity():
         model.system, openmm.VerletIntegrator(0), openmm.Platform.getPlatformByName("Reference")
     )
     context.setPositions(model.positions)
-    cv_value = torsion_similarity.evaluateInContext(context)
+    cv_value = torsion_similarity.getValue(context)
     phi = phi.ravel()
     psi = psi.ravel()
     deltas = np.hstack([phi[1:], psi[1:]]) - np.hstack([phi[:-1], psi[:-1]])
@@ -418,7 +418,7 @@ def test_atomic_function():
         model.system, openmm.VerletIntegrator(0), openmm.Platform.getPlatformByName("Reference")
     )
     context.setPositions(model.positions)
-    cv_value = colvar.evaluateInContext(context)
+    cv_value = colvar.getValue(context)
     positions = model.positions.value_in_unit(unit.nanometers)
     computed_value = np.sum(
         [
@@ -451,7 +451,7 @@ def test_centroid_function():
         model.system, openmm.VerletIntegrator(0), openmm.Platform.getPlatformByName("Reference")
     )
     context.setPositions(model.positions)
-    cv_value = colvar.evaluateInContext(context)
+    cv_value = colvar.getValue(context)
     positions = model.positions.value_in_unit(unit.nanometers)
     computed_value = np.sum(
         [

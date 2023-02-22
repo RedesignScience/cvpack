@@ -91,7 +91,7 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
         >>> integrator = openmm.VerletIntegrator(0)
         >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
-        >>> print(helix_content.evaluateInContext(context, 6))
+        >>> print(helix_content.getValue(context, 6))
         0.918571 dimensionless
 
     """

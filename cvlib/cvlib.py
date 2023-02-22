@@ -231,9 +231,7 @@ class AbstractCollectiveVariable(openmm.Force):
         """
         return self._unit
 
-    def evaluateInContext(
-        self, context: openmm.Context, digits: Optional[int] = None
-    ) -> mmunit.Quantity:
+    def getValue(self, context: openmm.Context, digits: Optional[int] = None) -> mmunit.Quantity:
         """
         Evaluate this collective variable at a given :OpenMM:`Context`.
 
@@ -256,7 +254,7 @@ class AbstractCollectiveVariable(openmm.Force):
         value = in_md_units(state.getPotentialEnergy())
         return (round(value, digits) if digits else value) * self.getUnit()
 
-    def effectiveMassInContext(
+    def getEffectiveMass(
         self, context: openmm.Context, digits: Optional[int] = None
     ) -> mmunit.Quantity:
         """
@@ -298,7 +296,7 @@ class AbstractCollectiveVariable(openmm.Force):
             >>> platform = mm.Platform.getPlatformByName('Reference')
             >>> context = mm.Context(model.system, mm.VerletIntegrator(0), platform)
             >>> context.setPositions(model.positions)
-            >>> print(radius_of_gyration.effectiveMassInContext(context, 6))
+            >>> print(radius_of_gyration.getEffectiveMass(context, 6))
             30.946932 Da
 
         """
