@@ -28,18 +28,14 @@ class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
 
     .. math::
 
-        \\alpha_{\\rm HB}({\\bf r}) = \\frac{1}{n-4} \\sum_{i=5}^n S\\left(
+        \\alpha_{\\rm HB}({\\bf r}) = \\frac{1}{n-4} \\sum_{i=5}^n B_m\\left(
             \\frac{\\| {\\bf r}^{\\rm H}_i - {\\bf r}^{\\rm O}_{i-4} \\|}{d_{\\rm HB}}
         \\right)
 
     where :math:`{\\bf r}^{\\rm H}_k` and :math:`{\\bf r}^{\\rm O}_k` are the positions of the
     hydrogen and oxygen atoms bonded, respectively, to the backbone nitrogen and carbon atoms of
     residue :math:`k`. In addition, :math:`d_{\\rm HB}` is the threshold distance for a hydrogen
-    bond and :math:`S(x)` is a step function equal to 1 if a contact is made or equal to 0
-    otherwise. In analysis, it is fine to make :math:`S(x) = H(1-x)`, where `H` is the `Heaviside
-    step function <https://en.wikipedia.org/wiki/Heaviside_step_function>`_. In a simulation,
-    however, :math:`S(x)` should continuously approximate :math:`H(1-x)` for :math:`x \\geq 0`. By
-    default :cite:`Iannuzzi_2003`,
+    bond and :math:`B_m(x)` is a smooth step function given by
 
     .. math::
 
