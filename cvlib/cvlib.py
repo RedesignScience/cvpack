@@ -14,6 +14,7 @@ from typing import Any, Dict, Optional, Tuple, Union
 
 import numpy as np
 import openmm
+from openmm import app as mmapp
 from openmm import unit as mmunit
 
 QuantityOrFloat = Union[mmunit.Quantity, float]
@@ -81,6 +82,21 @@ def str_to_unit(unitStr: str) -> mmunit.Unit:
     )
 
 
+class SerializableResidue(mmapp.topology.Residue):
+    """
+    A class that extends OpenMM's Residue class with additional methods for serialization and
+    deserialization.
+
+    """
+
+    def __init__(self, residue: mmapp.topology.Residue) -> None:
+        super().__init__(residue.name, residue.index, None, residue.id, None)
+        self._atoms = [
+            mmapp.topology.Atom(atom.name, atom.element, atom.index, None, atom.id)
+            for atom in residue.atoms()
+        ]
+
+
 class AbstractCollectiveVariable(openmm.Force):
     """
     An abstract class with common attributes and method for all CVs.
@@ -93,8 +109,8 @@ class AbstractCollectiveVariable(openmm.Force):
     def __getstate__(self) -> Dict[str, Any]:
         return self._args
 
-    def __setstate__(self, kw: Dict[str, Any]) -> None:
-        self.__init__(**kw)
+    def __setstate__(self, keywords: Dict[str, Any]) -> None:
+        self.__init__(**keywords)
 
     def _registerCV(self, unit: mmunit.Unit, *args: Any) -> None:
         """

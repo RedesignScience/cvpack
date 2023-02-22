@@ -13,7 +13,12 @@ import openmm
 from openmm import app as mmapp
 from openmm import unit as mmunit
 
-from .cvlib import AbstractCollectiveVariable, QuantityOrFloat, in_md_units
+from .cvlib import (
+    AbstractCollectiveVariable,
+    QuantityOrFloat,
+    SerializableResidue,
+    in_md_units,
+)
 
 
 class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable):
@@ -126,4 +131,5 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
                 [psi_ref],
             )
         self.setUsesPeriodicBoundaryConditions(pbc)
-        self._registerCV(mmunit.dimensionless, residues, pbc, phi_ref, psi_ref, tol, halfExponent)
+        res = [SerializableResidue(r) for r in residues]
+        self._registerCV(mmunit.dimensionless, res, pbc, phi_ref, psi_ref, tol, halfExponent)

@@ -14,7 +14,12 @@ import openmm
 from openmm import app as mmapp
 from openmm import unit as mmunit
 
-from .cvlib import AbstractCollectiveVariable, QuantityOrFloat, in_md_units
+from .cvlib import (
+    AbstractCollectiveVariable,
+    QuantityOrFloat,
+    SerializableResidue,
+    in_md_units,
+)
 
 
 class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
@@ -101,4 +106,5 @@ class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
                 [],
             )
         self.setUsesPeriodicBoundaryConditions(pbc)
-        self._registerCV(mmunit.dimensionless, residues, pbc, threshold, stepFunction)
+        res = [SerializableResidue(r) for r in residues]
+        self._registerCV(mmunit.dimensionless, res, pbc, threshold, stepFunction)

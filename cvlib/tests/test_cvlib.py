@@ -310,6 +310,7 @@ def test_helix_torsion_content():
     cv_value = helix_content.evaluateInContext(context)
 
     assert cv_value / cv_value.unit == pytest.approx(computed_value)
+    perform_common_tests(helix_content, context)
 
 
 def test_helix_angle_content():
@@ -339,6 +340,7 @@ def test_helix_angle_content():
     context.setPositions(model.positions)
     cv_value = helix_content.evaluateInContext(context)
     assert cv_value / cv_value.unit == pytest.approx(computed_value)
+    perform_common_tests(helix_content, context)
 
 
 def test_helix_hbond_content():
@@ -367,6 +369,7 @@ def test_helix_hbond_content():
     context.setPositions(model.positions)
     cv_value = helix_content.evaluateInContext(context)
     assert cv_value / cv_value.unit == pytest.approx(computed_value)
+    perform_common_tests(helix_content, context)
 
 
 def test_helix_torsion_similarity():
