@@ -2,6 +2,7 @@
 Unit and regression test for the cvlib package.
 """
 
+import copy
 import inspect
 import io
 import itertools
@@ -368,6 +369,50 @@ def test_helix_hbond_content():
     context = openmm.Context(model.system, integrator, platform)
     context.setPositions(model.positions)
     cv_value = helix_content.getValue(context)
+    assert cv_value / cv_value.unit == pytest.approx(computed_value)
+    perform_common_tests(helix_content, context)
+
+
+def test_helix_rmsd_content():
+    """
+    Test whether a helix rmsd content is computed correctly.
+
+    """
+    model = testsystems.LysozymeImplicit()
+
+    num_atoms = model.topology.getNumAtoms()
+    residues = list(model.topology.residues())
+    with pytest.raises(ValueError) as excinfo:
+        helix_content = cvlib.HelixRMSDContent(residues, num_atoms)
+    assert str(excinfo.value) == "Could not find all atoms in residue TMP163"
+    helix_content = cvlib.HelixRMSDContent(residues[59:80], num_atoms)
+    model.system.addForce(helix_content)
+    context = openmm.Context(
+        model.system, openmm.VerletIntegrator(0), openmm.Platform.getPlatformByName("Reference")
+    )
+    context.setPositions(model.positions)
+    cv_value = helix_content.getValue(context)
+
+    traj = mdtraj.Trajectory(model.positions, mdtraj.Topology.from_openmm(model.topology))
+    atoms = sum(
+        zip(
+            traj.top.select("resSeq 60 to 80 and name N"),
+            traj.top.select("resSeq 60 to 80 and name CA"),
+            traj.top.select("resSeq 60 to 80 and (name CB or (resname GLY and name HA2))"),
+            traj.top.select("resSeq 60 to 80 and name C"),
+            traj.top.select("resSeq 60 to 80 and name O"),
+        ),
+        (),
+    )
+
+    ref = copy.deepcopy(traj)
+    positions = helix_content._ideal_helix_positions  # pylint: disable=protected-access
+    computed_value = 0
+    for i in range(16):
+        group = atoms[5 * i : 5 * i + 30]
+        ref.xyz[:, group, :] = positions
+        computed_value += 1 / (1 + (mdtraj.rmsd(traj, ref, 0, group).item() / 0.08) ** 6)
+
     assert cv_value / cv_value.unit == pytest.approx(computed_value)
     perform_common_tests(helix_content, context)
 

@@ -31,9 +31,9 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
     .. math::
 
         \\alpha_{\\rm rmsd}({\\bf r}) = \\sum_{i=1}^{n-5} B_m\\left(
-            \\sqrt{\\frac{1}{30} \\sum_{j=1}^{30} \\left\|
+            \\sqrt{\\frac{1}{30} \\sum_{j=1}^{30} \\left\\|
                 {\\bf r}_j({\\bf g}_i) - {\\bf R}({\\bf g}_i){\\bf r}_j({\\bf g}_{\\rm ideal})
-            \\right\|^2}
+            \\right\\|^2}
         \\right)
 
     where :math:`{\\bf g}_i` represents a group of 30 atoms selected from residues :math:`i` to
@@ -97,6 +97,14 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
         15.915198 dimensionless
     """
 
+    _ideal_helix_positions = (
+        np.loadtxt(
+            os.path.join(os.path.dirname(__file__), "data", "ideal_alpha_helix.csv"),
+            delimiter=",",
+        )
+        / 10
+    )
+
     def __init__(  # pylint: disable=too-many-arguments
         self,
         residues: Iterable[mmapp.topology.Residue],
@@ -106,34 +114,35 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
         fractional: bool = False,
     ) -> None:
         assert len(residues) >= 6, "Must have at least 6 residues"
-        res = [SerializableResidue(r) for r in residues]
-        threshold = in_md_units(thresholdRMSD)
 
-        def stepFunction(i):
-            return f"1/(1 + (rmsd{i+1}/{threshold})^{2*halfExponent})"
+        def step_function(i):
+            return f"1/(1 + (rmsd{i+1}/{in_md_units(thresholdRMSD)})^{2*halfExponent})"
 
         def atoms_list(residue: mmapp.topology.Residue) -> List[int]:
             indices = {}
             for atom in residue.atoms():
                 if atom.name in ["N", "CA", "CB", "C", "O"]:
                     indices[atom.name] = atom.index
-                elif residue.name == "GLY" and atom.name in ["HA1", "HA2"]:
+                elif residue.name == "GLY" and atom.name == "HA2":
                     indices["CB"] = atom.index
             if len(indices) != 5:
                 raise ValueError(f"Could not find all atoms in residue {residue.name}{residue.id}")
             return [indices[atom] for atom in ["N", "CA", "CB", "C", "O"]]
 
         num_residue_blocks = len(residues) - 5
-        function = " + ".join(map(stepFunction, range(num_residue_blocks)))
+        function = " + ".join(map(step_function, range(num_residue_blocks)))
         super().__init__(f"({function})/{num_residue_blocks}" if fractional else function)
-        ideal_helix_positions = np.loadtxt(
-            os.path.join(os.path.dirname(__file__), "data", "ideal_alpha_helix.csv"),
-            delimiter=",",
-        )
-        positions = [openmm.Vec3(*x) for x in ideal_helix_positions / 10]
         atoms = [atoms_list(r) for r in residues]
+        positions = [openmm.Vec3(*x) for x in self._ideal_helix_positions]
         for i in range(num_residue_blocks):
-            group = sum(atoms[i : i + 6], [])  # noqa: E203
+            group = sum(atoms[i : i + 6], [])
             self.addCollectiveVariable(f"rmsd{i+1}", RMSD(positions, group, numAtoms))
 
-        self._registerCV(mmunit.dimensionless, res, numAtoms, threshold, stepFunction)
+        self._registerCV(
+            mmunit.dimensionless,
+            [SerializableResidue(r) for r in residues],
+            numAtoms,
+            in_md_units(thresholdRMSD),
+            halfExponent,
+            fractional,
+        )
