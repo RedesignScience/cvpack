@@ -7,7 +7,7 @@
 
 """
 
-import os
+from importlib.resources import files
 from typing import Iterable, List
 
 import numpy as np
@@ -97,12 +97,9 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
         15.915198 dimensionless
     """
 
-    _ideal_helix_positions = (
-        np.loadtxt(
-            os.path.join(os.path.dirname(__file__), "data", "ideal_alpha_helix.csv"),
-            delimiter=",",
-        )
-        / 10
+    _ideal_helix_positions = 0.1 * np.loadtxt(
+        files("cvlib").joinpath("data").joinpath("ideal_alpha_helix.csv"),
+        delimiter=",",
     )
 
     def __init__(  # pylint: disable=too-many-arguments

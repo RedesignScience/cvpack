@@ -21,7 +21,7 @@ classifiers = [
 requires-python = ">=3.8"
 # Declare any run-time dependencies that should be installed with the package.
 dependencies = [
-#    "importlib-resources;python_version<'3.10'",
+    "importlib-resources;python_version<'3.10'",
     "numpy",
     "openmm",
 ]
@@ -65,7 +65,8 @@ where = ["."]
 # Ref https://setuptools.pypa.io/en/latest/userguide/datafiles.html#package-data
 [tool.setuptools.package-data]
 cvlib = [
-    "py.typed"
+    "py.typed",
+    "data/ideal_alpha_helix.pdb"
 ]
 
 [tool.versioningit]
