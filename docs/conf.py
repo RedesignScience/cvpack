@@ -16,8 +16,8 @@ import os
 import sys
 
 # Incase the project was not installed
-import cvpack
-from cvpack.cvpack import AbstractCollectiveVariable
+import cvlib
+from cvlib.cvlib import AbstractCollectiveVariable
 
 sys.path.insert(0, os.path.abspath(".."))
 
@@ -33,7 +33,7 @@ def create_rst_file(cls):
             [
                 f"{name}\n",
                 "=" * len(name) + "\n\n",
-                ".. currentmodule:: cvpack\n",
+                ".. currentmodule:: cvlib\n",
                 f".. autoclass:: {name}\n",
                 "    :members:\n",
                 "    :member-order: bysource\n\n",
@@ -45,15 +45,15 @@ def create_rst_file(cls):
 
 with open("api/index.rst", "w") as f:
     f.write("Python API\n==========\n\n.. toctree::\n    :titlesonly:\n\n")
-    for item in cvpack.__dict__.values():
-        if isinstance(item, type) and item is not cvpack.cvpack.AbstractCollectiveVariable:
+    for item in cvlib.__dict__.values():
+        if isinstance(item, type) and item is not cvlib.cvlib.AbstractCollectiveVariable:
             f.write(f"    {item.__name__}\n")
             create_rst_file(item)
-    f.write("\n.. testsetup::\n\n    from cvpack import *")
+    f.write("\n.. testsetup::\n\n    from cvlib import *")
 
 # -- Project information -----------------------------------------------------
 
-project = "CV Library"
+project = "CV Package"
 copyright = "2023, Charlles Abreu | CMS Cookiecutter v1.1"
 author = "Charlles Abreu"
 
@@ -129,7 +129,7 @@ html_theme_options = {
     # 'logo_name': True,
     "github_button": False,
     "github_user": "craabreu",
-    "github_repo": "cvpack",
+    "github_repo": "cvlib",
 }
 html_sidebars = {
     "**": ["about.html", "globaltoc.html", "searchbox.html"],
@@ -169,7 +169,7 @@ def setup(app):
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "cvpackdoc"
+htmlhelp_basename = "cvlibdoc"
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -195,9 +195,9 @@ latex_elements = {
 latex_documents = [
     (
         master_doc,
-        "cvpack.tex",
-        "Collective Variable Library Documentation",
-        "cvpack",
+        "cvlib.tex",
+        "Collective Variable Package Documentation",
+        "cvlib",
         "manual",
     ),
 ]
@@ -208,7 +208,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, "cvpack", "Collective Variable Library Documentation", [author], 1)
+    (master_doc, "cvlib", "Collective Variable Package Documentation", [author], 1)
 ]
 
 
@@ -220,10 +220,10 @@ man_pages = [
 texinfo_documents = [
     (
         master_doc,
-        "cvpack",
-        "Collective Variable Library Documentation",
+        "cvlib",
+        "Collective Variable Package Documentation",
         author,
-        "cvpack",
+        "cvlib",
         "Useful Collective Variables for OpenMM",
         "Miscellaneous",
     ),

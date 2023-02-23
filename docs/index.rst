@@ -1,5 +1,5 @@
 ===========================
-Collective Variable Library
+Collective Variable Package
 ===========================
 
 .. image:: https://badgen.net/badge/icon/github?icon=github&label

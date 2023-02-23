@@ -1,4 +1,4 @@
 Getting Started
 ===============
 
-This page details how to get started with Collective Variable Library. 
+This page details how to get started with Collective Variable Package.

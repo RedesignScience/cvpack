@@ -1,5 +1,5 @@
 """
-Serializer submodule of CV Library
+Serializer submodule of CV Package
 
 """
 
