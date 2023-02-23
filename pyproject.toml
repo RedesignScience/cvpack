@@ -66,7 +66,7 @@ where = ["."]
 [tool.setuptools.package-data]
 cvlib = [
     "py.typed",
-    "data/ideal_alpha_helix.pdb"
+    "data/ideal_alpha_helix.csv"
 ]
 
 [tool.versioningit]
