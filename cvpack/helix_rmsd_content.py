@@ -20,7 +20,7 @@ except ImportError:
 from openmm import app as mmapp
 from openmm import unit as mmunit
 
-from .cvlib import (
+from .cvpack import (
     AbstractCollectiveVariable,
     QuantityOrFloat,
     SerializableResidue,
@@ -89,7 +89,7 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
 
     Example
     -------
-        >>> import cvlib
+        >>> import cvpack
         >>> import openmm as mm
         >>> from openmm import app, unit
         >>> from openmmtools import testsystems
@@ -97,7 +97,7 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
         >>> residues = [r for r in model.topology.residues() if 59 <= r.index <= 79]
         >>> print(*[r.name for r in residues])
         LYS ASP GLU ALA GLU LYS LEU PHE ASN GLN ASP VAL ASP ALA ALA VAL ARG GLY ILE LEU ARG
-        >>> helix_content = cvlib.HelixRMSDContent(residues, model.system.getNumParticles())
+        >>> helix_content = cvpack.HelixRMSDContent(residues, model.system.getNumParticles())
         >>> model.system.addForce(helix_content)
         6
         >>> platform = openmm.Platform.getPlatformByName('Reference')
@@ -109,7 +109,7 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
     """
 
     _ideal_helix_positions = 0.1 * np.loadtxt(
-        files("cvlib").joinpath("data").joinpath("ideal_alpha_helix.csv"),
+        files("cvpack").joinpath("data").joinpath("ideal_alpha_helix.csv"),
         delimiter=",",
     )
 

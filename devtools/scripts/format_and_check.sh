@@ -1,6 +1,6 @@
 #!/bin/env bash
 set -e
-isort ./cvlib
-black --line-length 100 ./cvlib
-flake8 --ignore=E203,W503 ./cvlib
-pylint --rcfile=devtools/linters/pylintrc ./cvlib
+isort ./cvpack
+black --line-length 100 ./cvpack
+flake8 --ignore=E203,W503 ./cvpack
+pylint --rcfile=devtools/linters/pylintrc ./cvpack

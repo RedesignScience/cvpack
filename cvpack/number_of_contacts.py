@@ -12,7 +12,7 @@ from typing import Iterable
 import openmm
 from openmm import unit as mmunit
 
-from .cvlib import AbstractCollectiveVariable, QuantityOrFloat, in_md_units
+from .cvpack import AbstractCollectiveVariable, QuantityOrFloat, in_md_units
 
 
 class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
@@ -66,7 +66,7 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
 
     Example
     -------
-        >>> import cvlib
+        >>> import cvpack
         >>> import openmm as mm
         >>> from openmm import app
         >>> from openmmtools import testsystems
@@ -74,7 +74,7 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
         >>> carbons = [a.index for a in model.topology.atoms() if a.element == app.element.carbon]
         >>> num_atoms = model.topology.getNumAtoms()
         >>> optionals = {"pbc": False, "stepFunction": "step(1-x)"}
-        >>> nc = cvlib.NumberOfContacts(carbons, carbons, num_atoms, **optionals)
+        >>> nc = cvpack.NumberOfContacts(carbons, carbons, num_atoms, **optionals)
         >>> model.system.addForce(nc)
         5
         >>> platform = openmm.Platform.getPlatformByName('Reference')

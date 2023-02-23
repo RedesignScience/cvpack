@@ -10,7 +10,7 @@
 import openmm
 from openmm import unit as mmunit
 
-from .cvlib import AbstractCollectiveVariable
+from .cvpack import AbstractCollectiveVariable
 
 
 class Angle(openmm.CustomAngleForce, AbstractCollectiveVariable):
@@ -39,12 +39,12 @@ class Angle(openmm.CustomAngleForce, AbstractCollectiveVariable):
             Whether to use periodic boundary conditions
 
     Example:
-        >>> import cvlib
+        >>> import cvpack
         >>> import openmm as mm
         >>> system = mm.System()
         >>> [system.addParticle(1) for i in range(3)]
         [0, 1, 2]
-        >>> angle = cvlib.Angle(0, 1, 2)
+        >>> angle = cvpack.Angle(0, 1, 2)
         >>> system.addForce(angle)
         0
         >>> integrator = mm.VerletIntegrator(0)

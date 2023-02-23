@@ -12,7 +12,7 @@ from typing import Iterable
 import openmm
 from openmm import unit as mmunit
 
-from .cvlib import AbstractCollectiveVariable
+from .cvpack import AbstractCollectiveVariable
 
 
 class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):
@@ -51,12 +51,12 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
 
     Example
     -------
-        >>> import cvlib
+        >>> import cvpack
         >>> import openmm as mm
         >>> from openmmtools import testsystems
         >>> model = testsystems.AlanineDipeptideVacuum()
         >>> num_atoms = model.system.getNumParticles()
-        >>> radius_of_gyration = cvlib.RadiusOfGyration(list(range(num_atoms)))
+        >>> radius_of_gyration = cvpack.RadiusOfGyration(list(range(num_atoms)))
         >>> model.system.addForce(radius_of_gyration)
         5
         >>> platform = mm.Platform.getPlatformByName('Reference')

@@ -11,7 +11,7 @@ from typing import Iterable
 
 import openmm
 
-from .cvlib import AbstractCollectiveVariable, UnitOrStr, in_md_units, str_to_unit
+from .cvpack import AbstractCollectiveVariable, UnitOrStr, in_md_units, str_to_unit
 
 
 class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable):
@@ -47,12 +47,12 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
 
     Example
     -------
-        >>> import cvlib
+        >>> import cvpack
         >>> import openmm as mm
         >>> from openmmtools import testsystems
         >>> model = testsystems.AlanineDipeptideVacuum()
-        >>> angle = cvlib.Angle(0, 11, 21)
-        >>> colvar = cvlib.AtomicFunction('angle(p1, p2, p3)', [0, 11, 21], "radians", False)
+        >>> angle = cvpack.Angle(0, 11, 21)
+        >>> colvar = cvpack.AtomicFunction('angle(p1, p2, p3)', [0, 11, 21], "radians", False)
         >>> [model.system.addForce(f) for f in [angle, colvar]]
         [5, 6]
         >>> integrator = mm.VerletIntegrator(0)

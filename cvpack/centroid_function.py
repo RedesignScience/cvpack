@@ -11,7 +11,7 @@ from typing import Iterable
 
 import openmm
 
-from .cvlib import AbstractCollectiveVariable, UnitOrStr, in_md_units, str_to_unit
+from .cvpack import AbstractCollectiveVariable, UnitOrStr, in_md_units, str_to_unit
 
 
 class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):
@@ -66,18 +66,18 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
 
     Example
     -------
-        >>> import cvlib
+        >>> import cvpack
         >>> import openmm as mm
         >>> from openmmtools import testsystems
         >>> model = testsystems.AlanineDipeptideVacuum()
         >>> num_atoms = model.system.getNumParticles()
         >>> atoms = list(range(num_atoms))
-        >>> rg = cvlib.RadiusOfGyration(atoms)
+        >>> rg = cvpack.RadiusOfGyration(atoms)
         >>> definitions = [f'd{i+1} = distance(g{i+1}, g{num_atoms+1})' for i in atoms]
         >>> sum_dist_sq = "+".join(f'd{i+1}^2' for i in atoms)
         >>> function = ";".join([f"sqrt(({sum_dist_sq})/{num_atoms})"] + definitions)
         >>> groups = [[i] for i in atoms] + [atoms]
-        >>> colvar = cvlib.CentroidFunction(function, groups, "nanometers")
+        >>> colvar = cvpack.CentroidFunction(function, groups, "nanometers")
         >>> [model.system.addForce(f) for f in [rg, colvar]]
         [5, 6]
         >>> integrator = mm.VerletIntegrator(0)
