@@ -39,14 +39,14 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
     where :math:`\\phi_i({\\bf r})` and :math:`\\psi_i({\\bf r})` are the Ramachandran dihedral
     angles of residue :math:`i`, :math:`\\phi_{\\rm ref}` and :math:`\\psi_{\\rm ref}` are their
     reference values in an alpha helix :cite:`Hovmoller_2002`, and :math:`\\theta_{\\rm tol}` is
-    the threshold tolerance around these refenrences. :math:`B_m(x)` is a smooth
-    `boxcar function <https://en.wikipedia.org/wiki/Boxcar_function>`_
+    the threshold tolerance around these refenrences. :math:`B_m(x)` is a smooth boxcar function
+    given by
 
     .. math::
         B_m(x) = \\frac{1}{1 + x^{2m}}
 
-    where :math:`m` is an integer parameter that controls its steepness. Note that :math:`x` will
-    always be elevated to an even power.
+    where :math:`m` is an integer parameter that controls its steepness. Note that :math:`x` needs
+    to be elevated to an even power for :math:`B_m(x)` to be an even function.
 
     .. note::
 

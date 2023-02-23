@@ -34,14 +34,13 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
     where :math:`\\theta^\\alpha_i` is the angle formed by the alpha-carbon atoms of residues
     :math:`i-1`, :math:`i`, and :math:`i+1`, :math:`\\theta_{\\rm ref}` is its reference value in
     an alpha helix, and :math:`\\theta_{\\rm tol}` is the threshold tolerance around this
-    reference. :math:`B_m(x)` is a smooth `boxcar function
-    <https://en.wikipedia.org/wiki/Boxcar_function>`_
+    reference. :math:`B_m(x)` is a smooth boxcar function given by
 
     .. math::
         B_m(x) = \\frac{1}{1 + x^{2m}}
 
-    where :math:`m` is an integer parameter that controls its steepness. Note that :math:`x` will
-    always be elevated to an even power.
+    where :math:`m` is an integer parameter that controls its steepness. Note that :math:`x` needs
+    to be elevated to an even power for :math:`B_m(x)` to be an even function.
 
     .. note::
 

@@ -47,7 +47,7 @@ jobs:
 
       - name: Run flake8
         shell: bash -l {0}
-        run: flake8 cvlib/
+        run: flake8 --ignore=E203,W503 cvlib/
 
       - name: Run black
         shell: bash -l {0}
