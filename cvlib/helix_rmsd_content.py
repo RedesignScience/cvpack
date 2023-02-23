@@ -59,7 +59,7 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
     `ALPHARMSD`_, which can match the present implementation by setting :math:`{\\rm NN}=m` and
     :math:`{\\rm MM}=2m`.
 
-    Optionally, the collective variable can be normalized to the range :math:`[0, 1]`.
+    Optionally, this collective variable can be normalized to the range :math:`[0, 1]`.
 
     .. _ALPHARMSD: https://www.plumed.org/doc-v2.8/user-doc/html/_a_l_p_h_a_r_m_s_d.html
 
@@ -73,7 +73,7 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
             The threshold RMSD value for the step function.
         halfExponent
             The parameter :math:`m` of the step function.
-        fractional
+        normalize
             Whether to normalize the collective variable to the range :math:`[0, 1]`.
 
     Example
@@ -111,7 +111,7 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
         numAtoms: int,
         thresholdRMSD: QuantityOrFloat = 0.08 * mmunit.nanometers,
         halfExponent: int = 3,
-        fractional: bool = False,
+        normalize: bool = False,
     ) -> None:
         assert len(residues) >= 6, "Must have at least 6 residues"
 
@@ -131,7 +131,7 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
 
         num_residue_blocks = len(residues) - 5
         function = " + ".join(map(step_function, range(num_residue_blocks)))
-        super().__init__(f"({function})/{num_residue_blocks}" if fractional else function)
+        super().__init__(f"({function})/{num_residue_blocks}" if normalize else function)
         atoms = [atoms_list(r) for r in residues]
         positions = [openmm.Vec3(*x) for x in self._ideal_helix_positions]
         for i in range(num_residue_blocks):
@@ -144,5 +144,5 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
             numAtoms,
             in_md_units(thresholdRMSD),
             halfExponent,
-            fractional,
+            normalize,
         )

@@ -1,7 +1,7 @@
 """
 .. class:: HelixAngleContent
    :platform: Linux, MacOS, Windows
-   :synopsis: Fractional alpha-helix angle content of a sequence of residues
+   :synopsis: Alpha-helix angle content of a sequence of residues
 
 .. classauthor:: Charlles Abreu <craabreu@gmail.com>
 
@@ -23,11 +23,11 @@ from .cvlib import (
 
 class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
     """
-    Fractional :math:`\\alpha`-helix angle content of a sequence of `n` residues:
+    The alpha-helix angle content of a sequence of `n` residues:
 
     .. math::
 
-        \\alpha_{\\theta}({\\bf r}) = \\frac{1}{n-2} \\sum_{i=2}^{n-1} B_m\\left(
+        \\alpha_{\\theta}({\\bf r}) = \\sum_{i=2}^{n-1} B_m\\left(
             \\frac{\\theta^\\alpha_i({\\bf r}) - \\theta_{\\rm ref}}{\\theta_{\\rm tol}}
         \\right)
 
@@ -41,6 +41,8 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
 
     where :math:`m` is an integer parameter that controls its steepness. Note that :math:`x` needs
     to be elevated to an even power for :math:`B_m(x)` to be an even function.
+
+    Optionally, this collective variable can be normalized to the range :math:`[0, 1]`.
 
     .. note::
 
@@ -59,6 +61,8 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
             The threshold tolerance around the reference values
         halfExponent
             The parameter :math:`m` of the boxcar function
+        normalize
+            Whether to normalize the collective variable to the range :math:`[0, 1]`
 
     Raises
     ------
@@ -83,8 +87,7 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
         >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
         >>> print(helix_content.getValue(context, digits=6))
-        0.987399 dimensionless
-
+        18.76058 dimensionless
     """
 
     def __init__(  # pylint: disable=too-many-arguments
@@ -94,6 +97,7 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
         thetaReference: QuantityOrFloat = 88 * mmunit.degrees,
         tolerance: QuantityOrFloat = 15 * mmunit.degrees,
         halfExponent: int = 3,
+        normalize: bool = False,
     ) -> None:
         def find_alpha_carbon(residue: mmapp.topology.Residue) -> int:
             for atom in residue.atoms():
@@ -103,7 +107,8 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
 
         theta_ref, tol = map(in_md_units, [thetaReference, tolerance])
         num_angles = len(residues) - 2
-        super().__init__(f"{1/num_angles}/(1+x^{2*halfExponent}); x=(theta-{theta_ref})/{tol}")
+        numerator = 1 / num_angles if normalize else 1
+        super().__init__(f"{numerator}/(1+x^{2*halfExponent}); x=(theta-{theta_ref})/{tol}")
         for i in range(1, len(residues) - 1):
             self.addAngle(
                 find_alpha_carbon(residues[i - 1]),
@@ -113,4 +118,4 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
             )
         self.setUsesPeriodicBoundaryConditions(pbc)
         res = [SerializableResidue(r) for r in residues]
-        self._registerCV(mmunit.dimensionless, res, pbc, theta_ref, tol, halfExponent)
+        self._registerCV(mmunit.dimensionless, res, pbc, theta_ref, tol, halfExponent, normalize)

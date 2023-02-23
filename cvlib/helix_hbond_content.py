@@ -1,7 +1,7 @@
 """
 .. class:: HelixHBondContent
    :platform: Linux, MacOS, Windows
-   :synopsis: Fractional alpha-helix hydrogen-bond content of a sequence of residues
+   :synopsis: Alpha-helix hydrogen-bond content of a sequence of residues
 
 .. classauthor:: Charlles Abreu <craabreu@gmail.com>
 
@@ -24,11 +24,11 @@ from .cvlib import (
 
 class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
     """
-    Fractional :math:`\\alpha`-helix hydrogen-bond content of a sequence of `n` residues:
+    The alpha-helix hydrogen-bond content of a sequence of `n` residues:
 
     .. math::
 
-        \\alpha_{\\rm HB}({\\bf r}) = \\frac{1}{n-4} \\sum_{i=5}^n B_m\\left(
+        \\alpha_{\\rm HB}({\\bf r}) = \\sum_{i=5}^n B_m\\left(
             \\frac{\\| {\\bf r}^{\\rm H}_i - {\\bf r}^{\\rm O}_{i-4} \\|}{d_{\\rm HB}}
         \\right)
 
@@ -38,8 +38,11 @@ class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
     bond and :math:`B_m(x)` is a smooth step function given by
 
     .. math::
+        B_m(x) = \\frac{1}{1 + x^{2m}}
 
-        S(x) = \\frac{1-x^6}{1-x^{12}} = \\frac{1}{1+x^6}
+    where :math:`m` is an integer parameter that controls its steepness.
+
+    Optionally, this collective variable can be normalized to the range :math:`[0, 1]`.
 
     .. note::
 
@@ -53,9 +56,8 @@ class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
             Whether to use periodic boundary conditions
         thresholdDistance
             The threshold distance for a hydrogen bond
-        stepFunction
-            A continuous approximation of :math:`H(1-x)`, where :math:`H(x)` is the Heaviside step
-            function.
+        halfExponent
+            The parameter :math:`m` of the step function.
 
     Example
     -------
@@ -75,16 +77,16 @@ class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
         >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
         >>> print(helix_content.getValue(context, digits=6))
-        0.93414 dimensionless
-
+        15.88038 dimensionless
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         residues: Iterable[mmapp.topology.Residue],
         pbc: bool = False,
         thresholdDistance: QuantityOrFloat = 0.33 * mmunit.nanometers,
-        stepFunction: str = "1/(1+x^6)",
+        halfExponent: int = 3,
+        normalize: bool = False,
     ) -> None:
         def find_atom(residue: mmapp.topology.Residue, pattern: Pattern) -> int:
             for atom in residue.atoms():
@@ -97,7 +99,8 @@ class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
             )
 
         threshold = in_md_units(thresholdDistance)
-        super().__init__(f"({stepFunction})/{len(residues) - 4}; x=r/{threshold}")
+        numerator = 1 / (len(residues) - 4) if normalize else 1
+        super().__init__(f"{numerator}/(1+x^{2*halfExponent}); x=r/{threshold}")
         hydrogen_pattern = regex.compile("\\b(H|1H|HN1|HT1|H1|HN)\\b")
         oxygen_pattern = regex.compile("\\b(O|OCT1|OC1|OT1|O1)\\b")
         for i in range(4, len(residues)):
@@ -108,4 +111,4 @@ class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
             )
         self.setUsesPeriodicBoundaryConditions(pbc)
         res = [SerializableResidue(r) for r in residues]
-        self._registerCV(mmunit.dimensionless, res, pbc, threshold, stepFunction)
+        self._registerCV(mmunit.dimensionless, res, pbc, threshold, halfExponent, normalize)

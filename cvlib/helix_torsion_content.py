@@ -1,7 +1,7 @@
 """
 .. class:: HelixTorsionContent
    :platform: Linux, MacOS, Windows
-   :synopsis: Fractional alpha-helix torsion content of a sequence of residues
+   :synopsis: Alpha-helix torsion content of a sequence of residues
 
 .. classauthor:: Charlles Abreu <craabreu@gmail.com>
 
@@ -23,11 +23,11 @@ from .cvlib import (
 
 class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable):
     """
-    Fractional :math:`\\alpha`-helix Ramachandran content of a sequence of `n` residues:
+    The alpha-helix Ramachandran content of a sequence of `n` residues:
 
     .. math::
 
-        \\alpha_{\\phi,\\psi}({\\bf r}) = \\frac{1}{2(n-2)} \\sum_{i=2}^{n-1} \\left[
+        \\alpha_{\\phi,\\psi}({\\bf r}) = \\frac{1}{2} \\sum_{i=2}^{n-1} \\left[
             B_m\\left(
                 \\frac{\\phi_i({\\bf r}) - \\phi_{\\rm ref}}{\\theta_{\\rm tol}}
             \\right) +
@@ -47,6 +47,8 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
 
     where :math:`m` is an integer parameter that controls its steepness. Note that :math:`x` needs
     to be elevated to an even power for :math:`B_m(x)` to be an even function.
+
+    Optionally, this collective variable can be normalized to the range :math:`[0, 1]`.
 
     .. note::
 
@@ -68,6 +70,8 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
             The threshold tolerance around the reference values
         halfExponent
             The parameter :math:`m` of the boxcar function
+        normalize
+            Whether to normalize the collective variable to the range :math:`[0, 1]`
 
     Raises
     ------
@@ -92,8 +96,7 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
         >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
         >>> print(helix_content.getValue(context, digits=6))
-        0.918571 dimensionless
-
+        17.452849 dimensionless
     """
 
     def __init__(  # pylint: disable=too-many-arguments
@@ -104,6 +107,7 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
         psiReference: QuantityOrFloat = -41.1 * mmunit.degrees,
         tolerance: QuantityOrFloat = 25 * mmunit.degrees,
         halfExponent: int = 3,
+        normalize: bool = False,
     ) -> None:
         def find_atom(residue: mmapp.topology.Residue, name: str) -> int:
             for atom in residue.atoms():
@@ -112,8 +116,8 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
             raise ValueError(f"Could not find atom {name} in residue {residue.name}{residue.id}")
 
         phi_ref, psi_ref, tol = map(in_md_units, [phiReference, psiReference, tolerance])
-        num_torsions = 2 * (len(residues) - 2)
-        super().__init__(f"{1/num_torsions}/(1+x^{2*halfExponent}); x=(theta-theta_ref)/{tol}")
+        numerator = 1 / (2 * (len(residues) - 2)) if normalize else 1 / 2
+        super().__init__(f"{numerator}/(1+x^{2*halfExponent}); x=(theta-theta_ref)/{tol}")
         self.addPerTorsionParameter("theta_ref")
         for i in range(1, len(residues) - 1):
             self.addTorsion(

@@ -296,7 +296,7 @@ def test_helix_torsion_content():
     _, psi = mdtraj.compute_psi(traj)
     x = (np.rad2deg(phi.ravel()[:-1]) + 63.8) / 25
     y = (np.rad2deg(psi.ravel()[1:]) + 41.1) / 25
-    computed_value = np.sum(1 / (1 + x**6) + 1 / (1 + y**6)) / (len(x) + len(y))
+    computed_value = np.sum(1 / (1 + x**6) + 1 / (1 + y**6)) / 2
 
     residues = list(model.topology.residues())
     with pytest.raises(ValueError) as excinfo:
@@ -327,7 +327,7 @@ def test_helix_angle_content():
     angle_atoms = np.array([alpha_carbons[:-2], alpha_carbons[1:-1], alpha_carbons[2:]]).T
     angles = mdtraj.compute_angles(traj, angle_atoms)
     x = (np.rad2deg(angles.ravel()) - 88) / 15
-    computed_value = np.sum(1 / (1 + x**6)) / len(x)
+    computed_value = np.sum(1 / (1 + x**6))
 
     residues = list(model.topology.residues())
     with pytest.raises(ValueError) as excinfo:
@@ -357,7 +357,7 @@ def test_helix_hbond_content():
     oxygens = traj.top.select("resSeq 59 to 79 and name O")
     distances = mdtraj.compute_distances(traj, np.array([hydrogens[4:], oxygens[:-4]]).T)
     x = distances.ravel() / 0.33
-    computed_value = np.sum(1 / (1 + x**6)) / len(x)
+    computed_value = np.sum(1 / (1 + x**6))
 
     residues = list(model.topology.residues())
     with pytest.raises(ValueError):
