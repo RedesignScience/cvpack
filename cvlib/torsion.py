@@ -64,7 +64,7 @@ class Torsion(openmm.CustomTorsionForce, AbstractCollectiveVariable):
     """
 
     def __init__(  # pylint: disable=too-many-arguments
-        self, atom1: int, atom2: int, atom3: int, atom4: int, pbc: bool = True
+        self, atom1: int, atom2: int, atom3: int, atom4: int, pbc: bool = False
     ) -> None:
         super().__init__("theta")
         self.addTorsion(atom1, atom2, atom3, atom4, [])

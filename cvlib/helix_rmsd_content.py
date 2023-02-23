@@ -68,6 +68,11 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
 
     .. _ALPHARMSD: https://www.plumed.org/doc-v2.8/user-doc/html/_a_l_p_h_a_r_m_s_d.html
 
+    .. warning::
+
+        Periodic boundary conditions are not supported (see OpenMM issue `#2392
+        <https://github.com/openmm/openmm/issues/2913>`_).
+
     Parameters
     ----------
         residues

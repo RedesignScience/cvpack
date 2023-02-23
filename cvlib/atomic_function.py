@@ -70,7 +70,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         function: str,
         group: Iterable[int],
         unit: UnitOrStr,
-        pbc: bool = True,
+        pbc: bool = False,
     ) -> None:
         super().__init__(len(group), function)
         self.addBond(group, [])
