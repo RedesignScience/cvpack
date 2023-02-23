@@ -13,7 +13,7 @@ import numpy as np
 import openmm
 from openmm import unit as mmunit
 
-from .cvlib import AbstractCollectiveVariable, in_md_units
+from .cvpack import AbstractCollectiveVariable, in_md_units
 
 
 class RMSD(openmm.RMSDForce, AbstractCollectiveVariable):
@@ -61,14 +61,14 @@ class RMSD(openmm.RMSDForce, AbstractCollectiveVariable):
 
     Example
     -------
-        >>> import cvlib
+        >>> import cvpack
         >>> import openmm as mm
         >>> from openmm import app, unit
         >>> from openmmtools import testsystems
         >>> model = testsystems.AlanineDipeptideImplicit()
         >>> num_atoms = model.topology.getNumAtoms()
         >>> group = list(range(num_atoms))
-        >>> rmsd = cvlib.RMSD(model.positions, group, num_atoms)
+        >>> rmsd = cvpack.RMSD(model.positions, group, num_atoms)
         >>> model.system.addForce(rmsd)
         6
         >>> platform = openmm.Platform.getPlatformByName('Reference')
@@ -114,13 +114,13 @@ class RMSD(openmm.RMSDForce, AbstractCollectiveVariable):
 
         Example
         -------
-            >>> import cvlib
+            >>> import cvpack
             >>> import openmm as mm
             >>> from openmm import app, unit
             >>> from openmmtools import testsystems
             >>> model = testsystems.WaterBox(box_edge=10*unit.angstroms, cutoff=5*unit.angstroms)
             >>> group = [atom.index for atom in model.topology.atoms() if atom.residue.index < 3]
-            >>> rmsd = cvlib.RMSD(model.positions, group, model.topology.getNumAtoms())
+            >>> rmsd = cvpack.RMSD(model.positions, group, model.topology.getNumAtoms())
             >>> [model.system.addForce(f) for f in [rmsd, rmsd.getFakeBondForce()]]
             [3, 4]
             >>> integrator = openmm.VerletIntegrator(2*unit.femtoseconds)

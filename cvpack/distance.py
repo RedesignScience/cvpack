@@ -10,7 +10,7 @@
 import openmm
 from openmm import unit as mmunit
 
-from .cvlib import AbstractCollectiveVariable
+from .cvpack import AbstractCollectiveVariable
 
 
 class Distance(openmm.CustomBondForce, AbstractCollectiveVariable):
@@ -31,12 +31,12 @@ class Distance(openmm.CustomBondForce, AbstractCollectiveVariable):
             Whether to use periodic boundary conditions
 
     Example:
-        >>> import cvlib
+        >>> import cvpack
         >>> import openmm as mm
         >>> system = mm.System()
         >>> [system.addParticle(1) for i in range(2)]
         [0, 1]
-        >>> distance = cvlib.Distance(0, 1)
+        >>> distance = cvpack.Distance(0, 1)
         >>> system.addForce(distance)
         0
         >>> integrator = mm.VerletIntegrator(0)

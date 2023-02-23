@@ -1,5 +1,5 @@
 """
-.. module:: cvlib
+.. module:: cvpack
    :platform: Linux, MacOS, Windows
    :synopsis: Useful Collective Variables for OpenMM
 
@@ -179,8 +179,8 @@ class AbstractCollectiveVariable(openmm.Force):
 
         Example
         -------
-            >>> import cvlib
-            >>> args, defaults = cvlib.RadiusOfGyration.getArguments()
+            >>> import cvpack
+            >>> args, defaults = cvpack.RadiusOfGyration.getArguments()
             >>> print(*args.items())
             ('group', typing.Iterable[int]) ('pbc', <class 'bool'>) ('weighByMass', <class 'bool'>)
             >>> print(*defaults.items())
@@ -264,12 +264,12 @@ class AbstractCollectiveVariable(openmm.Force):
 
         Example
         -------
-            >>> import cvlib
+            >>> import cvpack
             >>> import openmm as mm
             >>> from openmmtools import testsystems
             >>> model = testsystems.AlanineDipeptideImplicit()
             >>> peptide = [a.index for a in model.topology.atoms() if a.residue.name != 'HOH']
-            >>> radius_of_gyration = cvlib.RadiusOfGyration(peptide)
+            >>> radius_of_gyration = cvpack.RadiusOfGyration(peptide)
             >>> model.system.addForce(radius_of_gyration)
             6
             >>> platform = mm.Platform.getPlatformByName('Reference')

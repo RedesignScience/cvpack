@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 # Self-descriptive entries which should always be present
 # https://packaging.python.org/en/latest/specifications/declaring-project-metadata/
 [project]
-name = "cvlib"
+name = "cvpack"
 description = "Useful Collective Variables for OpenMM"
 dynamic = ["version"]
 readme = "README.md"
@@ -28,8 +28,8 @@ dependencies = [
 
 # Update the urls once the hosting is set up.
 #[project.urls]
-#"Source" = "https://github.com/<username>/cvlib/"
-#"Documentation" = "https://cvlib.readthedocs.io/"
+#"Source" = "https://github.com/<username>/cvpack/"
+#"Documentation" = "https://cvpack.readthedocs.io/"
 
 [project.optional-dependencies]
 test = [
@@ -64,7 +64,7 @@ where = ["."]
 
 # Ref https://setuptools.pypa.io/en/latest/userguide/datafiles.html#package-data
 [tool.setuptools.package-data]
-cvlib = [
+cvpack = [
     "py.typed",
     "data/ideal_alpha_helix.csv"
 ]
@@ -85,7 +85,7 @@ match = ["*"]
 default-tag = "0.0.0"
 
 [tool.versioningit.write]
-file = "cvlib/_version.py"
+file = "cvpack/_version.py"
 
 [tool.isort]
 profile = "black"

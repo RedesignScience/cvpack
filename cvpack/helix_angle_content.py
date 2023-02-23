@@ -13,7 +13,7 @@ import openmm
 from openmm import app as mmapp
 from openmm import unit as mmunit
 
-from .cvlib import (
+from .cvpack import (
     AbstractCollectiveVariable,
     QuantityOrFloat,
     SerializableResidue,
@@ -71,7 +71,7 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
 
     Example
     -------
-        >>> import cvlib
+        >>> import cvpack
         >>> import openmm as mm
         >>> from openmm import app, unit
         >>> from openmmtools import testsystems
@@ -79,7 +79,7 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
         >>> residues = [r for r in model.topology.residues() if 59 <= r.index <= 79]
         >>> print(*[r.name for r in residues])
         LYS ASP GLU ALA GLU LYS LEU PHE ASN GLN ASP VAL ASP ALA ALA VAL ARG GLY ILE LEU ARG
-        >>> helix_content = cvlib.HelixAngleContent(residues)
+        >>> helix_content = cvpack.HelixAngleContent(residues)
         >>> model.system.addForce(helix_content)
         6
         >>> platform = openmm.Platform.getPlatformByName('Reference')

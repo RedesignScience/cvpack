@@ -47,16 +47,16 @@ jobs:
 
       - name: Run flake8
         shell: bash -l {0}
-        run: flake8 --ignore=E203,W503 cvlib/
+        run: flake8 --ignore=E203,W503 cvpack/
 
       - name: Run black
         shell: bash -l {0}
-        run: black --line-length 100 --diff --color cvlib/
+        run: black --line-length 100 --diff --color cvpack/
 
       - name: Run isort
         shell: bash -l {0}
-        run: isort --check-only cvlib/
+        run: isort --check-only cvpack/
 
       - name: Run pylint
         shell: bash -l {0}
-        run: pylint --rcfile=devtools/linters/pylintrc cvlib/
+        run: pylint --rcfile=devtools/linters/pylintrc cvpack/

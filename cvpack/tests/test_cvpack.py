@@ -1,5 +1,5 @@
 """
-Unit and regression test for the cvlib package.
+Unit and regression test for the cvpack package.
 """
 
 import copy
@@ -17,15 +17,15 @@ from openmm import app, unit
 from openmmtools import testsystems
 from scipy.spatial.transform import Rotation
 
-import cvlib
+import cvpack
 
 
-def test_cvlib_imported():
+def test_cvpack_imported():
     """
     Sample test, will always pass so long as import statement worked.
 
     """
-    assert "cvlib" in sys.modules
+    assert "cvpack" in sys.modules
 
 
 def test_effective_mass():
@@ -34,7 +34,7 @@ def test_effective_mass():
 
     """
     model = testsystems.AlanineDipeptideVacuum()
-    rg_cv = cvlib.RadiusOfGyration(range(model.system.getNumParticles()))
+    rg_cv = cvpack.RadiusOfGyration(range(model.system.getNumParticles()))
     model.system.addForce(rg_cv)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -50,7 +50,7 @@ def test_argument_inspection():
 
     """
     # pylint: disable=missing-class-docstring, unused-argument
-    class Test(cvlib.cvlib.AbstractCollectiveVariable):
+    class Test(cvpack.cvpack.AbstractCollectiveVariable):
         def __init__(self, first: int, second: float, third: str = "3"):
             super().__init__(self)
 
@@ -64,7 +64,7 @@ def test_argument_inspection():
 
 
 def perform_common_tests(
-    collectiveVariable: cvlib.cvlib.AbstractCollectiveVariable, context: openmm.Context
+    collectiveVariable: cvpack.cvpack.AbstractCollectiveVariable, context: openmm.Context
 ) -> None:
     """
     Function to be called in every individual cv test.
@@ -84,9 +84,9 @@ def perform_common_tests(
 
     # Test serialization/deserialization
     pipe = io.StringIO()
-    cvlib.serializer.serialize(collectiveVariable, pipe)
+    cvpack.serializer.serialize(collectiveVariable, pipe)
     pipe.seek(0)
-    new_cv = cvlib.serializer.deserialize(pipe)
+    new_cv = cvpack.serializer.deserialize(pipe)
     context.getSystem().addForce(new_cv)
     context.reinitialize(preserveState=True)
     value1 = collectiveVariable.getValue(context)
@@ -103,7 +103,7 @@ def test_cv_is_in_context():
 
     """
     model = testsystems.AlanineDipeptideVacuum()
-    rg_cv = cvlib.RadiusOfGyration(range(model.system.getNumParticles()))
+    rg_cv = cvpack.RadiusOfGyration(range(model.system.getNumParticles()))
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
@@ -120,7 +120,7 @@ def test_distance():
     """
     model = testsystems.AlanineDipeptideVacuum()
     atom1, atom2 = 0, 5
-    distance = cvlib.Distance(atom1, atom2)
+    distance = cvpack.Distance(atom1, atom2)
     model.system.addForce(distance)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -139,7 +139,7 @@ def test_angle():
     """
     model = testsystems.AlanineDipeptideVacuum()
     atoms = [0, 5, 10]
-    angle = cvlib.Angle(*atoms)
+    angle = cvpack.Angle(*atoms)
     model.system.addForce(angle)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -160,7 +160,7 @@ def test_torsion():
     """
     model = testsystems.AlanineDipeptideVacuum()
     atoms = [0, 5, 10, 15]
-    torsion = cvlib.Torsion(*atoms)
+    torsion = cvpack.Torsion(*atoms)
     model.system.addForce(torsion)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -185,7 +185,7 @@ def test_radius_of_gyration():
     positions = model.positions.value_in_unit(unit.nanometers)
     centroid = positions.mean(axis=0)
     rgsq = np.sum((positions - centroid) ** 2) / model.system.getNumParticles()
-    rg_cv = cvlib.RadiusOfGyration(range(model.system.getNumParticles()))
+    rg_cv = cvpack.RadiusOfGyration(range(model.system.getNumParticles()))
     model.system.addForce(rg_cv)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -212,7 +212,7 @@ def test_number_of_contacts():
     distances = np.array([np.linalg.norm(pos[i] - pos[j]) for i, j in pairs])
     contacts = np.where(distances <= 0.6, 1 / (1 + (distances / 0.3) ** 6), 0)
     num_atoms = model.topology.getNumAtoms()
-    number_of_contacts = cvlib.NumberOfContacts(group1, group2, num_atoms, pbc=False)
+    number_of_contacts = cvpack.NumberOfContacts(group1, group2, num_atoms, pbc=False)
     model.system.addForce(number_of_contacts)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -239,7 +239,7 @@ def run_rmsd_test(
     group_ref = reference[group, :] - reference[group, :].mean(axis=0)
     if passVec3:
         reference = [openmm.Vec3(*row) for row in reference]
-    rmsd = cvlib.RMSD(
+    rmsd = cvpack.RMSD(
         group_ref if passGroupOnly else reference,
         group,
         num_atoms,
@@ -262,7 +262,7 @@ def test_rmsd():
     """
     model = testsystems.AlanineDipeptideVacuum()
     num_atoms = model.topology.getNumAtoms()
-    rmsd = cvlib.RMSD(model.positions, np.arange(num_atoms), num_atoms)
+    rmsd = cvpack.RMSD(model.positions, np.arange(num_atoms), num_atoms)
     model.system.addForce(rmsd)
     integrator = openmm.VerletIntegrator(2 * unit.femtosecond)
     integrator.setIntegrationForceGroups({0})
@@ -300,9 +300,9 @@ def test_helix_torsion_content():
 
     residues = list(model.topology.residues())
     with pytest.raises(ValueError) as excinfo:
-        helix_content = cvlib.HelixTorsionContent(residues)
+        helix_content = cvpack.HelixTorsionContent(residues)
     assert str(excinfo.value) == "Could not find atom N in residue TMP163"
-    helix_content = cvlib.HelixTorsionContent(residues[0:-1])
+    helix_content = cvpack.HelixTorsionContent(residues[0:-1])
     model.system.addForce(helix_content)
     integrator = openmm.VerletIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -331,9 +331,9 @@ def test_helix_angle_content():
 
     residues = list(model.topology.residues())
     with pytest.raises(ValueError) as excinfo:
-        helix_content = cvlib.HelixAngleContent(residues)
+        helix_content = cvpack.HelixAngleContent(residues)
     assert str(excinfo.value) == "Could not find atom CA in residue TMP163"
-    helix_content = cvlib.HelixAngleContent(residues[0:-1])
+    helix_content = cvpack.HelixAngleContent(residues[0:-1])
     model.system.addForce(helix_content)
     integrator = openmm.VerletIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -361,8 +361,8 @@ def test_helix_hbond_content():
 
     residues = list(model.topology.residues())
     with pytest.raises(ValueError):
-        helix_content = cvlib.HelixHBondContent(residues)
-    helix_content = cvlib.HelixHBondContent(residues[58:79])
+        helix_content = cvpack.HelixHBondContent(residues)
+    helix_content = cvpack.HelixHBondContent(residues[58:79])
     model.system.addForce(helix_content)
     integrator = openmm.VerletIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -383,9 +383,9 @@ def test_helix_rmsd_content():
     num_atoms = model.topology.getNumAtoms()
     residues = list(model.topology.residues())
     with pytest.raises(ValueError) as excinfo:
-        helix_content = cvlib.HelixRMSDContent(residues, num_atoms)
+        helix_content = cvpack.HelixRMSDContent(residues, num_atoms)
     assert str(excinfo.value) == "Could not find all atoms in residue TMP163"
-    helix_content = cvlib.HelixRMSDContent(residues[59:80], num_atoms)
+    helix_content = cvpack.HelixRMSDContent(residues[59:80], num_atoms)
     model.system.addForce(helix_content)
     context = openmm.Context(
         model.system, openmm.VerletIntegrator(0), openmm.Platform.getPlatformByName("Reference")
@@ -427,7 +427,7 @@ def test_helix_torsion_similarity():
     traj = mdtraj.Trajectory(positions, mdtraj.Topology.from_openmm(model.topology))
     phi_atoms, phi = mdtraj.compute_phi(traj)
     psi_atoms, psi = mdtraj.compute_psi(traj)
-    torsion_similarity = cvlib.TorsionSimilarity(
+    torsion_similarity = cvpack.TorsionSimilarity(
         np.vstack([phi_atoms[1:], psi_atoms[1:]]), np.vstack([phi_atoms[:-1], psi_atoms[:-1]])
     )
     model.system.addForce(torsion_similarity)
@@ -455,9 +455,9 @@ def test_atomic_function():
     np.random.shuffle(atoms)
     function = "+".join(f"distance(p{i+1}, p{i+2})" for i in range(num_atoms - 1))
     with pytest.raises(ValueError) as excinfo:
-        colvar = cvlib.AtomicFunction(function, atoms, unit.angstrom)
+        colvar = cvpack.AtomicFunction(function, atoms, unit.angstrom)
     assert str(excinfo.value) == "Unit angstrom is not compatible with the MD unit system."
-    colvar = cvlib.AtomicFunction(function, atoms, unit.nanometers)
+    colvar = cvpack.AtomicFunction(function, atoms, unit.nanometers)
     model.system.addForce(colvar)
     context = openmm.Context(
         model.system, openmm.VerletIntegrator(0), openmm.Platform.getPlatformByName("Reference")
@@ -488,9 +488,9 @@ def test_centroid_function():
     groups = np.reshape(atoms[: 3 * num_groups], (num_groups, 3))
     function = "+".join(f"distance(g{i+1}, g{i+2})" for i in range(num_groups - 1))
     with pytest.raises(ValueError) as excinfo:
-        colvar = cvlib.CentroidFunction(function, groups, unit.angstrom)
+        colvar = cvpack.CentroidFunction(function, groups, unit.angstrom)
     assert str(excinfo.value) == "Unit angstrom is not compatible with the MD unit system."
-    colvar = cvlib.CentroidFunction(function, groups, unit.nanometers, weighByMass=False)
+    colvar = cvpack.CentroidFunction(function, groups, unit.nanometers, weighByMass=False)
     model.system.addForce(colvar)
     context = openmm.Context(
         model.system, openmm.VerletIntegrator(0), openmm.Platform.getPlatformByName("Reference")

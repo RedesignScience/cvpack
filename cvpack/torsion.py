@@ -10,7 +10,7 @@
 import openmm
 from openmm import unit as mmunit
 
-from .cvlib import AbstractCollectiveVariable
+from .cvpack import AbstractCollectiveVariable
 
 
 class Torsion(openmm.CustomTorsionForce, AbstractCollectiveVariable):
@@ -45,12 +45,12 @@ class Torsion(openmm.CustomTorsionForce, AbstractCollectiveVariable):
             Whether to use periodic boundary conditions
 
     Example:
-        >>> import cvlib
+        >>> import cvpack
         >>> import openmm as mm
         >>> system = mm.System()
         >>> [system.addParticle(1) for i in range(4)]
         [0, 1, 2, 3]
-        >>> torsion = cvlib.Torsion(0, 1, 2, 3, pbc=False)
+        >>> torsion = cvpack.Torsion(0, 1, 2, 3, pbc=False)
         >>> system.addForce(torsion)
         0
         >>> integrator = mm.VerletIntegrator(0)

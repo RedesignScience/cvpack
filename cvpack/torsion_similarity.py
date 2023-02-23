@@ -13,7 +13,7 @@ import numpy as np
 import openmm
 from openmm import unit as mmunit
 
-from .cvlib import AbstractCollectiveVariable
+from .cvpack import AbstractCollectiveVariable
 
 
 class TorsionSimilarity(openmm.CustomCompoundBondForce, AbstractCollectiveVariable):
@@ -47,7 +47,7 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, AbstractCollectiveVariab
 
     Example
     -------
-        >>> import cvlib
+        >>> import cvpack
         >>> import mdtraj
         >>> import openmm as mm
         >>> import openmm.unit as mmunit
@@ -57,7 +57,7 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, AbstractCollectiveVariab
         >>> phi_atoms, _ = mdtraj.compute_phi(traj)
         >>> valid_atoms = traj.top.select("resid 59 to 79 and backbone")
         >>> phi_atoms = [phi for phi in phi_atoms if all(atom in valid_atoms for atom in phi)]
-        >>> torsion_similarity = cvlib.TorsionSimilarity(phi_atoms[1:], phi_atoms[:-1])
+        >>> torsion_similarity = cvpack.TorsionSimilarity(phi_atoms[1:], phi_atoms[:-1])
         >>> model.system.addForce(torsion_similarity)
         6
         >>> integrator = mm.VerletIntegrator(0)
