@@ -74,11 +74,9 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, AbstractCollectiveVariab
         secondList: Iterable[Iterable[int]],
         pbc: bool = False,
     ) -> None:
-        assert all(len(torsion) == 4 for torsion in firstList)  # each torsion must have 4 atoms
-        assert all(len(torsion) == 4 for torsion in secondList)  # each torsion must have 4 atoms
-        energy = f"0.5*(1 + cos(min(delta, {2*np.pi} - delta)))"
+        function = f"0.5*(1 + cos(min(delta, {2*np.pi} - delta)))"
         definition = "delta = dihedral(p1, p2, p3, p4) - dihedral(p5, p6, p7, p8)"
-        super().__init__(8, f"{energy}; {definition}")
+        super().__init__(8, f"{function}; {definition}")
         for first, second in zip(firstList, secondList):
             self.addBond([*first, *second], [])
         self.setUsesPeriodicBoundaryConditions(pbc)

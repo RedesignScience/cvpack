@@ -45,8 +45,9 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
     :math:`i+5` of the sequence, :math:`{\\bf g}_{\\rm ideal}` represents the same 30 atoms in an
     ideal alpha-helix configuration, :math:`{\\bf r}_j({\\bf g})` is the position of the
     :math:`j`-th atom in a group :math:`{\\bf g}` relative to the centroid of the group,
-    :math:`{\\bf R}({\\bf g})` is the optimal rotation matrix that aligns :math:`{\\bf g}` with
-    :math:`{\\bf g}_{\\rm ideal}`, and :math:`B_m(x)` is a smooth step function given by
+    :math:`{\\bf R}({\\bf g})` is the rotation matrix that minimizes the RMSD between
+    :math:`{\\bf g}` and :math:`{\\bf g}_{\\rm ideal}`, and :math:`B_m(x)` is a smooth step function
+    given by
 
     .. math::
         B_m(x) = \\frac{1}{1 + x^{2m}}

@@ -25,11 +25,14 @@ class RMSD(openmm.RMSDForce, AbstractCollectiveVariable):
 
         d_{\\rm rms}({\\bf r}) = \\sqrt{
             \\frac{1}{n} \\sum_{i=1}^n \\left\\|
-                {\\bf r}_i - {\\bf R}({\\bf r}) {\\bf r}_i^{\\rm ref}
+                \\hat{\\bf r}_i - {\\bf R}({\\bf r}) \\hat{\\bf r}_i^{\\rm ref}
             \\right\\|^2
         }
 
-    where :math:`{\\bf R}(\\bf r)` is the rotation matrix that minimizes the RMSD.
+    where :math:`\\hat{\\bf r}_i` is the position of the :math:`i`-th atom in the group relative to
+    the centroid of the group, :math:`\\hat{\\bf r}_i^{\\rm ref}` is the position of the same atom
+    in the reference configuration, and :math:`{\\bf R}({\\bf r})` is the rotation matrix that
+    minimizes the RMSD between the group and the reference structure.
 
     .. warning::
 
@@ -41,15 +44,20 @@ class RMSD(openmm.RMSDForce, AbstractCollectiveVariable):
     Parameters
     ----------
         referencePositions
-            The reference coordinates. If there are ``numAtoms`` coordinates, they must refer to the
-            the system atoms and be sorted accordingly. Otherwise, if there are ``n`` coordinates,
-            with ``n=len(group)``, they must refer to the group atoms in the same order as they
-            appear in ``group``. The first criterion has precedence over the second when
+            The reference coordinates. If there are ``n`` coordinates,  with ``n=len(group)``, they
+            must refer to the group atoms in the same order as they appear in ``group``. Otherwise,
+            if there are ``numAtoms`` coordinates (see below), they must refer to the the system
+            atoms and be sorted accordingly. The first criterion has precedence over the second when
             ``n == numAtoms``.
         group
             The index of the atoms in the group
         numAtoms
             The total number of atoms in the system (required by OpenMM)
+
+    Raises
+    ------
+        ValueError
+            If ``len(referencePositions)`` is neither ``numAtoms`` nor ``len(group)``
 
     Example
     -------
@@ -82,14 +90,15 @@ class RMSD(openmm.RMSDForce, AbstractCollectiveVariable):
     ) -> None:
         coords = in_md_units(referencePositions)
         num_coords = coords.shape[0] if isinstance(coords, np.ndarray) else len(coords)
-        assert num_coords == len(group) or num_coords == numAtoms
-        if num_coords == numAtoms:
-            positions = coords.copy()
-            coords = np.array([positions[atom] for atom in group])
-        else:
+        if num_coords == len(group):
             positions = np.zeros((numAtoms, 3))
             for i, atom in enumerate(group):
                 positions[atom, :] = np.array([coords[i][j] for j in range(3)])
+        elif num_coords == numAtoms:
+            positions = coords.copy()
+            coords = np.array([positions[atom] for atom in group])
+        else:
+            raise ValueError("Invalid number of coordinates")
         super().__init__(positions, group)
         self._registerCV(mmunit.nanometers, coords, group, numAtoms)
 
