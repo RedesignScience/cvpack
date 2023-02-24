@@ -1,11 +1,9 @@
-{% set version = "{{ environ['GIT_DESCRIBE_TAG'] }}" %}
-
 package:
   name: cvpack
-  version: {{ version }}
+  version: "{{ environ['GIT_DESCRIBE_TAG'] }}"
 
 source:
-  url: https://github.com/RedesignScience/cvpack/archive/refs/tags/{{ version }}.tar.gz
+  url: https://github.com/RedesignScience/cvpack/archive/refs/tags/{{ environ['GIT_DESCRIBE_TAG'] }}.tar.gz
 
 build:
   number: 1
