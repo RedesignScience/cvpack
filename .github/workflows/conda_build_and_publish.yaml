@@ -26,6 +26,8 @@ jobs:
           auto-update-conda: false
           auto-activate-base: false
           show-channel-urls: true
+      - name: Create environment variable
+        run: export CVPACK_VERSION=`git describe --tags | cut -d'-' -f 1`
       - name: Build and upload packages
         uses: uibcdf/action-build-and-upload-conda-packages@v1.1.0
         with:

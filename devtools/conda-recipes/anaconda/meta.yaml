@@ -1,9 +1,9 @@
 package:
   name: cvpack
-  version: "{{ environ['GIT_DESCRIBE_TAG'] }}"
+  version: "{{ environ['CVPACK_VERSION'] }}"
 
 source:
-  git_url: ../../
+  path: ../../
 
 build:
   number: 1
@@ -27,11 +27,6 @@ test:
 about:
   home: https://github.com/RedesignScience/cvpack
   summary: Useful Collective Variables for OpenMM
-  description: |
-    This plugin contains the SlicedNonbondedForce class, a variant of
-    OpenMM's NonbondedForce. By partitioning all particles among disjoint
-    subsets, the total potential energy becomes a linear combination of
-    contributions from pairs of subsets.
   license: MIT
   license_family: MIT
   license_file: LICENSE
