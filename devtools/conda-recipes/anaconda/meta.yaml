@@ -3,7 +3,8 @@ package:
   version: "{{ environ['GIT_DESCRIBE_TAG'] }}"
 
 source:
-  url: https://github.com/RedesignScience/cvpack/archive/refs/tags/{{ environ['GIT_DESCRIBE_TAG'] }}.tar.gz
+  git_rev: "{{ environ['GIT_DESCRIBE_TAG'] }}"
+  url: https://github.com/RedesignScience/cvpack.git
 
 build:
   number: 1
