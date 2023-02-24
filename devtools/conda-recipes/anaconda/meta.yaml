@@ -1,0 +1,43 @@
+package:
+  name: cvpack
+  version: "{{ environ['GIT_DESCRIBE_TAG'] }}"
+
+source:
+  path: ../../
+
+build:
+  number: 1
+
+requirements:
+  host:
+    - python >=3.8
+    - setuptools
+    - versioningit
+    - pip
+  run:
+    - python >=3.8
+    - importlib-resources  # [py<310]
+    - numpy
+    - openmm>=7.6
+
+test:
+  imports:
+    - cvpack
+
+about:
+  home: https://github.com/RedesignScience/cvpack
+  summary: Useful Collective Variables for OpenMM
+  description: |
+    This plugin contains the SlicedNonbondedForce class, a variant of
+    OpenMM's NonbondedForce. By partitioning all particles among disjoint
+    subsets, the total potential energy becomes a linear combination of
+    contributions from pairs of subsets.
+  license: MIT
+  license_family: MIT
+  license_file: LICENSE
+  doc_url: https://cvpack.readthedocs.io/en/stable
+  dev_url: https://github.com/RedesignScience/cvpack
+
+extra:
+  recipe-maintainers:
+    - craabreu

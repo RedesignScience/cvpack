@@ -1,0 +1,14 @@
+name: build
+channels:
+  - conda-forge
+dependencies:
+    # Base depends
+  - python
+  - openmm>=7.6
+  - numpy
+  - pyyaml
+  - importlib_resources
+
+    # Building
+  - anaconda-client
+  - conda-build
