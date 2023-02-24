@@ -10,9 +10,16 @@ Collective Variable Package
 
 ### Overview
 
-In [OpenMM], collective variables (CV) involved in a [CustomCVForce] are nothing but OpenMM [Force]
-objects. This CV Package provides several CVs of common use in molecular dynamics simulations, such
-as:
+Collective variables (CVs) are functions of the coordinates of a molecular system and provide a
+means to project its conformational state onto a lower-dimensional space. By stimulating the
+dynamics of a judiciously chosen set of CVs, one can obtain an enhanced sampling of the
+configurational space, including regions that are otherwise difficult to access. CVPack is a Python
+package that provides pre-defined CVs for the powerful molecular dynamics engine
+[OpenMM](https://openmm.org). All these CVs are subclasses of OpenMM's [Force] class. As such, they
+can be directly added to a [CustomCVForce] object or used to define a [BiasVariable] object for
+[Metadynamics], for example.
+
+The CVs currently implemented in CVPack are:
 
 * [Angle](https://cvpack-for-openmm.readthedocs.io/en/latest/api/Angle.html):
     The angle formed by three atoms.
@@ -41,17 +48,29 @@ as:
 * [Torsion similarity](https://cvpack-for-openmm.readthedocs.io/en/latest/api/TorsionSimilarity.html):
     The degree of similarity between pairs of torsion angles.
 
+### Installation
+
+CVPack is available on [PyPI](https://pypi.org/project/cvpack/). To install it, simply run:
+
+```bash
+    pip install cvpack
+```
+
+### Documentation
+
+The documentation for CVPack is available at [Read the Docs](https://cvpack.readthedocs.io/en/stable).
+
 ### Copyright
 
-Copyright (c) 2023, [C. Abreu](https://github.com/craabreu) & [Redesign Science](https://www.redesignscience.com)
+Copyright (c) 2023, [Redesign Science](https://www.redesignscience.com)
 
 
 #### Acknowledgements
 
 Project based on the [CMS Cookiecutter] version 1.1.
 
-
+[BiasVariable]:     https://docs.openmm.org/latest/api-python/generated/openmm.app.metadynamics.BiasVariable.html
 [CMS Cookiecutter]: https://github.com/molssi/cookiecutter-cms
-[CustomCVForce]:    http://docs.openmm.org/latest/api-python/generated/openmm.openmm.CustomCVForce.html
-[Force]:            http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Force.html
-[OpenMM]:           https://openmm.org
+[CustomCVForce]:    https://docs.openmm.org/latest/api-python/generated/openmm.openmm.CustomCVForce.html
+[Force]:            https://docs.openmm.org/latest/api-python/generated/openmm.openmm.Force.html
+[Metadynamics]:     https://docs.openmm.org/latest/api-python/generated/openmm.app.metadynamics.Metadynamics.html
