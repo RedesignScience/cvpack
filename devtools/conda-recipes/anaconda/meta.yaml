@@ -1,9 +1,9 @@
 package:
   name: cvpack
-  version: "{{ environ['GIT_DESCRIBE_TAG'] }}"
+  version: "{{ environ['GIT_DESCRIBE_TAG'][1:] }}"
 
 source:
-  path: ../../
+  git_url: https://github.com/RedesignScience/cvpack.git
 
 build:
   number: 1
