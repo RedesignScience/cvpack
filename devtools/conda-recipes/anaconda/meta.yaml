@@ -1,0 +1,42 @@
+{% set version = environ['CVPACK_VERSION'][1:] %}
+{% set python_version = environ['PYTHON_VERSION'] %}
+
+package:
+  name: cvpack
+  version: {{ version }}
+
+source:
+  git_url: ../../../
+
+build:
+  number: 0
+  script: python -m pip install . --no-deps
+
+requirements:
+  host:
+    - python=={{ python_version }}
+    - setuptools
+    - versioningit
+    - pip
+  run:
+    - python=={{ python_version }}
+    - importlib-resources  # [py<310]
+    - numpy
+    - openmm>=7.6
+
+test:
+  imports:
+    - cvpack
+
+about:
+  home: https://github.com/RedesignScience/cvpack
+  summary: Useful Collective Variables for OpenMM
+  license: MIT
+  license_family: MIT
+  license_file: LICENSE
+  doc_url: https://cvpack.readthedocs.io/en/stable
+  dev_url: https://github.com/RedesignScience/cvpack
+
+extra:
+  recipe-maintainers:
+    - craabreu
