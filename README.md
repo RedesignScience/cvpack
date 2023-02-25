@@ -31,31 +31,31 @@ to a [CustomCVForce] or used to define a [BiasVariable] for [Metadynamics], for 
 
 The CVs implemented in the development version of CVPack are:
 
-* [Angle](https://cvpack-for-openmm.readthedocs.io/en/latest/api/Angle.html):
+* [Angle](https://cvpack.readthedocs.io/en/latest/api/Angle.html):
     The angle formed by three atoms.
-* [Atomic Function](https://cvpack-for-openmm.readthedocs.io/en/latest/api/AtomicFunction.html):
+* [Atomic Function](https://cvpack.readthedocs.io/en/latest/api/AtomicFunction.html):
     A user-defined function of the coordinates of a group of atoms.
-* [Centroid Function](https://cvpack-for-openmm.readthedocs.io/en/latest/api/CentroidFunction.html)
+* [Centroid Function](https://cvpack.readthedocs.io/en/latest/api/CentroidFunction.html)
     A user-defined function of the centroids of groups of atoms.
-* [Distance](https://cvpack-for-openmm.readthedocs.io/en/latest/api/Distance.html):
+* [Distance](https://cvpack.readthedocs.io/en/latest/api/Distance.html):
     The distance between two atoms.
-* [Helix angle content](https://cvpack-for-openmm.readthedocs.io/en/latest/api/HelixAngleContent.html):
+* [Helix angle content](https://cvpack.readthedocs.io/en/latest/api/HelixAngleContent.html):
     The alpha-helix angle content of a sequence of residues.
-* [Helix H-bond content](https://cvpack-for-openmm.readthedocs.io/en/latest/api/HelixHBondContent.html):
+* [Helix H-bond content](https://cvpack.readthedocs.io/en/latest/api/HelixHBondContent.html):
     The alpha-helix hydrogen-bond content of a sequence of residues.
-* [Helix RMSD content](https://cvpack-for-openmm.readthedocs.io/en/latest/api/HelixRMSDContent.html):
+* [Helix RMSD content](https://cvpack.readthedocs.io/en/latest/api/HelixRMSDContent.html):
     The alpha-helix RMSD content of a sequence of residues
-* [Helix torsion content](https://cvpack-for-openmm.readthedocs.io/en/latest/api/HelixTorsionContent.html):
+* [Helix torsion content](https://cvpack.readthedocs.io/en/latest/api/HelixTorsionContent.html):
     The alpha-helix Ramachandran content of a sequence of residues.
-* [Number of contacts](https://cvpack-for-openmm.readthedocs.io/en/latest/api/NumberOfContacts.html):
+* [Number of contacts](https://cvpack.readthedocs.io/en/latest/api/NumberOfContacts.html):
     The number of contacts between two groups of atoms.
-* [Radius of gyration](https://cvpack-for-openmm.readthedocs.io/en/latest/api/RadiusOfGyration.html):
+* [Radius of gyration](https://cvpack.readthedocs.io/en/latest/api/RadiusOfGyration.html):
     The radius of gyration of a group of atoms.
-* [RMSD](https://cvpack-for-openmm.readthedocs.io/en/latest/api/RMSD.html):
+* [RMSD](https://cvpack.readthedocs.io/en/latest/api/RMSD.html):
     The RMSD of a group of atoms with respect to a reference structure.
-* [Torsion](https://cvpack-for-openmm.readthedocs.io/en/latest/api/Torsion.html):
+* [Torsion](https://cvpack.readthedocs.io/en/latest/api/Torsion.html):
     The torsion angle formed by four atoms.
-* [Torsion similarity](https://cvpack-for-openmm.readthedocs.io/en/latest/api/TorsionSimilarity.html):
+* [Torsion similarity](https://cvpack.readthedocs.io/en/latest/api/TorsionSimilarity.html):
     The degree of similarity between pairs of torsion angles.
 
 ### Installation and Usage
