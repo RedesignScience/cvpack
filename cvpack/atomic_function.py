@@ -48,16 +48,16 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
     Example
     -------
         >>> import cvpack
-        >>> import openmm as mm
+        >>> import openmm
         >>> from openmmtools import testsystems
         >>> model = testsystems.AlanineDipeptideVacuum()
         >>> angle = cvpack.Angle(0, 11, 21)
         >>> colvar = cvpack.AtomicFunction('angle(p1, p2, p3)', [0, 11, 21], "radians", False)
         >>> [model.system.addForce(f) for f in [angle, colvar]]
         [5, 6]
-        >>> integrator = mm.VerletIntegrator(0)
-        >>> platform = mm.Platform.getPlatformByName('Reference')
-        >>> context = mm.Context(model.system, integrator, platform)
+        >>> integrator =openmm.VerletIntegrator(0)
+        >>> platform =openmm.Platform.getPlatformByName('Reference')
+        >>> context =openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
         >>> print(angle.getValue(context, digits=6))
         2.318322 rad

@@ -40,18 +40,18 @@ class Angle(openmm.CustomAngleForce, AbstractCollectiveVariable):
 
     Example:
         >>> import cvpack
-        >>> import openmm as mm
-        >>> system = mm.System()
+        >>> import openmm
+        >>> system =openmm.System()
         >>> [system.addParticle(1) for i in range(3)]
         [0, 1, 2]
         >>> angle = cvpack.Angle(0, 1, 2)
         >>> system.addForce(angle)
         0
-        >>> integrator = mm.VerletIntegrator(0)
-        >>> platform = mm.Platform.getPlatformByName('Reference')
-        >>> context = mm.Context(system, integrator, platform)
+        >>> integrator =openmm.VerletIntegrator(0)
+        >>> platform =openmm.Platform.getPlatformByName('Reference')
+        >>> context =openmm.Context(system, integrator, platform)
         >>> positions = [[0, 0, 0], [1, 0, 0], [1, 1, 0]]
-        >>> context.setPositions([mm.Vec3(*pos) for pos in positions])
+        >>> context.setPositions([openmm.Vec3(*pos) for pos in positions])
         >>> print(angle.getValue(context, digits=6))
         1.570796 rad
 

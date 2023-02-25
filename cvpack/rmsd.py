@@ -25,21 +25,22 @@ class RMSD(openmm.RMSDForce, AbstractCollectiveVariable):
 
         d_{\\rm rms}({\\bf r}) = \\sqrt{
             \\frac{1}{n} \\sum_{i=1}^n \\left\\|
-                \\hat{\\bf r}_i - {\\bf R}({\\bf r}) \\hat{\\bf r}_i^{\\rm ref}
+                \\hat{\\bf r}_i - {\\bf A}({\\bf r}) \\hat{\\bf r}_i^{\\rm ref}
             \\right\\|^2
         }
 
     where :math:`\\hat{\\bf r}_i` is the position of the :math:`i`-th atom in the group relative to
-    the centroid of the group, :math:`\\hat{\\bf r}_i^{\\rm ref}` is the position of the same atom
-    in the reference configuration, and :math:`{\\bf R}({\\bf r})` is the rotation matrix that
-    minimizes the RMSD between the group and the reference structure.
+    the group's center of geometry (centroid), :math:`\\hat{\\bf r}_i^{\\rm ref}` is the
+    centroid-centered position of the same atom in a reference configuration, and
+    :math:`{\\bf A}({\\bf r})` is the rotation matrix that minimizes the RMSD between the group and
+    the reference structure.
 
     .. warning::
 
-        Periodic boundary conditions are not supported (see OpenMM issue `#2392
-        <https://github.com/openmm/openmm/issues/2913>`_). This is not a problem if all atoms belong
-        to the same molecule. If they do not, a way to circumvent a possible error is to call
-        :func:`getFakeBondForce` and add the resulting force to the system in addition to this CV.
+        Periodic boundary conditions are `not supported
+        <https://github.com/openmm/openmm/issues/2913>`_. It atoms in the group belong to distinct
+        molecules, calling :func:`getNullBondForce` and adding the resulting force to the system
+        might circumvent any potential issues.
 
     Parameters
     ----------
@@ -62,7 +63,7 @@ class RMSD(openmm.RMSDForce, AbstractCollectiveVariable):
     Example
     -------
         >>> import cvpack
-        >>> import openmm as mm
+        >>> import openmm
         >>> from openmm import app, unit
         >>> from openmmtools import testsystems
         >>> model = testsystems.AlanineDipeptideImplicit()
@@ -102,26 +103,24 @@ class RMSD(openmm.RMSDForce, AbstractCollectiveVariable):
         super().__init__(positions, group)
         self._registerCV(mmunit.nanometers, coords, group, numAtoms)
 
-    def getFakeBondForce(self) -> openmm.HarmonicBondForce:
+    def getNullBondForce(self) -> openmm.HarmonicBondForce:
         """
-        Get a bond force that does not contribute to the energy but, if added to the same system,
-        can guarantee that this collective variable is computed correctly when the atoms in the
-        group do not belong to the same molecule.
+        Get a null bond force that creates a connected graph with all the atoms in the group.
 
         Returns
         -------
-            A null bond force that creates a connected graph with all the atoms in the group.
+            force
 
         Example
         -------
             >>> import cvpack
-            >>> import openmm as mm
+            >>> import openmm
             >>> from openmm import app, unit
             >>> from openmmtools import testsystems
             >>> model = testsystems.WaterBox(box_edge=10*unit.angstroms, cutoff=5*unit.angstroms)
             >>> group = [atom.index for atom in model.topology.atoms() if atom.residue.index < 3]
             >>> rmsd = cvpack.RMSD(model.positions, group, model.topology.getNumAtoms())
-            >>> [model.system.addForce(f) for f in [rmsd, rmsd.getFakeBondForce()]]
+            >>> [model.system.addForce(f) for f in [rmsd, rmsd.getNullBondForce()]]
             [3, 4]
             >>> integrator = openmm.VerletIntegrator(2*unit.femtoseconds)
             >>> platform = openmm.Platform.getPlatformByName('Reference')

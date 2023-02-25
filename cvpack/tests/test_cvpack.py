@@ -383,7 +383,7 @@ def test_helix_rmsd_content():
     num_atoms = model.topology.getNumAtoms()
     residues = list(model.topology.residues())
     with pytest.raises(ValueError) as excinfo:
-        helix_content = cvpack.HelixRMSDContent(residues, num_atoms)
+        helix_content = cvpack.HelixRMSDContent(residues[len(residues) - 37 :], num_atoms)
     assert str(excinfo.value) == "Could not find all atoms in residue TMP163"
     helix_content = cvpack.HelixRMSDContent(residues[59:80], num_atoms)
     model.system.addForce(helix_content)

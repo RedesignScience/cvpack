@@ -12,8 +12,11 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
+import inspect
 import os
 import sys
+
+import versioningit
 
 # Incase the project was not installed
 import cvpack
@@ -24,10 +27,11 @@ sys.path.insert(0, os.path.abspath(".."))
 
 def create_rst_file(cls):
     name = cls.__name__
-    attributes = filter(
-        lambda name: not name.startswith("_"), dir(AbstractCollectiveVariable)
-    )
-    methods = [name for name in attributes if callable(getattr(cls, name))]
+    methods = [
+        *filter(lambda x: not x.startswith("_"), AbstractCollectiveVariable.__dict__),
+        *filter(lambda x: not x.startswith("_"), cls.__dict__),
+    ]
+    methods.sort()
     with open(f"api/{name}.rst", "w") as f:
         f.writelines(
             [
@@ -35,8 +39,7 @@ def create_rst_file(cls):
                 "=" * len(name) + "\n\n",
                 ".. currentmodule:: cvpack\n",
                 f".. autoclass:: {name}\n",
-                "    :members:\n",
-                "    :member-order: bysource\n\n",
+                "    :member-order: alphabetical\n\n",
                 "    .. rubric:: Methods\n\n",
             ]
             + [f"    .. automethod:: {method}\n" for method in methods]
@@ -46,22 +49,19 @@ def create_rst_file(cls):
 with open("api/index.rst", "w") as f:
     f.write("Python API\n==========\n\n.. toctree::\n    :titlesonly:\n\n")
     for item in cvpack.__dict__.values():
-        if isinstance(item, type) and item is not cvpack.cvpack.AbstractCollectiveVariable:
+        if inspect.isclass(item):
             f.write(f"    {item.__name__}\n")
             create_rst_file(item)
     f.write("\n.. testsetup::\n\n    from cvpack import *")
 
 # -- Project information -----------------------------------------------------
 
-project = "CV Package"
-copyright = "2023, Charlles Abreu | CMS Cookiecutter v1.1"
-author = "Charlles Abreu"
-
-# The short X.Y version
-version = ""
-# The full version, including alpha/beta/rc tags
+version = "v" + versioningit.get_version("..")
 release = ""
 
+project = f"CVPack {version if not version.endswith('dirty') else 'latest'}"
+copyright = "2023, Redesign Science | CMS Cookiecutter v1.1"
+author = "Charlles Abreu"
 
 # -- General configuration ---------------------------------------------------
 
@@ -82,6 +82,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.extlinks",
     "sphinxcontrib.bibtex",
+    "sphinx_copybutton",
 ]
 
 autosummary_generate = False
@@ -207,9 +208,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, "cvpack", "Collective Variable Package Documentation", [author], 1)
-]
+man_pages = [(master_doc, "cvpack", "Collective Variable Package Documentation", [author], 1)]
 
 
 # -- Options for Texinfo output ----------------------------------------------
@@ -244,3 +243,6 @@ extlinks = {
         "openmm.%s",
     )
 }
+
+# Copy button configuration
+copybutton_prompt_text = ">>> "

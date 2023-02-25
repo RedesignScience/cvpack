@@ -52,9 +52,12 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
 
     .. note::
 
-        The residues must be from a single chain and be ordered in sequence. The :math:`\\phi` and
-        :math:`\\psi` angles of the first and last residues are not considered. They are used to
-        compute the dihedral angles of the second and penultimate residues, respectively.
+        The :math:`\\phi` and :math:`\\psi` angles of the first and last residues are not
+        considered. They are used to compute the dihedral angles of the second and penultimate
+        residues, respectively.
+
+        The residues must be a contiguous sequence from a single chain, ordered from the N- to
+        the C-terminus. Due to an OpenMM limitation, the maximum supported number of residues is 37.
 
     Parameters
     ----------
@@ -81,7 +84,7 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
     Example
     -------
         >>> import cvpack
-        >>> import openmm as mm
+        >>> import openmm
         >>> from openmm import app, unit
         >>> from openmmtools import testsystems
         >>> model = testsystems.LysozymeImplicit()

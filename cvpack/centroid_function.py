@@ -67,7 +67,7 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
     Example
     -------
         >>> import cvpack
-        >>> import openmm as mm
+        >>> import openmm
         >>> from openmmtools import testsystems
         >>> model = testsystems.AlanineDipeptideVacuum()
         >>> num_atoms = model.system.getNumParticles()
@@ -80,9 +80,9 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         >>> colvar = cvpack.CentroidFunction(function, groups, "nanometers")
         >>> [model.system.addForce(f) for f in [rg, colvar]]
         [5, 6]
-        >>> integrator = mm.VerletIntegrator(0)
-        >>> platform = mm.Platform.getPlatformByName('Reference')
-        >>> context = mm.Context(model.system, integrator, platform)
+        >>> integrator =openmm.VerletIntegrator(0)
+        >>> platform =openmm.Platform.getPlatformByName('Reference')
+        >>> context =openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
         >>> print(rg.getValue(context, digits=6))
         0.295143 nm

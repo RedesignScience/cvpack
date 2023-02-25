@@ -67,7 +67,7 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
     Example
     -------
         >>> import cvpack
-        >>> import openmm as mm
+        >>> import openmm
         >>> from openmm import app
         >>> from openmmtools import testsystems
         >>> model = testsystems.AlanineDipeptideVacuum()

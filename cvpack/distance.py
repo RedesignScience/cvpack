@@ -32,17 +32,17 @@ class Distance(openmm.CustomBondForce, AbstractCollectiveVariable):
 
     Example:
         >>> import cvpack
-        >>> import openmm as mm
-        >>> system = mm.System()
+        >>> import openmm
+        >>> system =openmm.System()
         >>> [system.addParticle(1) for i in range(2)]
         [0, 1]
         >>> distance = cvpack.Distance(0, 1)
         >>> system.addForce(distance)
         0
-        >>> integrator = mm.VerletIntegrator(0)
-        >>> platform = mm.Platform.getPlatformByName('Reference')
-        >>> context = mm.Context(system, integrator, platform)
-        >>> context.setPositions([mm.Vec3(0, 0, 0), mm.Vec3(1, 1, 1)])
+        >>> integrator =openmm.VerletIntegrator(0)
+        >>> platform =openmm.Platform.getPlatformByName('Reference')
+        >>> context =openmm.Context(system, integrator, platform)
+        >>> context.setPositions([openmm.Vec3(0, 0, 0),openmm.Vec3(1, 1, 1)])
         >>> print(distance.getValue(context, digits=5))
         1.73205 nm
 

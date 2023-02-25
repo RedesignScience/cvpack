@@ -49,7 +49,7 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, AbstractCollectiveVariab
     -------
         >>> import cvpack
         >>> import mdtraj
-        >>> import openmm as mm
+        >>> import openmm
         >>> import openmm.unit as mmunit
         >>> from openmmtools import testsystems
         >>> model = testsystems.LysozymeImplicit()
@@ -60,9 +60,9 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, AbstractCollectiveVariab
         >>> torsion_similarity = cvpack.TorsionSimilarity(phi_atoms[1:], phi_atoms[:-1])
         >>> model.system.addForce(torsion_similarity)
         6
-        >>> integrator = mm.VerletIntegrator(0)
-        >>> platform = mm.Platform.getPlatformByName("Reference")
-        >>> context = mm.Context(model.system, integrator, platform)
+        >>> integrator =openmm.VerletIntegrator(0)
+        >>> platform =openmm.Platform.getPlatformByName("Reference")
+        >>> context =openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
         >>> print(torsion_similarity.getValue(context, digits=6))
         18.659917 dimensionless

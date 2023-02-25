@@ -52,16 +52,16 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
     Example
     -------
         >>> import cvpack
-        >>> import openmm as mm
+        >>> import openmm
         >>> from openmmtools import testsystems
         >>> model = testsystems.AlanineDipeptideVacuum()
         >>> num_atoms = model.system.getNumParticles()
         >>> radius_of_gyration = cvpack.RadiusOfGyration(list(range(num_atoms)))
         >>> model.system.addForce(radius_of_gyration)
         5
-        >>> platform = mm.Platform.getPlatformByName('Reference')
-        >>> integrator = mm.VerletIntegrator(0)
-        >>> context = mm.Context(model.system, integrator, platform)
+        >>> platform =openmm.Platform.getPlatformByName('Reference')
+        >>> integrator =openmm.VerletIntegrator(0)
+        >>> context =openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
         >>> print(radius_of_gyration.getValue(context, digits=6))
         0.295143 nm

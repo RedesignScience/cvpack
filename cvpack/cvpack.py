@@ -35,7 +35,6 @@ def in_md_units(quantity: QuantityOrFloat) -> float:
     Returns
     -------
         The numerical value of the quantity in the MD unit system
-
     """
     if mmunit.is_quantity(quantity):
         value = quantity.value_in_unit_system(mmunit.md_unit_system)
@@ -56,7 +55,6 @@ def str_to_unit(unitStr: str) -> mmunit.Unit:
     Returns
     -------
         The OpenMM unit of measurement
-
     """
 
     class NodeTransformer(ast.NodeTransformer):
@@ -64,14 +62,12 @@ def str_to_unit(unitStr: str) -> mmunit.Unit:
         A child class of ast.NodeTransformer that replaces all instances of ast.Name with
         an ast.Attribute with the value "mmunit" and the attribute name equal to the original
         id of the ast.Name.
-
         """
 
         def visit_Name(self, node: ast.Name) -> ast.Attribute:  # pylint: disable=invalid-name
             """
             Replace an instance of ast.Name with an ast.Attribute with the value "mmunit" and
             the attribute name equal to the original id of the ast.Name.
-
             """
             mod = ast.Name(id="mmunit", ctx=ast.Load())
             return ast.Attribute(value=mod, attr=node.id, ctx=ast.Load())
@@ -86,7 +82,6 @@ class SerializableResidue(mmapp.topology.Residue):
     """
     A class that extends OpenMM's Residue class with additional methods for serialization and
     deserialization.
-
     """
 
     def __init__(self, residue: mmapp.topology.Residue) -> None:
@@ -100,7 +95,6 @@ class SerializableResidue(mmapp.topology.Residue):
 class AbstractCollectiveVariable(openmm.Force):
     """
     An abstract class with common attributes and method for all CVs.
-
     """
 
     _unit = mmunit.dimensionless
@@ -126,7 +120,6 @@ class AbstractCollectiveVariable(openmm.Force):
                 kJ/mol, angle in rad).
             args
                 The arguments needed to construct this collective variable
-
         """
         self.setName(self.__class__.__name__)
         self.setUnit(unit)
@@ -153,7 +146,6 @@ class AbstractCollectiveVariable(openmm.Force):
         ------
             ValueError
                 If this force is not part of the system in the given context
-
         """
         forces = context.getSystem().getForces()
         if not any(force.this == self.this for force in forces):
@@ -185,7 +177,6 @@ class AbstractCollectiveVariable(openmm.Force):
             ('group', typing.Iterable[int]) ('pbc', <class 'bool'>) ('weighByMass', <class 'bool'>)
             >>> print(*defaults.items())
             ('pbc', False) ('weighByMass', False)
-
         """
         arguments = OrderedDict()
         defaults = OrderedDict()
@@ -203,14 +194,12 @@ class AbstractCollectiveVariable(openmm.Force):
         ----------
             unit
                 The unit of measurement of this collective variable
-
         """
         self._unit = unit
 
     def getUnit(self) -> mmunit.Unit:
         """
         Get the unit of measurement of this collective variable.
-
         """
         return self._unit
 
@@ -226,9 +215,6 @@ class AbstractCollectiveVariable(openmm.Force):
                 The context at which this collective variable should be evaluated
             digits
                 The number of digits to round to
-
-        Returns
-        -------
         """
         state = self._getSingleForceState(context, getEnergy=True)
         value = in_md_units(state.getPotentialEnergy())
@@ -265,19 +251,18 @@ class AbstractCollectiveVariable(openmm.Force):
         Example
         -------
             >>> import cvpack
-            >>> import openmm as mm
+            >>> import openmm
             >>> from openmmtools import testsystems
             >>> model = testsystems.AlanineDipeptideImplicit()
             >>> peptide = [a.index for a in model.topology.atoms() if a.residue.name != 'HOH']
             >>> radius_of_gyration = cvpack.RadiusOfGyration(peptide)
             >>> model.system.addForce(radius_of_gyration)
             6
-            >>> platform = mm.Platform.getPlatformByName('Reference')
-            >>> context = mm.Context(model.system, mm.VerletIntegrator(0), platform)
+            >>> platform =openmm.Platform.getPlatformByName('Reference')
+            >>> context =openmm.Context(model.system,openmm.VerletIntegrator(0), platform)
             >>> context.setPositions(model.positions)
             >>> print(radius_of_gyration.getEffectiveMass(context, digits=6))
             30.946932 Da
-
         """
         state = self._getSingleForceState(context, getForces=True)
         force_values = in_md_units(state.getForces(asNumpy=True))
