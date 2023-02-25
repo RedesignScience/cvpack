@@ -2,11 +2,11 @@
 Collective Variable Package
 ===========================
 
+.. image:: https://img.shields.io/badge/License-MIT-yellowgreen.svg
+   :target: https://github.com/RedesignScience/cvpack/blob/main/LICENSE.md
+
 .. image:: https://badgen.net/badge/icon/github?icon=github&label
    :target: https://github.com/RedesignScience/cvpack
-
-.. image:: https://img.shields.io/badge/License-MIT-green.svg
-   :target: https://github.com/RedesignScience/cvpack/blob/main/LICENSE.md
 
 .. raw:: html
 
