@@ -6,7 +6,7 @@ Collective Variable Package
 [![GitHub Actions Build Status](https://github.com/RedesignScience/cvpack/workflows/Windows/badge.svg)](https://github.com/RedesignScience/cvpack/actions?query=workflow%3AWindows)
 [![GitHub Actions Build Status](https://github.com/RedesignScience/cvpack/workflows/Linter/badge.svg)](https://github.com/RedesignScience/cvpack/actions?query=workflow%3ALinter)
 [![codecov](https://codecov.io/gh/RedesignScience/cvpack/branch/main/graph/badge.svg)](https://codecov.io/gh/RedesignScience/cvpack/branch/main)
-[![Documentation Status](https://readthedocs.org/projects/cvpack/badge/?style=flat)](https://readthedocs.org/projects/cvpack)
+[![Documentation Status](https://readthedocs.org/projects/cvpack/badge/?style=flat)](https://cvpack.readthedocs.io/en/latest)
 
 ### Overview
 
@@ -50,10 +50,17 @@ The CVs currently implemented in CVPack are:
 
 ### Installation
 
-CVPack is available on [PyPI](https://pypi.org/project/cvpack/). To install it, simply run:
+CVPack is available as a conda package on the
+[redesign-science](https://anaconda.org/redesign-science/cvpack) channel. To install it, simply run:
 
 ```bash
-    pip install cvpack
+    conda install -c redesign-science cvpack
+```
+
+Or, if you prefer to use [mamba](https://mamba.readthedocs.io/en/latest) instead of conda:
+
+```bash
+    mamba install -c redesign-science cvpack
 ```
 
 ### Documentation
