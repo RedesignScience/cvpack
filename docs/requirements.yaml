@@ -8,6 +8,8 @@ dependencies:
   - openmm
   - sphinx
   - sphinxcontrib-bibtex
+  - versioningit
+  - sphinx-copybutton
 
     # Pip-only installs
   # - pip:
