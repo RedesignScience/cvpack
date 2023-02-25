@@ -40,7 +40,7 @@ jobs:
         with:
           environment-file: devtools/conda-envs/test_env.yaml
           environment-name: test
-          channels: conda-forge,defaults
+          channels: conda-forge
           extra-specs: |
             python=${{ matrix.python-version }}
             openmm=${{ matrix.openmm-version }}

@@ -1,4 +1,4 @@
-name: test
+name: build
 channels:
   - conda-forge
 dependencies:
@@ -10,10 +10,7 @@ dependencies:
   - pyyaml
   - importlib_resources
 
-    # Testing
-  - scipy
-  - openmmtools
-  - mdtraj
-  - pytest
-  - pytest-cov
-  - codecov
+    # Conda build
+  - anaconda-client
+  - conda-build
+  - boa
