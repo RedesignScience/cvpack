@@ -1,19 +1,15 @@
-name: Linux
+name: Anaconda
 
 on:
-  # GitHub has started calling new repo's first branch "main" https://github.com/github/renaming
-  # The cookiecutter uses the "--initial-branch" flag when it runs git-init
   push:
     branches:
       - "main"
+    tags:
+      - v2
+  # Remove after tests:
   pull_request:
     branches:
       - "main"
-  schedule:
-    # Weekly tests run on main by default:
-    #   Scheduled workflows run on the latest commit on the default or base branch.
-    #   (from https://help.github.com/en/actions/reference/events-that-trigger-workflows#scheduled-events-schedule)
-    - cron: "0 0 * * 0"
 
 jobs:
   test:
@@ -22,7 +18,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: [3.8, 3.9, "3.10"]
+        python-version: ["3.11"]
 
     steps:
       - uses: actions/checkout@v3
@@ -50,15 +46,22 @@ jobs:
           python -m pip install . --no-deps
           micromamba list
 
-      - name: Run tests
-        # conda setup requires this special shell
+      - name: Conda Build and Upload
+        # if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         shell: bash -l {0}
         run: |
-          pytest -v --cov=cvpack --cov-report=xml --color=yes --doctest-modules cvpack/
-
-      - name: CodeCov
-        uses: codecov/codecov-action@v1
-        with:
-          file: ./coverage.xml
-          flags: unittests
-          name: codecov-${{ matrix.os }}-py${{ matrix.python-version }}
+          dir=`mktemp -d`
+          export CVPACK_VERSION=`git describe --tags | cut -d'-' -f 1)
+          export PYTHON_VERSION={{ matrix.python-version }}
+          export ANACONDA_API_TOKEN=${{ secrets.ANACONDA_TOKEN }}
+          cd devtools/conda-recipes/anaconda
+          for version in 3.{8..11}; do
+            outdir=$dir/py$version
+            mkdir $outdir
+            conda mambabuild . --no-anaconda-upload -c conda-forge --output-folder $outdir --python $version
+            PACKAGE=`find $outdir -name *.tar.bz2 | head -1`
+            conda convert --platform all $PACKAGE -o $outdir
+          done
+          for filename in `find $dir -name *.tar.bz2`; do
+            anaconda upload --user redesign-science --force --label main $filename
+          done
