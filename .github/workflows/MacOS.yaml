@@ -22,7 +22,7 @@ jobs:
     strategy:
       matrix:
         os: [macOS-latest]
-        python-version: [3.8, 3.9, "3.10", "3.11"]
+        python-version: [3.8, 3.9, "3.10"]
         openmm-version: ["8.0"]
 
     steps:
@@ -40,7 +40,7 @@ jobs:
         with:
           environment-file: devtools/conda-envs/test_env.yaml
           environment-name: test
-          channels: conda-forge,defaults
+          channels: conda-forge
           extra-specs: |
             python=${{ matrix.python-version }}
             openmm=${{ matrix.openmm-version }}

@@ -13,7 +13,7 @@ on:
 
 jobs:
   test:
-    name: Test on ${{ matrix.os }}, Python ${{ matrix.python-version }}
+    name: Build on ${{ matrix.os }}, Python ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -33,9 +33,9 @@ jobs:
       # More info on options: https://github.com/marketplace/actions/provision-with-micromamba
       - uses: mamba-org/provision-with-micromamba@main
         with:
-          environment-file: devtools/conda-envs/test_env.yaml
+          environment-file: devtools/conda-envs/conda_build_env.yaml
           environment-name: test
-          channels: conda-forge,defaults
+          channels: conda-forge
           extra-specs: |
             python=${{ matrix.python-version }}
 
