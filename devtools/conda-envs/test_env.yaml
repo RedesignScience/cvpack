@@ -18,6 +18,7 @@ dependencies:
   - pytest-cov
   - codecov
 
-    # Pip-only installs
-  #- pip:
-  #  - codecov
+    # Conda build
+  - anaconda-client
+  - conda-build
+  - boa
