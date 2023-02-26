@@ -9,9 +9,9 @@ Collective Variable Package
 [![codecov](https://codecov.io/gh/RedesignScience/cvpack/branch/main/graph/badge.svg)](https://codecov.io/gh/RedesignScience/cvpack/branch/main)
 [![Documentation Status](https://readthedocs.org/projects/cvpack/badge/?style=flat)](https://cvpack.readthedocs.io/en/latest)
 
-[![Anaconda-Server Badge](https://anaconda.org/redesign-science/cvpack/badges/version.svg)](https://anaconda.org/redesign-science/cvpack)
-[![Anaconda-Server Badge](https://anaconda.org/redesign-science/cvpack/badges/platforms.svg)](https://anaconda.org/redesign-science/cvpack)
-[![Anaconda-Server Badge](https://anaconda.org/redesign-science/cvpack/badges/downloads.svg)](https://anaconda.org/redesign-science/cvpack)
+[![Conda cvpack version](https://img.shields.io/conda/v/redesign-science/cvpack.svg)](https://anaconda.org/redesign-science/cvpack)
+[![Conda cvpack platforms](https://img.shields.io/conda/pn/redesign-science/cvpack.svg)](https://anaconda.org/redesign-science/cvpack)
+[![Conda cvpack downloads](https://img.shields.io/conda/dn/redesign-science/cvpack.svg)](https://anaconda.org/redesign-science/cvpack)
 
 [![License](https://img.shields.io/badge/License-MIT-yellowgreen.svg?style=flat)](https://github.com/RedesignScience/cvpack/blob/main/LICENSE.md)
 [![Twitter](https://badgen.net/badge/follow%20us/@RedesignScience?icon=twitter)](https://twitter.com/RedesignScience)
