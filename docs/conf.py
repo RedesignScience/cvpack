@@ -57,11 +57,12 @@ with open("api/index.rst", "w") as f:
 # -- Project information -----------------------------------------------------
 
 version = "v" + versioningit.get_version("..")
-release = ""
-
-project = f"CVPack {version if not version.endswith('dirty') else 'latest'}"
+if version.find("+") != -1:
+    version = "latest"
+project = f"CVPack {version}"
 copyright = "2023, Redesign Science | CMS Cookiecutter v1.1"
 author = "Charlles Abreu"
+release = ""
 
 # -- General configuration ---------------------------------------------------
 
