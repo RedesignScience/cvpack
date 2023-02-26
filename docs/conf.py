@@ -16,8 +16,6 @@ import inspect
 import os
 import sys
 
-import versioningit
-
 # Incase the project was not installed
 import cvpack
 from cvpack.cvpack import AbstractCollectiveVariable
@@ -56,12 +54,10 @@ with open("api/index.rst", "w") as f:
 
 # -- Project information -----------------------------------------------------
 
-version = "v" + versioningit.get_version("..")
-if version.find("+") != -1:
-    version = "latest"
-project = f"CVPack {version}"
+project = "CVPack"
 copyright = "2023, Redesign Science | CMS Cookiecutter v1.1"
 author = "Charlles Abreu"
+version = ""
 release = ""
 
 # -- General configuration ---------------------------------------------------

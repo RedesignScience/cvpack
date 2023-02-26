@@ -18,11 +18,11 @@ Installation
 
 To install CVPack in a conda environment, run the following command::
 
-    conda install -c redesign-science cvpack
+    conda install -c conda-forge -c redesign-science cvpack
 
 Or use mamba instead::
 
-    mamba install -c redesign-science cvpack
+    mamba install -c conda-forge -c redesign-science cvpack
 
 Usage
 -----

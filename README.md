@@ -64,13 +64,13 @@ CVPack is available as a conda package on the
 [redesign-science](https://anaconda.org/redesign-science/cvpack) channel. To install it, simply run:
 
 ```bash
-    conda install -c redesign-science cvpack
+    conda install -c conda-forge -c redesign-science cvpack
 ```
 
 Or, if you prefer to use [mamba](https://mamba.readthedocs.io/en/latest) instead of conda:
 
 ```bash
-    mamba install -c redesign-science cvpack
+    mamba install -c conda-forge -c redesign-science cvpack
 ```
 
 To use CVPack in your own Python script or Jupyter notebook, simply import it as follows:
