@@ -107,3 +107,6 @@ ENV/
 
 # In-tree generated files
 #*/_version.py
+
+# VSCode
+.vscode/
