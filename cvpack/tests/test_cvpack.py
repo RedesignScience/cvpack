@@ -49,6 +49,7 @@ def test_argument_inspection():
     Test argument inspection of a arbitrary AbstractCollectiveVariable subclass
 
     """
+
     # pylint: disable=missing-class-docstring, unused-argument
     class Test(cvpack.cvpack.AbstractCollectiveVariable):
         def __init__(self, first: int, second: float, third: str = "3"):

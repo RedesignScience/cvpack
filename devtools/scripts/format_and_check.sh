@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 set -e -v
 isort ./cvpack
 black --line-length 100 ./cvpack

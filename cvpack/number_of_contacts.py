@@ -62,7 +62,7 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
         cutoffDistance
             The distance beyond which an atom pair will be ignored
         switchingDistance
-            The distance beyond which a swithing function will be applied
+            The distance beyond which a switching function will be applied
 
     Example
     -------
