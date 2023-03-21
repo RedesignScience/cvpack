@@ -9,12 +9,13 @@
 
 from __future__ import annotations
 
-from typing import Sequence, Union
+from typing import Sequence
+
+import numpy as np
+import openmm
 from numpy.typing import ArrayLike
 
 from .cvpack import AbstractCollectiveVariable
-import openmm
-import numpy as np
 
 
 class MultilayerPerceptron(openmm.CustomCVForce, AbstractCollectiveVariable):
@@ -28,7 +29,7 @@ class MultilayerPerceptron(openmm.CustomCVForce, AbstractCollectiveVariable):
     where :math:`n` is the number of hidden layers in the network, :math:`{\\bf w}` is the vector
     of weights of the output layer, :math:`b` is the bias of the output layer, :math:`{\\bf f}_n`
     is the vector of outputs of the last hidden layer, and :math:`a` is the activation function.
-    The size of :math:`{\\bf w}` is equal to the number of neurons in the last hidden layer.
+    The size of :math:`{\\bf w}` is equal to the number of neurons in the n-th hidden layer.
 
     The output of the i-th hidden layer is computed as:
 
@@ -37,11 +38,12 @@ class MultilayerPerceptron(openmm.CustomCVForce, AbstractCollectiveVariable):
         {\\bf f}_i({\\bf r}) = a\\Big({\\bf W}_i {\\bf f}_{i-1}({\\bf r}) + {\\bf b}_i\\Big)
 
     where :math:`{\\bf W}_i` and :math:`{\\bf b}_i` are the weight matrix and bias vector of the
-    i-th hidden layer, respectively. The number of rows of :math:`{\\bf W}_i` and the size of
-    :math:`{\\bf b}_i` are equal to the number of neurons in the i-th hidden layer, while the
-    number of columns of :math:`{\\bf W}_i` is equal to the number of neurons in the previous layer.
-    The vector of inputs of the first hidden layer, :math:`{\\bf f}_0({\\bf r})`, is a set of
-    transformed collective variables.
+    i-th hidden layer, respectively. The activation function is applied element-wise to a vector
+    of any size. The number of rows of :math:`{\\bf W}_i` and the size of :math:`{\\bf b}_i` are
+    equal to the number of neurons in the i-th hidden layer, while the number of columns of
+    :math:`{\\bf W}_i` is equal to the number of neurons in the previous layer. The vector of inputs
+    of the first hidden layer, :math:`{\\bf f}_0({\\bf r})`, is a set of transformed collective
+    variables.
 
     Parameters
     ----------
@@ -61,10 +63,10 @@ class MultilayerPerceptron(openmm.CustomCVForce, AbstractCollectiveVariable):
             The bias vectors of the hidden layers
         activation_function
             The activation function to be used. It must be a function of a single variable named
-            ``x``. Defaults to ``x*erf(x)`` (the Gaussian error linear unit).
+            ``x``. Defaults to ``x*erf(x)``, the Gaussian error linear unit (GELU).
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         collective_variables: Sequence[openmm.Force],
         transformations: Sequence[str],
@@ -84,3 +86,4 @@ class MultilayerPerceptron(openmm.CustomCVForce, AbstractCollectiveVariable):
             if i > 0:
                 assert matrices[i - 1].shape[1] == matrix.shape[0], "Weight matrices do not conform"
             assert matrix.shape[0] == len(vector), "Wrong shape of bias vector"
+        super().__init__(activation_function)
