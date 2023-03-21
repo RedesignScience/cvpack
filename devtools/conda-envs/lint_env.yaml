@@ -8,6 +8,7 @@ dependencies:
   - openmmtools
   - mdtraj
   - numpy
+  - sympy
   - scipy
   - pytest
 

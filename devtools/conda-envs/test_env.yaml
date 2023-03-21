@@ -7,6 +7,7 @@ dependencies:
   - pip
   - openmm>=7.6
   - numpy<1.24
+  - sympy
   - pyyaml
   - importlib_resources
 

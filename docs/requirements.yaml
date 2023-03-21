@@ -5,6 +5,8 @@ dependencies:
     # Base depends
   - python
   - pip
+  - numpy
+  - sympy
   - openmm
   - sphinx
   - sphinxcontrib-bibtex

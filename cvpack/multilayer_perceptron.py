@@ -9,7 +9,9 @@
 
 from __future__ import annotations
 
-from typing import Sequence
+import functools
+import itertools
+from typing import Iterable, Sequence
 
 import numpy as np
 import openmm
@@ -20,43 +22,46 @@ from .cvpack import AbstractCollectiveVariable
 
 class MultilayerPerceptron(openmm.CustomCVForce, AbstractCollectiveVariable):
     """
-    A feed-forward neural network with single output, having other collective variables as inputs:
+    The single output of a feed-forward, fully connected neural network with :math:`N` inputs and
+    :math:`n+1` layers:
 
     .. math::
 
-        f({\\bf r}) = a\\Big({\\bf w}^T {\\bf f}_n({\\bf r}) + b\\Big)
+        f_{\\rm MLP}({\\bf r}) = f_n({\\bf r})
 
-    where :math:`n` is the number of hidden layers in the network, :math:`{\\bf w}` is the vector
-    of weights of the output layer, :math:`b` is the bias of the output layer, :math:`{\\bf f}_n`
-    is the vector of outputs of the last hidden layer, and :math:`a` is the activation function.
-    The size of :math:`{\\bf w}` is equal to the number of neurons in the n-th hidden layer.
-
-    The output of the i-th hidden layer is computed as:
+    where
 
     .. math::
 
-        {\\bf f}_i({\\bf r}) = a\\Big({\\bf W}_i {\\bf f}_{i-1}({\\bf r}) + {\\bf b}_i\\Big)
+        {\\bf f}_i({\\bf r}) = g\\Big({\\bf W}_i^T {\\bf f}_{i-1}({\\bf r}) + {\\bf b}_i\\Big)
+            \\qquad i = 1, \\ldots, n
 
-    where :math:`{\\bf W}_i` and :math:`{\\bf b}_i` are the weight matrix and bias vector of the
-    i-th hidden layer, respectively. The activation function is applied element-wise to a vector
-    of any size. The number of rows of :math:`{\\bf W}_i` and the size of :math:`{\\bf b}_i` are
-    equal to the number of neurons in the i-th hidden layer, while the number of columns of
-    :math:`{\\bf W}_i` is equal to the number of neurons in the previous layer. The vector of inputs
-    of the first hidden layer, :math:`{\\bf f}_0({\\bf r})`, is a set of transformed collective
-    variables.
+    and
+
+    .. math::
+
+        {\\bf f}_0({\\bf r}) = \\begin{bmatrix}
+            t_1(y_1({\\bf r})) \\\\
+            \\vdots \\\\
+            t_N(y_N({\\bf r}))
+        \\end{bmatrix}
+
+    In the equations above, :math:`{\\bf f}_i({\\bf r})` is the output of the i-th layer,
+    :math:`y_1({\\bf r}), \\ldots, y_N({\\bf r})` are the collective variables fed to the network,
+    :math:`t_1(x), \\ldots, t_N(x)` are transforms applied to these collective variables,
+    :math:`{\\bf W}_i` and :math:`{\\bf b}_i` are the weight matrix and bias vector of the i-th
+    layer, respectively, and :math:`g(x)` is the activation function, applicable element-wise to a
+    vector of any size.
+
+    The weight matrices must be conformable with respect to the product
+    :math:`{\\bf W}_1 {\\bf W}_2 \\cdots {\\bf W}_n`, whose result must be a column vector equal in
+    size to the number of neurons in the input layer. Each bias vector must be sized so that the
+    product :math:`{\\bf W}_i {\\bf b}_i` is also possible.
 
     Parameters
     ----------
         collective_variables
             The collective variables to be used as inputs
-        transformations
-            The transformations to be applied to the collective variables. Each transformation must
-            be a function of a single variable named ``x``, which will be replaced by the
-            corresponding collective variable.
-        output_weights
-            The weights of the output layer
-        output_bias
-            The bias of the output layer
         weight_matrices
             The weight matrices of the hidden layers
         bias_vectors
@@ -64,26 +69,57 @@ class MultilayerPerceptron(openmm.CustomCVForce, AbstractCollectiveVariable):
         activation_function
             The activation function to be used. It must be a function of a single variable named
             ``x``. Defaults to ``x*erf(x)``, the Gaussian error linear unit (GELU).
+        transforms
+            The transforms to be applied to the collective variables. Each transform must be a
+            function of a single variable named ``x``. Defaults to ``x`` for all collective
+            variables.
+
+    Examples
+    --------
+        >>> from cvpack import MultilayerPerceptron, Distance, Angle, Torsion
+        >>> import numpy as np
+        >>> from openmm import unit
+        >>> from openmmtools import testsystems
+        >>> model = testsystems.AlanineDipeptideVacuum()
+        >>> collective_variables = [
+        ...     Distance(0, 1),
+        ...     Distance(1, 2),
+        ...     Distance(2, 3),
+        ...     Angle(0, 1, 2),
+        ...     Angle(1, 2, 3),
+        ...     Torsion(0, 1, 2, 3),
+        ... ]
+        >>> mlp = MultilayerPerceptron(
+        ...     collective_variables,
+        ...     [np.ones((6, 3)), np.ones((3, 3)), np.ones((3, 1))],
+        ...     [np.ones(3), np.ones(3), np.ones(1)],
+        ...     transforms = ["1/x", "1/x", "x", "sin(x)", "sin(x)", "cos(x)"],
+        ... )
+
     """
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
         collective_variables: Sequence[openmm.Force],
-        transformations: Sequence[str],
-        output_weights: Sequence[float],
-        output_bias: float,
         weight_matrices: Sequence[ArrayLike],
         bias_vectors: Sequence[ArrayLike],
         activation_function: str = "x*erf(x)",
+        transforms: Iterable[str] = itertools.repeat("x"),
     ) -> None:
         num_inputs = len(collective_variables)
-        num_hidden_layers = len(weight_matrices)
-        assert len(transformations) == num_inputs, "Wrong number of transformations"
-        assert len(bias_vectors) == num_hidden_layers, "Wrong number of bias vectors"
-        matrices = [np.reshape(output_weights, (-1, 1))] + list(map(np.array, weight_matrices))
-        vectors = [np.reshape(output_bias, (1, 1))] + list(map(np.array, bias_vectors))
-        for i, (matrix, vector) in enumerate(zip(matrices, vectors)):
-            if i > 0:
-                assert matrices[i - 1].shape[1] == matrix.shape[0], "Weight matrices do not conform"
-            assert matrix.shape[0] == len(vector), "Wrong shape of bias vector"
+        matrices = [np.array(matrix) for matrix in weight_matrices]
+        vectors = [np.array(vector).ravel() for vector in bias_vectors]
+        input_data = list(zip(collective_variables, transforms))
+
+        # Sanity checks
+        assert len(input_data) == num_inputs, "Wrong number of transformations"
+        assert len(vectors) == len(matrices), "Wrong number of weight matrices or bias vectors"
+        try:
+            product = functools.reduce(np.dot, matrices)
+        except ValueError as error:
+            raise ValueError("Weight matrices do not conform") from error
+        assert product.shape == (num_inputs, 1), "Last weight matrix does not yield a single output"
+        assert all(
+            matrix.shape[1] == len(vector) for matrix, vector in zip(matrices, vectors)
+        ), "Bias vectors and weight matrices do not conform"
         super().__init__(activation_function)
