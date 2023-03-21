@@ -15,9 +15,13 @@ from typing import Iterable, Sequence
 
 import numpy as np
 import openmm
+
+import sympy
 from numpy.typing import ArrayLike
 
 from .cvpack import AbstractCollectiveVariable
+
+from sympy.abc import x
 
 
 class MultilayerPerceptron(openmm.CustomCVForce, AbstractCollectiveVariable):
@@ -109,7 +113,8 @@ class MultilayerPerceptron(openmm.CustomCVForce, AbstractCollectiveVariable):
         num_inputs = len(collective_variables)
         matrices = [np.array(matrix) for matrix in weight_matrices]
         vectors = [np.array(vector).ravel() for vector in bias_vectors]
-        input_data = list(zip(collective_variables, transforms))
+        input_data = list(zip(collective_variables, map(sympy.sympify, transforms)))
+        activation = sympy.sympify(activation_function)
 
         # Sanity checks
         assert len(input_data) == num_inputs, "Wrong number of transformations"
@@ -118,8 +123,13 @@ class MultilayerPerceptron(openmm.CustomCVForce, AbstractCollectiveVariable):
             product = functools.reduce(np.dot, matrices)
         except ValueError as error:
             raise ValueError("Weight matrices do not conform") from error
-        assert product.shape == (num_inputs, 1), "Last weight matrix does not yield a single output"
+        assert product.shape == (
+            num_inputs,
+            1,
+        ), "Weight matrices incompatible with number of provided CVs or with a single output"
         assert all(
             matrix.shape[1] == len(vector) for matrix, vector in zip(matrices, vectors)
         ), "Bias vectors and weight matrices do not conform"
+        assert activation.free_symbols == {x}, "Invalid activation function"
+        assert all(data[1].free_symbols == {x} for data in input_data), "Invalid transform"
         super().__init__(activation_function)
