@@ -53,7 +53,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
 
     Parameters
     ----------
-        atoms_per_group
+        atomsPerGroup
             The number of atoms in each group
         function
             The function to be evaluated. It must be a valid :OpenMM:`CustomCompoundBondForce`
@@ -115,15 +115,15 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        atoms_per_group: int,
+        atomsPerGroup: int,
         function: str,
         indices: ArrayLike,
         unit: UnitOrStr,
         pbc: bool = False,
         **parameters: Union[QuantityOrFloat, Sequence[QuantityOrFloat]],
     ) -> None:
-        groups = np.asarray(indices, dtype=np.int32).reshape(-1, atoms_per_group)
-        super().__init__(atoms_per_group, function)
+        groups = np.asarray(indices, dtype=np.int32).reshape(-1, atomsPerGroup)
+        super().__init__(atomsPerGroup, function)
         perbond_parameters = []
         for name, data in parameters.items():
             if isinstance(data, mmunit.Quantity):
@@ -139,7 +139,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         cv_unit = str_to_unit(unit) if isinstance(unit, str) else unit
         if in_md_units(mmunit.Quantity(1.0, cv_unit)) != 1:
             raise ValueError(f"Unit {cv_unit} is not compatible with the MD unit system.")
-        self._registerCV(cv_unit, atoms_per_group, function, groups, str(unit), pbc)
+        self._registerCV(cv_unit, atomsPerGroup, function, groups, str(unit), pbc)
 
     @classmethod
     def _fromCustomBondForce(
