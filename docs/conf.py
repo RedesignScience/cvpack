@@ -244,4 +244,5 @@ extlinks = {
 }
 
 # Copy button configuration
-copybutton_prompt_text = ">>> "
+copybutton_prompt_text = r">>> |\.\.\. "
+copybutton_prompt_is_regexp = True

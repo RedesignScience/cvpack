@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import Sequence, Union
+from typing import Sequence, Union, get_args
 
 import numpy as np
 import openmm
@@ -29,6 +29,13 @@ try:
 except ImportError:
     from typing_extensions import Self
 
+CustomForce = Union[
+    openmm.CustomBondForce,
+    openmm.CustomAngleForce,
+    openmm.CustomTorsionForce,
+    openmm.CustomCompoundBondForce,
+]
+
 
 class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable):
     """
@@ -43,13 +50,11 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
     where :math:`F` is a user-defined function and :math:`{\\bf r}_{i,j}` is the position of the
     :math:`j`-th atom of the :math:`i`-th group.
 
-    .. note::
-
-        The function :math:`F` is defined as a string and can be any expression supported by
-        :OpenMM:`CustomCompoundBondForce`. It can contain named parameters, which must be passed
-        as keyword arguments to the constructor. The parameters can be scalars or arrays of length
-        :math:`n`. In the latter case, each value of the array is used for the corresponding group
-        of atoms.
+    The function :math:`F` is defined as a string and can be any expression supported by
+    :OpenMM:`CustomCompoundBondForce`. If it contains named parameters, they must be passed as
+    keyword arguments to the :class:`AtomicFunction` constructor. The parameters can be scalars
+    or arrays of length :math:`m`. In the latter case, each value will be assigned to the
+    corresponding group of atoms.
 
     Parameters
     ----------
@@ -142,97 +147,46 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         self._registerCV(cv_unit, atomsPerGroup, function, groups, str(unit), pbc)
 
     @classmethod
-    def _fromCustomBondForce(
+    def _fromCustomForce(
         cls,
-        force: Union[openmm.CustomBondForce, openmm.CustomCompoundBondForce],
+        force: CustomForce,
         unit: UnitOrStr,
         pbc: bool = False,
     ) -> Self:
         """
-        Create a :class:`AtomicFunction` from an :OpenMM:`CustomBondForce` or
-        :OpenMM:`CustomCompoundBondForce`.
+        Create a :class:`AtomicFunction` from an object of :openmm:`CustomBondForce`,
+        :openmm:`CustomAngleForce`, :openmm:`CustomTorsionForce`, or
+        :openmm:`CustomCompoundBondForce` class.
         """
-        is_compound = isinstance(force, openmm.CustomCompoundBondForce)
-        atoms_per_group = force.getNumParticlesPerBond() if is_compound else 2
-        function = force.getEnergyFunction()
+        if isinstance(force, openmm.CustomBondForce):
+            number, item, definition = 2, "Bond", "; r=distance(p1, p2)"
+        elif isinstance(force, openmm.CustomAngleForce):
+            number, item, definition = 3, "Angle", "; theta=angle(p1, p2, p3)"
+        elif isinstance(force, openmm.CustomTorsionForce):
+            number, item, definition = 4, "Torsion", "; theta=dihedral(p1, p2, p3, p4)"
+        elif isinstance(force, openmm.CustomCompoundBondForce):
+            number, item, definition = force.getNumParticlesPerBond(), "Bond", ""
+        function = force.getEnergyFunction() + definition
         parameters = {}
         for i in range(force.getNumGlobalParameters()):
             name = force.getGlobalParameterName(i)
             value = force.getGlobalParameterDefaultValue(i)
             parameters[name] = value
-        perbond_parameter_names = []
-        for i in range(force.getNumPerBondParameters()):
-            perbond_parameter_names.append(force.getPerBondParameterName(i))
-        for name in perbond_parameter_names:
+        per_item_parameter_names = []
+        for i in range(getattr(force, f"getNumPer{item}Parameters")()):
+            per_item_parameter_names.append(getattr(force, f"getPer{item}ParameterName")(i))
+        for name in per_item_parameter_names:
             parameters[name] = []
         atoms = []
-        for i in range(force.getNumBonds()):
-            if is_compound:
-                indices, perbond_parameters = force.getBondParameters(i)
+        for i in range(getattr(force, f"getNum{item}s")()):
+            if isinstance(force, openmm.CustomCompoundBondForce):
+                indices, per_item_parameters = force.getBondParameters(i)
             else:
-                *indices, perbond_parameters = force.getBondParameters(i)
+                *indices, per_item_parameters = getattr(force, f"get{item}Parameters")(i)
             atoms.append(indices)
-            for name, value in zip(perbond_parameter_names, perbond_parameters):
+            for name, value in zip(per_item_parameter_names, per_item_parameters):
                 parameters[name].append(value)
-        return cls(atoms_per_group, function, atoms, unit, pbc, **parameters)
-
-    @classmethod
-    def _fromCustomAngleForce(
-        cls,
-        force: openmm.CustomAngleForce,
-        unit: UnitOrStr,
-        pbc: bool = False,
-    ) -> Self:
-        """
-        Create a :class:`AtomicFunction` from an :OpenMM:`CustomAngleForce`.
-        """
-        function = force.getEnergyFunction()
-        parameters = {}
-        for i in range(force.getNumGlobalParameters()):
-            name = force.getGlobalParameterName(i)
-            value = force.getGlobalParameterDefaultValue(i)
-            parameters[name] = value
-        perangle_parameter_names = []
-        for i in range(force.getNumPerAngleParameters()):
-            perangle_parameter_names.append(force.getPerAngleParameterName(i))
-        for name in perangle_parameter_names:
-            parameters[name] = []
-        atoms = []
-        for i in range(force.getNumAngles()):
-            *indices, perangle_parameters = force.getAngleParameters(i)
-            atoms.append(indices)
-            for name, value in zip(perangle_parameter_names, perangle_parameters):
-                parameters[name].append(value)
-        return cls(3, function, atoms, unit, pbc, **parameters)
-
-    @classmethod
-    def _fromCustomTorsionForce(
-        cls,
-        force: openmm.CustomTorsionForce,
-        unit: UnitOrStr,
-        pbc: bool = False,
-    ) -> Self:
-        """
-        Create a :class:`AtomicFunction` from an :OpenMM:`CustomTorsionForce`.
-        """
-        function = force.getEnergyFunction()
-        parameters = {}
-        for i in range(force.getNumGlobalParameters()):
-            name = force.getGlobalParameterName(i)
-            value = force.getGlobalParameterDefaultValue(i)
-            parameters[name] = value
-        pertorsion_parameter_names = []
-        for i in range(force.getNumPerTorsionParameters()):
-            pertorsion_parameter_names.append(force.getPerTorsionParameterName(i))
-        for name in pertorsion_parameter_names:
-            parameters[name] = []
-        atoms = []
-        for i in range(force.getNumTorsions()):
-            *indices, pertorsion_parameters = force.getTorsionParameters(i)
-            atoms.append(indices)
-            for name, value in zip(pertorsion_parameter_names, pertorsion_parameters):
-                parameters[name].append(value)
-        return cls(4, function, atoms, unit, pbc, **parameters)
+        return cls(number, function, atoms, unit, pbc, **parameters)
 
     @classmethod
     def _fromHarmonicBondForce(
@@ -292,7 +246,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
             parameters["k"].append(k)
         return cls(
             4,
-            "k*(1+cos(periodicity*angle(p1, p2, p3, p4)-phase))",
+            "k*(1 + cos(periodicity*dihedral(p1, p2, p3, p4) - phase))",
             atoms,
             unit,
             pbc,
@@ -320,17 +274,50 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         ------
             TypeError
                 If the force is not convertible to an :class:`AtomicFunction`
+
+        Examples
+        --------
+        >>> import cvpack
+        >>> import openmm
+        >>> from openmm import app, unit
+        >>> from openmmtools import testsystems
+        >>> model = testsystems.LysozymeImplicit()
+        >>> residues = [r for r in model.topology.residues() if 59 <= r.index <= 79]
+        >>> helix_content = cvpack.HelixTorsionContent(residues)
+        >>> model.system.addForce(helix_content)
+        6
+        >>> forces = {force.getName(): force for force in model.system.getForces()}
+        >>> copies = {
+        ...     name: cvpack.AtomicFunction.fromOpenMMForce(force, "kilojoules_per_mole")
+        ...     for name, force in forces.items()
+        ...     if name in ["HarmonicBondForce", "HarmonicAngleForce", "PeriodicTorsionForce"]
+        ... }
+        >>> copies["HelixTorsionContent"] = cvpack.AtomicFunction.fromOpenMMForce(
+        ...     helix_content, "dimensionless"
+        ... )
+        >>> [model.system.addForce(force) for force in copies.values()]
+        [7, 8, 9, 10]
+        >>> platform = openmm.Platform.getPlatformByName('Reference')
+        >>> integrator = openmm.VerletIntegrator(0)
+        >>> context = openmm.Context(model.system, integrator, platform)
+        >>> context.setPositions(model.positions)
+        >>> for name, force in copies.items():
+        ...    forces[name].setForceGroup(1)
+        ...    state = context.getState(getEnergy=True, groups={1})
+        ...    value = state.getPotentialEnergy().value_in_unit(unit.kilojoules_per_mole)
+        ...    print(f"{name}: original={value}, copy={force.getValue(context, digits=6)}")
+        ...    forces[name].setForceGroup(0)
+        HarmonicBondForce: original=2094.3124828597124, copy=2094.312483 kJ/mol
+        HarmonicAngleForce: original=3239.795214705211, copy=3239.795215 kJ/mol
+        PeriodicTorsionForce: original=4226.051934121031, copy=4226.051934 kJ/mol
+        HelixTorsionContent: original=17.452848762681054, copy=17.452849 dimensionless
         """
-        if isinstance(force, (openmm.CustomBondForce, openmm.CustomCompoundBondForce)):
-            return cls._fromCustomBondForce(force, unit, pbc)
+        if isinstance(force, get_args(CustomForce)):
+            return cls._fromCustomForce(force, unit, pbc)
         if isinstance(force, openmm.HarmonicBondForce):
             return cls._fromHarmonicBondForce(force, unit, pbc)
         if isinstance(force, openmm.HarmonicAngleForce):
             return cls._fromHarmonicAngleForce(force, unit, pbc)
         if isinstance(force, openmm.PeriodicTorsionForce):
             return cls._fromPeriodicTorsionForce(force, unit, pbc)
-        if isinstance(force, openmm.CustomAngleForce):
-            return cls._fromCustomAngleForce(force, unit, pbc)
-        if isinstance(force, openmm.CustomTorsionForce):
-            return cls._fromCustomTorsionForce(force, unit, pbc)
         raise TypeError(f"Force {force} is not a CustomCompoundBondForce.")
