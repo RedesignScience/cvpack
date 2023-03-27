@@ -7,7 +7,7 @@
 
 """
 
-from typing import Iterable
+from typing import Sequence
 
 import numpy as np
 import openmm
@@ -70,8 +70,8 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, AbstractCollectiveVariab
 
     def __init__(
         self,
-        firstList: Iterable[Iterable[int]],
-        secondList: Iterable[Iterable[int]],
+        firstList: Sequence[Sequence[int]],
+        secondList: Sequence[Sequence[int]],
         pbc: bool = False,
     ) -> None:
         function = f"0.5*(1 + cos(min(delta, {2*np.pi} - delta)))"

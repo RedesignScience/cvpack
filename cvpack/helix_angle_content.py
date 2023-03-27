@@ -7,18 +7,14 @@
 
 """
 
-from typing import Iterable
+from typing import Sequence, Union
 
 import openmm
 from openmm import app as mmapp
 from openmm import unit as mmunit
 
-from .cvpack import (
-    AbstractCollectiveVariable,
-    QuantityOrFloat,
-    SerializableResidue,
-    in_md_units,
-)
+from .cvpack import AbstractCollectiveVariable, SerializableResidue
+from .unit import convert_quantities
 
 
 class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
@@ -91,12 +87,13 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
         18.76058 dimensionless
     """
 
+    @convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        residues: Iterable[mmapp.topology.Residue],
+        residues: Sequence[mmapp.topology.Residue],
         pbc: bool = False,
-        thetaReference: QuantityOrFloat = 88 * mmunit.degrees,
-        tolerance: QuantityOrFloat = 15 * mmunit.degrees,
+        thetaReference: Union[mmunit.Quantity, float] = mmunit.Quantity(88, mmunit.degrees),
+        tolerance: Union[mmunit.Quantity, float] = mmunit.Quantity(15, mmunit.degrees),
         halfExponent: int = 3,
         normalize: bool = False,
     ) -> None:
@@ -106,10 +103,11 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
                     return atom.index
             raise ValueError(f"Could not find atom CA in residue {residue.name}{residue.id}")
 
-        theta_ref, tol = map(in_md_units, [thetaReference, tolerance])
         num_angles = len(residues) - 2
         numerator = 1 / num_angles if normalize else 1
-        super().__init__(f"{numerator}/(1+x^{2*halfExponent}); x=(theta-{theta_ref})/{tol}")
+        super().__init__(
+            f"{numerator}/(1+x^{2*halfExponent}); x=(theta-{thetaReference})/{tolerance}"
+        )
         for i in range(1, len(residues) - 1):
             self.addAngle(
                 find_alpha_carbon(residues[i - 1]),
@@ -118,5 +116,12 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
                 [],
             )
         self.setUsesPeriodicBoundaryConditions(pbc)
-        res = [SerializableResidue(r) for r in residues]
-        self._registerCV(mmunit.dimensionless, res, pbc, theta_ref, tol, halfExponent, normalize)
+        self._registerCV(  # pylint: disable=duplicate-code
+            mmunit.dimensionless,
+            list(map(SerializableResidue, residues)),
+            pbc,
+            thetaReference,
+            tolerance,
+            halfExponent,
+            normalize,
+        )

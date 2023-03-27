@@ -7,75 +7,16 @@
 
 """
 
-import ast
 import inspect
 from collections import OrderedDict
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 import openmm
 from openmm import app as mmapp
 from openmm import unit as mmunit
 
-QuantityOrFloat = Union[mmunit.Quantity, float]
-UnitOrStr = Union[mmunit.Unit, str]
-
-
-def in_md_units(quantity: QuantityOrFloat) -> float:
-    """
-    Returns the numerical value of a quantity in a unit of measurement compatible with the
-    Molecular Dynamics unit system (mass in Da, distance in nm, time in ps, temperature in K,
-    energy in kJ/mol, angle in rad).
-
-    Parameters
-    ----------
-        quantity
-            The quantity to be converted
-
-    Returns
-    -------
-        The numerical value of the quantity in the MD unit system
-    """
-    if mmunit.is_quantity(quantity):
-        value = quantity.value_in_unit_system(mmunit.md_unit_system)
-    else:
-        value = quantity
-    return value
-
-
-def str_to_unit(unitStr: str) -> mmunit.Unit:
-    """
-    Returns an OpenMM unit of measurement from its string representation.
-
-    Parameters
-    ----------
-        unitStr
-            The string representation of the unit to be converted
-
-    Returns
-    -------
-        The OpenMM unit of measurement
-    """
-
-    class NodeTransformer(ast.NodeTransformer):
-        """
-        A child class of ast.NodeTransformer that replaces all instances of ast.Name with
-        an ast.Attribute with the value "mmunit" and the attribute name equal to the original
-        id of the ast.Name.
-        """
-
-        def visit_Name(self, node: ast.Name) -> ast.Attribute:  # pylint: disable=invalid-name
-            """
-            Replace an instance of ast.Name with an ast.Attribute with the value "mmunit" and
-            the attribute name equal to the original id of the ast.Name.
-            """
-            mod = ast.Name(id="mmunit", ctx=ast.Load())
-            return ast.Attribute(value=mod, attr=node.id, ctx=ast.Load())
-
-    tree = NodeTransformer().visit(ast.parse(unitStr, mode="eval"))
-    return eval(  # pylint: disable=eval-used
-        compile(ast.fix_missing_locations(tree), "", mode="eval")
-    )
+from .unit import in_md_units
 
 
 class SerializableResidue(mmapp.topology.Residue):
@@ -97,8 +38,8 @@ class AbstractCollectiveVariable(openmm.Force):
     An abstract class with common attributes and method for all CVs.
     """
 
-    _unit = mmunit.dimensionless
-    _args = {}
+    _unit: mmunit.Unit = mmunit.dimensionless
+    _args: Dict[str, Any] = {}
 
     def __getstate__(self) -> Dict[str, Any]:
         return self._args
@@ -174,7 +115,7 @@ class AbstractCollectiveVariable(openmm.Force):
             >>> import cvpack
             >>> args, defaults = cvpack.RadiusOfGyration.getArguments()
             >>> print(*args.items())
-            ('group', typing.Iterable[int]) ('pbc', <class 'bool'>) ('weighByMass', <class 'bool'>)
+            ('group', typing.Sequence[int]) ('pbc', <class 'bool'>) ('weighByMass', <class 'bool'>)
             >>> print(*defaults.items())
             ('pbc', False) ('weighByMass', False)
         """
@@ -218,7 +159,7 @@ class AbstractCollectiveVariable(openmm.Force):
         """
         state = self._getSingleForceState(context, getEnergy=True)
         value = in_md_units(state.getPotentialEnergy())
-        return (round(value, digits) if digits else value) * self.getUnit()
+        return mmunit.Quantity(round(value, digits) if digits else value, self.getUnit())
 
     def getEffectiveMass(
         self, context: openmm.Context, digits: Optional[int] = None
@@ -266,9 +207,10 @@ class AbstractCollectiveVariable(openmm.Force):
         """
         state = self._getSingleForceState(context, getForces=True)
         force_values = in_md_units(state.getForces(asNumpy=True))
-        indices = np.arange(context.getSystem().getNumParticles())
-        masses_with_units = map(context.getSystem().getParticleMass, indices)
-        mass_values = np.array(list(map(in_md_units, masses_with_units)))
+        mass_values = [
+            in_md_units(context.getSystem().getParticleMass(i))
+            for i in range(context.getSystem().getNumParticles())
+        ]
         effective_mass = 1.0 / np.sum(np.sum(force_values**2, axis=1) / mass_values)
         unit = mmunit.dalton * (mmunit.nanometers / self.getUnit()) ** 2
-        return (round(effective_mass, digits) if digits else effective_mass) * unit
+        return mmunit.Quantity(round(effective_mass, digits) if digits else effective_mass, unit)

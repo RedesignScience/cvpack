@@ -7,7 +7,7 @@ import inspect
 import io
 import itertools
 import sys
-from typing import Iterable
+from typing import Sequence
 
 import mdtraj
 import numpy as np
@@ -226,7 +226,7 @@ def test_number_of_contacts():
 
 def run_rmsd_test(
     coordinates: np.ndarray,
-    group: Iterable[int],
+    group: Sequence[int],
     passGroupOnly: bool,
     passVec3: bool,
 ) -> None:

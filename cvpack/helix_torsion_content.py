@@ -7,18 +7,14 @@
 
 """
 
-from typing import Iterable
+from typing import Sequence, Union
 
 import openmm
 from openmm import app as mmapp
 from openmm import unit as mmunit
 
-from .cvpack import (
-    AbstractCollectiveVariable,
-    QuantityOrFloat,
-    SerializableResidue,
-    in_md_units,
-)
+from .cvpack import AbstractCollectiveVariable, SerializableResidue
+from .unit import convert_quantities
 
 
 class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable):
@@ -102,13 +98,14 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
         17.452849 dimensionless
     """
 
+    @convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        residues: Iterable[mmapp.topology.Residue],
+        residues: Sequence[mmapp.topology.Residue],
         pbc: bool = False,
-        phiReference: QuantityOrFloat = -63.8 * mmunit.degrees,
-        psiReference: QuantityOrFloat = -41.1 * mmunit.degrees,
-        tolerance: QuantityOrFloat = 25 * mmunit.degrees,
+        phiReference: Union[mmunit.Quantity, float] = mmunit.Quantity(-63.8, mmunit.degrees),
+        psiReference: Union[mmunit.Quantity, float] = mmunit.Quantity(-41.1, mmunit.degrees),
+        tolerance: Union[mmunit.Quantity, float] = mmunit.Quantity(25, mmunit.degrees),
         halfExponent: int = 3,
         normalize: bool = False,
     ) -> None:
@@ -118,9 +115,8 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
                     return atom.index
             raise ValueError(f"Could not find atom {name} in residue {residue.name}{residue.id}")
 
-        phi_ref, psi_ref, tol = map(in_md_units, [phiReference, psiReference, tolerance])
         numerator = 1 / (2 * (len(residues) - 2)) if normalize else 1 / 2
-        super().__init__(f"{numerator}/(1+x^{2*halfExponent}); x=(theta-theta_ref)/{tol}")
+        super().__init__(f"{numerator}/(1+x^{2*halfExponent}); x=(theta-theta_ref)/{tolerance}")
         self.addPerTorsionParameter("theta_ref")
         for i in range(1, len(residues) - 1):
             self.addTorsion(
@@ -128,15 +124,22 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
                 find_atom(residues[i], "N"),
                 find_atom(residues[i], "CA"),
                 find_atom(residues[i], "C"),
-                [phi_ref],
+                [phiReference],
             )
             self.addTorsion(
                 find_atom(residues[i], "N"),
                 find_atom(residues[i], "CA"),
                 find_atom(residues[i], "C"),
                 find_atom(residues[i + 1], "N"),
-                [psi_ref],
+                [psiReference],
             )
         self.setUsesPeriodicBoundaryConditions(pbc)
-        res = [SerializableResidue(r) for r in residues]
-        self._registerCV(mmunit.dimensionless, res, pbc, phi_ref, psi_ref, tol, halfExponent)
+        self._registerCV(  # pylint: disable=duplicate-code
+            mmunit.dimensionless,
+            list(map(SerializableResidue, residues)),
+            pbc,
+            phiReference,
+            psiReference,
+            tolerance,
+            halfExponent,
+        )

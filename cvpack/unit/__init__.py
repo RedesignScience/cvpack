@@ -7,4 +7,4 @@
 
 """
 
-from .unit import in_md_units, convert_quantities, str_to_unit
+from .unit import SerializableUnit, convert_quantities, in_md_units  # noqa: F401

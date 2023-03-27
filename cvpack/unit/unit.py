@@ -61,21 +61,24 @@ class _NodeTransformer(ast.NodeTransformer):
         return ast.Attribute(value=mod, attr=node.id, ctx=ast.Load())
 
 
-def str_to_unit(string: str) -> unit.Unit:
+class SerializableUnit(unit.Unit):
     """
-    Convert a string representation of a unit into an instance of openmm.unit.Unit.
-
-    Parameters
-    ----------
-        string
-            A string representation of a unit.
-
-    Returns
-    -------
-        unit.Unit
-            An instance of openmm.unit.Unit.
+    A child class of openmm.unit.Unit that can be serialized and deserialized.
     """
-    tree = _NodeTransformer().visit(ast.parse(string, mode="eval"))
-    return eval(  # pylint: disable=eval-used
-        compile(ast.fix_missing_locations(tree), "", mode="eval")
-    )
+
+    def __init__(self, base_or_scaled_units):
+        if isinstance(base_or_scaled_units, unit.Unit):
+            self.__dict__ = base_or_scaled_units.__dict__
+        elif isinstance(base_or_scaled_units, str):
+            tree = _NodeTransformer().visit(ast.parse(base_or_scaled_units, mode="eval"))
+            self.__dict__ = eval(  # pylint: disable=eval-used
+                compile(ast.fix_missing_locations(tree), "", mode="eval")
+            ).__dict__
+        else:
+            super().__init__(base_or_scaled_units)
+
+    def __getstate__(self):
+        return {"description": self.__repr__()}
+
+    def __setstate__(self, keywords) -> None:
+        self.__init__(keywords["description"])

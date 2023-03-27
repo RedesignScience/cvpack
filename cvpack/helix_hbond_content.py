@@ -8,18 +8,14 @@
 """
 
 import re as regex
-from typing import Iterable, Pattern
+from typing import Pattern, Sequence, Union
 
 import openmm
 from openmm import app as mmapp
 from openmm import unit as mmunit
 
-from .cvpack import (
-    AbstractCollectiveVariable,
-    QuantityOrFloat,
-    SerializableResidue,
-    in_md_units,
-)
+from .cvpack import AbstractCollectiveVariable, SerializableResidue
+from .unit import convert_quantities
 
 
 class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
@@ -81,11 +77,12 @@ class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
         15.88038 dimensionless
     """
 
+    @convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        residues: Iterable[mmapp.topology.Residue],
+        residues: Sequence[mmapp.topology.Residue],
         pbc: bool = False,
-        thresholdDistance: QuantityOrFloat = 0.33 * mmunit.nanometers,
+        thresholdDistance: Union[mmunit.Quantity, float] = mmunit.Quantity(0.33, mmunit.nanometers),
         halfExponent: int = 3,
         normalize: bool = False,
     ) -> None:
@@ -99,9 +96,8 @@ class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
                 f" in residue {residue.name}{residue.id}"
             )
 
-        threshold = in_md_units(thresholdDistance)
         numerator = 1 / (len(residues) - 4) if normalize else 1
-        super().__init__(f"{numerator}/(1+x^{2*halfExponent}); x=r/{threshold}")
+        super().__init__(f"{numerator}/(1+x^{2*halfExponent}); x=r/{thresholdDistance}")
         hydrogen_pattern = regex.compile("\\b(H|1H|HN1|HT1|H1|HN)\\b")
         oxygen_pattern = regex.compile("\\b(O|OCT1|OC1|OT1|O1)\\b")
         for i in range(4, len(residues)):
@@ -111,5 +107,11 @@ class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
                 [],
             )
         self.setUsesPeriodicBoundaryConditions(pbc)
-        res = [SerializableResidue(r) for r in residues]
-        self._registerCV(mmunit.dimensionless, res, pbc, threshold, halfExponent, normalize)
+        self._registerCV(  # pylint: disable=duplicate-code
+            mmunit.dimensionless,
+            list(map(SerializableResidue, residues)),
+            pbc,
+            thresholdDistance,
+            halfExponent,
+            normalize,
+        )
