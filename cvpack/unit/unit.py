@@ -13,39 +13,34 @@ import ast
 import inspect
 from functools import wraps
 
-from openmm import unit as _unit
+from openmm import unit
 
 
-def in_md_units(quantity):
+def in_md_units(val):
     """
     Return the numerical value of a quantity in the MD unit system (e.g. mass in Da, distance in nm,
     time in ps, temperature in K, energy in kJ/mol, angle in rad).
     """
-    if isinstance(quantity, _unit.Quantity):
-        return quantity.value_in_unit_system(_unit.md_unit_system)
-    return quantity
+    if isinstance(val, unit.Quantity):
+        return val.value_in_unit_system(unit.md_unit_system)
+    return val
 
 
-def with_values_in_md_units(func):
+def convert_quantities(func):
     """
-    A decorator that converts all instances of openmm.unit.Quantity in a function's arguments
-    to their numerical values in the MD unit system (e.g. mass in Da, distance in nm, time in ps,
-    temperature in K, energy in kJ/mol, angle in rad).
+    A decorator that converts all instances of openmm.unit.Quantity in a function's list of
+    arguments to their numerical values in the MD unit system (e.g. mass in Da, distance in nm,
+    time in ps, charge in e, temperature in K, angle in rad, energy in kJ/mol).
     """
-    # create a new signature with converted Quantity defaults and update the function's signature
     sig = inspect.signature(func)
-    func.__signature__ = sig.replace(
-        parameters=[
-            parameter.replace(default=in_md_units(parameter.default))
-            for parameter in sig.parameters.values()
-        ]
-    )
 
     @wraps(func)
     def wrapper(*args, **kwargs):
-        converted_args = map(in_md_units, args)
-        converted_kwargs = dict(zip(kwargs.keys(), map(in_md_units, kwargs.values())))
-        return func(*converted_args, **converted_kwargs)
+        bound = sig.bind(*args, **kwargs)
+        bound.apply_defaults()
+        for name, value in bound.arguments.items():
+            bound.arguments[name] = in_md_units(value)
+        return func(*bound.args, **bound.kwargs)
 
     return wrapper
 
@@ -53,41 +48,34 @@ def with_values_in_md_units(func):
 class _NodeTransformer(ast.NodeTransformer):
     """
     A child class of ast.NodeTransformer that replaces all instances of ast.Name with
-    an ast.Attribute with the value "mmunit" and the attribute name equal to the original
+    an ast.Attribute with the value "unit" and the attribute name equal to the original
     id of the ast.Name.
     """
 
     def visit_Name(self, node: ast.Name) -> ast.Attribute:  # pylint: disable=invalid-name
         """
-        Replace an instance of ast.Name with an ast.Attribute with the value "mmunit" and
+        Replace an instance of ast.Name with an ast.Attribute with the value "unit" and
         the attribute name equal to the original id of the ast.Name.
         """
-        mod = ast.Name(id="_unit", ctx=ast.Load())
+        mod = ast.Name(id="unit", ctx=ast.Load())
         return ast.Attribute(value=mod, attr=node.id, ctx=ast.Load())
 
 
-class Unit(_unit.Unit):
+def str_to_unit(string: str) -> unit.Unit:
     """
-    A child class of openmm.unit.Unit that allows for serialization and deserialization.
+    Convert a string representation of a unit into an instance of openmm.unit.Unit.
+
+    Parameters
+    ----------
+        string
+            A string representation of a unit.
+
+    Returns
+    -------
+        unit.Unit
+            An instance of openmm.unit.Unit.
     """
-
-    def __getstate__(self):
-        return {"description": str(self)}
-
-    def __setstate__(self, keywords) -> None:
-        tree = _NodeTransformer().visit(ast.parse(keywords["description"], mode="eval"))
-        self.__dict__ = eval(  # pylint: disable=eval-used
-            compile(ast.fix_missing_locations(tree), "", mode="eval")
-        ).__dict__
-
-
-class Quantity(_unit.Quantity):
-    """
-    A child class of openmm.unit.Quantity that allows for serialization and deserialization.
-    """
-
-    def __getstate__(self):
-        return {"value": self._value, "unit": self._unit}
-
-    def __setstate__(self, keywords):
-        self.__init__(keywords["value"], keywords["unit"])
+    tree = _NodeTransformer().visit(ast.parse(string, mode="eval"))
+    return eval(  # pylint: disable=eval-used
+        compile(ast.fix_missing_locations(tree), "", mode="eval")
+    )
