@@ -7,9 +7,10 @@
 
 """
 
-from typing import Iterable
+from typing import Sequence
 
 import openmm
+from openmm import unit as mmunit
 
 from .cvpack import AbstractCollectiveVariable, UnitOrStr, in_md_units, str_to_unit
 
@@ -51,7 +52,7 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         groups
             The groups of atoms to be used in the function. Each group must be a list of atom
             indices
-        unit
+        cvUnit
             The unit of measurement of the collective variable. It must be compatible with the
             MD unit system (mass in `daltons`, distance in `nanometers`, time in `picoseconds`,
             temperature in `kelvin`, energy in `kilojoules_per_mol`, angle in `radians`). If
@@ -93,8 +94,8 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
     def __init__(  # pylint: disable=too-many-arguments
         self,
         function: str,
-        groups: Iterable[Iterable[int]],
-        unit: UnitOrStr,
+        groups: Sequence[Sequence[int]],
+        cvUnit: mmunit.Unit,
         pbc: bool = False,
         weighByMass: bool = False,
     ) -> None:
@@ -104,7 +105,7 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
             self.addGroup(group, None if weighByMass else [1] * len(group))
         self.addBond(list(range(num_groups)), [])
         self.setUsesPeriodicBoundaryConditions(pbc)
-        cv_unit = str_to_unit(unit) if isinstance(unit, str) else unit
-        if in_md_units(1 * cv_unit) != 1:
+        cv_unit = cvUnit if isinstance(cvUnit, mmunit.Unit) else str_to_unit(cvUnit)
+        if in_md_units(mmunit.Quantity(1, cv_unit)) != 1:
             raise ValueError(f"Unit {cv_unit} is not compatible with the MD unit system.")
-        self._registerCV(cv_unit, function, groups, str(unit), pbc)
+        self._registerCV(cv_unit, function, groups, str(cv_unit), pbc)
