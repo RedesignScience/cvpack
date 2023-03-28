@@ -14,7 +14,8 @@ from typing import Any, Dict, Optional, Tuple
 import numpy as np
 import openmm
 from openmm import app as mmapp
-from openmm import unit as mmunit
+
+from cvpack import unit as mmunit
 
 from .unit import in_md_units
 
@@ -86,16 +87,16 @@ class AbstractCollectiveVariable(openmm.Force):
         Raises
         ------
             ValueError
-                If this force is not part of the system in the given context
+                If this force is not present in the given context
         """
         forces = context.getSystem().getForces()
         if not any(force.this == self.this for force in forces):
-            raise RuntimeError("This force is not part of the system in the given context.")
+            raise RuntimeError("This force is not present in the given context.")
         free_groups = set(range(32)) - set(f.getForceGroup() for f in forces)
         old_group = self.getForceGroup()
         new_group = next(iter(free_groups))
         self.setForceGroup(new_group)
-        state = context.getState(getEnergy=getEnergy, getForces=getForces, groups={new_group})
+        state = context.getState(getEnergy=getEnergy, getForces=getForces, groups=1 << new_group)
         self.setForceGroup(old_group)
         return state
 

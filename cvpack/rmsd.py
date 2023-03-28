@@ -11,7 +11,8 @@ from typing import Sequence, Union
 
 import numpy as np
 import openmm
-from openmm import unit as mmunit
+
+from cvpack import unit as mmunit
 
 from .cvpack import AbstractCollectiveVariable, in_md_units
 

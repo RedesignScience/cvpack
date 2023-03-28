@@ -13,7 +13,7 @@ from __future__ import annotations
 import ast
 import inspect
 from functools import wraps
-from typing import List, Sequence, Union, Protocol, Any
+from typing import Any, Protocol, Sequence, Union
 
 import numpy as np
 import openmm

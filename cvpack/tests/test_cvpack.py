@@ -111,7 +111,7 @@ def test_cv_is_in_context():
     context.setPositions(model.positions)
     with pytest.raises(RuntimeError) as excinfo:
         rg_cv.getValue(context)
-    assert str(excinfo.value) == "This force is not part of the system in the given context."
+    assert str(excinfo.value) == "This force is not present in the given context."
 
 
 def test_distance():

@@ -18,7 +18,8 @@ except ImportError:
     from importlib_resources import files
 
 from openmm import app as mmapp
-from openmm import unit as mmunit
+
+from cvpack import unit as mmunit
 
 from .cvpack import AbstractCollectiveVariable, SerializableResidue
 from .rmsd import RMSD

@@ -10,7 +10,8 @@
 from typing import Sequence
 
 import openmm
-from openmm import unit as mmunit
+
+from cvpack import unit as mmunit
 
 from .cvpack import AbstractCollectiveVariable
 
