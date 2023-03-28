@@ -7,7 +7,7 @@
 
 """
 
-from typing import Sequence, Union
+from typing import Sequence
 
 import openmm
 from openmm import app as mmapp
@@ -15,7 +15,6 @@ from openmm import app as mmapp
 from cvpack import unit as mmunit
 
 from .cvpack import AbstractCollectiveVariable, SerializableResidue
-from .unit import convert_quantities
 
 
 class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable):
@@ -99,14 +98,14 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
         17.452849 dimensionless
     """
 
-    @convert_quantities
+    @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
         residues: Sequence[mmapp.topology.Residue],
         pbc: bool = False,
-        phiReference: Union[mmunit.Quantity, float] = mmunit.Quantity(-63.8, mmunit.degrees),
-        psiReference: Union[mmunit.Quantity, float] = mmunit.Quantity(-41.1, mmunit.degrees),
-        tolerance: Union[mmunit.Quantity, float] = mmunit.Quantity(25, mmunit.degrees),
+        phiReference: mmunit.ScalarQuantity = mmunit.Quantity(-63.8, mmunit.degrees),
+        psiReference: mmunit.ScalarQuantity = mmunit.Quantity(-41.1, mmunit.degrees),
+        tolerance: mmunit.ScalarQuantity = mmunit.Quantity(25, mmunit.degrees),
         halfExponent: int = 3,
         normalize: bool = False,
     ) -> None:

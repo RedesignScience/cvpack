@@ -7,7 +7,7 @@
 
 """
 
-from typing import Sequence, Union
+from typing import Sequence
 
 import openmm
 from openmm import app as mmapp
@@ -15,7 +15,6 @@ from openmm import app as mmapp
 from cvpack import unit as mmunit
 
 from .cvpack import AbstractCollectiveVariable, SerializableResidue
-from .unit import convert_quantities
 
 
 class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
@@ -88,13 +87,13 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
         18.76058 dimensionless
     """
 
-    @convert_quantities
+    @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
         residues: Sequence[mmapp.topology.Residue],
         pbc: bool = False,
-        thetaReference: Union[mmunit.Quantity, float] = mmunit.Quantity(88, mmunit.degrees),
-        tolerance: Union[mmunit.Quantity, float] = mmunit.Quantity(15, mmunit.degrees),
+        thetaReference: mmunit.ScalarQuantity = mmunit.Quantity(88, mmunit.degrees),
+        tolerance: mmunit.ScalarQuantity = mmunit.Quantity(15, mmunit.degrees),
         halfExponent: int = 3,
         normalize: bool = False,
     ) -> None:

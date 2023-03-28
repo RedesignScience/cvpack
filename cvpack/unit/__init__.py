@@ -14,29 +14,15 @@ import ast
 import inspect
 from functools import wraps
 from numbers import Real
-from typing import List, Protocol, Sequence, Union
+from typing import List, Sequence, Union
 
 import numpy as np
 import openmm
 from openmm import unit as _mmunit
 
-
-class ScalarQuantity(Protocol):  # pylint: disable=too-few-public-methods
-    """A protocol for single-valued quantities."""
-
-    _value: float
-    unit: openmm.unit.Unit
-
-
-class ArrayQuantity(Protocol):  # pylint: disable=too-few-public-methods
-    """A protocol for array-valued quantities."""
-
-    _value: Union[np.ndarray, Sequence[openmm.Vec3]]
-    unit: openmm.unit.Unit
-
-
-ScalarValue = Union[ScalarQuantity, Real]
-Coordinates = Union[ArrayQuantity, np.ndarray, Sequence[openmm.Vec3]]
+ScalarQuantity = Union[_mmunit.Quantity, Real]
+VectorQuantity = Union[_mmunit.Quantity, openmm.Vec3]
+MatrixQuantity = Union[_mmunit.Quantity, np.ndarray, Sequence[openmm.Vec3]]
 
 
 class _NodeTransformer(ast.NodeTransformer):
@@ -138,8 +124,8 @@ class SerializableQuantity(_mmunit.Quantity):
 
 
 def in_md_units(  # pylint: disable=redefined-outer-name
-    quantity: Union[ScalarValue, Coordinates]
-) -> Union[float, np.ndarray, List[openmm.Vec3]]:
+    quantity: Union[ScalarQuantity, VectorQuantity, MatrixQuantity]
+) -> Union[float, np.ndarray, openmm.Vec3, List[openmm.Vec3]]:
     """
     Return the numerical value of a quantity in the MD unit system (e.g. mass in Da, distance in nm,
     time in ps, temperature in K, energy in kJ/mol, angle in rad).
@@ -188,7 +174,7 @@ def in_md_units(  # pylint: disable=redefined-outer-name
         return float(value)
     if isinstance(value, Sequence) and isinstance(value[0], openmm.Vec3):
         return [openmm.Vec3(*vec) for vec in value]
-    if isinstance(value, np.ndarray):
+    if isinstance(value, (np.ndarray, openmm.Vec3)):
         return value
     raise TypeError(f"Cannot convert {quantity} to MD units")
 

@@ -8,7 +8,7 @@
 """
 
 import re as regex
-from typing import Pattern, Sequence, Union
+from typing import Pattern, Sequence
 
 import openmm
 from openmm import app as mmapp
@@ -16,7 +16,6 @@ from openmm import app as mmapp
 from cvpack import unit as mmunit
 
 from .cvpack import AbstractCollectiveVariable, SerializableResidue
-from .unit import convert_quantities
 
 
 class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
@@ -78,12 +77,12 @@ class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
         15.88038 dimensionless
     """
 
-    @convert_quantities
+    @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
         residues: Sequence[mmapp.topology.Residue],
         pbc: bool = False,
-        thresholdDistance: Union[mmunit.Quantity, float] = mmunit.Quantity(0.33, mmunit.nanometers),
+        thresholdDistance: mmunit.ScalarQuantity = mmunit.Quantity(0.33, mmunit.nanometers),
         halfExponent: int = 3,
         normalize: bool = False,
     ) -> None:

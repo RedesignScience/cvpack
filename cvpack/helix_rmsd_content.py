@@ -7,23 +7,22 @@
 
 """
 
-from typing import List, Sequence, Union
+import sys
+from typing import List, Sequence
 
 import numpy as np
 import openmm
-
-try:
-    from importlib.resources import files
-except ImportError:
-    from importlib_resources import files
-
 from openmm import app as mmapp
 
 from cvpack import unit as mmunit
 
 from .cvpack import AbstractCollectiveVariable, SerializableResidue
 from .rmsd import RMSD
-from .unit import convert_quantities
+
+if sys.version_info >= (3, 9):
+    from importlib import resources
+else:
+    import importlib_resources as resources
 
 
 class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
@@ -112,16 +111,16 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
     """
 
     _ideal_helix_positions = 0.1 * np.loadtxt(
-        files("cvpack").joinpath("data").joinpath("ideal_alpha_helix.csv"),
+        str(resources.files("cvpack").joinpath("data").joinpath("ideal_alpha_helix.csv")),
         delimiter=",",
     )
 
-    @convert_quantities
+    @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
         residues: Sequence[mmapp.topology.Residue],
         numAtoms: int,
-        thresholdRMSD: Union[mmunit.Quantity, float] = mmunit.Quantity(0.08, mmunit.nanometers),
+        thresholdRMSD: mmunit.ScalarQuantity = mmunit.Quantity(0.08, mmunit.nanometers),
         halfExponent: int = 3,
         normalize: bool = False,
     ) -> None:

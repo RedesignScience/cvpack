@@ -7,14 +7,15 @@
 
 """
 
-from typing import Sequence, Union
+import copy
+from typing import Sequence
 
 import numpy as np
 import openmm
 
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable, in_md_units
+from .cvpack import AbstractCollectiveVariable
 
 
 class RMSD(openmm.RMSDForce, AbstractCollectiveVariable):
@@ -84,20 +85,21 @@ class RMSD(openmm.RMSDForce, AbstractCollectiveVariable):
 
     """
 
+    @mmunit.convert_quantities
     def __init__(
         self,
-        referencePositions: Union[np.ndarray, Sequence[openmm.Vec3], mmunit.Quantity],
+        referencePositions: mmunit.MatrixQuantity,
         group: Sequence[int],
         numAtoms: int,
     ) -> None:
-        coords = in_md_units(referencePositions)
+        coords = referencePositions
         num_coords = coords.shape[0] if isinstance(coords, np.ndarray) else len(coords)
         if num_coords == len(group):
             positions = np.zeros((numAtoms, 3))
             for i, atom in enumerate(group):
                 positions[atom, :] = np.array([coords[i][j] for j in range(3)])
         elif num_coords == numAtoms:
-            positions = coords.copy()
+            positions = copy.deepcopy(coords)
             coords = np.array([positions[atom] for atom in group])
         else:
             raise ValueError("Invalid number of coordinates")
