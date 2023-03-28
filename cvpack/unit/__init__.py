@@ -13,7 +13,8 @@ from __future__ import annotations
 import ast
 import inspect
 from functools import wraps
-from typing import Any, Protocol, Sequence, Union
+from numbers import Real
+from typing import List, Protocol, Sequence, Union
 
 import numpy as np
 import openmm
@@ -34,7 +35,7 @@ class ArrayQuantity(Protocol):  # pylint: disable=too-few-public-methods
     unit: openmm.unit.Unit
 
 
-ScalarValue = Union[ScalarQuantity, float]
+ScalarValue = Union[ScalarQuantity, Real]
 Coordinates = Union[ArrayQuantity, np.ndarray, Sequence[openmm.Vec3]]
 
 
@@ -136,7 +137,9 @@ class SerializableQuantity(_mmunit.Quantity):
         self.__init__(keywords["value"], keywords["unit"])
 
 
-def in_md_units(quantity: Any) -> Any:  # pylint: disable=redefined-outer-name
+def in_md_units(  # pylint: disable=redefined-outer-name
+    quantity: Union[ScalarValue, Coordinates]
+) -> Union[float, np.ndarray, List[openmm.Vec3]]:
     """
     Return the numerical value of a quantity in the MD unit system (e.g. mass in Da, distance in nm,
     time in ps, temperature in K, energy in kJ/mol, angle in rad).
@@ -165,24 +168,29 @@ def in_md_units(quantity: Any) -> Any:  # pylint: disable=redefined-outer-name
         1.0
         >>> in_md_units(1.0*femtosecond)
         0.001
-        >>> round(in_md_units(1.0*degree), 8)
-        0.01745329
-        >>> in_md_units(array([1, 2, 4])*angstrom)
-        array([0.1, 0.2, 0.4])
+        >>> in_md_units(1.0*degree)
+        0.017453292519943295
+        >>> in_md_units(array([1, 2, 3])*angstrom)
+        array([0.1, 0.2, 0.3])
         >>> in_md_units([Vec3(1, 2, 4), Vec3(5, 8, 9)]*angstrom)
         [Vec3(x=0.1, y=0.2, z=0.4), Vec3(x=0.5, y=0.8, z=0.9)]
+        >>> try:
+        ...     in_md_units([1, 2, 3]*angstrom)
+        ... except TypeError as error:
+        ...     print(error)
+        Cannot convert [1, 2, 3] A to MD units
     """
     if isinstance(quantity, _mmunit.Quantity):
         value = quantity.value_in_unit_system(_mmunit.md_unit_system)
     else:
         value = quantity
-    if isinstance(value, float):
+    if isinstance(value, Real):
         return float(value)
     if isinstance(value, Sequence) and isinstance(value[0], openmm.Vec3):
         return [openmm.Vec3(*vec) for vec in value]
     if isinstance(value, np.ndarray):
-        return np.array(value)
-    return value
+        return value
+    raise TypeError(f"Cannot convert {quantity} to MD units")
 
 
 def convert_quantities(func):
@@ -218,7 +226,8 @@ def convert_quantities(func):
         bound = sig.bind(*args, **kwargs)
         bound.apply_defaults()
         for name, value in bound.arguments.items():
-            bound.arguments[name] = in_md_units(value)
+            if isinstance(value, _mmunit.Quantity):
+                bound.arguments[name] = value.value_in_unit_system(_mmunit.md_unit_system)
         return func(*bound.args, **bound.kwargs)
 
     return wrapper
