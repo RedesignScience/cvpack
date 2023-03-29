@@ -10,11 +10,18 @@
 from __future__ import annotations
 
 import sys
-from typing import Sequence, Union, get_args
+from typing import Sequence, Union
 
 import numpy as np
 import openmm
 from numpy.typing import ArrayLike
+from openmm import (
+    CustomAngleForce,
+    CustomBondForce,
+    CustomCompoundBondForce,
+    CustomExternalForce,
+    CustomTorsionForce,
+)
 
 from cvpack import unit as mmunit
 
@@ -24,13 +31,6 @@ if sys.version_info >= (3, 11):
     from typing import Self
 else:
     from typing_extensions import Self
-
-CustomForce = Union[
-    openmm.CustomBondForce,
-    openmm.CustomAngleForce,
-    openmm.CustomTorsionForce,
-    openmm.CustomCompoundBondForce,
-]
 
 
 class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable):
@@ -147,7 +147,13 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
     @classmethod
     def _fromCustomForce(
         cls,
-        force: CustomForce,
+        force: Union[
+            CustomAngleForce,
+            CustomBondForce,
+            CustomCompoundBondForce,
+            CustomExternalForce,
+            CustomTorsionForce,
+        ],
         unit: mmunit.Unit,
         pbc: bool = False,
     ) -> Self:
@@ -156,7 +162,9 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         :openmm:`CustomAngleForce`, :openmm:`CustomTorsionForce`, or
         :openmm:`CustomCompoundBondForce` class.
         """
-        if isinstance(force, openmm.CustomBondForce):
+        if isinstance(force, openmm.CustomExternalForce):
+            number, item, definition = 1, "Particle", "; x=x1; y=y1; z=z1"
+        elif isinstance(force, openmm.CustomBondForce):
             number, item, definition = 2, "Bond", "; r=distance(p1, p2)"
         elif isinstance(force, openmm.CustomAngleForce):
             number, item, definition = 3, "Angle", "; theta=angle(p1, p2, p3)"
@@ -277,25 +285,39 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         --------
         >>> import cvpack
         >>> import openmm
-        >>> from openmm import app
+        >>> from collections import deque
         >>> from cvpack import unit
+        >>> from openmm import app
         >>> from openmmtools import testsystems
         >>> model = testsystems.LysozymeImplicit()
         >>> residues = [r for r in model.topology.residues() if 59 <= r.index <= 79]
         >>> helix_content = cvpack.HelixTorsionContent(residues)
         >>> model.system.addForce(helix_content)
         6
+        >>> num_atoms = model.system.getNumParticles()
+        >>> mean_x = openmm.CustomExternalForce("x/num_atoms")
+        >>> mean_x.addGlobalParameter("num_atoms", num_atoms)
+        0
+        >>> deque(map(mean_x.addParticle, range(num_atoms), [[]] * num_atoms), maxlen=0)
+        deque([], maxlen=0)
+        >>> model.system.addForce(mean_x)
+        7
         >>> forces = {force.getName(): force for force in model.system.getForces()}
         >>> copies = {
         ...     name: cvpack.AtomicFunction.fromOpenMMForce(force, unit.kilojoules_per_mole)
         ...     for name, force in forces.items()
-        ...     if name in ["HarmonicBondForce", "HarmonicAngleForce", "PeriodicTorsionForce"]
+        ...     if name in [
+        ...         "HarmonicBondForce",
+        ...         "HarmonicAngleForce",
+        ...         "PeriodicTorsionForce",
+        ...         "CustomExternalForce"
+        ...     ]
         ... }
         >>> copies["HelixTorsionContent"] = cvpack.AtomicFunction.fromOpenMMForce(
         ...     helix_content, unit.dimensionless
         ... )
         >>> [model.system.addForce(force) for force in copies.values()]
-        [7, 8, 9, 10]
+        [8, 9, 10, 11, 12]
         >>> platform = openmm.Platform.getPlatformByName('Reference')
         >>> integrator = openmm.VerletIntegrator(0)
         >>> context = openmm.Context(model.system, integrator, platform)
@@ -304,14 +326,24 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         ...    forces[name].setForceGroup(1)
         ...    state = context.getState(getEnergy=True, groups={1})
         ...    value = state.getPotentialEnergy().value_in_unit(unit.kilojoules_per_mole)
-        ...    print(f"{name}: original={value}, copy={force.getValue(context, digits=6)}")
+        ...    print(f"{name}: original={value:.6f}, copy={force.getValue(context, digits=6)}")
         ...    forces[name].setForceGroup(0)
-        HarmonicBondForce: original=2094.3124828597124, copy=2094.312483 kJ/mol
-        HarmonicAngleForce: original=3239.795214705211, copy=3239.795215 kJ/mol
-        PeriodicTorsionForce: original=4226.051934121031, copy=4226.051934 kJ/mol
-        HelixTorsionContent: original=17.452848762681054, copy=17.452849 dimensionless
+        HarmonicBondForce: original=2094.312483, copy=2094.312483 kJ/mol
+        HarmonicAngleForce: original=3239.795215, copy=3239.795215 kJ/mol
+        PeriodicTorsionForce: original=4226.051934, copy=4226.051934 kJ/mol
+        CustomExternalForce: original=5.021558, copy=5.021558 kJ/mol
+        HelixTorsionContent: original=17.452849, copy=17.452849 dimensionless
         """
-        if isinstance(force, get_args(CustomForce)):
+        if isinstance(
+            force,
+            (
+                CustomAngleForce,
+                CustomBondForce,
+                CustomCompoundBondForce,
+                CustomExternalForce,
+                CustomTorsionForce,
+            ),
+        ):
             return cls._fromCustomForce(force, unit, pbc)
         if isinstance(force, openmm.HarmonicBondForce):
             return cls._fromHarmonicBondForce(force, unit, pbc)
