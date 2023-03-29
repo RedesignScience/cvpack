@@ -9,6 +9,7 @@ dependencies:
   - numpy<1.24
   - pyyaml
   - importlib_resources
+  - typing_extensions
 
     # Testing
   - scipy
