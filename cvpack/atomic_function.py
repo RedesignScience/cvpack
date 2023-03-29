@@ -87,20 +87,16 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         >>> import cvpack
         >>> import openmm
         >>> import numpy as np
-        >>> from openmm import unit
+        >>> from cvpack import unit
         >>> from openmmtools import testsystems
         >>> model = testsystems.AlanineDipeptideVacuum()
-        >>> angle = cvpack.Angle(0, 11, 21)
-        >>> colvar = cvpack.AtomicFunction('angle(p1, p2, p3)', [0, 11, 21], unit.radians, False)
-        >>> [model.system.addForce(f) for f in [angle, colvar]]
-        [5, 6]
         >>> angle1 = cvpack.Angle(0, 5, 10)
         >>> angle2 = cvpack.Angle(10, 15, 20)
         >>> colvar = cvpack.AtomicFunction(
         ...     3,
-        ...     '(k/2)*(angle(p1, p2, p3) - theta0)^2',
+        ...     "(k/2)*(angle(p1, p2, p3) - theta0)^2",
         ...     [[0, 5, 10], [10, 15, 20]],
-        ...     "kilojoules_per_mole",
+        ...     unit.kilojoules_per_mole,
         ...     k = 1000 * unit.kilojoules_per_mole/unit.radian**2,
         ...     theta0 = [np.pi/2, np.pi/3] * unit.radian,
         ... )
@@ -118,6 +114,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         429.479028 kJ/mol
     """
 
+    @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
         atomsPerGroup: int,
@@ -144,7 +141,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         if mmunit.Quantity(1, unit).value_in_unit_system(mmunit.md_unit_system) != 1:
             raise ValueError(f"Unit {unit} is not compatible with the MD unit system.")
         self._registerCV(
-            unit, atomsPerGroup, function, groups, mmunit.SerializableUnit(unit), pbc, parameters
+            unit, atomsPerGroup, function, groups, mmunit.SerializableUnit(unit), pbc, **parameters
         )
 
     @classmethod
@@ -280,7 +277,8 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         --------
         >>> import cvpack
         >>> import openmm
-        >>> from openmm import app, unit
+        >>> from openmm import app
+        >>> from cvpack import unit
         >>> from openmmtools import testsystems
         >>> model = testsystems.LysozymeImplicit()
         >>> residues = [r for r in model.topology.residues() if 59 <= r.index <= 79]
@@ -289,12 +287,12 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         6
         >>> forces = {force.getName(): force for force in model.system.getForces()}
         >>> copies = {
-        ...     name: cvpack.AtomicFunction.fromOpenMMForce(force, "kilojoules_per_mole")
+        ...     name: cvpack.AtomicFunction.fromOpenMMForce(force, unit.kilojoules_per_mole)
         ...     for name, force in forces.items()
         ...     if name in ["HarmonicBondForce", "HarmonicAngleForce", "PeriodicTorsionForce"]
         ... }
         >>> copies["HelixTorsionContent"] = cvpack.AtomicFunction.fromOpenMMForce(
-        ...     helix_content, "dimensionless"
+        ...     helix_content, unit.dimensionless
         ... )
         >>> [model.system.addForce(force) for force in copies.values()]
         [7, 8, 9, 10]
