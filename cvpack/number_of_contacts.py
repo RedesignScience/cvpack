@@ -7,12 +7,13 @@
 
 """
 
-from typing import Iterable
+from typing import Sequence
 
 import openmm
-from openmm import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable, QuantityOrFloat, in_md_units
+from cvpack import unit as mmunit
+
+from .cvpack import AbstractCollectiveVariable
 
 
 class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
@@ -85,18 +86,19 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
 
     """
 
+    @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        group1: Iterable[int],
-        group2: Iterable[int],
+        group1: Sequence[int],
+        group2: Sequence[int],
         numAtoms: int,
         pbc: bool = False,
         stepFunction: str = "1/(1+x^6)",
-        thresholdDistance: QuantityOrFloat = 0.3,
-        cutoffDistance: QuantityOrFloat = 0.6,
-        switchingDistance: QuantityOrFloat = 0.5,
+        thresholdDistance: mmunit.ScalarQuantity = mmunit.Quantity(0.3, mmunit.nanometers),
+        cutoffDistance: mmunit.ScalarQuantity = mmunit.Quantity(0.6, mmunit.nanometers),
+        switchingDistance: mmunit.ScalarQuantity = mmunit.Quantity(0.5, mmunit.nanometers),
     ) -> None:
-        super().__init__(stepFunction + f"; x=r/{in_md_units(thresholdDistance)}")
+        super().__init__(stepFunction + f"; x=r/{thresholdDistance}")
         nonbonded_method = self.CutoffPeriodic if pbc else self.CutoffNonPeriodic
         self.setNonbondedMethod(nonbonded_method)
         for _ in range(numAtoms):
@@ -113,7 +115,7 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
             numAtoms,
             pbc,
             stepFunction,
-            in_md_units(thresholdDistance),
-            in_md_units(cutoffDistance),
-            in_md_units(switchingDistance),
+            thresholdDistance,
+            cutoffDistance,
+            switchingDistance,
         )

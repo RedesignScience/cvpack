@@ -7,11 +7,14 @@
 
 """
 
-from typing import Iterable
+from typing import Sequence
 
 import openmm
 
-from .cvpack import AbstractCollectiveVariable, UnitOrStr, in_md_units, str_to_unit
+from cvpack import unit as mmunit
+
+from .cvpack import AbstractCollectiveVariable
+from .unit import SerializableUnit
 
 
 class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable):
@@ -49,10 +52,11 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
     -------
         >>> import cvpack
         >>> import openmm
+        >>> from openmm import unit
         >>> from openmmtools import testsystems
         >>> model = testsystems.AlanineDipeptideVacuum()
         >>> angle = cvpack.Angle(0, 11, 21)
-        >>> colvar = cvpack.AtomicFunction('angle(p1, p2, p3)', [0, 11, 21], "radians", False)
+        >>> colvar = cvpack.AtomicFunction('angle(p1, p2, p3)', [0, 11, 21], unit.radians, False)
         >>> [model.system.addForce(f) for f in [angle, colvar]]
         [5, 6]
         >>> integrator =openmm.VerletIntegrator(0)
@@ -68,14 +72,13 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
     def __init__(
         self,
         function: str,
-        group: Iterable[int],
-        unit: UnitOrStr,
+        group: Sequence[int],
+        unit: mmunit.Unit,
         pbc: bool = False,
     ) -> None:
         super().__init__(len(group), function)
         self.addBond(group, [])
         self.setUsesPeriodicBoundaryConditions(pbc)
-        cv_unit = str_to_unit(unit) if isinstance(unit, str) else unit
-        if in_md_units(1 * cv_unit) != 1:
-            raise ValueError(f"Unit {cv_unit} is not compatible with the MD unit system.")
-        self._registerCV(cv_unit, function, group, str(unit), pbc)
+        if mmunit.Quantity(1, unit).value_in_unit_system(mmunit.md_unit_system) != 1:
+            raise ValueError(f"Unit {unit} is not compatible with the MD unit system.")
+        self._registerCV(unit, function, group, SerializableUnit(unit), pbc)
