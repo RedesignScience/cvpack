@@ -214,6 +214,14 @@ def convert_quantities(func):
         for name, value in bound.arguments.items():
             if isinstance(value, _mmunit.Quantity):
                 bound.arguments[name] = value.value_in_unit_system(_mmunit.md_unit_system)
+            elif isinstance(value, (list, tuple)):
+                bound.arguments[name] = type(value)(
+                    item.value_in_unit_system(_mmunit.md_unit_system)
+                    if isinstance(item, _mmunit.Quantity)
+                    else item
+                    for item in value
+                )
+
         return func(*bound.args, **bound.kwargs)
 
     return wrapper
