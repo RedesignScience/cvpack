@@ -1,10 +1,10 @@
 """
-.. package:: unit
+.. module:: unit
    :platform: Linux, MacOS, Windows
    :synopsis: This module explicitly exports OpenMM's unit module classes and
                 constants for type annotation purposes.
 
-.. moduleauthor:: Charlles Abreu <ccode raabreu@gmail.com>
+.. moduleauthor:: Charlles Abreu <craabreu@gmail.com>
 
 """
 
@@ -21,8 +21,8 @@ import openmm
 from openmm import unit as _mmunit
 
 ScalarQuantity = Union[_mmunit.Quantity, Real]
-VectorQuantity = Union[_mmunit.Quantity, openmm.Vec3]
-MatrixQuantity = Union[_mmunit.Quantity, np.ndarray, Sequence[openmm.Vec3]]
+VectorQuantity = Union[_mmunit.Quantity, np.ndarray, openmm.Vec3]
+MatrixQuantity = Union[_mmunit.Quantity, np.ndarray, Sequence[openmm.Vec3], Sequence[np.ndarray]]
 
 
 class _NodeTransformer(ast.NodeTransformer):
@@ -172,8 +172,11 @@ def in_md_units(  # pylint: disable=redefined-outer-name
         value = quantity
     if isinstance(value, Real):
         return float(value)
-    if isinstance(value, Sequence) and isinstance(value[0], openmm.Vec3):
-        return [openmm.Vec3(*vec) for vec in value]
+    if isinstance(value, Sequence):
+        if isinstance(value[0], openmm.Vec3):
+            return [openmm.Vec3(*vec) for vec in value]
+        if isinstance(value[0], np.ndarray):
+            return np.vstack(value)
     if isinstance(value, (np.ndarray, openmm.Vec3)):
         return value
     raise TypeError(f"Cannot convert {quantity} to MD units")
@@ -214,6 +217,14 @@ def convert_quantities(func):
         for name, value in bound.arguments.items():
             if isinstance(value, _mmunit.Quantity):
                 bound.arguments[name] = value.value_in_unit_system(_mmunit.md_unit_system)
+            elif isinstance(value, (list, tuple)):
+                bound.arguments[name] = type(value)(
+                    item.value_in_unit_system(_mmunit.md_unit_system)
+                    if isinstance(item, _mmunit.Quantity)
+                    else item
+                    for item in value
+                )
+
         return func(*bound.args, **bound.kwargs)
 
     return wrapper
