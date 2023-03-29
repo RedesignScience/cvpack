@@ -351,4 +351,4 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
             return cls._fromHarmonicAngleForce(force, unit, pbc)
         if isinstance(force, openmm.PeriodicTorsionForce):
             return cls._fromPeriodicTorsionForce(force, unit, pbc)
-        raise TypeError(f"Force {force} is not a CustomCompoundBondForce.")
+        raise TypeError(f"Force {force} is not convertible to an AtomicFunction")
