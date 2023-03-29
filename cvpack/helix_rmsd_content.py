@@ -7,26 +7,22 @@
 
 """
 
-from typing import Iterable, List
+import sys
+from typing import List, Sequence
 
 import numpy as np
 import openmm
-
-try:
-    from importlib.resources import files
-except ImportError:
-    from importlib_resources import files
-
 from openmm import app as mmapp
-from openmm import unit as mmunit
 
-from .cvpack import (
-    AbstractCollectiveVariable,
-    QuantityOrFloat,
-    SerializableResidue,
-    in_md_units,
-)
+from cvpack import unit as mmunit
+
+from .cvpack import AbstractCollectiveVariable, SerializableResidue
 from .rmsd import RMSD
+
+if sys.version_info >= (3, 9):
+    from importlib import resources
+else:
+    import importlib_resources as resources
 
 
 class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
@@ -115,22 +111,23 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
     """
 
     _ideal_helix_positions = 0.1 * np.loadtxt(
-        files("cvpack").joinpath("data").joinpath("ideal_alpha_helix.csv"),
+        str(resources.files("cvpack").joinpath("data").joinpath("ideal_alpha_helix.csv")),
         delimiter=",",
     )
 
+    @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        residues: Iterable[mmapp.topology.Residue],
+        residues: Sequence[mmapp.topology.Residue],
         numAtoms: int,
-        thresholdRMSD: QuantityOrFloat = 0.08 * mmunit.nanometers,
+        thresholdRMSD: mmunit.ScalarQuantity = mmunit.Quantity(0.08, mmunit.nanometers),
         halfExponent: int = 3,
         normalize: bool = False,
     ) -> None:
         assert 6 <= len(residues) <= 37, "The number of residues must be between 6 and 37"
 
         def step_function(i):
-            return f"1/(1 + (rmsd{i+1}/{in_md_units(thresholdRMSD)})^{2*halfExponent})"
+            return f"1/(1 + (rmsd{i+1}/{thresholdRMSD})^{2*halfExponent})"
 
         def atoms_list(residue: mmapp.topology.Residue) -> List[int]:
             indices = {}
@@ -152,11 +149,11 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
             group = sum(atoms[i : i + 6], [])
             self.addCollectiveVariable(f"rmsd{i+1}", RMSD(positions, group, numAtoms))
 
-        self._registerCV(
+        self._registerCV(  # pylint: disable=duplicate-code
             mmunit.dimensionless,
-            [SerializableResidue(r) for r in residues],
+            list(map(SerializableResidue, residues)),
             numAtoms,
-            in_md_units(thresholdRMSD),
+            thresholdRMSD,
             halfExponent,
             normalize,
         )

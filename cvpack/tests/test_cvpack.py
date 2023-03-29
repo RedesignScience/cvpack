@@ -7,7 +7,7 @@ import inspect
 import io
 import itertools
 import sys
-from typing import Iterable
+from typing import Sequence
 
 import mdtraj
 import numpy as np
@@ -111,7 +111,7 @@ def test_cv_is_in_context():
     context.setPositions(model.positions)
     with pytest.raises(RuntimeError) as excinfo:
         rg_cv.getValue(context)
-    assert str(excinfo.value) == "This force is not part of the system in the given context."
+    assert str(excinfo.value) == "This force is not present in the given context."
 
 
 def test_distance():
@@ -226,7 +226,7 @@ def test_number_of_contacts():
 
 def run_rmsd_test(
     coordinates: np.ndarray,
-    group: Iterable[int],
+    group: Sequence[int],
     passGroupOnly: bool,
     passVec3: bool,
 ) -> None:

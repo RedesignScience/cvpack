@@ -7,11 +7,14 @@
 
 """
 
-from typing import Iterable
+from typing import Sequence
 
 import openmm
 
-from .cvpack import AbstractCollectiveVariable, UnitOrStr, in_md_units, str_to_unit
+from cvpack import unit as mmunit
+
+from .cvpack import AbstractCollectiveVariable
+from .unit import SerializableUnit
 
 
 class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):
@@ -68,6 +71,7 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
     -------
         >>> import cvpack
         >>> import openmm
+        >>> from openmm import unit
         >>> from openmmtools import testsystems
         >>> model = testsystems.AlanineDipeptideVacuum()
         >>> num_atoms = model.system.getNumParticles()
@@ -77,7 +81,7 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         >>> sum_dist_sq = "+".join(f'd{i+1}^2' for i in atoms)
         >>> function = ";".join([f"sqrt(({sum_dist_sq})/{num_atoms})"] + definitions)
         >>> groups = [[i] for i in atoms] + [atoms]
-        >>> colvar = cvpack.CentroidFunction(function, groups, "nanometers")
+        >>> colvar = cvpack.CentroidFunction(function, groups, unit.nanometers)
         >>> [model.system.addForce(f) for f in [rg, colvar]]
         [5, 6]
         >>> integrator =openmm.VerletIntegrator(0)
@@ -93,8 +97,8 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
     def __init__(  # pylint: disable=too-many-arguments
         self,
         function: str,
-        groups: Iterable[Iterable[int]],
-        unit: UnitOrStr,
+        groups: Sequence[Sequence[int]],
+        unit: mmunit.Unit,
         pbc: bool = False,
         weighByMass: bool = False,
     ) -> None:
@@ -104,7 +108,6 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
             self.addGroup(group, None if weighByMass else [1] * len(group))
         self.addBond(list(range(num_groups)), [])
         self.setUsesPeriodicBoundaryConditions(pbc)
-        cv_unit = str_to_unit(unit) if isinstance(unit, str) else unit
-        if in_md_units(1 * cv_unit) != 1:
-            raise ValueError(f"Unit {cv_unit} is not compatible with the MD unit system.")
-        self._registerCV(cv_unit, function, groups, str(unit), pbc)
+        if mmunit.Quantity(1, unit).value_in_unit_system(mmunit.md_unit_system) != 1:
+            raise ValueError(f"Unit {unit} is not compatible with the MD unit system.")
+        self._registerCV(unit, function, groups, SerializableUnit(unit), pbc)

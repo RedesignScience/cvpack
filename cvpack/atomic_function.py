@@ -9,24 +9,20 @@
 
 from __future__ import annotations
 
+import sys
 from typing import Sequence, Union, get_args
 
 import numpy as np
 import openmm
 from numpy.typing import ArrayLike
-from openmm import unit as mmunit
 
-from .cvpack import (
-    AbstractCollectiveVariable,
-    QuantityOrFloat,
-    UnitOrStr,
-    in_md_units,
-    str_to_unit,
-)
+from cvpack import unit as mmunit
 
-try:
+from .cvpack import AbstractCollectiveVariable
+
+if sys.version_info >= (3, 11):
     from typing import Self
-except ImportError:
+else:
     from typing_extensions import Self
 
 CustomForce = Union[
@@ -94,6 +90,10 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         >>> from openmm import unit
         >>> from openmmtools import testsystems
         >>> model = testsystems.AlanineDipeptideVacuum()
+        >>> angle = cvpack.Angle(0, 11, 21)
+        >>> colvar = cvpack.AtomicFunction('angle(p1, p2, p3)', [0, 11, 21], unit.radians, False)
+        >>> [model.system.addForce(f) for f in [angle, colvar]]
+        [5, 6]
         >>> angle1 = cvpack.Angle(0, 5, 10)
         >>> angle2 = cvpack.Angle(10, 15, 20)
         >>> colvar = cvpack.AtomicFunction(
@@ -123,9 +123,9 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         atomsPerGroup: int,
         function: str,
         indices: ArrayLike,
-        unit: UnitOrStr,
+        unit: mmunit.Unit,
         pbc: bool = False,
-        **parameters: Union[QuantityOrFloat, Sequence[QuantityOrFloat]],
+        **parameters: Union[mmunit.ScalarQuantity, Sequence[mmunit.ScalarQuantity]],
     ) -> None:
         groups = np.asarray(indices, dtype=np.int32).reshape(-1, atomsPerGroup)
         super().__init__(atomsPerGroup, function)
@@ -141,16 +141,17 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         for group, *values in zip(groups, *perbond_parameters):
             self.addBond(group, values)
         self.setUsesPeriodicBoundaryConditions(pbc)
-        cv_unit = str_to_unit(unit) if isinstance(unit, str) else unit
-        if in_md_units(mmunit.Quantity(1.0, cv_unit)) != 1:
-            raise ValueError(f"Unit {cv_unit} is not compatible with the MD unit system.")
-        self._registerCV(cv_unit, atomsPerGroup, function, groups, str(unit), pbc)
+        if mmunit.Quantity(1, unit).value_in_unit_system(mmunit.md_unit_system) != 1:
+            raise ValueError(f"Unit {unit} is not compatible with the MD unit system.")
+        self._registerCV(
+            unit, atomsPerGroup, function, groups, mmunit.SerializableUnit(unit), pbc, parameters
+        )
 
     @classmethod
     def _fromCustomForce(
         cls,
         force: CustomForce,
-        unit: UnitOrStr,
+        unit: mmunit.Unit,
         pbc: bool = False,
     ) -> Self:
         """
@@ -192,7 +193,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
     def _fromHarmonicBondForce(
         cls,
         force: openmm.HarmonicBondForce,
-        unit: UnitOrStr,
+        unit: mmunit.Unit,
         pbc: bool = False,
     ) -> Self:
         """
@@ -211,7 +212,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
     def _fromHarmonicAngleForce(
         cls,
         force: openmm.HarmonicAngleForce,
-        unit: UnitOrStr,
+        unit: mmunit.Unit,
         pbc: bool = False,
     ) -> Self:
         """
@@ -230,7 +231,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
     def _fromPeriodicTorsionForce(
         cls,
         force: openmm.PeriodicTorsionForce,
-        unit: UnitOrStr,
+        unit: mmunit.Unit,
         pbc: bool = False,
     ) -> Self:
         """
@@ -254,7 +255,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         )
 
     @classmethod
-    def fromOpenMMForce(cls, force: openmm.Force, unit: UnitOrStr, pbc: bool = False) -> Self:
+    def fromOpenMMForce(cls, force: openmm.Force, unit: mmunit.Unit, pbc: bool = False) -> Self:
         """
         Create an :class:`AtomicFunction` from an :OpenMM:`Force`.
 
