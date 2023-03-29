@@ -456,9 +456,9 @@ def test_atomic_function():
     np.random.shuffle(atoms)
     function = "+".join(f"distance(p{i+1}, p{i+2})" for i in range(num_atoms - 1))
     with pytest.raises(ValueError) as excinfo:
-        colvar = cvpack.AtomicFunction(function, atoms, unit.angstrom)
+        colvar = cvpack.AtomicFunction(num_atoms, function, atoms, unit.angstrom)
     assert str(excinfo.value) == "Unit angstrom is not compatible with the MD unit system."
-    colvar = cvpack.AtomicFunction(function, atoms, unit.nanometers)
+    colvar = cvpack.AtomicFunction(num_atoms, function, atoms, unit.nanometers)
     model.system.addForce(colvar)
     context = openmm.Context(
         model.system, openmm.VerletIntegrator(0), openmm.Platform.getPlatformByName("Reference")

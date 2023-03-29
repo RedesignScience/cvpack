@@ -3,6 +3,10 @@
 ignored-modules=openmm.unit
 ignore=_version.py
 
+[DESIGN]
+
+max-locals=20  # Maximum number of local variables for function/method body
+
 [BASIC]
 
 method-naming-style=camelCase

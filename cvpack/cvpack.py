@@ -48,7 +48,7 @@ class AbstractCollectiveVariable(openmm.Force):
     def __setstate__(self, keywords: Dict[str, Any]) -> None:
         self.__init__(**keywords)
 
-    def _registerCV(self, unit: mmunit.Unit, *args: Any) -> None:
+    def _registerCV(self, unit: mmunit.Unit, *args: Any, **kwargs: Any) -> None:
         """
         Register the newly created AbstractCollectiveVariable subclass instance.
 
@@ -62,11 +62,14 @@ class AbstractCollectiveVariable(openmm.Force):
                 kJ/mol, angle in rad).
             args
                 The arguments needed to construct this collective variable
+            kwargs
+                The keyword arguments needed to construct this collective variable
         """
         self.setName(self.__class__.__name__)
         self.setUnit(unit)
         arguments, _ = self.getArguments()
         self._args = dict(zip(arguments, args))
+        self._args.update(kwargs)
 
     def _getSingleForceState(
         self, context: openmm.Context, getEnergy: bool = False, getForces: bool = False
