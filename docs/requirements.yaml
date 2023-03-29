@@ -4,6 +4,8 @@ channels:
 dependencies:
     # Base depends
   - python
+  - importlib_resources
+  - typing_extensions
   - pip
   - openmm
   - sphinx
