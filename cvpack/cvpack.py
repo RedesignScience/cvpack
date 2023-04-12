@@ -17,7 +17,7 @@ from openmm import app as mmapp
 
 from cvpack import unit as mmunit
 
-from .unit import in_md_units
+from .unit import value_in_md_units
 
 
 class SerializableResidue(mmapp.topology.Residue):
@@ -162,7 +162,7 @@ class AbstractCollectiveVariable(openmm.Force):
                 The number of digits to round to
         """
         state = self._getSingleForceState(context, getEnergy=True)
-        value = in_md_units(state.getPotentialEnergy())
+        value = value_in_md_units(state.getPotentialEnergy())
         return mmunit.Quantity(round(value, digits) if digits else value, self.getUnit())
 
     def getEffectiveMass(
@@ -210,9 +210,9 @@ class AbstractCollectiveVariable(openmm.Force):
             30.946932 Da
         """
         state = self._getSingleForceState(context, getForces=True)
-        force_values = in_md_units(state.getForces(asNumpy=True))
+        force_values = value_in_md_units(state.getForces(asNumpy=True))
         mass_values = [
-            in_md_units(context.getSystem().getParticleMass(i))
+            value_in_md_units(context.getSystem().getParticleMass(i))
             for i in range(context.getSystem().getNumParticles())
         ]
         effective_mass = 1.0 / np.sum(np.sum(force_values**2, axis=1) / mass_values)
