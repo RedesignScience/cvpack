@@ -4,6 +4,7 @@
 from ._version import __version__  # noqa: F401
 from .angle import Angle  # noqa: F401
 from .atomic_function import AtomicFunction  # noqa: F401
+from .attraction_strength import AttractionStrength  # noqa: F401
 from .centroid_function import CentroidFunction  # noqa: F401
 from .distance import Distance  # noqa: F401
 from .helix_angle_content import HelixAngleContent  # noqa: F401

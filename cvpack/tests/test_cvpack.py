@@ -13,11 +13,13 @@ import mdtraj
 import numpy as np
 import openmm
 import pytest
-from openmm import app, unit
+from openmm import app
 from openmmtools import testsystems
+from openmmtools.constants import ONE_4PI_EPS0
 from scipy.spatial.transform import Rotation
 
 import cvpack
+from cvpack import unit
 
 
 def test_cvpack_imported():
@@ -508,4 +510,46 @@ def test_centroid_function():
         ]
     )
     assert cv_value / cv_value.unit == pytest.approx(computed_value)
+    perform_common_tests(colvar, context)
+
+
+def test_attraction_strength():
+    """
+    Test whether an attraction strength CV is computed correctly.
+
+    """
+    num_particles = 20
+    group1 = list(range(num_particles // 2))
+    group2 = list(range(num_particles // 2, num_particles))
+    charges = 1.0 - 2.0 * np.random.rand(num_particles)
+    sigmas = np.random.rand(num_particles)
+    epsilons = np.random.rand(num_particles)
+    positions = np.random.rand(num_particles, 3)
+    cutoff = 1.0
+    strength = 0.0
+    for i in group1:
+        for j in group2:
+            rij = np.linalg.norm(positions[i] - positions[j])
+            if rij <= cutoff:
+                x = np.abs((2 * rij / (sigmas[i] + sigmas[j])) ** 6 - 2.0) + 2.0
+                strength -= 4 * np.sqrt(epsilons[i] * epsilons[j]) * (1 / x**2 - 1 / x)
+                if charges[i] * charges[j] < 0.0:
+                    x = rij / cutoff
+                    strength -= ONE_4PI_EPS0 * charges[i] * charges[j] * (1 / x + (x**2 - 3) / 2)
+    system = openmm.System()
+    for i in range(num_particles):
+        system.addParticle(1.0)
+    force = openmm.NonbondedForce()
+    for params in zip(charges, sigmas, epsilons):
+        force.addParticle(*params)
+    force.setUseSwitchingFunction(False)
+    force.setNonbondedMethod(openmm.NonbondedForce.CutoffNonPeriodic)
+    force.setCutoffDistance(cutoff)
+    colvar = cvpack.AttractionStrength(group1, group2, force)
+    system.addForce(colvar)
+    platform = openmm.Platform.getPlatformByName("Reference")
+    integreator = openmm.VerletIntegrator(0)
+    context = openmm.Context(system, integreator, platform)
+    context.setPositions(positions)
+    assert unit.value_in_md_units(colvar.getValue(context)) == pytest.approx(strength)
     perform_common_tests(colvar, context)
