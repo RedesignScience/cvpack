@@ -37,6 +37,8 @@ The CVs implemented in CVPack are:
     angle formed by three atoms
 * [Atomic Function](https://cvpack.readthedocs.io/en/latest/api/AtomicFunction.html):
     a user-defined function of the coordinates of a group of atoms
+* [Attraction Strength](https://cvpack.readthedocs.io/en/latest/api/AttractionStrength.html):
+    strength of the attraction between two groups of atoms
 * [Centroid Function](https://cvpack.readthedocs.io/en/latest/api/CentroidFunction.html):
     a user-defined function of the centroids of groups of atoms
 * [Distance](https://cvpack.readthedocs.io/en/latest/api/Distance.html):
