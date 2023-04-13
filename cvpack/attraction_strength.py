@@ -104,9 +104,9 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
     >>> context = openmm.Context(model.system, integrator, platform)
     >>> context.setPositions(model.positions)
     >>> print(attraction_strength.getValue(context, 6))
-    4910.382 kJ/mol
+    4912.514 kJ/mol
     >>> print(attraction_strength.getEffectiveMass(context, 6))
-    2.169263e-07 nm**2 mol**2 Da/(kJ**2)
+    2.163946e-07 nm**2 mol**2 Da/(kJ**2)
     """
 
     def __init__(  # pylint: disable=too-many-arguments
@@ -120,7 +120,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
         super().__init__(
             f"4*epsilon*(1/y - 1/y^2) + {one_4pi_eps0}*q12sq*(1/x + (x^2 - 3)/2)"
             f"; x = r/{cutoff}"
-            "; y = abs((r/sigma)**6 - 2) + 2"
+            "; y = abs((r/sigma)^6 - 2) + 2"
             "; q12sq = max(0, -charge1*charge2)"
             "; epsilon = sqrt(epsilon1*epsilon2)"
             "; sigma = (sigma1 + sigma2)/2"
