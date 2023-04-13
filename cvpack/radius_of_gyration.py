@@ -65,7 +65,7 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         >>> context =openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
         >>> print(radius_of_gyration.getValue(context, digits=6))
-        0.295143 nm
+        0.2951431 nm
 
     """
 
