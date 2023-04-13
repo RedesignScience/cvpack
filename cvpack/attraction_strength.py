@@ -30,30 +30,45 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
 
     .. math::
 
-        U({\\bf r}) = \\sum_{i \\in {\\bf g}_1} \\sum_{\\substack{j \\in {\\bf g}_2 \\\\ j \\neq i}}
-        \\left\\{
-            4 \\epsilon_{ij} \\left(\\frac{1}{y_{ij}} - \\frac{1}{y_{ij}^2}\\right) +
-            \\frac{q_{ij}^2}{4 \\pi \\varepsilon_0 r_{\\rm c}}
-                \\left(\\frac{1}{x_{ij}} + \\frac{x_{ij}^2 - 3}{2}\\right)
-        \\right\\}
+        S_{\\rm attr}({\\bf r}) =
+            &-\\sum_{i \\in {\\bf g}_1} \\sum_{\\substack{j \\in {\\bf g}_2 \\\\ j \\neq i}}
+                \\epsilon_{ij} u_{\\rm disp}\\left(
+                    \\frac{\\|{\\bf r}_i - {\\bf r}_j\\|}{\\sigma_{ij}}
+                \\right) \\\\
+            &-\\sum_{i \\in {\\bf g}_1} \\sum_{\\substack{j \\in {\\bf g}_2 \\\\ q_jq_i < 0}}
+            \\frac{q_i q_j}{4 \\pi \\varepsilon_0 r_{\\rm c}} u_{\\rm elec}\\left(
+                \\frac{\\|{\\bf r}_i - {\\bf r}_j\\|}{r_{\\rm c}}
+            \\right)
 
     where :math:`{\\bf g}_1` and :math:`{\\bf g}_2` are the two atom groups, :math:`r_{\\rm c}`
-    is the cutoff distance, and :math:`\\varepsilon_0` is the permittivity of empty space. The
-    charge product :math:`q_{ij}^2` is zero if atoms i and j repell each other and is equal to
-    :math:`-q_i q_j` otherwise, i.e. :math:`q_{ij}^2 = \\max(0, -q_i q_j)`. The Lennard-Jones
-    parameters are given by Lorentz-Berthelot mixing rules, i.e. :math:`\\epsilon_{ij} =
-    \\sqrt{\\epsilon_i \\epsilon_j}`, and :math:`\\sigma_{ij} = (\\sigma_i + \\sigma_j)/2`.
-    The remaining symbols are defined as:
+    is the cutoff distance, :math:`\\varepsilon_0` is the permittivity of empty space, and
+    :math:`q_i` is the charge of atom :math:`i`. The Lennard-Jones parameters are given by the
+    Lorentz-Berthelot mixing rule, i.e. :math:`\\epsilon_{ij} = \\sqrt{\\epsilon_i \\epsilon_j}`,
+    and :math:`\\sigma_{ij} = (\\sigma_i + \\sigma_j)/2`.
+
+    The function :math:`u_{\\rm disp}(x)` is a Lennard-Jones-like reduced potential with a
+    highly softened repulsion part, defined as
 
     .. math::
 
-        x_{ij} = \\left\\|\\frac{{\\bf r}_i - {\\bf r}_j}{r_{\\rm c}}\\right\\|
+        u_{\\rm disp}(x) = 4\\left(\\frac{1}{y^2} - \\frac{1}{y}\\right),
+        \\quad \\text{where} \\quad
+        y = |x^6 - 2| + 2
 
-    and :math:`y_{ij} = \\max(z_{ij}, 4 - z_{ij})`, where
+    The function :math:`u_{\\rm elec}(x)` provides a Coulomb-like decay with reaction-field
+    screening, defined as
 
     .. math::
 
-        z_{ij} = \\left\\|\\frac{{\\bf r}_i - {\\bf r}_j}{\\sigma_{ij}}\\right\\|^6
+        u_{\\rm elec}(x) = \\frac{1}{x} + \\frac{x^2 - 3}{2}
+
+    The screening considers a perfect conductor as the surrounding medium :cite:`Correa_2022`.
+
+    .. note::
+
+        Only attractive electrostatic interactions are considered (:math:`q_i q_i < 0`). This makes
+        :math:`S_{\\rm attr}({\\bf r})` exclusively non-negative. Its upper bound depends on the
+        system and the chosen groups of atoms.
 
     The Lennard-Jones parameters, atomic charges, cutoff distance, boundary conditions, as well as
     whether to use a switching function and its corresponding switching distance, are taken from
@@ -67,7 +82,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
     group2
         The second atom group.
     nonbonded_force
-        The :openmm:`NonbondedForce` object from which to take the necessary parameters.
+        The :openmm:`NonbondedForce` object from which to collect the necessary parameters.
 
     Examples
     --------
@@ -89,9 +104,9 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
     >>> context = openmm.Context(model.system, integrator, platform)
     >>> context.setPositions(model.positions)
     >>> print(attraction_strength.getValue(context, 6))
-    4912.514 kJ/mol
+    4910.382 kJ/mol
     >>> print(attraction_strength.getEffectiveMass(context, 6))
-    2.163946e-07 nm**2 mol**2 Da/(kJ**2)
+    2.169263e-07 nm**2 mol**2 Da/(kJ**2)
     """
 
     def __init__(  # pylint: disable=too-many-arguments
@@ -105,8 +120,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
         super().__init__(
             f"4*epsilon*(1/y - 1/y^2) + {one_4pi_eps0}*q12sq*(1/x + (x^2 - 3)/2)"
             f"; x = r/{cutoff}"
-            "; y = max(z, 4 - z)"
-            "; z = (r/sigma)^6"
+            "; y = abs((r/sigma)**6 - 2) + 2"
             "; q12sq = max(0, -charge1*charge2)"
             "; epsilon = sqrt(epsilon1*epsilon2)"
             "; sigma = (sigma1 + sigma2)/2"
