@@ -17,7 +17,7 @@ from openmm import app as mmapp
 
 from cvpack import unit as mmunit
 
-from .unit import in_md_units
+from .unit import value_in_md_units
 
 
 class SerializableResidue(mmapp.topology.Residue):
@@ -99,9 +99,34 @@ class AbstractCollectiveVariable(openmm.Force):
         old_group = self.getForceGroup()
         new_group = next(iter(free_groups))
         self.setForceGroup(new_group)
+        context.reinitialize(preserveState=True)
         state = context.getState(getEnergy=getEnergy, getForces=getForces, groups=1 << new_group)
         self.setForceGroup(old_group)
+        context.reinitialize(preserveState=True)
         return state
+
+    def _precisionRound(self, number: float, digits: Optional[int] = None) -> float:
+        """
+        Round a number to a specified number of precision digits (if specified).
+
+        The number of precision digits is defined as the number of digits after the decimal point
+        of the number's scientific notation representation.
+
+        Parameters
+        ----------
+            number
+                The number to be rounded
+            digits
+                The number of digits to round to. If None, the number will not be rounded.
+
+        Returns
+        -------
+            The rounded number
+        """
+        if digits is None:
+            return number
+        power = f"{number:e}".split("e")[1]
+        return round(number, -(int(power) - digits))
 
     @classmethod
     def getArguments(cls) -> Tuple[OrderedDict, OrderedDict]:
@@ -152,18 +177,23 @@ class AbstractCollectiveVariable(openmm.Force):
         """
         Evaluate this collective variable at a given :OpenMM:`Context`.
 
-        Optionally, the value can be rounded to a specified number of digits.
+        Optionally, the value can be rounded to a specified number of precision digits, which is
+        the number of digits after the decimal point of the value in scientific notation.
 
         Parameters
         ----------
             context
                 The context at which this collective variable should be evaluated
             digits
-                The number of digits to round to
+                The number of precision digits to round to. If None, the value will not be rounded.
+
+        Returns
+        -------
+            The value of this collective variable at the given context
         """
         state = self._getSingleForceState(context, getEnergy=True)
-        value = in_md_units(state.getPotentialEnergy())
-        return mmunit.Quantity(round(value, digits) if digits else value, self.getUnit())
+        value = value_in_md_units(state.getPotentialEnergy())
+        return mmunit.Quantity(self._precisionRound(value, digits), self.getUnit())
 
     def getEffectiveMass(
         self, context: openmm.Context, digits: Optional[int] = None
@@ -180,18 +210,20 @@ class AbstractCollectiveVariable(openmm.Force):
                 \\sum_{i=1}^N \\frac{1}{m_i} \\left\\|\\frac{dq}{d{\\bf r}_i}\\right\\|^2
             \\right)^{-1}
 
-        Optionally, the value of the effective mass of this collective variable can be rounded to a
-        specified number of digits.
+        Optionally, effective mass of this collective variable can be rounded to a specified number
+        of precision digits, which is the number of digits after the decimal point of the effective
+        mass in scientific notation.
 
         Parameters
         ----------
             context
                 The context at which this collective variable's effective mass should be evaluated
             digits
-                The number of digits to round to
+                The number of precision digits to round to. If None, the value will not be rounded.
 
         Returns
         -------
+            The effective mass of this collective variable at the given context
 
         Example
         -------
@@ -207,14 +239,14 @@ class AbstractCollectiveVariable(openmm.Force):
             >>> context =openmm.Context(model.system,openmm.VerletIntegrator(0), platform)
             >>> context.setPositions(model.positions)
             >>> print(radius_of_gyration.getEffectiveMass(context, digits=6))
-            30.946932 Da
+            30.94693 Da
         """
         state = self._getSingleForceState(context, getForces=True)
-        force_values = in_md_units(state.getForces(asNumpy=True))
+        force_values = value_in_md_units(state.getForces(asNumpy=True))
         mass_values = [
-            in_md_units(context.getSystem().getParticleMass(i))
+            value_in_md_units(context.getSystem().getParticleMass(i))
             for i in range(context.getSystem().getNumParticles())
         ]
         effective_mass = 1.0 / np.sum(np.sum(force_values**2, axis=1) / mass_values)
         unit = mmunit.dalton * (mmunit.nanometers / self.getUnit()) ** 2
-        return mmunit.Quantity(round(effective_mass, digits) if digits else effective_mass, unit)
+        return mmunit.Quantity(self._precisionRound(effective_mass, digits), unit)

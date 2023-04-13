@@ -61,6 +61,7 @@ class SerializableUnit(_mmunit.Unit):
         >>> print(dump)
         !!python/object:cvpack.unit.SerializableUnit
         description: nanometer/picosecond
+        version: 1
         <BLANKLINE>
         >>> 2*yaml.load(dump, Loader=yaml.CLoader)
         Quantity(value=2, unit=nanometer/picosecond)
@@ -78,10 +79,12 @@ class SerializableUnit(_mmunit.Unit):
             super().__init__(base_or_scaled_units)
 
     def __getstate__(self):
-        return {"description": str(self)}
+        return {"version": 1, "description": str(self)}
 
-    def __setstate__(self, keywords) -> None:
-        self.__init__(keywords["description"])
+    def __setstate__(self, kwds) -> None:
+        if kwds["version"] != 1:
+            raise ValueError("Unknown version")
+        self.__init__(kwds["description"])
 
 
 class SerializableQuantity(_mmunit.Quantity):
@@ -91,9 +94,9 @@ class SerializableQuantity(_mmunit.Quantity):
     Parameters
     ----------
         value
-            The numerical value of the quantity.
+            Another quantity or the numerical value of a quantity.
         unit
-            The unit of the quantity.
+            A unit of measurement or None if value is a quantity.
 
     Examples
     --------
@@ -107,25 +110,39 @@ class SerializableQuantity(_mmunit.Quantity):
         !!python/object:cvpack.unit.SerializableQuantity
         unit: !!python/object:cvpack.unit.SerializableUnit
           description: nanometer
+          version: 1
         value: 1.0
+        version: 1
         <BLANKLINE>
         >>> yaml.load(dump, Loader=yaml.CLoader)
         Quantity(value=1.0, unit=nanometer)
     """
 
-    def __init__(self, value, unit):  # pylint: disable=redefined-outer-name
-        super().__init__(value, SerializableUnit(unit))
+    def __init__(self, value, unit=None):  # pylint: disable=redefined-outer-name
+        if unit is None:
+            super().__init__(value._value, SerializableUnit(value.unit))
+        else:
+            super().__init__(value, SerializableUnit(unit))
 
     def __getstate__(self):
-        return {"value": self._value, "unit": self.unit}
+        return {"version": 1, "value": self._value, "unit": self.unit}
 
-    def __setstate__(self, keywords) -> None:
-        self.__init__(keywords["value"], keywords["unit"])
+    def __setstate__(self, kwds) -> None:
+        if kwds["version"] != 1:
+            raise ValueError("Unknown version")
+        self.__init__(kwds["value"], kwds["unit"])
+
+    def value_in_md_units(self):  # pylint: disable=invalid-name
+        """
+        Return the numerical value of the quantity in the MD unit system (e.g. mass in Da,
+        distance in nm, time in ps, temperature in K, energy in kJ/mol, angle in rad).
+        """
+        return value_in_md_units(self)
 
 
-def in_md_units(  # pylint: disable=redefined-outer-name
+def value_in_md_units(  # pylint: disable=redefined-outer-name
     quantity: Union[ScalarQuantity, VectorQuantity, MatrixQuantity]
-) -> Union[float, np.ndarray, openmm.Vec3, List[openmm.Vec3]]:
+) -> Union[float, np.ndarray, openmm.Vec3, List[openmm.Vec3], List[np.ndarray]]:
     """
     Return the numerical value of a quantity in the MD unit system (e.g. mass in Da, distance in nm,
     time in ps, temperature in K, energy in kJ/mol, angle in rad).
@@ -146,22 +163,22 @@ def in_md_units(  # pylint: disable=redefined-outer-name
 
     Examples
     --------
-        >>> from cvpack.unit import in_md_units
+        >>> from cvpack.unit import value_in_md_units
         >>> from openmm import Vec3
         >>> from openmm.unit import angstrom, femtosecond, degree
         >>> from numpy import array
-        >>> in_md_units(1.0)
+        >>> value_in_md_units(1.0)
         1.0
-        >>> in_md_units(1.0*femtosecond)
+        >>> value_in_md_units(1.0*femtosecond)
         0.001
-        >>> in_md_units(1.0*degree)
+        >>> value_in_md_units(1.0*degree)
         0.017453292519943295
-        >>> in_md_units(array([1, 2, 3])*angstrom)
+        >>> value_in_md_units(array([1, 2, 3])*angstrom)
         array([0.1, 0.2, 0.3])
-        >>> in_md_units([Vec3(1, 2, 4), Vec3(5, 8, 9)]*angstrom)
+        >>> value_in_md_units([Vec3(1, 2, 4), Vec3(5, 8, 9)]*angstrom)
         [Vec3(x=0.1, y=0.2, z=0.4), Vec3(x=0.5, y=0.8, z=0.9)]
         >>> try:
-        ...     in_md_units([1, 2, 3]*angstrom)
+        ...     value_in_md_units([1, 2, 3]*angstrom)
         ... except TypeError as error:
         ...     print(error)
         Cannot convert [1, 2, 3] A to MD units
@@ -176,7 +193,7 @@ def in_md_units(  # pylint: disable=redefined-outer-name
         if isinstance(value[0], openmm.Vec3):
             return [openmm.Vec3(*vec) for vec in value]
         if isinstance(value[0], np.ndarray):
-            return np.vstack(value)
+            return [np.array(vec) for vec in value]
     if isinstance(value, (np.ndarray, openmm.Vec3)):
         return value
     raise TypeError(f"Cannot convert {quantity} to MD units")
@@ -219,9 +236,11 @@ def convert_quantities(func):
                 bound.arguments[name] = value.value_in_unit_system(_mmunit.md_unit_system)
             elif isinstance(value, (list, tuple)):
                 bound.arguments[name] = type(value)(
-                    item.value_in_unit_system(_mmunit.md_unit_system)
-                    if isinstance(item, _mmunit.Quantity)
-                    else item
+                    (
+                        item.value_in_unit_system(_mmunit.md_unit_system)
+                        if isinstance(item, _mmunit.Quantity)
+                        else item
+                    )
                     for item in value
                 )
 

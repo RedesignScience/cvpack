@@ -95,7 +95,7 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
         >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
         >>> print(helix_content.getValue(context, digits=6))
-        17.452849 dimensionless
+        17.45285 dimensionless
     """
 
     @mmunit.convert_quantities

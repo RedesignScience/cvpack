@@ -89,9 +89,9 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         >>> context =openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
         >>> print(rg.getValue(context, digits=6))
-        0.295143 nm
+        0.2951431 nm
         >>> print(colvar.getValue(context, digits=6))
-        0.295143 nm
+        0.2951431 nm
     """
 
     def __init__(  # pylint: disable=too-many-arguments
