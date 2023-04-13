@@ -105,7 +105,7 @@ class AbstractCollectiveVariable(openmm.Force):
         context.reinitialize(preserveState=True)
         return state
 
-    def _precision_round(self, number: float, digits: Optional[int] = None) -> float:
+    def _precisionRound(self, number: float, digits: Optional[int] = None) -> float:
         """
         Round a number to a specified number of precision digits (if specified).
 
@@ -125,7 +125,7 @@ class AbstractCollectiveVariable(openmm.Force):
         """
         if digits is None:
             return number
-        power = "{:e}".format(number).split('e')[1]
+        power = f"{number:e}".split("e")[1]
         return round(number, -(int(power) - digits))
 
     @classmethod
@@ -193,7 +193,7 @@ class AbstractCollectiveVariable(openmm.Force):
         """
         state = self._getSingleForceState(context, getEnergy=True)
         value = value_in_md_units(state.getPotentialEnergy())
-        return mmunit.Quantity(self._precision_round(value, digits), self.getUnit())
+        return mmunit.Quantity(self._precisionRound(value, digits), self.getUnit())
 
     def getEffectiveMass(
         self, context: openmm.Context, digits: Optional[int] = None
@@ -249,4 +249,4 @@ class AbstractCollectiveVariable(openmm.Force):
         ]
         effective_mass = 1.0 / np.sum(np.sum(force_values**2, axis=1) / mass_values)
         unit = mmunit.dalton * (mmunit.nanometers / self.getUnit()) ** 2
-        return mmunit.Quantity(self._precision_round(effective_mass, digits), unit)
+        return mmunit.Quantity(self._precisionRound(effective_mass, digits), unit)
