@@ -1,5 +1,4 @@
 {% set version = environ['CVPACK_VERSION'][1:] %}
-{% set python_version = environ['PYTHON_VERSION'] %}
 
 package:
   name: cvpack
@@ -9,20 +8,23 @@ source:
   git_url: ../../../
 
 build:
+  noarch: python
   number: 0
-  script: python -m pip install . --no-deps
+  script: python -m pip install --no-deps --ignore-installed .
 
 requirements:
   host:
-    - python=={{ python_version }}
+    - python
     - setuptools
     - versioningit
     - pip
   run:
-    - python=={{ python_version }}
+    - python
     - importlib-resources  # [py<310]
+    - typing_extensions  # [py<311]
     - numpy
     - openmm>=7.6
+    - pyyaml
 
 test:
   imports:
