@@ -4,9 +4,6 @@ on:
   push:
     tags:
       - v*
-  pull_request:
-    branches:
-      - main
 
 jobs:
   test:
@@ -48,7 +45,6 @@ jobs:
           echo "::group::Building cvpack $CVPACK_VERSION"
           outdir=$(mktemp -d)
           export CVPACK_VERSION=${{ github.ref_name }}
-          export CVPACK_VERSION="v0.0.1"
           conda mambabuild . --no-anaconda-upload -c conda-forge --output-folder $outdir
           echo "::endgroup::"
           echo "::group::Uploading package to redesign-science conda channel"
