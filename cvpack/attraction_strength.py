@@ -10,6 +10,7 @@
 from typing import Dict, Sequence
 
 import openmm
+import xmltodict
 
 from cvpack import unit as mmunit
 
@@ -18,10 +19,10 @@ from .cvpack import AbstractCollectiveVariable
 
 class _NonbondedForce(openmm.NonbondedForce):
     def __getstate__(self) -> Dict[str, str]:
-        return {"xml": openmm.XmlSerializer.serialize(self)}
+        return xmltodict.parse(openmm.XmlSerializer.serialize(self))
 
     def __setstate__(self, state: Dict[str, str]) -> None:
-        self.__init__(openmm.XmlSerializer.deserialize(state["xml"]))
+        self.__init__(openmm.XmlSerializer.deserialize(xmltodict.unparse(state)))
 
 
 class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
@@ -81,7 +82,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
         The first atom group.
     group2
         The second atom group.
-    nonbonded_force
+    nonbondedForce
         The :openmm:`NonbondedForce` object from which to collect the necessary parameters.
 
     Examples
@@ -113,10 +114,10 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
         self,
         group1: Sequence[int],
         group2: Sequence[int],
-        nonbonded_force: openmm.NonbondedForce,
+        nonbondedForce: openmm.NonbondedForce,
     ) -> None:
         one_4pi_eps0 = 138.93545764438198
-        cutoff = mmunit.value_in_md_units(nonbonded_force.getCutoffDistance())
+        cutoff = mmunit.value_in_md_units(nonbondedForce.getCutoffDistance())
         super().__init__(
             f"4*epsilon*(1/y - 1/y^2) + {one_4pi_eps0}*q12sq*(1/x + (x^2 - 3)/2)"
             f"; x = r/{cutoff}"
@@ -125,22 +126,22 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
             "; epsilon = sqrt(epsilon1*epsilon2)"
             "; sigma = (sigma1 + sigma2)/2"
         )
-        if nonbonded_force.usesPeriodicBoundaryConditions():
+        if nonbondedForce.usesPeriodicBoundaryConditions():
             self.setNonbondedMethod(self.CutoffPeriodic)
         else:
             self.setNonbondedMethod(self.CutoffNonPeriodic)
         self.setCutoffDistance(cutoff)
         for parameter in ("charge", "sigma", "epsilon"):
             self.addPerParticleParameter(parameter)
-        for atom in range(nonbonded_force.getNumParticles()):
-            self.addParticle(nonbonded_force.getParticleParameters(atom))
-        self.setUseSwitchingFunction(nonbonded_force.getUseSwitchingFunction())
-        self.setSwitchingDistance(nonbonded_force.getSwitchingDistance())
+        for atom in range(nonbondedForce.getNumParticles()):
+            self.addParticle(nonbondedForce.getParticleParameters(atom))
+        self.setUseSwitchingFunction(nonbondedForce.getUseSwitchingFunction())
+        self.setSwitchingDistance(nonbondedForce.getSwitchingDistance())
         self.setUseLongRangeCorrection(False)
         self.addInteractionGroup(group1, group2)
         self._registerCV(
             mmunit.kilojoules_per_mole,
             group1,
             group2,
-            _NonbondedForce(nonbonded_force),
+            _NonbondedForce(nonbondedForce),
         )

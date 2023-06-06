@@ -10,6 +10,7 @@ dependencies:
   - pyyaml
   - importlib_resources
   - typing_extensions
+  - xmltodict
 
     # Testing
   - scipy
