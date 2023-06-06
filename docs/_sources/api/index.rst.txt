@@ -15,7 +15,7 @@ Python API
     HelixTorsionContent
     NumberOfContacts
     RadiusOfGyration
-    RadiusOfGyrationSquared
+    RadiusOfGyrationSq
     RMSD
     Torsion
     TorsionSimilarity

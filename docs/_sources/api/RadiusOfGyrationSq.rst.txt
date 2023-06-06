@@ -1,8 +1,8 @@
-RadiusOfGyrationSquared
-=======================
+RadiusOfGyrationSq
+==================
 
 .. currentmodule:: cvpack
-.. autoclass:: RadiusOfGyrationSquared
+.. autoclass:: RadiusOfGyrationSq
     :member-order: alphabetical
 
     .. rubric:: Methods
