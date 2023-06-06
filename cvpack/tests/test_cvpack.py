@@ -199,6 +199,26 @@ def test_radius_of_gyration():
     perform_common_tests(rg_cv, context)
 
 
+def test_radius_of_gyration_squared():
+    """
+    Test whether a squared radius of gyration is computed correctly.
+
+    """
+    model = testsystems.AlanineDipeptideVacuum()
+    positions = model.positions.value_in_unit(unit.nanometers)
+    centroid = positions.mean(axis=0)
+    rgsq = np.sum((positions - centroid) ** 2) / model.system.getNumParticles()
+    rg_sq = cvpack.RadiusOfGyrationSquared(range(model.system.getNumParticles()))
+    model.system.addForce(rg_sq)
+    integrator = openmm.CustomIntegrator(0)
+    platform = openmm.Platform.getPlatformByName("Reference")
+    context = openmm.Context(model.system, integrator, platform)
+    context.setPositions(model.positions)
+    rg_sq_value = rg_sq.getValue(context).value_in_unit(unit.nanometers**2)
+    assert rg_sq_value == pytest.approx(rgsq)
+    perform_common_tests(rg_sq, context)
+
+
 def test_number_of_contacts():
     """
     Test whether a number of contacts is computed correctly.
