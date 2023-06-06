@@ -1,0 +1,14 @@
+HelixHBondContent
+=================
+
+.. currentmodule:: cvpack
+.. autoclass:: HelixHBondContent
+    :member-order: alphabetical
+
+    .. rubric:: Methods
+
+    .. automethod:: getArguments
+    .. automethod:: getEffectiveMass
+    .. automethod:: getUnit
+    .. automethod:: getValue
+    .. automethod:: setUnit
