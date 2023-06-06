@@ -46,7 +46,7 @@ The CVs implemented in CVPack are listed in the table below.
 | [Helix torsion content] | alpha-helix Ramachandran content of a sequence of residues       |
 | [Number of contacts]    | number of contacts between two groups of atoms                   |
 | [Radius of gyration]    | radius of gyration of a group of atoms                           |
-| [Rg squared]            | square of the radius of gyration of a group of atoms             |
+| [Radius of gyration Sq.]| square of the radius of gyration of a group of atoms             |
 | [RMSD]                  | root-mean-square deviation with respect to a reference structure |
 | [Torsion]               | torsion angle formed by four atoms                               |
 | [Torsion similarity]    | degree of similarity between pairs of torsion angles             |
@@ -94,18 +94,18 @@ Project based on the [CMS Cookiecutter] version 1.1.
 [OpenMM]:             https://openmm.org
 [UFED]:               https://ufedmm.readthedocs.io/en/latest/index.html
 
-[Angle]:                 https://redesignscience.github.io/cvpack/api/Angle.html
-[Atomic Function]:       https://redesignscience.github.io/cvpack/api/AtomicFunction.html
-[Attraction Strength]:   https://redesignscience.github.io/cvpack/api/AttractionStrength.html
-[Centroid Function]:     https://redesignscience.github.io/cvpack/api/CentroidFunction.html
-[Distance]:              https://redesignscience.github.io/cvpack/api/Distance.html
-[Helix angle content]:   https://redesignscience.github.io/cvpack/api/HelixAngleContent.html
-[Helix H-bond content]:  https://redesignscience.github.io/cvpack/api/HelixHBondContent.html
-[Helix RMSD content]:    https://redesignscience.github.io/cvpack/api/HelixRMSDContent.html
-[Helix torsion content]: https://redesignscience.github.io/cvpack/api/HelixTorsionContent.html
-[Number of contacts]:    https://redesignscience.github.io/cvpack/api/NumberOfContacts.html
-[Radius of gyration]:    https://redesignscience.github.io/cvpack/api/RadiusOfGyration.html
-[Rg squared]:            https://redesignscience.github.io/cvpack/api/RgSquared.html
-[RMSD]:                  https://redesignscience.github.io/cvpack/api/RMSD.html
-[Torsion]:               https://redesignscience.github.io/cvpack/api/Torsion.html
-[Torsion similarity]:    https://redesignscience.github.io/cvpack/api/TorsionSimilarity.html
+[Angle]:                  https://redesignscience.github.io/cvpack/api/Angle.html
+[Atomic Function]:        https://redesignscience.github.io/cvpack/api/AtomicFunction.html
+[Attraction Strength]:    https://redesignscience.github.io/cvpack/api/AttractionStrength.html
+[Centroid Function]:      https://redesignscience.github.io/cvpack/api/CentroidFunction.html
+[Distance]:               https://redesignscience.github.io/cvpack/api/Distance.html
+[Helix angle content]:    https://redesignscience.github.io/cvpack/api/HelixAngleContent.html
+[Helix H-bond content]:   https://redesignscience.github.io/cvpack/api/HelixHBondContent.html
+[Helix RMSD content]:     https://redesignscience.github.io/cvpack/api/HelixRMSDContent.html
+[Helix torsion content]:  https://redesignscience.github.io/cvpack/api/HelixTorsionContent.html
+[Number of contacts]:     https://redesignscience.github.io/cvpack/api/NumberOfContacts.html
+[Radius of gyration]:     https://redesignscience.github.io/cvpack/api/RadiusOfGyration.html
+[Radius of gyration Sq.]: https://redesignscience.github.io/cvpack/api/RadiusOfGyrationSq.html
+[RMSD]:                   https://redesignscience.github.io/cvpack/api/RMSD.html
+[Torsion]:                https://redesignscience.github.io/cvpack/api/Torsion.html
+[Torsion similarity]:     https://redesignscience.github.io/cvpack/api/TorsionSimilarity.html

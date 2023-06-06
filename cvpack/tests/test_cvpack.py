@@ -208,7 +208,7 @@ def test_radius_of_gyration_squared():
     positions = model.positions.value_in_unit(unit.nanometers)
     centroid = positions.mean(axis=0)
     rgsq = np.sum((positions - centroid) ** 2) / model.system.getNumParticles()
-    rg_sq = cvpack.RadiusOfGyrationSquared(range(model.system.getNumParticles()))
+    rg_sq = cvpack.RadiusOfGyrationSq(range(model.system.getNumParticles()))
     model.system.addForce(rg_sq)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")

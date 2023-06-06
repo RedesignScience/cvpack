@@ -1,5 +1,5 @@
 """
-.. class:: RadiusOfGyrationSquared
+.. class:: RadiusOfGyrationSq
    :platform: Linux, MacOS, Windows
 
    :synopsis: The square of the radius of gyration of a group of atoms
@@ -17,7 +17,7 @@ from cvpack import unit as mmunit
 from .cvpack import AbstractCollectiveVariable
 
 
-class RadiusOfGyrationSquared(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):
+class RadiusOfGyrationSq(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):
     """
     The square of the radius of gyration of a group of :math:`n` atoms:
 
@@ -63,7 +63,7 @@ class RadiusOfGyrationSquared(openmm.CustomCentroidBondForce, AbstractCollective
         >>> from openmmtools import testsystems
         >>> model = testsystems.AlanineDipeptideVacuum()
         >>> num_atoms = model.system.getNumParticles()
-        >>> rgsq = cvpack.RadiusOfGyrationSquared(list(range(num_atoms)))
+        >>> rgsq = cvpack.RadiusOfGyrationSq(list(range(num_atoms)))
         >>> model.system.addForce(rgsq)
         5
         >>> platform =openmm.Platform.getPlatformByName('Reference')
