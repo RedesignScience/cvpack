@@ -17,6 +17,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           path: cvpack
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Additional info about the build
         shell: bash
