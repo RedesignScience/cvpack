@@ -31,36 +31,25 @@ to a [CustomCVForce] or used to define a [BiasVariable] for [Metadynamics], for 
 
 ### Collective Variables
 
-The CVs implemented in CVPack are:
+The CVs implemented in CVPack are listed in the table below.
 
-* [Angle](https://cvpack.readthedocs.io/en/latest/api/Angle.html):
-    angle formed by three atoms
-* [Atomic Function](https://cvpack.readthedocs.io/en/latest/api/AtomicFunction.html):
-    a user-defined function of the coordinates of a group of atoms
-* [Attraction Strength](https://cvpack.readthedocs.io/en/latest/api/AttractionStrength.html):
-    strength of the attraction between two groups of atoms
-* [Centroid Function](https://cvpack.readthedocs.io/en/latest/api/CentroidFunction.html):
-    a user-defined function of the centroids of groups of atoms
-* [Distance](https://cvpack.readthedocs.io/en/latest/api/Distance.html):
-    distance between two atoms
-* [Helix angle content](https://cvpack.readthedocs.io/en/latest/api/HelixAngleContent.html):
-    alpha-helix angle content of a sequence of residues
-* [Helix H-bond content](https://cvpack.readthedocs.io/en/latest/api/HelixHBondContent.html):
-    alpha-helix hydrogen-bond content of a sequence of residues
-* [Helix RMSD content](https://cvpack.readthedocs.io/en/latest/api/HelixRMSDContent.html):
-    alpha-helix RMSD content of a sequence of residues
-* [Helix torsion content](https://cvpack.readthedocs.io/en/latest/api/HelixTorsionContent.html):
-    alpha-helix Ramachandran content of a sequence of residues
-* [Number of contacts](https://cvpack.readthedocs.io/en/latest/api/NumberOfContacts.html):
-    number of contacts between two groups of atoms
-* [Radius of gyration](https://cvpack.readthedocs.io/en/latest/api/RadiusOfGyration.html):
-    radius of gyration of a group of atoms
-* [RMSD](https://cvpack.readthedocs.io/en/latest/api/RMSD.html):
-    root-mean-square deviation of atoms with respect to a reference structure
-* [Torsion](https://cvpack.readthedocs.io/en/latest/api/Torsion.html):
-    torsion angle formed by four atoms
-* [Torsion similarity](https://cvpack.readthedocs.io/en/latest/api/TorsionSimilarity.html):
-    degree of similarity between pairs of torsion angles
+| Collective Variable     | Description                                                      |
+|-------------------------|------------------------------------------------------------------|
+| [Angle]                 | angle formed by three atoms                                      |
+| [Atomic Function]       | a user-defined function of the coordinates of a group of atoms   |
+| [Attraction Strength]   | strength of the attraction between two groups of atoms           |
+| [Centroid Function]     | a user-defined function of the centroids of groups of atoms      |
+| [Distance]              | distance between two atoms                                       |
+| [Helix angle content]   | alpha-helix angle content of a sequence of residues              |
+| [Helix H-bond content]  | alpha-helix hydrogen-bond content of a sequence of residues      |
+| [Helix RMSD content]    | alpha-helix RMSD content of a sequence of residues               |
+| [Helix torsion content] | alpha-helix Ramachandran content of a sequence of residues       |
+| [Number of contacts]    | number of contacts between two groups of atoms                   |
+| [Radius of gyration]    | radius of gyration of a group of atoms                           |
+| [Rg squared]            | square of the radius of gyration of a group of atoms             |
+| [RMSD]                  | root-mean-square deviation with respect to a reference structure |
+| [Torsion]               | torsion angle formed by four atoms                               |
+| [Torsion similarity]    | degree of similarity between pairs of torsion angles             |
 
 ### Installation and Usage
 
@@ -101,6 +90,22 @@ Project based on the [CMS Cookiecutter] version 1.1.
 [CollectiveVariable]: https://ufedmm.readthedocs.io/en/latest/pythonapi/ufedmm.html#ufedmm.ufedmm.CollectiveVariable
 [CustomCVForce]:      https://docs.openmm.org/latest/api-python/generated/openmm.openmm.CustomCVForce.html
 [Force]:              https://docs.openmm.org/latest/api-python/generated/openmm.openmm.Force.html
-[Metadynamics]:       https://docs.openmm.org/latest/api-python/generated/openmm.app.metadynamics.Metadynamics.
+[Metadynamics]:       https://docs.openmm.org/latest/api-python/generated/openmm.app.metadynamics.Metadynamics.html
 [OpenMM]:             https://openmm.org
 [UFED]:               https://ufedmm.readthedocs.io/en/latest/index.html
+
+[Angle]:                 https://cvpack.readthedocs.io/en/latest/api/Angle.html
+[Atomic Function]:       https://cvpack.readthedocs.io/en/latest/api/AtomicFunction.html
+[Attraction Strength]:   https://cvpack.readthedocs.io/en/latest/api/AttractionStrength.html
+[Centroid Function]:     https://cvpack.readthedocs.io/en/latest/api/CentroidFunction.html
+[Distance]:              https://cvpack.readthedocs.io/en/latest/api/Distance.html
+[Helix angle content]:   https://cvpack.readthedocs.io/en/latest/api/HelixAngleContent.html
+[Helix H-bond content]:  https://cvpack.readthedocs.io/en/latest/api/HelixHBondContent.html
+[Helix RMSD content]:    https://cvpack.readthedocs.io/en/latest/api/HelixRMSDContent.html
+[Helix torsion content]: https://cvpack.readthedocs.io/en/latest/api/HelixTorsionContent.html
+[Number of contacts]:    https://cvpack.readthedocs.io/en/latest/api/NumberOfContacts.html
+[Radius of gyration]:    https://cvpack.readthedocs.io/en/latest/api/RadiusOfGyration.html
+[Rg squared]:            https://cvpack.readthedocs.io/en/latest/api/RgSquared.html
+[RMSD]:                  https://cvpack.readthedocs.io/en/latest/api/RMSD.html
+[Torsion]:               https://cvpack.readthedocs.io/en/latest/api/Torsion.html
+[Torsion similarity]:    https://cvpack.readthedocs.io/en/latest/api/TorsionSimilarity.html
