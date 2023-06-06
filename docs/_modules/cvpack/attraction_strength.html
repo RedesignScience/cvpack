@@ -45,6 +45,7 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Sequence</span>
 
 <span class="kn">import</span> <span class="nn">openmm</span>
+<span class="kn">import</span> <span class="nn">xmltodict</span>
 
 <span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
@@ -53,10 +54,10 @@
 
 <span class="k">class</span> <span class="nc">_NonbondedForce</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">NonbondedForce</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;xml&quot;</span><span class="p">:</span> <span class="n">openmm</span><span class="o">.</span><span class="n">XmlSerializer</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">)}</span>
+        <span class="k">return</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">XmlSerializer</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">XmlSerializer</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s2">&quot;xml&quot;</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">XmlSerializer</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">xmltodict</span><span class="o">.</span><span class="n">unparse</span><span class="p">(</span><span class="n">state</span><span class="p">)))</span>
 
 
 <div class="viewcode-block" id="AttractionStrength"><a class="viewcode-back" href="../../api/AttractionStrength.html#cvpack.AttractionStrength">[docs]</a><span class="k">class</span> <span class="nc">AttractionStrength</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomNonbondedForce</span><span class="p">,</span> <span class="n">AbstractCollectiveVariable</span><span class="p">):</span>
@@ -116,7 +117,7 @@
 <span class="sd">        The first atom group.</span>
 <span class="sd">    group2</span>
 <span class="sd">        The second atom group.</span>
-<span class="sd">    nonbonded_force</span>
+<span class="sd">    nonbondedForce</span>
 <span class="sd">        The :openmm:`NonbondedForce` object from which to collect the necessary parameters.</span>
 
 <span class="sd">    Examples</span>
@@ -148,10 +149,10 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">group1</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
         <span class="n">group2</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
-        <span class="n">nonbonded_force</span><span class="p">:</span> <span class="n">openmm</span><span class="o">.</span><span class="n">NonbondedForce</span><span class="p">,</span>
+        <span class="n">nonbondedForce</span><span class="p">:</span> <span class="n">openmm</span><span class="o">.</span><span class="n">NonbondedForce</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">one_4pi_eps0</span> <span class="o">=</span> <span class="mf">138.93545764438198</span>
-        <span class="n">cutoff</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">value_in_md_units</span><span class="p">(</span><span class="n">nonbonded_force</span><span class="o">.</span><span class="n">getCutoffDistance</span><span class="p">())</span>
+        <span class="n">cutoff</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">value_in_md_units</span><span class="p">(</span><span class="n">nonbondedForce</span><span class="o">.</span><span class="n">getCutoffDistance</span><span class="p">())</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;4*epsilon*(1/y - 1/y^2) + </span><span class="si">{</span><span class="n">one_4pi_eps0</span><span class="si">}</span><span class="s2">*q12sq*(1/x + (x^2 - 3)/2)&quot;</span>
             <span class="sa">f</span><span class="s2">&quot;; x = r/</span><span class="si">{</span><span class="n">cutoff</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -160,24 +161,24 @@
             <span class="s2">&quot;; epsilon = sqrt(epsilon1*epsilon2)&quot;</span>
             <span class="s2">&quot;; sigma = (sigma1 + sigma2)/2&quot;</span>
         <span class="p">)</span>
-        <span class="k">if</span> <span class="n">nonbonded_force</span><span class="o">.</span><span class="n">usesPeriodicBoundaryConditions</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">nonbondedForce</span><span class="o">.</span><span class="n">usesPeriodicBoundaryConditions</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">setNonbondedMethod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CutoffPeriodic</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">setNonbondedMethod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CutoffNonPeriodic</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setCutoffDistance</span><span class="p">(</span><span class="n">cutoff</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;charge&quot;</span><span class="p">,</span> <span class="s2">&quot;sigma&quot;</span><span class="p">,</span> <span class="s2">&quot;epsilon&quot;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">addPerParticleParameter</span><span class="p">(</span><span class="n">parameter</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nonbonded_force</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">addParticle</span><span class="p">(</span><span class="n">nonbonded_force</span><span class="o">.</span><span class="n">getParticleParameters</span><span class="p">(</span><span class="n">atom</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">setUseSwitchingFunction</span><span class="p">(</span><span class="n">nonbonded_force</span><span class="o">.</span><span class="n">getUseSwitchingFunction</span><span class="p">())</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">setSwitchingDistance</span><span class="p">(</span><span class="n">nonbonded_force</span><span class="o">.</span><span class="n">getSwitchingDistance</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nonbondedForce</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addParticle</span><span class="p">(</span><span class="n">nonbondedForce</span><span class="o">.</span><span class="n">getParticleParameters</span><span class="p">(</span><span class="n">atom</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setUseSwitchingFunction</span><span class="p">(</span><span class="n">nonbondedForce</span><span class="o">.</span><span class="n">getUseSwitchingFunction</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setSwitchingDistance</span><span class="p">(</span><span class="n">nonbondedForce</span><span class="o">.</span><span class="n">getSwitchingDistance</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setUseLongRangeCorrection</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">addInteractionGroup</span><span class="p">(</span><span class="n">group1</span><span class="p">,</span> <span class="n">group2</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span>
             <span class="n">mmunit</span><span class="o">.</span><span class="n">kilojoules_per_mole</span><span class="p">,</span>
             <span class="n">group1</span><span class="p">,</span>
             <span class="n">group2</span><span class="p">,</span>
-            <span class="n">_NonbondedForce</span><span class="p">(</span><span class="n">nonbonded_force</span><span class="p">),</span>
+            <span class="n">_NonbondedForce</span><span class="p">(</span><span class="n">nonbondedForce</span><span class="p">),</span>
         <span class="p">)</span></div>
 </pre></div>
 
