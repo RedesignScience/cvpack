@@ -54,6 +54,11 @@ as:</p>
 <div class="math notranslate nohighlight">
 \[{\bf r}_c({\bf r}) = \frac{1}{M} \sum_{i=1}^n m_i {\bf r}_i\]</div>
 <p>where <span class="math notranslate nohighlight">\(M = \sum_{i=1}^n m_i\)</span> is the total mass of the group.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This collective variable is better parallelized than <a class="reference internal" href="RadiusOfGyration.html#cvpack.RadiusOfGyration" title="cvpack.RadiusOfGyration"><code class="xref py py-class docutils literal notranslate"><span class="pre">RadiusOfGyration</span></code></a> and might
+be preferred over <a class="reference internal" href="RadiusOfGyration.html#cvpack.RadiusOfGyration" title="cvpack.RadiusOfGyration"><code class="xref py py-class docutils literal notranslate"><span class="pre">RadiusOfGyration</span></code></a> when the group of atoms is large.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
