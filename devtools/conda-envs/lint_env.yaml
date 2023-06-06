@@ -10,6 +10,7 @@ dependencies:
   - numpy
   - scipy
   - pytest
+  - xmltodict
 
     # Linting
   - flake8
