@@ -1,7 +1,8 @@
 """
-.. class:: RadiusOfGyration
+.. class:: RadiusOfGyrationSquared
    :platform: Linux, MacOS, Windows
-   :synopsis: The radius of gyration of a group of atoms
+
+   :synopsis: The square of the radius of gyration of a group of atoms
 
 .. classauthor:: Charlles Abreu <craabreu@gmail.com>
 
@@ -16,15 +17,15 @@ from cvpack import unit as mmunit
 from .cvpack import AbstractCollectiveVariable
 
 
-class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):
+class RadiusOfGyrationSquared(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):
     """
-    The radius of gyration of a group of :math:`n` atoms:
+    The square of the radius of gyration of a group of :math:`n` atoms:
 
     .. math::
 
-        r_g({\\bf r}) = \\sqrt{ \\frac{1}{n} \\sum_{i=1}^n \\left\\|
+        r_g^2({\\bf r}) = \\frac{1}{n} \\sum_{i=1}^n \\left\\|
             {\\bf r}_i - {\\bf r}_c({\\bf r})
-        \\right\\|^2 }.
+        \\right\\|^2.
 
     where :math:`{\\bf r}_c({\\bf r})` is the centroid of the group:
 
@@ -43,8 +44,8 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
 
     .. note::
 
-        This collective variable lacks parallelization and might be slow when the group of atoms
-        is large. In this case, :class:`RadiusOfGyrationSquared` might be preferred.
+        This collective variable is better parallelized than :class:`RadiusOfGyration` and might
+        be preferred over :class:`RadiusOfGyration` when the group of atoms is large.
 
     Parameters
     ----------
@@ -62,26 +63,25 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         >>> from openmmtools import testsystems
         >>> model = testsystems.AlanineDipeptideVacuum()
         >>> num_atoms = model.system.getNumParticles()
-        >>> radius_of_gyration = cvpack.RadiusOfGyration(list(range(num_atoms)))
-        >>> model.system.addForce(radius_of_gyration)
+        >>> rgsq = cvpack.RadiusOfGyrationSquared(list(range(num_atoms)))
+        >>> model.system.addForce(rgsq)
         5
         >>> platform =openmm.Platform.getPlatformByName('Reference')
         >>> integrator =openmm.VerletIntegrator(0)
         >>> context =openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
-        >>> print(radius_of_gyration.getValue(context, digits=6))
-        0.2951431 nm
+        >>> print(rgsq.getValue(context, digits=6))  # doctest: +ELLIPSIS
+        0.0871... nm**2
 
     """
 
     def __init__(self, group: Sequence[int], pbc: bool = False, weighByMass: bool = False) -> None:
         num_atoms = len(group)
-        num_groups = num_atoms + 1
-        sum_dist_sq = "+".join([f"distance(g{i+1}, g{num_atoms + 1})^2" for i in range(num_atoms)])
-        super().__init__(num_groups, f"sqrt(({sum_dist_sq})/{num_atoms})")
+        super().__init__(2, f"distance(g1, g2)^2/{num_atoms}")
         for atom in group:
             self.addGroup([atom], [1])
         self.addGroup(group, None if weighByMass else [1] * num_atoms)
-        self.addBond(list(range(num_groups)), [])
+        for atom in group:
+            self.addBond([atom, num_atoms])
         self.setUsesPeriodicBoundaryConditions(pbc)
-        self._registerCV(mmunit.nanometers, group, pbc, weighByMass)
+        self._registerCV(mmunit.nanometers**2, group, pbc, weighByMass)
