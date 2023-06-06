@@ -7,7 +7,7 @@ Collective Variable Package
 [![GitHub Actions Build Status](https://github.com/RedesignScience/cvpack/workflows/Windows/badge.svg)](https://github.com/RedesignScience/cvpack/actions?query=workflow%3AWindows)
 [![GitHub Actions Build Status](https://github.com/RedesignScience/cvpack/workflows/Linter/badge.svg)](https://github.com/RedesignScience/cvpack/actions?query=workflow%3ALinter)
 [![Documentation Status](https://github.com/RedesignScience/cvpack/workflows/Docs/badge.svg)](https://github.com/RedesignScience/cvpack/actions?query=workflow%3ADocs)
-[![Coverage Report](https://redesignscience.github.io/cvpack/coverage/coverage.svg)](https://redesignscience.github.io/cvpack/coverage/coverage)
+[![Coverage Report](https://redesignscience.github.io/cvpack/coverage/coverage.svg)](https://redesignscience.github.io/cvpack/coverage)
 
 [![Conda cvpack version](https://img.shields.io/conda/v/redesign-science/cvpack.svg)](https://anaconda.org/redesign-science/cvpack)
 [![Conda cvpack platforms](https://img.shields.io/conda/pn/redesign-science/cvpack.svg)](https://anaconda.org/redesign-science/cvpack)
