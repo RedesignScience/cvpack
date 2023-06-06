@@ -55,6 +55,8 @@ The CVs implemented in CVPack are:
     number of contacts between two groups of atoms
 * [Radius of gyration](https://cvpack.readthedocs.io/en/latest/api/RadiusOfGyration.html):
     radius of gyration of a group of atoms
+* [Radius of gyration squared](https://cvpack.readthedocs.io/en/latest/api/RadiusOfGyrationSquared.html):
+    square of the radius of gyration of a group of atoms
 * [RMSD](https://cvpack.readthedocs.io/en/latest/api/RMSD.html):
     root-mean-square deviation of atoms with respect to a reference structure
 * [Torsion](https://cvpack.readthedocs.io/en/latest/api/Torsion.html):
