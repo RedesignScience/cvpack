@@ -41,6 +41,11 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
 
     where :math:`M = \\sum_{i=1}^n m_i` is the total mass of the group.
 
+    .. note::
+
+        This collective variable lacks parallelization and might be slow when the group of atoms
+        is large. In this case, :class:`RadiusOfGyrationSquared` might be preferred.
+
     Parameters
     ----------
         group

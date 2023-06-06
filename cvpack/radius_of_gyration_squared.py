@@ -2,7 +2,7 @@
 .. class:: RadiusOfGyrationSquared
    :platform: Linux, MacOS, Windows
 
-   :synopsis: The radius of gyration of a group of atoms
+   :synopsis: The square of the radius of gyration of a group of atoms
 
 .. classauthor:: Charlles Abreu <craabreu@gmail.com>
 
@@ -41,6 +41,11 @@ class RadiusOfGyrationSquared(openmm.CustomCentroidBondForce, AbstractCollective
         {\\bf r}_c({\\bf r}) = \\frac{1}{M} \\sum_{i=1}^n m_i {\\bf r}_i
 
     where :math:`M = \\sum_{i=1}^n m_i` is the total mass of the group.
+
+    .. note::
+
+        This collective variable is better parallelized than :class:`RadiusOfGyration` and might
+        be preferred over :class:`RadiusOfGyration` when the group of atoms is large.
 
     Parameters
     ----------
