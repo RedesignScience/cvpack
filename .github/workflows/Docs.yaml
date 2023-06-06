@@ -83,8 +83,8 @@ jobs:
         shell: bash -l {0}
         run: |
           if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
-          #   echo "Deployment is deactivated on pull requests"
-          # else
+            echo "Deployment is deactivated on pull requests"
+          else
             cd cvpack/
             git reset --hard HEAD
             set -x
