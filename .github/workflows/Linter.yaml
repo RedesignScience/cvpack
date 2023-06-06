@@ -27,13 +27,11 @@ jobs:
           df -h
           ulimit -a
 
-      # More info on options: https://github.com/marketplace/actions/provision-with-micromamba
-      - uses: mamba-org/provision-with-micromamba@main
+      - uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: devtools/conda-envs/lint_env.yaml
           environment-name: linter
-          channels: conda-forge,defaults
-          extra-specs: |
+          create-args: >-
             python=${{ matrix.python-version }}
 
       - name: Install package
