@@ -6,8 +6,8 @@ Collective Variable Package
 [![GitHub Actions Build Status](https://github.com/RedesignScience/cvpack/workflows/MacOS/badge.svg)](https://github.com/RedesignScience/cvpack/actions?query=workflow%3AMacOS)
 [![GitHub Actions Build Status](https://github.com/RedesignScience/cvpack/workflows/Windows/badge.svg)](https://github.com/RedesignScience/cvpack/actions?query=workflow%3AWindows)
 [![GitHub Actions Build Status](https://github.com/RedesignScience/cvpack/workflows/Linter/badge.svg)](https://github.com/RedesignScience/cvpack/actions?query=workflow%3ALinter)
-[![codecov](https://codecov.io/gh/RedesignScience/cvpack/branch/main/graph/badge.svg)](https://codecov.io/gh/RedesignScience/cvpack/branch/main)
-[![Documentation Status](https://readthedocs.org/projects/cvpack/badge/?style=flat)](https://cvpack.readthedocs.io/en/latest)
+[![Documentation Status](https://github.com/RedesignScience/cvpack/workflows/Docs/badge.svg)](https://github.com/RedesignScience/cvpack/actions?query=workflow%3ADocs)
+[![Coverage Report](https://redesignscience.github.io/cvpack/coverage/coverage.svg)](https://redesignscience.github.io/cvpack/coverage/coverage)
 
 [![Conda cvpack version](https://img.shields.io/conda/v/redesign-science/cvpack.svg)](https://anaconda.org/redesign-science/cvpack)
 [![Conda cvpack platforms](https://img.shields.io/conda/pn/redesign-science/cvpack.svg)](https://anaconda.org/redesign-science/cvpack)
@@ -46,7 +46,7 @@ The CVs implemented in CVPack are listed in the table below.
 | [Helix torsion content] | alpha-helix Ramachandran content of a sequence of residues       |
 | [Number of contacts]    | number of contacts between two groups of atoms                   |
 | [Radius of gyration]    | radius of gyration of a group of atoms                           |
-| [Rg squared]            | square of the radius of gyration of a group of atoms             |
+| [Radius of gyration Sq.]| square of the radius of gyration of a group of atoms             |
 | [RMSD]                  | root-mean-square deviation with respect to a reference structure |
 | [Torsion]               | torsion angle formed by four atoms                               |
 | [Torsion similarity]    | degree of similarity between pairs of torsion angles             |
@@ -94,18 +94,18 @@ Project based on the [CMS Cookiecutter] version 1.1.
 [OpenMM]:             https://openmm.org
 [UFED]:               https://ufedmm.readthedocs.io/en/latest/index.html
 
-[Angle]:                 https://cvpack.readthedocs.io/en/latest/api/Angle.html
-[Atomic Function]:       https://cvpack.readthedocs.io/en/latest/api/AtomicFunction.html
-[Attraction Strength]:   https://cvpack.readthedocs.io/en/latest/api/AttractionStrength.html
-[Centroid Function]:     https://cvpack.readthedocs.io/en/latest/api/CentroidFunction.html
-[Distance]:              https://cvpack.readthedocs.io/en/latest/api/Distance.html
-[Helix angle content]:   https://cvpack.readthedocs.io/en/latest/api/HelixAngleContent.html
-[Helix H-bond content]:  https://cvpack.readthedocs.io/en/latest/api/HelixHBondContent.html
-[Helix RMSD content]:    https://cvpack.readthedocs.io/en/latest/api/HelixRMSDContent.html
-[Helix torsion content]: https://cvpack.readthedocs.io/en/latest/api/HelixTorsionContent.html
-[Number of contacts]:    https://cvpack.readthedocs.io/en/latest/api/NumberOfContacts.html
-[Radius of gyration]:    https://cvpack.readthedocs.io/en/latest/api/RadiusOfGyration.html
-[Rg squared]:            https://cvpack.readthedocs.io/en/latest/api/RgSquared.html
-[RMSD]:                  https://cvpack.readthedocs.io/en/latest/api/RMSD.html
-[Torsion]:               https://cvpack.readthedocs.io/en/latest/api/Torsion.html
-[Torsion similarity]:    https://cvpack.readthedocs.io/en/latest/api/TorsionSimilarity.html
+[Angle]:                  https://redesignscience.github.io/cvpack/api/Angle.html
+[Atomic Function]:        https://redesignscience.github.io/cvpack/api/AtomicFunction.html
+[Attraction Strength]:    https://redesignscience.github.io/cvpack/api/AttractionStrength.html
+[Centroid Function]:      https://redesignscience.github.io/cvpack/api/CentroidFunction.html
+[Distance]:               https://redesignscience.github.io/cvpack/api/Distance.html
+[Helix angle content]:    https://redesignscience.github.io/cvpack/api/HelixAngleContent.html
+[Helix H-bond content]:   https://redesignscience.github.io/cvpack/api/HelixHBondContent.html
+[Helix RMSD content]:     https://redesignscience.github.io/cvpack/api/HelixRMSDContent.html
+[Helix torsion content]:  https://redesignscience.github.io/cvpack/api/HelixTorsionContent.html
+[Number of contacts]:     https://redesignscience.github.io/cvpack/api/NumberOfContacts.html
+[Radius of gyration]:     https://redesignscience.github.io/cvpack/api/RadiusOfGyration.html
+[Radius of gyration Sq.]: https://redesignscience.github.io/cvpack/api/RadiusOfGyrationSq.html
+[RMSD]:                   https://redesignscience.github.io/cvpack/api/RMSD.html
+[Torsion]:                https://redesignscience.github.io/cvpack/api/Torsion.html
+[Torsion similarity]:     https://redesignscience.github.io/cvpack/api/TorsionSimilarity.html

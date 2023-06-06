@@ -44,7 +44,7 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
     .. note::
 
         This collective variable lacks parallelization and might be slow when the group of atoms
-        is large. In this case, :class:`RadiusOfGyrationSquared` might be preferred.
+        is large. In this case, :class:`RadiusOfGyrationSq` might be preferred.
 
     Parameters
     ----------
