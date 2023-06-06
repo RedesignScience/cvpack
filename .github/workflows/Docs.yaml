@@ -28,7 +28,7 @@ jobs:
       - uses: mamba-org/setup-micromamba@v1
         with:
           micromamba-version: '1.4.3-0'
-          environment-file: cvpack/devtools/conda-envs/test_env.yaml
+          environment-file: cvpack/devtools/conda-envs/docs_env.yaml
           environment-name: docs
           create-args: >-
             python=3.9
