@@ -102,30 +102,3 @@ jobs:
             git push -f origin gh-pages
             echo "::endgroup::"
           fi
-
-      - uses: actions/checkout@v3
-        with:
-          repository: RedesignScience/badges
-          token: ${{ secrets.REPO_TOKEN }}
-          path: badges
-          fetch-depth: 0
-
-      - name: Deploy coverage badge
-        shell: bash -l {0}
-        run: |
-          if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
-          #  echo "Deployment is deactivated on pull requests"
-          #else
-            echo "::group::Push coverage badge to public repo"
-            BRANCH=iU3YOSzd
-            DATETIME=$(date +"%D at %T.%6N")
-            cd badges
-            git checkout $BRANCH
-            cp -f ../cvpack/htmlcov/coverage.svg ./
-            git add -f ./coverage.svg
-            git config user.name "$(git show --format=%an -s)"
-            git config user.email "$(git show --format=%ae -s)"
-            git commit -m "Created on $DATETIME" || echo "Branch is up to date"
-            git push -f
-            echo "::endgroup::"
-          fi
