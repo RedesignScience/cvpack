@@ -10,14 +10,12 @@
 
 from typing import Sequence
 
-import openmm
-
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable
+from .radius_of_gyration import _RadiusOfGyrationBase
 
 
-class RadiusOfGyrationSq(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):
+class RadiusOfGyrationSq(_RadiusOfGyrationBase):
     """
     The square of the radius of gyration of a group of :math:`n` atoms:
 
@@ -78,14 +76,7 @@ class RadiusOfGyrationSq(openmm.CustomCentroidBondForce, AbstractCollectiveVaria
 
     def __init__(self, group: Sequence[int], pbc: bool = False, weighByMass: bool = False) -> None:
         num_atoms = len(group)
-        super().__init__(2, f"distance(g1, g2)^2/{num_atoms}")
-        for atom in group:
-            self.addGroup([atom])
-        if weighByMass:
-            self.addGroup(group)
-        else:
-            self.addGroup(group, [1] * num_atoms)
+        super().__init__(2, f"distance(g1, g2)^2/{num_atoms}", group, pbc, weighByMass)
         for atom in group:
             self.addBond([atom, num_atoms])
-        self.setUsesPeriodicBoundaryConditions(pbc)
         self._registerCV(mmunit.nanometers**2, group, pbc, weighByMass)
