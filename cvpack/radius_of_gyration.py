@@ -26,18 +26,18 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
             {\\bf r}_i - {\\bf r}_c({\\bf r})
         \\right\\|^2 }.
 
-    where :math:`{\\bf r}_c({\\bf r})` is the centroid of the group:
+    where :math:`{\\bf r}_c({\\bf r})` is the geometric center of the group:
 
     .. math::
 
         {\\bf r}_c({\\bf r}) = \\frac{1}{n} \\sum_{i=j}^n {\\bf r}_j
 
-    Optionally, the atoms can be weighted by their masses. In this case, the centroid is computed
-    as:
+    Optionally, the radius of gyration can be computed with respect to the center of
+    mass of the group. In this case, the geometric center is replaced by:
 
     .. math::
 
-        {\\bf r}_c({\\bf r}) = \\frac{1}{M} \\sum_{i=1}^n m_i {\\bf r}_i
+        {\\bf r}_m({\\bf r}) = \\frac{1}{M} \\sum_{i=1}^n m_i {\\bf r}_i
 
     where :math:`M = \\sum_{i=1}^n m_i` is the total mass of the group.
 
@@ -53,7 +53,8 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         pbc
             Whether to use periodic boundary conditions
         weighByMass
-            Whether to weigh the atoms by their masses
+            Whether to use the center of mass of the group instead of its geometric
+            center
 
     Example
     -------
@@ -80,8 +81,11 @@ class RadiusOfGyration(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         sum_dist_sq = "+".join([f"distance(g{i+1}, g{num_atoms + 1})^2" for i in range(num_atoms)])
         super().__init__(num_groups, f"sqrt(({sum_dist_sq})/{num_atoms})")
         for atom in group:
-            self.addGroup([atom], [1])
-        self.addGroup(group, None if weighByMass else [1] * num_atoms)
+            self.addGroup([atom])
+        if weighByMass:
+            self.addGroup(group)
+        else:
+            self.addGroup(group, [1] * num_atoms)
         self.addBond(list(range(num_groups)), [])
         self.setUsesPeriodicBoundaryConditions(pbc)
         self._registerCV(mmunit.nanometers, group, pbc, weighByMass)
