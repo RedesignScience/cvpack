@@ -215,17 +215,27 @@ def test_radius_of_gyration_squared():
 
     """
     model = testsystems.AlanineDipeptideVacuum()
+    masses = np.array(
+        [unit.value_in_md_units(atom.element.mass) for atom in model.topology.atoms()]
+    )
     positions = model.positions.value_in_unit(unit.nanometers)
     centroid = positions.mean(axis=0)
-    rgsq = np.sum((positions - centroid) ** 2) / model.system.getNumParticles()
-    rg_sq = cvpack.RadiusOfGyrationSq(range(model.system.getNumParticles()))
+    center_of_mass = np.einsum("i,ij->j", masses, positions) / np.sum(masses)
+    num_atoms = model.system.getNumParticles()
+    rgsq = np.sum((positions - centroid) ** 2) / num_atoms
+    rg_sq = cvpack.RadiusOfGyrationSq(range(num_atoms))
+    weighted_rgsq = np.sum((positions - center_of_mass) ** 2) / num_atoms
+    weighted_rg_sq = cvpack.RadiusOfGyrationSq(range(num_atoms), weighByMass=True)
     model.system.addForce(rg_sq)
+    model.system.addForce(weighted_rg_sq)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
     context.setPositions(model.positions)
-    rg_sq_value = rg_sq.getValue(context).value_in_unit(unit.nanometers**2)
+    rg_sq_value = unit.value_in_md_units(rg_sq.getValue(context))
     assert rg_sq_value == pytest.approx(rgsq)
+    weighted_rg_sq_value = unit.value_in_md_units(weighted_rg_sq.getValue(context))
+    assert weighted_rg_sq_value == pytest.approx(weighted_rgsq)
     perform_common_tests(rg_sq, context)
 
 
