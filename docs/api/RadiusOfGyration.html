@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>RadiusOfGyration &#8212; CVPack  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=039e1c02" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=572d9513" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=ccdb6887"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -37,22 +37,22 @@
           <div class="body" role="main">
             
   <section id="radiusofgyration">
-<h1>RadiusOfGyration<a class="headerlink" href="#radiusofgyration" title="Permalink to this heading">¶</a></h1>
+<h1>RadiusOfGyration<a class="headerlink" href="#radiusofgyration" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="cvpack.RadiusOfGyration">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">RadiusOfGyration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighByMass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/radius_of_gyration.html#RadiusOfGyration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.RadiusOfGyration" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">RadiusOfGyration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighByMass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/radius_of_gyration.html#RadiusOfGyration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.RadiusOfGyration" title="Link to this definition">¶</a></dt>
 <dd><p>The radius of gyration of a group of <span class="math notranslate nohighlight">\(n\)</span> atoms:</p>
 <div class="math notranslate nohighlight">
 \[r_g({\bf r}) = \sqrt{ \frac{1}{n} \sum_{i=1}^n \left\|
     {\bf r}_i - {\bf r}_c({\bf r})
 \right\|^2 }.\]</div>
-<p>where <span class="math notranslate nohighlight">\({\bf r}_c({\bf r})\)</span> is the centroid of the group:</p>
+<p>where <span class="math notranslate nohighlight">\({\bf r}_c({\bf r})\)</span> is the geometric center of the group:</p>
 <div class="math notranslate nohighlight">
 \[{\bf r}_c({\bf r}) = \frac{1}{n} \sum_{i=j}^n {\bf r}_j\]</div>
-<p>Optionally, the atoms can be weighted by their masses. In this case, the centroid is computed
-as:</p>
+<p>Optionally, the radius of gyration can be computed with respect to the center of
+mass of the group. In this case, the geometric center is replaced by:</p>
 <div class="math notranslate nohighlight">
-\[{\bf r}_c({\bf r}) = \frac{1}{M} \sum_{i=1}^n m_i {\bf r}_i\]</div>
+\[{\bf r}_m({\bf r}) = \frac{1}{M} \sum_{i=1}^n m_i {\bf r}_i\]</div>
 <p>where <span class="math notranslate nohighlight">\(M = \sum_{i=1}^n m_i\)</span> is the total mass of the group.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -64,7 +64,8 @@ is large. In this case, <a class="reference internal" href="RadiusOfGyrationSq.h
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>group</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em>) – The indices of the atoms in the group</p></li>
 <li><p><strong>pbc</strong> (<em>bool</em>) – Whether to use periodic boundary conditions</p></li>
-<li><p><strong>weighByMass</strong> (<em>bool</em>) – Whether to weigh the atoms by their masses</p></li>
+<li><p><strong>weighByMass</strong> (<em>bool</em>) – Whether to use the center of mass of the group instead of its geometric
+center</p></li>
 </ul>
 </dd>
 </dl>
@@ -88,7 +89,7 @@ is large. In this case, <a class="reference internal" href="RadiusOfGyrationSq.h
 <p class="rubric">Methods</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cvpack.RadiusOfGyration.getArguments">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getArguments</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.RadiusOfGyration.getArguments" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getArguments</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.RadiusOfGyration.getArguments" title="Link to this definition">¶</a></dt>
 <dd><p>Inspect the arguments needed for constructing an instance of this collective variable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -115,7 +116,7 @@ is large. In this case, <a class="reference internal" href="RadiusOfGyrationSq.h
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cvpack.RadiusOfGyration.getEffectiveMass">
-<span class="sig-name descname"><span class="pre">getEffectiveMass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.RadiusOfGyration.getEffectiveMass" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getEffectiveMass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.RadiusOfGyration.getEffectiveMass" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the effective mass of this collective variable at a given <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html">openmm.Context</a>.</p>
 <p>The effective mass of a collective variable <span class="math notranslate nohighlight">\(q({\bf r})\)</span> is defined as
 <span id="id1">[<a class="reference internal" href="../references.html#id2" title="Christophe Chipot and Andrew Pohorille, editors. Free Energy Calculations. Springer Berlin Heidelberg, 2007. URL: https://doi.org/10.1007/978-3-540-38448-9, doi:10.1007/978-3-540-38448-9.">1</a>]</span>:</p>
@@ -157,7 +158,7 @@ mass in scientific notation.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cvpack.RadiusOfGyration.getUnit">
-<span class="sig-name descname"><span class="pre">getUnit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.RadiusOfGyration.getUnit" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getUnit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.RadiusOfGyration.getUnit" title="Link to this definition">¶</a></dt>
 <dd><p>Get the unit of measurement of this collective variable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -168,7 +169,7 @@ mass in scientific notation.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cvpack.RadiusOfGyration.getValue">
-<span class="sig-name descname"><span class="pre">getValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.RadiusOfGyration.getValue" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.RadiusOfGyration.getValue" title="Link to this definition">¶</a></dt>
 <dd><p>Evaluate this collective variable at a given <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html">openmm.Context</a>.</p>
 <p>Optionally, the value can be rounded to a specified number of precision digits, which is
 the number of digits after the decimal point of the value in scientific notation.</p>
@@ -187,7 +188,7 @@ the number of digits after the decimal point of the value in scientific notation
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cvpack.RadiusOfGyration.setUnit">
-<span class="sig-name descname"><span class="pre">setUnit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.RadiusOfGyration.setUnit" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">setUnit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.RadiusOfGyration.setUnit" title="Link to this definition">¶</a></dt>
 <dd><p>Set the unit of measurement of this collective variable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -262,7 +263,7 @@ the number of digits after the decimal point of the value in scientific notation
       &copy;2023, Redesign Science | CMS Cookiecutter v1.1.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
       
       |

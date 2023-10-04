@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>cvpack.atomic_function &#8212; CVPack  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/sphinx_highlight.js"></script>
-    <script src="../../_static/clipboard.min.js"></script>
-    <script src="../../_static/copybutton.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=039e1c02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=572d9513" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=ccdb6887"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -68,7 +68,9 @@
     <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Self</span>
 
 
-<div class="viewcode-block" id="AtomicFunction"><a class="viewcode-back" href="../../api/AtomicFunction.html#cvpack.AtomicFunction">[docs]</a><span class="k">class</span> <span class="nc">AtomicFunction</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomCompoundBondForce</span><span class="p">,</span> <span class="n">AbstractCollectiveVariable</span><span class="p">):</span>
+<div class="viewcode-block" id="AtomicFunction">
+<a class="viewcode-back" href="../../api/AtomicFunction.html#cvpack.AtomicFunction">[docs]</a>
+<span class="k">class</span> <span class="nc">AtomicFunction</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomCompoundBondForce</span><span class="p">,</span> <span class="n">AbstractCollectiveVariable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A generic function of the coordinates of `m` groups of `n` atoms:</span>
 
@@ -294,7 +296,9 @@
             <span class="o">**</span><span class="n">parameters</span><span class="p">,</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="AtomicFunction.fromOpenMMForce"><a class="viewcode-back" href="../../api/AtomicFunction.html#cvpack.AtomicFunction.fromOpenMMForce">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="AtomicFunction.fromOpenMMForce">
+<a class="viewcode-back" href="../../api/AtomicFunction.html#cvpack.AtomicFunction.fromOpenMMForce">[docs]</a>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">fromOpenMMForce</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Force</span><span class="p">,</span> <span class="n">unit</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Unit</span><span class="p">,</span> <span class="n">pbc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create an :class:`AtomicFunction` from an :OpenMM:`Force`.</span>
@@ -386,7 +390,9 @@
             <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_fromHarmonicAngleForce</span><span class="p">(</span><span class="n">force</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">pbc</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">force</span><span class="p">,</span> <span class="n">openmm</span><span class="o">.</span><span class="n">PeriodicTorsionForce</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_fromPeriodicTorsionForce</span><span class="p">(</span><span class="n">force</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">pbc</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Force </span><span class="si">{</span><span class="n">force</span><span class="si">}</span><span class="s2"> is not convertible to an AtomicFunction&quot;</span><span class="p">)</span></div></div>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Force </span><span class="si">{</span><span class="n">force</span><span class="si">}</span><span class="s2"> is not convertible to an AtomicFunction&quot;</span><span class="p">)</span></div>
+</div>
+
 </pre></div>
 
           </div>
@@ -433,7 +439,7 @@
       &copy;2023, Redesign Science | CMS Cookiecutter v1.1.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.0.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
       
     </div>
