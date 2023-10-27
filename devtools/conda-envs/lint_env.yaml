@@ -14,6 +14,7 @@ dependencies:
 
     # Linting
   - flake8
+  - flake8-pyproject
   - black
   - isort
   - pylint
