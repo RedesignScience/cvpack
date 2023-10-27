@@ -94,10 +94,16 @@ class RadiusOfGyration(_RadiusOfGyrationBase):
 
     """
 
-    def __init__(self, group: Sequence[int], pbc: bool = False, weighByMass: bool = False) -> None:
+    def __init__(
+        self, group: Sequence[int], pbc: bool = False, weighByMass: bool = False
+    ) -> None:
         num_atoms = len(group)
         num_groups = num_atoms + 1
-        sum_dist_sq = "+".join([f"distance(g{i+1}, g{num_atoms + 1})^2" for i in range(num_atoms)])
-        super().__init__(num_groups, f"sqrt(({sum_dist_sq})/{num_atoms})", group, pbc, weighByMass)
+        sum_dist_sq = "+".join(
+            [f"distance(g{i+1}, g{num_atoms + 1})^2" for i in range(num_atoms)]
+        )
+        super().__init__(
+            num_groups, f"sqrt(({sum_dist_sq})/{num_atoms})", group, pbc, weighByMass
+        )
         self.addBond(list(range(num_groups)))
         self._registerCV(mmunit.nanometers, group, pbc, weighByMass)

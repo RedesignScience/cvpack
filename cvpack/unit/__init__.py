@@ -22,7 +22,9 @@ from openmm import unit as _mmunit
 
 ScalarQuantity = Union[_mmunit.Quantity, Real]
 VectorQuantity = Union[_mmunit.Quantity, np.ndarray, openmm.Vec3]
-MatrixQuantity = Union[_mmunit.Quantity, np.ndarray, Sequence[openmm.Vec3], Sequence[np.ndarray]]
+MatrixQuantity = Union[
+    _mmunit.Quantity, np.ndarray, Sequence[openmm.Vec3], Sequence[np.ndarray]
+]
 
 
 class _NodeTransformer(ast.NodeTransformer):
@@ -32,7 +34,9 @@ class _NodeTransformer(ast.NodeTransformer):
     id of the ast.Name.
     """
 
-    def visit_Name(self, node: ast.Name) -> ast.Attribute:  # pylint: disable=invalid-name
+    def visit_Name(  # pylint: disable=invalid-name
+        self, node: ast.Name
+    ) -> ast.Attribute:
         """
         Replace an instance of ast.Name with an ast.Attribute with the value "unit" and
         the attribute name equal to the original id of the ast.Name.
@@ -71,7 +75,9 @@ class SerializableUnit(_mmunit.Unit):
         if isinstance(base_or_scaled_units, _mmunit.Unit):
             self.__dict__ = base_or_scaled_units.__dict__
         elif isinstance(base_or_scaled_units, str):
-            tree = _NodeTransformer().visit(ast.parse(base_or_scaled_units, mode="eval"))
+            tree = _NodeTransformer().visit(
+                ast.parse(base_or_scaled_units, mode="eval")
+            )
             self.__dict__ = eval(  # pylint: disable=eval-used
                 compile(ast.fix_missing_locations(tree), "", mode="eval")
             ).__dict__
@@ -233,7 +239,9 @@ def convert_quantities(func):
         bound.apply_defaults()
         for name, value in bound.arguments.items():
             if isinstance(value, _mmunit.Quantity):
-                bound.arguments[name] = value.value_in_unit_system(_mmunit.md_unit_system)
+                bound.arguments[name] = value.value_in_unit_system(
+                    _mmunit.md_unit_system
+                )
             elif isinstance(value, (list, tuple)):
                 bound.arguments[name] = type(value)(
                     (

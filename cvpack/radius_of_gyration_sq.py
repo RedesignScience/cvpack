@@ -74,7 +74,9 @@ class RadiusOfGyrationSq(_RadiusOfGyrationBase):
 
     """
 
-    def __init__(self, group: Sequence[int], pbc: bool = False, weighByMass: bool = False) -> None:
+    def __init__(
+        self, group: Sequence[int], pbc: bool = False, weighByMass: bool = False
+    ) -> None:
         num_atoms = len(group)
         super().__init__(2, f"distance(g1, g2)^2/{num_atoms}", group, pbc, weighByMass)
         for atom in group:

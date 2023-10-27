@@ -67,7 +67,8 @@ def test_argument_inspection():
 
 
 def perform_common_tests(
-    collectiveVariable: cvpack.cvpack.AbstractCollectiveVariable, context: openmm.Context
+    collectiveVariable: cvpack.cvpack.AbstractCollectiveVariable,
+    context: openmm.Context,
 ) -> None:
     """
     Function to be called in every individual cv test.
@@ -174,7 +175,9 @@ def test_torsion():
     u23 = model.positions[atoms[2]] - model.positions[atoms[1]]
     u23 /= np.linalg.norm(u23)
     r34 = model.positions[atoms[3]] - model.positions[atoms[2]]
-    value2 = np.arctan2(np.cross(r21, r34).dot(u23), r21.dot(r34) - r21.dot(u23) * r34.dot(u23))
+    value2 = np.arctan2(
+        np.cross(r21, r34).dot(u23), r21.dot(r34) - r21.dot(u23) * r34.dot(u23)
+    )
     assert value1 == pytest.approx(value2)
     perform_common_tests(torsion, context)
 
@@ -246,8 +249,12 @@ def test_number_of_contacts():
     """
     model = testsystems.AlanineDipeptideVacuum()
     pos = model.positions
-    group1 = [a.index for a in model.topology.atoms() if a.element == app.element.carbon]
-    group2 = [a.index for a in model.topology.atoms() if a.element == app.element.oxygen]
+    group1 = [
+        a.index for a in model.topology.atoms() if a.element == app.element.carbon
+    ]
+    group2 = [
+        a.index for a in model.topology.atoms() if a.element == app.element.oxygen
+    ]
     pairs = set()
     for i, j in itertools.product(group1, group2):
         if j != i and (j, i) not in pairs:
@@ -314,15 +321,21 @@ def test_rmsd():
     context.setPositions(model.positions)
     context.setVelocitiesToTemperature(300 * unit.kelvin, 1234)
     context.getIntegrator().step(10000)
-    state = context.getState(getPositions=True)  # pylint: disable=unexpected-keyword-arg
+    state = context.getState(  # pylint: disable=unexpected-keyword-arg
+        getPositions=True
+    )
     coordinates = state.getPositions(asNumpy=True).value_in_unit(unit.nanometers)
     for pass_vec3 in [False, True]:
         for pass_group_only in [False, True]:
             group = np.arange(num_atoms)
             run_rmsd_test(coordinates, group, pass_group_only, pass_vec3)
-            run_rmsd_test(coordinates, group[: num_atoms // 2], pass_group_only, pass_vec3)
+            run_rmsd_test(
+                coordinates, group[: num_atoms // 2], pass_group_only, pass_vec3
+            )
             np.random.shuffle(group)
-            run_rmsd_test(coordinates, group[: num_atoms // 2], pass_group_only, pass_vec3)
+            run_rmsd_test(
+                coordinates, group[: num_atoms // 2], pass_group_only, pass_vec3
+            )
     perform_common_tests(rmsd, context)
 
 
@@ -367,7 +380,9 @@ def test_helix_angle_content():
     positions = model.positions.value_in_unit(unit.nanometers)
     traj = mdtraj.Trajectory(positions, mdtraj.Topology.from_openmm(model.topology))
     alpha_carbons = traj.top.select("name CA")
-    angle_atoms = np.array([alpha_carbons[:-2], alpha_carbons[1:-1], alpha_carbons[2:]]).T
+    angle_atoms = np.array(
+        [alpha_carbons[:-2], alpha_carbons[1:-1], alpha_carbons[2:]]
+    ).T
     angles = mdtraj.compute_angles(traj, angle_atoms)
     x = (np.rad2deg(angles.ravel()) - 88) / 15
     computed_value = np.sum(1 / (1 + x**6))
@@ -398,7 +413,9 @@ def test_helix_hbond_content():
     traj = mdtraj.Trajectory(positions, mdtraj.Topology.from_openmm(model.topology))
     hydrogens = traj.top.select("resSeq 59 to 79 and name H")
     oxygens = traj.top.select("resSeq 59 to 79 and name O")
-    distances = mdtraj.compute_distances(traj, np.array([hydrogens[4:], oxygens[:-4]]).T)
+    distances = mdtraj.compute_distances(
+        traj, np.array([hydrogens[4:], oxygens[:-4]]).T
+    )
     x = distances.ravel() / 0.33
     computed_value = np.sum(1 / (1 + x**6))
 
@@ -426,22 +443,30 @@ def test_helix_rmsd_content():
     num_atoms = model.topology.getNumAtoms()
     residues = list(model.topology.residues())
     with pytest.raises(ValueError) as excinfo:
-        helix_content = cvpack.HelixRMSDContent(residues[len(residues) - 37 :], num_atoms)
+        helix_content = cvpack.HelixRMSDContent(
+            residues[len(residues) - 37 :], num_atoms
+        )
     assert str(excinfo.value) == "Could not find all atoms in residue TMP163"
     helix_content = cvpack.HelixRMSDContent(residues[59:80], num_atoms)
     model.system.addForce(helix_content)
     context = openmm.Context(
-        model.system, openmm.VerletIntegrator(0), openmm.Platform.getPlatformByName("Reference")
+        model.system,
+        openmm.VerletIntegrator(0),
+        openmm.Platform.getPlatformByName("Reference"),
     )
     context.setPositions(model.positions)
     cv_value = helix_content.getValue(context)
 
-    traj = mdtraj.Trajectory(model.positions, mdtraj.Topology.from_openmm(model.topology))
+    traj = mdtraj.Trajectory(
+        model.positions, mdtraj.Topology.from_openmm(model.topology)
+    )
     atoms = sum(
         zip(
             traj.top.select("resSeq 60 to 80 and name N"),
             traj.top.select("resSeq 60 to 80 and name CA"),
-            traj.top.select("resSeq 60 to 80 and (name CB or (resname GLY and name HA2))"),
+            traj.top.select(
+                "resSeq 60 to 80 and (name CB or (resname GLY and name HA2))"
+            ),
             traj.top.select("resSeq 60 to 80 and name C"),
             traj.top.select("resSeq 60 to 80 and name O"),
         ),
@@ -454,7 +479,9 @@ def test_helix_rmsd_content():
     for i in range(16):
         group = atoms[5 * i : 5 * i + 30]
         ref.xyz[:, group, :] = positions
-        computed_value += 1 / (1 + (mdtraj.rmsd(traj, ref, 0, group).item() / 0.08) ** 6)
+        computed_value += 1 / (
+            1 + (mdtraj.rmsd(traj, ref, 0, group).item() / 0.08) ** 6
+        )
 
     assert cv_value / cv_value.unit == pytest.approx(computed_value)
     perform_common_tests(helix_content, context)
@@ -471,11 +498,14 @@ def test_helix_torsion_similarity():
     phi_atoms, phi = mdtraj.compute_phi(traj)
     psi_atoms, psi = mdtraj.compute_psi(traj)
     torsion_similarity = cvpack.TorsionSimilarity(
-        np.vstack([phi_atoms[1:], psi_atoms[1:]]), np.vstack([phi_atoms[:-1], psi_atoms[:-1]])
+        np.vstack([phi_atoms[1:], psi_atoms[1:]]),
+        np.vstack([phi_atoms[:-1], psi_atoms[:-1]]),
     )
     model.system.addForce(torsion_similarity)
     context = openmm.Context(
-        model.system, openmm.VerletIntegrator(0), openmm.Platform.getPlatformByName("Reference")
+        model.system,
+        openmm.VerletIntegrator(0),
+        openmm.Platform.getPlatformByName("Reference"),
     )
     context.setPositions(model.positions)
     cv_value = torsion_similarity.getValue(context)
@@ -499,11 +529,15 @@ def test_atomic_function():
     function = "+".join(f"distance(p{i+1}, p{i+2})" for i in range(num_atoms - 1))
     with pytest.raises(ValueError) as excinfo:
         colvar = cvpack.AtomicFunction(num_atoms, function, atoms, unit.angstrom)
-    assert str(excinfo.value) == "Unit angstrom is not compatible with the MD unit system."
+    assert (
+        str(excinfo.value) == "Unit angstrom is not compatible with the MD unit system."
+    )
     colvar = cvpack.AtomicFunction(num_atoms, function, atoms, unit.nanometers)
     model.system.addForce(colvar)
     context = openmm.Context(
-        model.system, openmm.VerletIntegrator(0), openmm.Platform.getPlatformByName("Reference")
+        model.system,
+        openmm.VerletIntegrator(0),
+        openmm.Platform.getPlatformByName("Reference"),
     )
     context.setPositions(model.positions)
     cv_value = colvar.getValue(context)
@@ -532,11 +566,17 @@ def test_centroid_function():
     function = "+".join(f"distance(g{i+1}, g{i+2})" for i in range(num_groups - 1))
     with pytest.raises(ValueError) as excinfo:
         colvar = cvpack.CentroidFunction(function, groups, unit.angstrom)
-    assert str(excinfo.value) == "Unit angstrom is not compatible with the MD unit system."
-    colvar = cvpack.CentroidFunction(function, groups, unit.nanometers, weighByMass=False)
+    assert (
+        str(excinfo.value) == "Unit angstrom is not compatible with the MD unit system."
+    )
+    colvar = cvpack.CentroidFunction(
+        function, groups, unit.nanometers, weighByMass=False
+    )
     model.system.addForce(colvar)
     context = openmm.Context(
-        model.system, openmm.VerletIntegrator(0), openmm.Platform.getPlatformByName("Reference")
+        model.system,
+        openmm.VerletIntegrator(0),
+        openmm.Platform.getPlatformByName("Reference"),
     )
     context.setPositions(model.positions)
     cv_value = colvar.getValue(context)
@@ -544,7 +584,8 @@ def test_centroid_function():
     computed_value = np.sum(
         [
             np.linalg.norm(
-                np.mean(positions[groups[i + 1]], axis=0) - np.mean(positions[groups[i]], axis=0)
+                np.mean(positions[groups[i + 1]], axis=0)
+                - np.mean(positions[groups[i]], axis=0)
             )
             for i in range(num_groups - 1)
         ]
@@ -572,10 +613,17 @@ def test_attraction_strength():
             rij = np.linalg.norm(positions[i] - positions[j])
             if rij <= cutoff:
                 x = np.abs((2 * rij / (sigmas[i] + sigmas[j])) ** 6 - 2.0) + 2.0
-                strength -= 4 * np.sqrt(epsilons[i] * epsilons[j]) * (1 / x**2 - 1 / x)
+                strength -= (
+                    4 * np.sqrt(epsilons[i] * epsilons[j]) * (1 / x**2 - 1 / x)
+                )
                 if charges[i] * charges[j] < 0.0:
                     x = rij / cutoff
-                    strength -= ONE_4PI_EPS0 * charges[i] * charges[j] * (1 / x + (x**2 - 3) / 2)
+                    strength -= (
+                        ONE_4PI_EPS0
+                        * charges[i]
+                        * charges[j]
+                        * (1 / x + (x**2 - 3) / 2)
+                    )
     system = openmm.System()
     for i in range(num_particles):
         system.addParticle(1.0)

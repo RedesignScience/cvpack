@@ -101,7 +101,9 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
             for atom in residue.atoms():
                 if atom.name == "CA":
                     return atom.index
-            raise ValueError(f"Could not find atom CA in residue {residue.name}{residue.id}")
+            raise ValueError(
+                f"Could not find atom CA in residue {residue.name}{residue.id}"
+            )
 
         num_angles = len(residues) - 2
         numerator = 1 / num_angles if normalize else 1

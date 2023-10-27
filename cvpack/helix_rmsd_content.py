@@ -111,7 +111,9 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
     """
 
     _ideal_helix_positions = 0.1 * np.loadtxt(
-        str(resources.files("cvpack").joinpath("data").joinpath("ideal_alpha_helix.csv")),
+        str(
+            resources.files("cvpack").joinpath("data").joinpath("ideal_alpha_helix.csv")
+        ),
         delimiter=",",
     )
 
@@ -124,7 +126,9 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
         halfExponent: int = 3,
         normalize: bool = False,
     ) -> None:
-        assert 6 <= len(residues) <= 37, "The number of residues must be between 6 and 37"
+        assert (
+            6 <= len(residues) <= 37
+        ), "The number of residues must be between 6 and 37"
 
         def step_function(i):
             return f"1/(1 + (rmsd{i+1}/{thresholdRMSD})^{2*halfExponent})"
@@ -137,12 +141,16 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
                 elif residue.name == "GLY" and atom.name == "HA2":
                     indices["CB"] = atom.index
             if len(indices) != 5:
-                raise ValueError(f"Could not find all atoms in residue {residue.name}{residue.id}")
+                raise ValueError(
+                    f"Could not find all atoms in residue {residue.name}{residue.id}"
+                )
             return [indices[atom] for atom in ["N", "CA", "CB", "C", "O"]]
 
         num_residue_blocks = len(residues) - 5
         function = " + ".join(map(step_function, range(num_residue_blocks)))
-        super().__init__(f"({function})/{num_residue_blocks}" if normalize else function)
+        super().__init__(
+            f"({function})/{num_residue_blocks}" if normalize else function
+        )
         atoms = [atoms_list(r) for r in residues]
         positions = [openmm.Vec3(*x) for x in self._ideal_helix_positions]
         for i in range(num_residue_blocks):

@@ -94,9 +94,13 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
         numAtoms: int,
         pbc: bool = False,
         stepFunction: str = "1/(1+x^6)",
-        thresholdDistance: mmunit.ScalarQuantity = mmunit.Quantity(0.3, mmunit.nanometers),
+        thresholdDistance: mmunit.ScalarQuantity = mmunit.Quantity(
+            0.3, mmunit.nanometers
+        ),
         cutoffDistance: mmunit.ScalarQuantity = mmunit.Quantity(0.6, mmunit.nanometers),
-        switchingDistance: mmunit.ScalarQuantity = mmunit.Quantity(0.5, mmunit.nanometers),
+        switchingDistance: mmunit.ScalarQuantity = mmunit.Quantity(
+            0.5, mmunit.nanometers
+        ),
     ) -> None:
         super().__init__(stepFunction + f"; x=r/{thresholdDistance}")
         nonbonded_method = self.CutoffPeriodic if pbc else self.CutoffNonPeriodic
