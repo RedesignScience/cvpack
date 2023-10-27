@@ -17,3 +17,4 @@ from .radius_of_gyration_sq import RadiusOfGyrationSq  # noqa: F401
 from .rmsd import RMSD  # noqa: F401
 from .torsion import Torsion  # noqa: F401
 from .torsion_similarity import TorsionSimilarity  # noqa: F401
+from .volume_overlap import VolumeOverlap  # noqa: F401
