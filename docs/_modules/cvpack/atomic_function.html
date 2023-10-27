@@ -178,7 +178,13 @@
         <span class="k">if</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span><span class="o">.</span><span class="n">value_in_unit_system</span><span class="p">(</span><span class="n">mmunit</span><span class="o">.</span><span class="n">md_unit_system</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unit </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2"> is not compatible with the MD unit system.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span>
-            <span class="n">unit</span><span class="p">,</span> <span class="n">atomsPerGroup</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">SerializableUnit</span><span class="p">(</span><span class="n">unit</span><span class="p">),</span> <span class="n">pbc</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span>
+            <span class="n">unit</span><span class="p">,</span>
+            <span class="n">atomsPerGroup</span><span class="p">,</span>
+            <span class="n">function</span><span class="p">,</span>
+            <span class="n">groups</span><span class="p">,</span>
+            <span class="n">mmunit</span><span class="o">.</span><span class="n">SerializableUnit</span><span class="p">(</span><span class="n">unit</span><span class="p">),</span>
+            <span class="n">pbc</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">parameters</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="nd">@classmethod</span>
@@ -217,7 +223,9 @@
             <span class="n">parameters</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
         <span class="n">per_item_parameter_names</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">force</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;getNumPer</span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2">Parameters&quot;</span><span class="p">)()):</span>
-            <span class="n">per_item_parameter_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">force</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;getPer</span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2">ParameterName&quot;</span><span class="p">)(</span><span class="n">i</span><span class="p">))</span>
+            <span class="n">per_item_parameter_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="n">force</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;getPer</span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2">ParameterName&quot;</span><span class="p">)(</span><span class="n">i</span><span class="p">)</span>
+            <span class="p">)</span>
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">per_item_parameter_names</span><span class="p">:</span>
             <span class="n">parameters</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">atoms</span> <span class="o">=</span> <span class="p">[]</span>
@@ -225,7 +233,9 @@
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">force</span><span class="p">,</span> <span class="n">openmm</span><span class="o">.</span><span class="n">CustomCompoundBondForce</span><span class="p">):</span>
                 <span class="n">indices</span><span class="p">,</span> <span class="n">per_item_parameters</span> <span class="o">=</span> <span class="n">force</span><span class="o">.</span><span class="n">getBondParameters</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="o">*</span><span class="n">indices</span><span class="p">,</span> <span class="n">per_item_parameters</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">force</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;get</span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2">Parameters&quot;</span><span class="p">)(</span><span class="n">i</span><span class="p">)</span>
+                <span class="o">*</span><span class="n">indices</span><span class="p">,</span> <span class="n">per_item_parameters</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">force</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;get</span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2">Parameters&quot;</span><span class="p">)(</span>
+                    <span class="n">i</span>
+                <span class="p">)</span>
             <span class="n">atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">per_item_parameter_names</span><span class="p">,</span> <span class="n">per_item_parameters</span><span class="p">):</span>
                 <span class="n">parameters</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
@@ -267,7 +277,9 @@
             <span class="n">atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
             <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;theta0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
             <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;(k/2)*(angle(p1, p2, p3)-theta0)^2&quot;</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">pbc</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;(k/2)*(angle(p1, p2, p3)-theta0)^2&quot;</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">pbc</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span>
+        <span class="p">)</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_fromPeriodicTorsionForce</span><span class="p">(</span>
@@ -299,7 +311,9 @@
 <div class="viewcode-block" id="AtomicFunction.fromOpenMMForce">
 <a class="viewcode-back" href="../../api/AtomicFunction.html#cvpack.AtomicFunction.fromOpenMMForce">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">fromOpenMMForce</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Force</span><span class="p">,</span> <span class="n">unit</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Unit</span><span class="p">,</span> <span class="n">pbc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">fromOpenMMForce</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Force</span><span class="p">,</span> <span class="n">unit</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Unit</span><span class="p">,</span> <span class="n">pbc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create an :class:`AtomicFunction` from an :OpenMM:`Force`.</span>
 

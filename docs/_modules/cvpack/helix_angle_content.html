@@ -138,7 +138,9 @@
             <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;CA&quot;</span><span class="p">:</span>
                     <span class="k">return</span> <span class="n">atom</span><span class="o">.</span><span class="n">index</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not find atom CA in residue </span><span class="si">{</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="si">}{</span><span class="n">residue</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Could not find atom CA in residue </span><span class="si">{</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="si">}{</span><span class="n">residue</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
 
         <span class="n">num_angles</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">residues</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span>
         <span class="n">numerator</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">num_angles</span> <span class="k">if</span> <span class="n">normalize</span> <span class="k">else</span> <span class="mi">1</span>
