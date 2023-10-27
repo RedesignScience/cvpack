@@ -100,7 +100,9 @@ class AbstractCollectiveVariable(openmm.Force):
         new_group = next(iter(free_groups))
         self.setForceGroup(new_group)
         context.reinitialize(preserveState=True)
-        state = context.getState(getEnergy=getEnergy, getForces=getForces, groups=1 << new_group)
+        state = context.getState(
+            getEnergy=getEnergy, getForces=getForces, groups=1 << new_group
+        )
         self.setForceGroup(old_group)
         context.reinitialize(preserveState=True)
         return state
@@ -173,7 +175,9 @@ class AbstractCollectiveVariable(openmm.Force):
         """
         return self._unit
 
-    def getValue(self, context: openmm.Context, digits: Optional[int] = None) -> mmunit.Quantity:
+    def getValue(
+        self, context: openmm.Context, digits: Optional[int] = None
+    ) -> mmunit.Quantity:
         """
         Evaluate this collective variable at a given :OpenMM:`Context`.
 

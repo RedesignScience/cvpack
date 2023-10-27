@@ -2,6 +2,7 @@
 
 ignored-modules=openmm.unit
 ignore=_version.py
+extension-pkg-whitelist=rdkit,openmm.app.internal.compiled
 
 [DESIGN]
 

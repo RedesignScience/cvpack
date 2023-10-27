@@ -141,7 +141,13 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         if mmunit.Quantity(1, unit).value_in_unit_system(mmunit.md_unit_system) != 1:
             raise ValueError(f"Unit {unit} is not compatible with the MD unit system.")
         self._registerCV(
-            unit, atomsPerGroup, function, groups, mmunit.SerializableUnit(unit), pbc, **parameters
+            unit,
+            atomsPerGroup,
+            function,
+            groups,
+            mmunit.SerializableUnit(unit),
+            pbc,
+            **parameters,
         )
 
     @classmethod
@@ -180,7 +186,9 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
             parameters[name] = value
         per_item_parameter_names = []
         for i in range(getattr(force, f"getNumPer{item}Parameters")()):
-            per_item_parameter_names.append(getattr(force, f"getPer{item}ParameterName")(i))
+            per_item_parameter_names.append(
+                getattr(force, f"getPer{item}ParameterName")(i)
+            )
         for name in per_item_parameter_names:
             parameters[name] = []
         atoms = []
@@ -188,7 +196,9 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
             if isinstance(force, openmm.CustomCompoundBondForce):
                 indices, per_item_parameters = force.getBondParameters(i)
             else:
-                *indices, per_item_parameters = getattr(force, f"get{item}Parameters")(i)
+                *indices, per_item_parameters = getattr(force, f"get{item}Parameters")(
+                    i
+                )
             atoms.append(indices)
             for name, value in zip(per_item_parameter_names, per_item_parameters):
                 parameters[name].append(value)
@@ -230,7 +240,9 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
             atoms.append(indices)
             parameters["theta0"].append(angle)
             parameters["k"].append(k)
-        return cls(3, "(k/2)*(angle(p1, p2, p3)-theta0)^2", atoms, unit, pbc, **parameters)
+        return cls(
+            3, "(k/2)*(angle(p1, p2, p3)-theta0)^2", atoms, unit, pbc, **parameters
+        )
 
     @classmethod
     def _fromPeriodicTorsionForce(
@@ -260,7 +272,9 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         )
 
     @classmethod
-    def fromOpenMMForce(cls, force: openmm.Force, unit: mmunit.Unit, pbc: bool = False) -> Self:
+    def fromOpenMMForce(
+        cls, force: openmm.Force, unit: mmunit.Unit, pbc: bool = False
+    ) -> Self:
         """
         Create an :class:`AtomicFunction` from an :OpenMM:`Force`.
 

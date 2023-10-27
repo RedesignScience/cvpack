@@ -51,8 +51,7 @@ jobs:
         shell: bash -l {0}
         run: |
           cd cvpack/
-          pytest -v --cov=cvpack --cov-report=term-missing --cov-report=html \
-            --pyargs --color=yes --doctest-modules cvpack/
+          pytest
 
       - name: Get coverage report
         id:  coverage

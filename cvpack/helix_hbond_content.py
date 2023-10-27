@@ -82,7 +82,9 @@ class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
         self,
         residues: Sequence[mmapp.topology.Residue],
         pbc: bool = False,
-        thresholdDistance: mmunit.ScalarQuantity = mmunit.Quantity(0.33, mmunit.nanometers),
+        thresholdDistance: mmunit.ScalarQuantity = mmunit.Quantity(
+            0.33, mmunit.nanometers
+        ),
         halfExponent: int = 3,
         normalize: bool = False,
     ) -> None:
