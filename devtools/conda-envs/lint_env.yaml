@@ -4,19 +4,13 @@ channels:
 dependencies:
     # Base depends
   - python
-  - pip
   - openmm>=7.6
-  - numpy<1.24
-  - pyyaml
-  - importlib_resources
-  - typing_extensions
-  - xmltodict
-  - rdkit
-
-  # Testing
-  - scipy
   - openmmtools
   - mdtraj
+  - numpy
+  - scipy
+  - pytest
+  - xmltodict
 
     # Linting
   - flake8
