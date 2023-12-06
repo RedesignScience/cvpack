@@ -141,7 +141,13 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         if mmunit.Quantity(1, unit).value_in_unit_system(mmunit.md_unit_system) != 1:
             raise ValueError(f"Unit {unit} is not compatible with the MD unit system.")
         self._registerCV(
-            unit, atomsPerGroup, function, groups, mmunit.SerializableUnit(unit), pbc, **parameters
+            unit,
+            atomsPerGroup,
+            function,
+            groups,
+            mmunit.SerializableUnit(unit),
+            pbc,
+            **parameters,
         )
 
     @classmethod
@@ -180,7 +186,9 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
             parameters[name] = value
         per_item_parameter_names = []
         for i in range(getattr(force, f"getNumPer{item}Parameters")()):
-            per_item_parameter_names.append(getattr(force, f"getPer{item}ParameterName")(i))
+            per_item_parameter_names.append(
+                getattr(force, f"getPer{item}ParameterName")(i)
+            )
         for name in per_item_parameter_names:
             parameters[name] = []
         atoms = []
@@ -188,7 +196,9 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
             if isinstance(force, openmm.CustomCompoundBondForce):
                 indices, per_item_parameters = force.getBondParameters(i)
             else:
-                *indices, per_item_parameters = getattr(force, f"get{item}Parameters")(i)
+                *indices, per_item_parameters = getattr(force, f"get{item}Parameters")(
+                    i
+                )
             atoms.append(indices)
             for name, value in zip(per_item_parameter_names, per_item_parameters):
                 parameters[name].append(value)
@@ -230,7 +240,9 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
             atoms.append(indices)
             parameters["theta0"].append(angle)
             parameters["k"].append(k)
-        return cls(3, "(k/2)*(angle(p1, p2, p3)-theta0)^2", atoms, unit, pbc, **parameters)
+        return cls(
+            3, "(k/2)*(angle(p1, p2, p3)-theta0)^2", atoms, unit, pbc, **parameters
+        )
 
     @classmethod
     def _fromPeriodicTorsionForce(
@@ -260,7 +272,9 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         )
 
     @classmethod
-    def fromOpenMMForce(cls, force: openmm.Force, unit: mmunit.Unit, pbc: bool = False) -> Self:
+    def fromOpenMMForce(
+        cls, force: openmm.Force, unit: mmunit.Unit, pbc: bool = False
+    ) -> Self:
         """
         Create an :class:`AtomicFunction` from an :OpenMM:`Force`.
 
@@ -284,8 +298,8 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         Examples
         --------
         >>> import cvpack
+        >>> import numpy as np
         >>> import openmm
-        >>> from collections import deque
         >>> from cvpack import unit
         >>> from openmm import app
         >>> from openmmtools import testsystems
@@ -298,13 +312,15 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         >>> mean_x = openmm.CustomExternalForce("x/num_atoms")
         >>> mean_x.addGlobalParameter("num_atoms", num_atoms)
         0
-        >>> deque(map(mean_x.addParticle, range(num_atoms), [[]] * num_atoms), maxlen=0)
-        deque([], maxlen=0)
+        >>> for i in range(num_atoms):
+        ...     _ = mean_x.addParticle(i, [])
         >>> model.system.addForce(mean_x)
         7
         >>> forces = {force.getName(): force for force in model.system.getForces()}
         >>> copies = {
-        ...     name: cvpack.AtomicFunction.fromOpenMMForce(force, unit.kilojoules_per_mole)
+        ...     name: cvpack.AtomicFunction.fromOpenMMForce(
+        ...         force, unit.kilojoules_per_mole
+        ...     )
         ...     for name, force in forces.items()
         ...     if name in [
         ...         "HarmonicBondForce",
@@ -316,18 +332,20 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         >>> copies["HelixTorsionContent"] = cvpack.AtomicFunction.fromOpenMMForce(
         ...     helix_content, unit.dimensionless
         ... )
-        >>> [model.system.addForce(force) for force in copies.values()]
-        [8, 9, 10, 11, 12]
+        >>> indices = {}
+        >>> for index, (name, force) in enumerate(copies.items(), start=1):
+        ...     _ = model.system.addForce(force)
+        ...     force.setForceGroup(index)
+        ...     indices[name] = index
         >>> platform = openmm.Platform.getPlatformByName('Reference')
         >>> integrator = openmm.VerletIntegrator(0)
         >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
-        >>> for name, force in copies.items():
-        ...    forces[name].setForceGroup(1)
-        ...    state = context.getState(getEnergy=True, groups={1})
-        ...    value = state.getPotentialEnergy().value_in_unit(unit.kilojoules_per_mole)
-        ...    print(f"{name}: original={value:.6f}, copy={force.getValue(context, digits=6)}")
-        ...    forces[name].setForceGroup(0)
+        >>> for name in copies:
+        ...    state = context.getState(getEnergy=True, groups={indices[name]})
+        ...    value = state.getPotentialEnergy() / unit.kilojoules_per_mole
+        ...    copy_value = copies[name].getValue(context, digits=6)
+        ...    print(f"{name}: original={value:.6f}, copy={copy_value}")
         HarmonicBondForce: original=2094.312483, copy=2094.312 kJ/mol
         HarmonicAngleForce: original=3239.795215, copy=3239.795 kJ/mol
         PeriodicTorsionForce: original=4226.051934, copy=4226.052 kJ/mol

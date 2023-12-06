@@ -10,14 +10,12 @@
 
 from typing import Sequence
 
-import openmm
-
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable
+from .radius_of_gyration import _RadiusOfGyrationBase
 
 
-class RadiusOfGyrationSq(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):
+class RadiusOfGyrationSq(_RadiusOfGyrationBase):
     """
     The square of the radius of gyration of a group of :math:`n` atoms:
 
@@ -27,18 +25,18 @@ class RadiusOfGyrationSq(openmm.CustomCentroidBondForce, AbstractCollectiveVaria
             {\\bf r}_i - {\\bf r}_c({\\bf r})
         \\right\\|^2.
 
-    where :math:`{\\bf r}_c({\\bf r})` is the centroid of the group:
+    where :math:`{\\bf r}_c({\\bf r})` is the geometric center of the group:
 
     .. math::
 
         {\\bf r}_c({\\bf r}) = \\frac{1}{n} \\sum_{i=j}^n {\\bf r}_j
 
-    Optionally, the atoms can be weighted by their masses. In this case, the centroid is computed
-    as:
+    Optionally, the radius of gyration can be computed with respect to the center of
+    mass of the group. In this case, the geometric center is replaced by:
 
     .. math::
 
-        {\\bf r}_c({\\bf r}) = \\frac{1}{M} \\sum_{i=1}^n m_i {\\bf r}_i
+        {\\bf r}_m({\\bf r}) = \\frac{1}{M} \\sum_{i=1}^n m_i {\\bf r}_i
 
     where :math:`M = \\sum_{i=1}^n m_i` is the total mass of the group.
 
@@ -54,7 +52,8 @@ class RadiusOfGyrationSq(openmm.CustomCentroidBondForce, AbstractCollectiveVaria
         pbc
             Whether to use periodic boundary conditions
         weighByMass
-            Whether to weigh the atoms by their masses
+            Whether to use the center of mass of the group instead of its geometric
+            center
 
     Example
     -------
@@ -75,13 +74,11 @@ class RadiusOfGyrationSq(openmm.CustomCentroidBondForce, AbstractCollectiveVaria
 
     """
 
-    def __init__(self, group: Sequence[int], pbc: bool = False, weighByMass: bool = False) -> None:
+    def __init__(
+        self, group: Sequence[int], pbc: bool = False, weighByMass: bool = False
+    ) -> None:
         num_atoms = len(group)
-        super().__init__(2, f"distance(g1, g2)^2/{num_atoms}")
-        for atom in group:
-            self.addGroup([atom], [1])
-        self.addGroup(group, None if weighByMass else [1] * num_atoms)
+        super().__init__(2, f"distance(g1, g2)^2/{num_atoms}", group, pbc, weighByMass)
         for atom in group:
             self.addBond([atom, num_atoms])
-        self.setUsesPeriodicBoundaryConditions(pbc)
         self._registerCV(mmunit.nanometers**2, group, pbc, weighByMass)

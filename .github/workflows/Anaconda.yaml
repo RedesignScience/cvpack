@@ -47,8 +47,8 @@ jobs:
           export CVPACK_VERSION=${{ github.ref_name }}
           conda mambabuild . --no-anaconda-upload -c conda-forge --output-folder $outdir
           echo "::endgroup::"
-          echo "::group::Uploading package to redesign-science conda channel"
+          echo "::group::Uploading package to mdtools conda channel"
           PACKAGE=$(find $outdir -name *.tar.bz2 | head -1)
           export ANACONDA_API_TOKEN=${{ secrets.ANACONDA_TOKEN }}
-          anaconda upload --user redesign-science --force --label main $PACKAGE
+          anaconda upload --user mdtools --force --label main $PACKAGE
           echo "::endgroup::"

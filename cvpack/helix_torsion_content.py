@@ -113,10 +113,14 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
             for atom in residue.atoms():
                 if atom.name == name:
                     return atom.index
-            raise ValueError(f"Could not find atom {name} in residue {residue.name}{residue.id}")
+            raise ValueError(
+                f"Could not find atom {name} in residue {residue.name}{residue.id}"
+            )
 
         numerator = 1 / (2 * (len(residues) - 2)) if normalize else 1 / 2
-        super().__init__(f"{numerator}/(1+x^{2*halfExponent}); x=(theta-theta_ref)/{tolerance}")
+        super().__init__(
+            f"{numerator}/(1+x^{2*halfExponent}); x=(theta-theta_ref)/{tolerance}"
+        )
         self.addPerTorsionParameter("theta_ref")
         for i in range(1, len(residues) - 1):
             self.addTorsion(

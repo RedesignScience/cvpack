@@ -9,9 +9,9 @@ Collective Variable Package
 [![Documentation Status](https://github.com/RedesignScience/cvpack/workflows/Docs/badge.svg)](https://github.com/RedesignScience/cvpack/actions?query=workflow%3ADocs)
 [![Coverage Report](https://redesignscience.github.io/cvpack/coverage/coverage.svg)](https://redesignscience.github.io/cvpack/coverage)
 
-[![Conda cvpack version](https://img.shields.io/conda/v/redesign-science/cvpack.svg)](https://anaconda.org/redesign-science/cvpack)
-[![Conda cvpack platforms](https://img.shields.io/conda/pn/redesign-science/cvpack.svg)](https://anaconda.org/redesign-science/cvpack)
-[![Conda cvpack downloads](https://img.shields.io/conda/dn/redesign-science/cvpack.svg)](https://anaconda.org/redesign-science/cvpack)
+[![Conda cvpack version](https://img.shields.io/conda/v/mdtools/cvpack.svg)](https://anaconda.org/mdtools/cvpack)
+[![Conda cvpack platforms](https://img.shields.io/conda/pn/mdtools/cvpack.svg)](https://anaconda.org/mdtools/cvpack)
+[![Conda cvpack downloads](https://img.shields.io/conda/dn/mdtools/cvpack.svg)](https://anaconda.org/mdtools/cvpack)
 
 [![License](https://img.shields.io/badge/License-MIT-yellowgreen.svg?style=flat)](https://github.com/RedesignScience/cvpack/blob/main/LICENSE.md)
 [![Twitter](https://badgen.net/badge/follow%20us/@RedesignScience?icon=twitter)](https://twitter.com/RedesignScience)
@@ -54,16 +54,16 @@ The CVs implemented in CVPack are listed in the table below.
 ### Installation and Usage
 
 CVPack is available as a conda package on the
-[redesign-science](https://anaconda.org/redesign-science/cvpack) channel. To install it, simply run:
+[mdtools](https://anaconda.org/mdtools/cvpack) channel. To install it, run:
 
 ```bash
-    conda install -c conda-forge -c redesign-science cvpack
+    conda install -c conda-forge -c mdtools cvpack
 ```
 
-Or, if you prefer to use [mamba](https://mamba.readthedocs.io/en/latest) instead of conda:
+Or:
 
 ```bash
-    mamba install -c conda-forge -c redesign-science cvpack
+    mamba install -c mdtools cvpack
 ```
 
 To use CVPack in your own Python script or Jupyter notebook, simply import it as follows:
