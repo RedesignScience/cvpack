@@ -298,8 +298,8 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         Examples
         --------
         >>> import cvpack
+        >>> import numpy as np
         >>> import openmm
-        >>> from collections import deque
         >>> from cvpack import unit
         >>> from openmm import app
         >>> from openmmtools import testsystems
@@ -312,13 +312,15 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         >>> mean_x = openmm.CustomExternalForce("x/num_atoms")
         >>> mean_x.addGlobalParameter("num_atoms", num_atoms)
         0
-        >>> deque(map(mean_x.addParticle, range(num_atoms), [[]] * num_atoms), maxlen=0)
-        deque([], maxlen=0)
+        >>> for i in range(num_atoms):
+        ...     _ = mean_x.addParticle(i, [])
         >>> model.system.addForce(mean_x)
         7
         >>> forces = {force.getName(): force for force in model.system.getForces()}
         >>> copies = {
-        ...     name: cvpack.AtomicFunction.fromOpenMMForce(force, unit.kilojoules_per_mole)
+        ...     name: cvpack.AtomicFunction.fromOpenMMForce(
+        ...         force, unit.kilojoules_per_mole
+        ...     )
         ...     for name, force in forces.items()
         ...     if name in [
         ...         "HarmonicBondForce",
@@ -330,18 +332,20 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         >>> copies["HelixTorsionContent"] = cvpack.AtomicFunction.fromOpenMMForce(
         ...     helix_content, unit.dimensionless
         ... )
-        >>> [model.system.addForce(force) for force in copies.values()]
-        [8, 9, 10, 11, 12]
+        >>> indices = {}
+        >>> for index, (name, force) in enumerate(copies.items(), start=1):
+        ...     _ = model.system.addForce(force)
+        ...     force.setForceGroup(index)
+        ...     indices[name] = index
         >>> platform = openmm.Platform.getPlatformByName('Reference')
         >>> integrator = openmm.VerletIntegrator(0)
         >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
-        >>> for name, force in copies.items():
-        ...    forces[name].setForceGroup(1)
-        ...    state = context.getState(getEnergy=True, groups={1})
-        ...    value = state.getPotentialEnergy().value_in_unit(unit.kilojoules_per_mole)
-        ...    print(f"{name}: original={value:.6f}, copy={force.getValue(context, digits=6)}")
-        ...    forces[name].setForceGroup(0)
+        >>> for name in copies:
+        ...    state = context.getState(getEnergy=True, groups={indices[name]})
+        ...    value = state.getPotentialEnergy() / unit.kilojoules_per_mole
+        ...    copy_value = copies[name].getValue(context, digits=6)
+        ...    print(f"{name}: original={value:.6f}, copy={copy_value}")
         HarmonicBondForce: original=2094.312483, copy=2094.312 kJ/mol
         HarmonicAngleForce: original=3239.795215, copy=3239.795 kJ/mol
         PeriodicTorsionForce: original=4226.051934, copy=4226.052 kJ/mol
