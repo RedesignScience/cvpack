@@ -337,8 +337,8 @@
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; import cvpack</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
 <span class="sd">        &gt;&gt;&gt; import openmm</span>
-<span class="sd">        &gt;&gt;&gt; from collections import deque</span>
 <span class="sd">        &gt;&gt;&gt; from cvpack import unit</span>
 <span class="sd">        &gt;&gt;&gt; from openmm import app</span>
 <span class="sd">        &gt;&gt;&gt; from openmmtools import testsystems</span>
@@ -351,13 +351,15 @@
 <span class="sd">        &gt;&gt;&gt; mean_x = openmm.CustomExternalForce(&quot;x/num_atoms&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; mean_x.addGlobalParameter(&quot;num_atoms&quot;, num_atoms)</span>
 <span class="sd">        0</span>
-<span class="sd">        &gt;&gt;&gt; deque(map(mean_x.addParticle, range(num_atoms), [[]] * num_atoms), maxlen=0)</span>
-<span class="sd">        deque([], maxlen=0)</span>
+<span class="sd">        &gt;&gt;&gt; for i in range(num_atoms):</span>
+<span class="sd">        ...     _ = mean_x.addParticle(i, [])</span>
 <span class="sd">        &gt;&gt;&gt; model.system.addForce(mean_x)</span>
 <span class="sd">        7</span>
 <span class="sd">        &gt;&gt;&gt; forces = {force.getName(): force for force in model.system.getForces()}</span>
 <span class="sd">        &gt;&gt;&gt; copies = {</span>
-<span class="sd">        ...     name: cvpack.AtomicFunction.fromOpenMMForce(force, unit.kilojoules_per_mole)</span>
+<span class="sd">        ...     name: cvpack.AtomicFunction.fromOpenMMForce(</span>
+<span class="sd">        ...         force, unit.kilojoules_per_mole</span>
+<span class="sd">        ...     )</span>
 <span class="sd">        ...     for name, force in forces.items()</span>
 <span class="sd">        ...     if name in [</span>
 <span class="sd">        ...         &quot;HarmonicBondForce&quot;,</span>
@@ -369,18 +371,20 @@
 <span class="sd">        &gt;&gt;&gt; copies[&quot;HelixTorsionContent&quot;] = cvpack.AtomicFunction.fromOpenMMForce(</span>
 <span class="sd">        ...     helix_content, unit.dimensionless</span>
 <span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; [model.system.addForce(force) for force in copies.values()]</span>
-<span class="sd">        [8, 9, 10, 11, 12]</span>
+<span class="sd">        &gt;&gt;&gt; indices = {}</span>
+<span class="sd">        &gt;&gt;&gt; for index, (name, force) in enumerate(copies.items(), start=1):</span>
+<span class="sd">        ...     _ = model.system.addForce(force)</span>
+<span class="sd">        ...     force.setForceGroup(index)</span>
+<span class="sd">        ...     indices[name] = index</span>
 <span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
 <span class="sd">        &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
 <span class="sd">        &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">        &gt;&gt;&gt; for name, force in copies.items():</span>
-<span class="sd">        ...    forces[name].setForceGroup(1)</span>
-<span class="sd">        ...    state = context.getState(getEnergy=True, groups={1})</span>
-<span class="sd">        ...    value = state.getPotentialEnergy().value_in_unit(unit.kilojoules_per_mole)</span>
-<span class="sd">        ...    print(f&quot;{name}: original={value:.6f}, copy={force.getValue(context, digits=6)}&quot;)</span>
-<span class="sd">        ...    forces[name].setForceGroup(0)</span>
+<span class="sd">        &gt;&gt;&gt; for name in copies:</span>
+<span class="sd">        ...    state = context.getState(getEnergy=True, groups={indices[name]})</span>
+<span class="sd">        ...    value = state.getPotentialEnergy() / unit.kilojoules_per_mole</span>
+<span class="sd">        ...    copy_value = copies[name].getValue(context, digits=6)</span>
+<span class="sd">        ...    print(f&quot;{name}: original={value:.6f}, copy={copy_value}&quot;)</span>
 <span class="sd">        HarmonicBondForce: original=2094.312483, copy=2094.312 kJ/mol</span>
 <span class="sd">        HarmonicAngleForce: original=3239.795215, copy=3239.795 kJ/mol</span>
 <span class="sd">        PeriodicTorsionForce: original=4226.051934, copy=4226.052 kJ/mol</span>
