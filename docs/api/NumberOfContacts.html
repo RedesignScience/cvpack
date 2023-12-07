@@ -40,26 +40,28 @@
 <h1>NumberOfContacts<a class="headerlink" href="#numberofcontacts" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="cvpack.NumberOfContacts">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">NumberOfContacts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numAtoms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stepFunction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1/(1+x^6)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresholdDistance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Quantity(value=0.3,</span> <span class="pre">unit=nanometer)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoffDistance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Quantity(value=0.6,</span> <span class="pre">unit=nanometer)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">switchingDistance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Quantity(value=0.5,</span> <span class="pre">unit=nanometer)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/number_of_contacts.html#NumberOfContacts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.NumberOfContacts" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">NumberOfContacts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numAtoms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stepFunction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1/(1+x^6)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresholdDistance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Quantity(value=0.3,</span> <span class="pre">unit=nanometer)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoffFactor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">switchFactor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/number_of_contacts.html#NumberOfContacts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.NumberOfContacts" title="Link to this definition">¶</a></dt>
 <dd><p>The number of contacts between two atom groups:</p>
 <div class="math notranslate nohighlight">
 \[N({\bf r}) = \sum_{i \in {\bf g}_1} \sum_{j \in {\bf g}_2}
                 S\left(\frac{\|{\bf r}_j - {\bf r}_i\|}{r_0}\right)\]</div>
-<p>where <span class="math notranslate nohighlight">\(r_0\)</span> is the threshold distance for defining a contact and <span class="math notranslate nohighlight">\(S(x)\)</span> is a step
-function equal to 1 if a contact is made or equal to 0 otherwise. In analysis, it is fine to
-make <span class="math notranslate nohighlight">\(S(x) = H(1-x)\)</span>, where <cite>H</cite> is the <a class="reference external" href="https://en.wikipedia.org/wiki/Heaviside_step_function">Heaviside step function</a>. In a simulation, however,
-<span class="math notranslate nohighlight">\(S(x)\)</span> should continuously approximate <span class="math notranslate nohighlight">\(H(1-x)\)</span> for <span class="math notranslate nohighlight">\(x \geq 0\)</span>. By default
-<span id="id1">[<a class="reference internal" href="../references.html#id5" title="Marcella Iannuzzi, Alessandro Laio, and Michele Parrinello. Efficient exploration of reactive potential energy surfaces using car-parrinello molecular dynamics. Physical Review Letters, jun 2003. doi:10.1103/physrevlett.90.238302.">5</a>]</span>,</p>
+<p>where <span class="math notranslate nohighlight">\(r_0\)</span> is the threshold distance for defining a contact and <span class="math notranslate nohighlight">\(S(x)\)</span> is
+a step function equal to <span class="math notranslate nohighlight">\(1\)</span> if a contact is made or equal to <span class="math notranslate nohighlight">\(0\)</span> otherwise.
+For trajectory analysis, it is fine to make <span class="math notranslate nohighlight">\(S(x) = H(1-x)\)</span>, where <cite>H</cite> is the
+<a class="reference external" href="https://en.wikipedia.org/wiki/Heaviside_step_function">Heaviside step function</a>. For
+molecular dynamics, however, <span class="math notranslate nohighlight">\(S(x)\)</span> should be a continuous approximation of
+<span class="math notranslate nohighlight">\(H(1-x)\)</span> for <span class="math notranslate nohighlight">\(x \geq 0\)</span>. By default <span id="id1">[<a class="reference internal" href="../references.html#id5" title="Marcella Iannuzzi, Alessandro Laio, and Michele Parrinello. Efficient exploration of reactive potential energy surfaces using car-parrinello molecular dynamics. Physical Review Letters, jun 2003. doi:10.1103/physrevlett.90.238302.">5</a>]</span>, the following
+function is used:</p>
 <div class="math notranslate nohighlight">
 \[S(x) = \frac{1-x^6}{1-x^{12}} = \frac{1}{1+x^6}\]</div>
-<p>Atom pairs are ignored for distances beyond a cutoff <span class="math notranslate nohighlight">\(r_c\)</span>. To avoid discontinuities,
-a switching function is applied at <span class="math notranslate nohighlight">\(r_s \leq r \leq r_c\)</span> to make <span class="math notranslate nohighlight">\(S(r/r_0)\)</span>
-smoothly decay to zero.</p>
+<p>In fact, a cutoff distance <span class="math notranslate nohighlight">\(r_c = x_c r_0\)</span> (typically, <span class="math notranslate nohighlight">\(x_c = 2\)</span>) is applied
+so that <span class="math notranslate nohighlight">\(S(x) = 0\)</span> for <span class="math notranslate nohighlight">\(x \geq x_c\)</span>. To avoid discontinuities, there is also
+the option to smoothly switch off <span class="math notranslate nohighlight">\(S(x)\)</span> starting from <span class="math notranslate nohighlight">\(r_s = x_s r_0\)</span>
+(typically, <span class="math notranslate nohighlight">\(x_s = 1.5\)</span>) instead of doing it abruptly at <span class="math notranslate nohighlight">\(r_c\)</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The two groups are allowed to overlap. In this case, terms with <span class="math notranslate nohighlight">\(j = i\)</span>
-(self-contacts) are ignored and each combination with <span class="math notranslate nohighlight">\(j \neq i\)</span> is counted
-only once.</p>
+<p>Atoms are allowed to be in both groups. In this case, self-contacts (<span class="math notranslate nohighlight">\(i = j\)</span>)
+are ignored and each pair of distinct atoms (<span class="math notranslate nohighlight">\(i \neq j\)</span>) is counted only once.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -70,9 +72,13 @@ only once.</p>
 <li><p><strong>pbc</strong> (<em>bool</em>) – Whether the system has periodic boundary conditions</p></li>
 <li><p><strong>stepFunction</strong> (<em>str</em>) – The function “step(1-x)” (for analysis only) or a continuous approximation
 thereof</p></li>
-<li><p><strong>thresholdDistance</strong> (<em>Quantity</em><em> | </em><em>Real</em>) – The threshold distance for considering two atoms as being in contact</p></li>
-<li><p><strong>cutoffDistance</strong> (<em>Quantity</em><em> | </em><em>Real</em>) – The distance beyond which an atom pair will be ignored</p></li>
-<li><p><strong>switchingDistance</strong> (<em>Quantity</em><em> | </em><em>Real</em>) – The distance beyond which a switching function will be applied</p></li>
+<li><p><strong>thresholdDistance</strong> (<em>Quantity</em><em> | </em><em>Real</em>) – The threshold distance (<span class="math notranslate nohighlight">\(r_0\)</span>) for considering two atoms as being in
+contact</p></li>
+<li><p><strong>cutoffFactor</strong> (<em>float</em>) – The factor <span class="math notranslate nohighlight">\(x_c\)</span> that multiplies the threshold distance to define
+the cutoff distance</p></li>
+<li><p><strong>switchFactor</strong> (<em>float</em><em> | </em><em>None</em>) – The factor <span class="math notranslate nohighlight">\(x_s\)</span> that multiplies the threshold distance to define
+the distance at which the step function starts switching off smoothly.
+If None, it switches off abruptly at the cutoff distance.</p></li>
 </ul>
 </dd>
 </dl>

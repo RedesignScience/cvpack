@@ -42,7 +42,7 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">t</span>
 
 <span class="kn">import</span> <span class="nn">openmm</span>
 
@@ -61,26 +61,27 @@
 <span class="sd">        N({\\bf r}) = \\sum_{i \\in {\\bf g}_1} \\sum_{j \\in {\\bf g}_2}</span>
 <span class="sd">                        S\\left(\\frac{\\|{\\bf r}_j - {\\bf r}_i\\|}{r_0}\\right)</span>
 
-<span class="sd">    where :math:`r_0` is the threshold distance for defining a contact and :math:`S(x)` is a step</span>
-<span class="sd">    function equal to 1 if a contact is made or equal to 0 otherwise. In analysis, it is fine to</span>
-<span class="sd">    make :math:`S(x) = H(1-x)`, where `H` is the `Heaviside step function</span>
-<span class="sd">    &lt;https://en.wikipedia.org/wiki/Heaviside_step_function&gt;`_. In a simulation, however,</span>
-<span class="sd">    :math:`S(x)` should continuously approximate :math:`H(1-x)` for :math:`x \\geq 0`. By default</span>
-<span class="sd">    :cite:`Iannuzzi_2003`,</span>
+<span class="sd">    where :math:`r_0` is the threshold distance for defining a contact and :math:`S(x)` is</span>
+<span class="sd">    a step function equal to :math:`1` if a contact is made or equal to :math:`0` otherwise.</span>
+<span class="sd">    For trajectory analysis, it is fine to make :math:`S(x) = H(1-x)`, where `H` is the</span>
+<span class="sd">    `Heaviside step function &lt;https://en.wikipedia.org/wiki/Heaviside_step_function&gt;`_. For</span>
+<span class="sd">    molecular dynamics, however, :math:`S(x)` should be a continuous approximation of</span>
+<span class="sd">    :math:`H(1-x)` for :math:`x \\geq 0`. By default :cite:`Iannuzzi_2003`, the following</span>
+<span class="sd">    function is used:</span>
 
 <span class="sd">    .. math::</span>
 
 <span class="sd">        S(x) = \\frac{1-x^6}{1-x^{12}} = \\frac{1}{1+x^6}</span>
 
-<span class="sd">    Atom pairs are ignored for distances beyond a cutoff :math:`r_c`. To avoid discontinuities,</span>
-<span class="sd">    a switching function is applied at :math:`r_s \\leq r \\leq r_c` to make :math:`S(r/r_0)`</span>
-<span class="sd">    smoothly decay to zero.</span>
+<span class="sd">    In fact, a cutoff distance :math:`r_c = x_c r_0` (typically, :math:`x_c = 2`) is applied</span>
+<span class="sd">    so that :math:`S(x) = 0` for :math:`x \\geq x_c`. To avoid discontinuities, there is also</span>
+<span class="sd">    the option to smoothly switch off :math:`S(x)` starting from :math:`r_s = x_s r_0`</span>
+<span class="sd">    (typically, :math:`x_s = 1.5`) instead of doing it abruptly at :math:`r_c`.</span>
 
 <span class="sd">    .. note::</span>
 
-<span class="sd">        The two groups are allowed to overlap. In this case, terms with :math:`j = i`</span>
-<span class="sd">        (self-contacts) are ignored and each combination with :math:`j \\neq i` is counted</span>
-<span class="sd">        only once.</span>
+<span class="sd">        Atoms are allowed to be in both groups. In this case, self-contacts (:math:`i = j`)</span>
+<span class="sd">        are ignored and each pair of distinct atoms (:math:`i \\neq j`) is counted only once.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -96,11 +97,15 @@
 <span class="sd">            The function &quot;step(1-x)&quot; (for analysis only) or a continuous approximation</span>
 <span class="sd">            thereof</span>
 <span class="sd">        thresholdDistance</span>
-<span class="sd">            The threshold distance for considering two atoms as being in contact</span>
-<span class="sd">        cutoffDistance</span>
-<span class="sd">            The distance beyond which an atom pair will be ignored</span>
-<span class="sd">        switchingDistance</span>
-<span class="sd">            The distance beyond which a switching function will be applied</span>
+<span class="sd">            The threshold distance (:math:`r_0`) for considering two atoms as being in</span>
+<span class="sd">            contact</span>
+<span class="sd">        cutoffFactor</span>
+<span class="sd">            The factor :math:`x_c` that multiplies the threshold distance to define</span>
+<span class="sd">            the cutoff distance</span>
+<span class="sd">        switchFactor</span>
+<span class="sd">            The factor :math:`x_s` that multiplies the threshold distance to define</span>
+<span class="sd">            the distance at which the step function starts switching off smoothly.</span>
+<span class="sd">            If None, it switches off abruptly at the cutoff distance.</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
@@ -126,27 +131,27 @@
     <span class="nd">@mmunit</span><span class="o">.</span><span class="n">convert_quantities</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">group1</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
-        <span class="n">group2</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">group1</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">group2</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
         <span class="n">numAtoms</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">pbc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">pbc</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">stepFunction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;1/(1+x^6)&quot;</span><span class="p">,</span>
         <span class="n">thresholdDistance</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span>
             <span class="mf">0.3</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span>
         <span class="p">),</span>
-        <span class="n">cutoffDistance</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span><span class="p">),</span>
-        <span class="n">switchingDistance</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span>
-            <span class="mf">0.5</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span>
-        <span class="p">),</span>
+        <span class="n">cutoffFactor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+        <span class="n">switchFactor</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">stepFunction</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;; x=r/</span><span class="si">{</span><span class="n">thresholdDistance</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">nonbonded_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">CutoffPeriodic</span> <span class="k">if</span> <span class="n">pbc</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">CutoffNonPeriodic</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setNonbondedMethod</span><span class="p">(</span><span class="n">nonbonded_method</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numAtoms</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">addParticle</span><span class="p">([])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">setUseSwitchingFunction</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">setCutoffDistance</span><span class="p">(</span><span class="n">cutoffDistance</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">setSwitchingDistance</span><span class="p">(</span><span class="n">switchingDistance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setCutoffDistance</span><span class="p">(</span><span class="n">cutoffFactor</span> <span class="o">*</span> <span class="n">thresholdDistance</span><span class="p">)</span>
+        <span class="n">use_switching_function</span> <span class="o">=</span> <span class="n">switchFactor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setUseSwitchingFunction</span><span class="p">(</span><span class="n">use_switching_function</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_switching_function</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setSwitchingDistance</span><span class="p">(</span><span class="n">switchFactor</span> <span class="o">*</span> <span class="n">thresholdDistance</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setUseLongRangeCorrection</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">addInteractionGroup</span><span class="p">(</span><span class="n">group1</span><span class="p">,</span> <span class="n">group2</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span>
@@ -157,8 +162,8 @@
             <span class="n">pbc</span><span class="p">,</span>
             <span class="n">stepFunction</span><span class="p">,</span>
             <span class="n">thresholdDistance</span><span class="p">,</span>
-            <span class="n">cutoffDistance</span><span class="p">,</span>
-            <span class="n">switchingDistance</span><span class="p">,</span>
+            <span class="n">cutoffFactor</span><span class="p">,</span>
+            <span class="n">switchFactor</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 </pre></div>
