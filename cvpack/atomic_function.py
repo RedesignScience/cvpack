@@ -66,10 +66,15 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
             collective variables does not have a unit, use `unit.dimensionless`
         pbc
             Whether to use periodic boundary conditions
+
+    Keyword Args
+    ------------
         **parameters
-            The named parameters of the function. Each parameter can be a scalar quantity or a 1D
-            array-like object of length `m`, where `m` is the number of groups. In the latter
-            case, each entry of the array is used for the corresponding group of atoms.
+            The named parameters of the function. Each parameter can be specified as single
+            value for all groups of atoms, or as a sequence of values, one for each group.
+            In the latter case, the length of the sequence must be equal to `m` (see the
+            `atoms` argument description). If the specified values have units, they will be
+            converted to the MD unit system.
 
     Raises
     ------
@@ -96,9 +101,9 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         ... )
         >>> [model.system.addForce(f) for f in [angle1, angle2, colvar]]
         [5, 6, 7]
-        >>> integrator =openmm.VerletIntegrator(0)
-        >>> platform =openmm.Platform.getPlatformByName('Reference')
-        >>> context =openmm.Context(model.system, integrator, platform)
+        >>> integrator = openmm.VerletIntegrator(0)
+        >>> platform = openmm.Platform.getPlatformByName('Reference')
+        >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
         >>> theta1 = angle1.getValue(context).value_in_unit(openmm.unit.radian)
         >>> theta2 = angle2.getValue(context).value_in_unit(openmm.unit.radian)
@@ -125,6 +130,10 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
             if isinstance(data, mmunit.Quantity):
                 data = data.value_in_unit_system(mmunit.md_unit_system)
             if isinstance(data, Sequence):
+                if len(data) != groups.shape[0]:
+                    raise ValueError(
+                        f"The length of the parameter {name} must be equal to {groups.shape[0]}."
+                    )
                 self.addPerBondParameter(name)
                 perbond_parameters.append(data)
             else:
@@ -132,8 +141,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         for group, *values in zip(groups, *perbond_parameters):
             self.addBond(group, values)
         self.setUsesPeriodicBoundaryConditions(pbc)
-        if mmunit.Quantity(1, unit).value_in_unit_system(mmunit.md_unit_system) != 1:
-            raise ValueError(f"Unit {unit} is not compatible with the MD unit system.")
+        self._checkUnitCompatibility(unit)
         self._registerCV(
             unit,
             atomsPerGroup,
