@@ -7,7 +7,6 @@
 
 """
 
-import sys
 from importlib import resources
 from typing import List, Sequence
 
