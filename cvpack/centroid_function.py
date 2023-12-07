@@ -61,6 +61,15 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
             the collective variables does not have a unit, use `dimensionless`
         pbc
             Whether to use periodic boundary conditions
+        weighByMass
+            Whether to define the centroid as the center of mass of the group instead of the
+            geometric center
+
+    Keyword Args
+    ------------
+        **parameters
+            The named parameters of the function. If the specified value has units, it will be
+            converted to the MD unit system.
 
     Raises
     ------
@@ -76,20 +85,21 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         >>> model = testsystems.AlanineDipeptideVacuum()
         >>> num_atoms = model.system.getNumParticles()
         >>> atoms = list(range(num_atoms))
-        >>> rg = cvpack.RadiusOfGyration(atoms)
-        >>> definitions = [f'd{i+1} = distance(g{i+1}, g{num_atoms+1})' for i in atoms]
-        >>> sum_dist_sq = "+".join(f'd{i+1}^2' for i in atoms)
-        >>> function = ";".join([f"sqrt(({sum_dist_sq})/{num_atoms})"] + definitions)
-        >>> groups = [[i] for i in atoms] + [atoms]
-        >>> colvar = cvpack.CentroidFunction(function, groups, unit.nanometers)
-        >>> [model.system.addForce(f) for f in [rg, colvar]]
-        [5, 6]
-        >>> integrator =openmm.VerletIntegrator(0)
-        >>> platform =openmm.Platform.getPlatformByName('Reference')
-        >>> context =openmm.Context(model.system, integrator, platform)
+        >>> groups = [[i] for i in atoms]  # Each atom is a group
+        >>> groups.append(atoms)  # The whole molecule is a group
+        >>> sum_dist_sq = "+".join(
+        ...     f'distance(g{i+1}, g{num_atoms+1})^2' for i in atoms
+        ... )
+        >>> function = f"sqrt(({sum_dist_sq})/n)"  # The radius of gyration
+        >>> colvar = cvpack.CentroidFunction(
+        ...     function, groups, unit.nanometers, n=num_atoms,
+        ... )
+        >>> model.system.addForce(colvar)
+        5
+        >>> integrator = openmm.VerletIntegrator(0)
+        >>> platform = openmm.Platform.getPlatformByName('Reference')
+        >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
-        >>> print(rg.getValue(context, digits=6))
-        0.2951431 nm
         >>> print(colvar.getValue(context, digits=6))
         0.2951431 nm
     """
@@ -101,13 +111,15 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         unit: mmunit.Unit,
         pbc: bool = False,
         weighByMass: bool = False,
+        **parameters: mmunit.ScalarQuantity,
     ) -> None:
         num_groups = len(groups)
         super().__init__(num_groups, function)
         for group in groups:
             self.addGroup(group, None if weighByMass else [1] * len(group))
+        for name, value in parameters.items():
+            self.addGlobalParameter(name, value)
         self.addBond(list(range(num_groups)), [])
         self.setUsesPeriodicBoundaryConditions(pbc)
-        if mmunit.Quantity(1, unit).value_in_unit_system(mmunit.md_unit_system) != 1:
-            raise ValueError(f"Unit {unit} is not compatible with the MD unit system.")
+        self._checkUnitCompatibility(unit)
         self._registerCV(unit, function, groups, SerializableUnit(unit), pbc)
