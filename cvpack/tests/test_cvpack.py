@@ -262,7 +262,13 @@ def test_number_of_contacts():
     distances = np.array([np.linalg.norm(pos[i] - pos[j]) for i, j in pairs])
     contacts = np.where(distances <= 0.6, 1 / (1 + (distances / 0.3) ** 6), 0)
     num_atoms = model.topology.getNumAtoms()
-    number_of_contacts = cvpack.NumberOfContacts(group1, group2, num_atoms, pbc=False)
+    number_of_contacts = cvpack.NumberOfContacts(
+        group1,
+        group2,
+        num_atoms,
+        pbc=False,
+        switchFactor=None,
+    )
     model.system.addForce(number_of_contacts)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
