@@ -99,7 +99,9 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
         numAtoms: int,
         pbc: bool,
         stepFunction: str = "1/(1+x^6)",
-        thresholdDistance: mmunit.ScalarQuantity = mmunit.Quantity(0.3, mmunit.nanometers),
+        thresholdDistance: mmunit.ScalarQuantity = mmunit.Quantity(
+            0.3, mmunit.nanometers
+        ),
         cutoffFactor: float = 2.0,
         switchFactor: t.Optional[float] = 1.5,
     ) -> None:
