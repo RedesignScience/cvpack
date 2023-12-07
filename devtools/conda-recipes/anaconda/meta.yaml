@@ -25,6 +25,7 @@ requirements:
     - numpy
     - openmm>=7.6
     - pyyaml
+    - xmltodict
 
 test:
   imports:
