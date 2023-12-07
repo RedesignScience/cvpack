@@ -5,11 +5,9 @@ dependencies:
     # Base depends
   - python
   - pip
-  - openmm
   - numpy
+  - openmm
   - pyyaml
-  - importlib_resources
-  - typing_extensions
   - xmltodict
 
     # Conda build

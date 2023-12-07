@@ -8,6 +8,7 @@
 """
 
 import sys
+from importlib import resources
 from typing import List, Sequence
 
 import numpy as np
@@ -18,11 +19,6 @@ from cvpack import unit as mmunit
 
 from .cvpack import AbstractCollectiveVariable, SerializableResidue
 from .rmsd import RMSD
-
-if sys.version_info >= (3, 9):
-    from importlib import resources
-else:
-    import importlib_resources as resources
 
 
 class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):

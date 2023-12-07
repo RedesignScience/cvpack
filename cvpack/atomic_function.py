@@ -27,11 +27,6 @@ from cvpack import unit as mmunit
 
 from .cvpack import AbstractCollectiveVariable
 
-if sys.version_info >= (3, 11):
-    from typing import Self
-else:
-    from typing_extensions import Self
-
 
 class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable):
     """
@@ -162,7 +157,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         ],
         unit: mmunit.Unit,
         pbc: bool = False,
-    ) -> Self:
+    ) -> "AtomicFunction":
         """
         Create a :class:`AtomicFunction` from an object of :openmm:`CustomBondForce`,
         :openmm:`CustomAngleForce`, :openmm:`CustomTorsionForce`, or
@@ -210,7 +205,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         force: openmm.HarmonicBondForce,
         unit: mmunit.Unit,
         pbc: bool = False,
-    ) -> Self:
+    ) -> "AtomicFunction":
         """
         Create a :class:`AtomicFunction` from an :OpenMM:`HarmonicBondForce`.
         """
@@ -229,7 +224,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         force: openmm.HarmonicAngleForce,
         unit: mmunit.Unit,
         pbc: bool = False,
-    ) -> Self:
+    ) -> "AtomicFunction":
         """
         Create a :class:`AtomicFunction` from an :OpenMM:`HarmonicAngleForce`.
         """
@@ -250,7 +245,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         force: openmm.PeriodicTorsionForce,
         unit: mmunit.Unit,
         pbc: bool = False,
-    ) -> Self:
+    ) -> "AtomicFunction":
         """
         Create a :class:`AtomicFunction` from an :OpenMM:`PeriodicTorsionForce`.
         """
@@ -274,7 +269,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
     @classmethod
     def fromOpenMMForce(
         cls, force: openmm.Force, unit: mmunit.Unit, pbc: bool = False
-    ) -> Self:
+    ) -> "AtomicFunction":
         """
         Create an :class:`AtomicFunction` from an :OpenMM:`Force`.
 

@@ -5,11 +5,9 @@ dependencies:
     # Base dependencies
   - python
   - pip
-  - openmm>=7.6
-  - numpy<1.24
+  - openmm
+  - numpy
   - pyyaml
-  - importlib_resources
-  - typing_extensions
   - xmltodict
 
     # Testing

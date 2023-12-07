@@ -20,10 +20,8 @@ requirements:
     - pip
   run:
     - python
-    - importlib-resources  # [py<310]
-    - typing_extensions  # [py<311]
     - numpy
-    - openmm>=7.6
+    - openmm
     - pyyaml
     - xmltodict
 
