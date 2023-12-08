@@ -27,22 +27,22 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, AbstractCollectiveVariab
             \\phi^{\\rm 1st}_i({\\bf r}) - \\phi^{\\rm 2nd}_i({\\bf r})
         \\Big)
 
-    where :math:`\\phi^{\\rm kth}_i` is the torsion angle at position :math:`i` in the :math:`k`-th
-    list.
+    where :math:`\\phi^{\\rm kth}_i` is the torsion angle at position :math:`i` in the
+    :math:`k`-th list.
 
     .. note::
 
-        In `PLUMED <https://www.plumed.org/doc-v2.8/user-doc/html/_colvar.html>`_, this collective
-        variable is called ``DIHCOR``.
+        In `PLUMED <https://www.plumed.org/doc-v2.8/user-doc/html/_colvar.html>`_, this
+        collective variable is called ``DIHCOR``.
 
     Parameters
     ----------
         firstList
-            A list of :math:`n` tuples of four atom indices defining the first torsion angle in
-            each pair.
+            A list of :math:`n` tuples of four atom indices defining the first torsion
+            angle in each pair.
         secondList
-            A list of :math:`n` tuples of four atom indices defining the second torsion angle in
-            each pair.
+            A list of :math:`n` tuples of four atom indices defining the second torsion
+            angle in each pair.
         pbc
             Whether to use periodic boundary conditions
 
@@ -54,11 +54,19 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, AbstractCollectiveVariab
         >>> import openmm.unit as mmunit
         >>> from openmmtools import testsystems
         >>> model = testsystems.LysozymeImplicit()
-        >>> traj = mdtraj.Trajectory(model.positions, mdtraj.Topology.from_openmm(model.topology))
+        >>> traj = mdtraj.Trajectory(
+        ...     model.positions, mdtraj.Topology.from_openmm(model.topology)
+        ... )
         >>> phi_atoms, _ = mdtraj.compute_phi(traj)
         >>> valid_atoms = traj.top.select("resid 59 to 79 and backbone")
-        >>> phi_atoms = [phi for phi in phi_atoms if all(atom in valid_atoms for atom in phi)]
-        >>> torsion_similarity = cvpack.TorsionSimilarity(phi_atoms[1:], phi_atoms[:-1])
+        >>> phi_atoms = [
+        ...     phi
+        ...     for phi in phi_atoms
+        ...     if all(atom in valid_atoms for atom in phi)
+        ... ]
+        >>> torsion_similarity = cvpack.TorsionSimilarity(
+        ...     phi_atoms[1:], phi_atoms[:-1]
+        ... )
         >>> model.system.addForce(torsion_similarity)
         6
         >>> integrator =openmm.VerletIntegrator(0)

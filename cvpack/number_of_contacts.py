@@ -77,14 +77,22 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
         >>> from openmm import app
         >>> from openmmtools import testsystems
         >>> model = testsystems.AlanineDipeptideVacuum()
-        >>> carbons = [a.index for a in model.topology.atoms() if a.element == app.element.carbon]
+        >>> carbons = [
+        ...     a.index
+        ...     for a in model.topology.atoms()
+        ...     if a.element == app.element.carbon
+        ... ]
         >>> num_atoms = model.topology.getNumAtoms()
         >>> optionals = {"pbc": False, "stepFunction": "step(1-x)"}
-        >>> nc = cvpack.NumberOfContacts(carbons, carbons, num_atoms, **optionals)
+        >>> nc = cvpack.NumberOfContacts(
+        ...     carbons, carbons, num_atoms, **optionals
+        ... )
         >>> model.system.addForce(nc)
         5
         >>> platform = openmm.Platform.getPlatformByName('Reference')
-        >>> context = openmm.Context(model.system, openmm.CustomIntegrator(0), platform)
+        >>> context = openmm.Context(
+        ...     model.system, openmm.CustomIntegrator(0), platform
+        ... )
         >>> context.setPositions(model.positions)
         >>> print(nc.getValue(context, digits=6))
         6.0 dimensionless

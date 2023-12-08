@@ -27,23 +27,25 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
             \\frac{\\theta^\\alpha_i({\\bf r}) - \\theta_{\\rm ref}}{\\theta_{\\rm tol}}
         \\right)
 
-    where :math:`\\theta^\\alpha_i` is the angle formed by the alpha-carbon atoms of residues
-    :math:`i-1`, :math:`i`, and :math:`i+1`, :math:`\\theta_{\\rm ref}` is its reference value in
-    an alpha helix, and :math:`\\theta_{\\rm tol}` is the threshold tolerance around this
-    reference. :math:`B_m(x)` is a smooth boxcar function given by
+    where :math:`\\theta^\\alpha_i` is the angle formed by the alpha-carbon atoms of
+    residues :math:`i-1`, :math:`i`, and :math:`i+1`, :math:`\\theta_{\\rm ref}` is its
+    reference value in an alpha helix, and :math:`\\theta_{\\rm tol}` is the threshold
+    tolerance around this reference. :math:`B_m(x)` is a smooth boxcar function given by
 
     .. math::
         B_m(x) = \\frac{1}{1 + x^{2m}}
 
-    where :math:`m` is an integer parameter that controls its steepness. Note that :math:`x` needs
-    to be elevated to an even power for :math:`B_m(x)` to be an even function.
+    where :math:`m` is an integer parameter that controls its steepness. Note that
+    :math:`x` needs to be elevated to an even power for :math:`B_m(x)` to be an even
+    function.
 
     Optionally, this collective variable can be normalized to the range :math:`[0, 1]`.
 
     .. note::
 
-        The residues must be a contiguous sequence from a single chain, ordered from the N- to
-        the C-terminus. Due to an OpenMM limitation, the maximum supported number of residues is 37.
+        The residues must be a contiguous sequence from a single chain, ordered from the
+        N- to the C-terminus. Due to an OpenMM limitation, the maximum supported number
+        of residues is 37.
 
     Parameters
     ----------
@@ -52,8 +54,9 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
         pbc
             Whether to use periodic boundary conditions
         thetaReference
-            The reference value of the :math:`{\\rm C}_\\alpha{\\rm -C}_\\alpha{\\rm -C}_\\alpha`
-            angle in an alpha helix
+            The reference value of the
+            :math:`{\\rm C}_\\alpha{\\rm -C}_\\alpha{\\rm -C}_\\alpha` angle in an alpha
+            helix
         tolerance
             The threshold tolerance around the reference values
         halfExponent
@@ -73,9 +76,13 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
         >>> from openmm import app, unit
         >>> from openmmtools import testsystems
         >>> model = testsystems.LysozymeImplicit()
-        >>> residues = [r for r in model.topology.residues() if 59 <= r.index <= 79]
-        >>> print(*[r.name for r in residues])
-        LYS ASP GLU ALA GLU LYS LEU PHE ASN GLN ASP VAL ASP ALA ALA VAL ARG GLY ILE LEU ARG
+        >>> residues = [
+        ...     r
+        ...     for r in model.topology.residues()
+        ...     if 59 <= r.index <= 79
+        ... ]
+        >>> print(*[r.name for r in residues])  # doctest: +ELLIPSIS
+        LYS ASP GLU ... ILE LEU ARG
         >>> helix_content = cvpack.HelixAngleContent(residues)
         >>> model.system.addForce(helix_content)
         6
@@ -108,7 +115,8 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
         num_angles = len(residues) - 2
         numerator = 1 / num_angles if normalize else 1
         super().__init__(
-            f"{numerator}/(1+x^{2*halfExponent}); x=(theta-{thetaReference})/{tolerance}"
+            f"{numerator}/(1+x^{2*halfExponent})"
+            f"; x=(theta-{thetaReference})/{tolerance}"
         )
         for i in range(1, len(residues) - 1):
             self.addAngle(

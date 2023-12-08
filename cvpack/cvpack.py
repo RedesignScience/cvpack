@@ -22,8 +22,8 @@ from .unit import value_in_md_units
 
 class SerializableResidue(mmapp.topology.Residue):
     """
-    A class that extends OpenMM's Residue class with additional methods for serialization and
-    deserialization.
+    A class that extends OpenMM's Residue class with additional methods for
+    serialization and deserialization.
     """
 
     def __init__(self, residue: mmapp.topology.Residue) -> None:
@@ -57,9 +57,9 @@ class AbstractCollectiveVariable(openmm.Force):
         Parameters
         ----------
             unit
-                The unit of measurement of this collective variable. It must be a unit in the MD
-                unit system (mass in Da, distance in nm, time in ps, temperature in K, energy in
-                kJ/mol, angle in rad).
+                The unit of measurement of this collective variable. It must be a unit
+                in the MD unit system (mass in Da, distance in nm, time in ps,
+                temperature in K, energy in kJ/mol, angle in rad).
             args
                 The arguments needed to construct this collective variable
             kwargs
@@ -75,8 +75,8 @@ class AbstractCollectiveVariable(openmm.Force):
         self, context: openmm.Context, getEnergy: bool = False, getForces: bool = False
     ) -> openmm.State:
         """
-        Get an OpenMM State containing the potential energy and/or force values computed from this
-        single force object.
+        Get an OpenMM State containing the potential energy and/or force values computed
+        from this single force object.
 
         Parameters
         ----------
@@ -111,15 +111,16 @@ class AbstractCollectiveVariable(openmm.Force):
         """
         Round a number to a specified number of precision digits (if specified).
 
-        The number of precision digits is defined as the number of digits after the decimal point
-        of the number's scientific notation representation.
+        The number of precision digits is defined as the number of digits after the
+        decimal point of the number's scientific notation representation.
 
         Parameters
         ----------
             number
                 The number to be rounded
             digits
-                The number of digits to round to. If None, the number will not be rounded.
+                The number of digits to round to. If None, the number will not be
+                rounded.
 
         Returns
         -------
@@ -133,7 +134,8 @@ class AbstractCollectiveVariable(openmm.Force):
     @classmethod
     def getArguments(cls) -> Tuple[OrderedDict, OrderedDict]:
         """
-        Inspect the arguments needed for constructing an instance of this collective variable.
+        Inspect the arguments needed for constructing an instance of this collective
+        variable.
 
         Returns
         -------
@@ -145,8 +147,11 @@ class AbstractCollectiveVariable(openmm.Force):
         -------
             >>> import cvpack
             >>> args, defaults = cvpack.RadiusOfGyration.getArguments()
-            >>> print(*args.items())
-            ('group', typing.Sequence[int]) ('pbc', <class 'bool'>) ('weighByMass', <class 'bool'>)
+            >>> for name, annotation in args.items():
+            ...     print(f"{name}: {annotation}")
+            group: typing.Sequence[int]
+            pbc: <class 'bool'>
+            weighByMass: <class 'bool'>
             >>> print(*defaults.items())
             ('pbc', False) ('weighByMass', False)
         """
@@ -181,15 +186,17 @@ class AbstractCollectiveVariable(openmm.Force):
         """
         Evaluate this collective variable at a given :OpenMM:`Context`.
 
-        Optionally, the value can be rounded to a specified number of precision digits, which is
-        the number of digits after the decimal point of the value in scientific notation.
+        Optionally, the value can be rounded to a specified number of precision digits,
+        which is the number of digits after the decimal point of the value in scientific
+        notation.
 
         Parameters
         ----------
             context
                 The context at which this collective variable should be evaluated
             digits
-                The number of precision digits to round to. If None, the value will not be rounded.
+                The number of precision digits to round to. If None, the value will not
+                be rounded.
 
         Returns
         -------
@@ -203,7 +210,8 @@ class AbstractCollectiveVariable(openmm.Force):
         self, context: openmm.Context, digits: Optional[int] = None
     ) -> mmunit.Quantity:
         """
-        Compute the effective mass of this collective variable at a given :OpenMM:`Context`.
+        Compute the effective mass of this collective variable at a given
+        :OpenMM:`Context`.
 
         The effective mass of a collective variable :math:`q({\\bf r})` is defined as
         :cite:`Chipot_2007`:
@@ -211,19 +219,23 @@ class AbstractCollectiveVariable(openmm.Force):
         .. math::
 
             m_\\mathrm{eff}({\\bf r}) = \\left(
-                \\sum_{i=1}^N \\frac{1}{m_i} \\left\\|\\frac{dq}{d{\\bf r}_i}\\right\\|^2
+                \\sum_{i=1}^N \\frac{1}{m_i} \\left\\|
+                    \\frac{dq}{d{\\bf r}_i}
+                \\right\\|^2
             \\right)^{-1}
 
-        Optionally, effective mass of this collective variable can be rounded to a specified number
-        of precision digits, which is the number of digits after the decimal point of the effective
-        mass in scientific notation.
+        Optionally, effective mass of this collective variable can be rounded to a
+        specified number of precision digits, which is the number of digits after the
+        decimal point of the effective mass in scientific notation.
 
         Parameters
         ----------
             context
-                The context at which this collective variable's effective mass should be evaluated
+                The context at which this collective variable's effective mass should be
+                evaluated
             digits
-                The number of precision digits to round to. If None, the value will not be rounded.
+                The number of precision digits to round to. If None, the value will not
+                be rounded.
 
         Returns
         -------
@@ -235,12 +247,18 @@ class AbstractCollectiveVariable(openmm.Force):
             >>> import openmm
             >>> from openmmtools import testsystems
             >>> model = testsystems.AlanineDipeptideImplicit()
-            >>> peptide = [a.index for a in model.topology.atoms() if a.residue.name != 'HOH']
+            >>> peptide = [
+            ...     a.index
+            ...     for a in model.topology.atoms()
+            ...     if a.residue.name != 'HOH'
+            ... ]
             >>> radius_of_gyration = cvpack.RadiusOfGyration(peptide)
             >>> model.system.addForce(radius_of_gyration)
             6
             >>> platform =openmm.Platform.getPlatformByName('Reference')
-            >>> context =openmm.Context(model.system,openmm.VerletIntegrator(0), platform)
+            >>> context =openmm.Context(
+            ...     model.system,openmm.VerletIntegrator(0), platform
+            ... )
             >>> context.setPositions(model.positions)
             >>> print(radius_of_gyration.getEffectiveMass(context, digits=6))
             30.94693 Da
