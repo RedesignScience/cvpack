@@ -70,14 +70,16 @@ in <cite>picoseconds</cite>, temperature in <cite>kelvin</cite>, energy in <cite
 angle in <cite>radians</cite>). If the collective variables does not have a unit, use
 <cite>unit.dimensionless</cite></p></li>
 <li><p><strong>pbc</strong> (<em>bool</em>) – Whether to use periodic boundary conditions</p></li>
-<li><p><strong>**parameters</strong> (<em>Union</em><em>[</em><em>mmunit.ScalarQuantity</em><em>, </em><em>Sequence</em><em>[</em><em>mmunit.ScalarQuantity</em><em>]</em><em>]</em>) – The named parameters of the function. Each parameter can be a scalar
-quantity or a 1D array-like object of length <cite>m</cite>, where <cite>m</cite> is the number of
-groups. In the latter case, each entry of the array is used for the
-corresponding group of atoms.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ValueError</strong> – If the collective variable is not compatible with the MD unit system</p>
+<dt class="field-even">Keyword Arguments<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>**parameters</strong> – The named parameters of the function. Each parameter can be a scalar
+quantity or a 1D array-like object of length <cite>m</cite>, where <cite>m</cite> is the number of
+groups. In the latter case, each entry of the array is used for the
+corresponding group of atoms.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the collective variable is not compatible with the MD unit system</p>
 </dd>
 </dl>
 <p class="rubric">Example</p>
@@ -99,9 +101,9 @@ corresponding group of atoms.</p></li>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="p">[</span><span class="n">angle1</span><span class="p">,</span> <span class="n">angle2</span><span class="p">,</span> <span class="n">colvar</span><span class="p">]]</span>
 <span class="go">[5, 6, 7]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">integrator</span> <span class="o">=</span><span class="n">openmm</span><span class="o">.</span><span class="n">VerletIntegrator</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">platform</span> <span class="o">=</span><span class="n">openmm</span><span class="o">.</span><span class="n">Platform</span><span class="o">.</span><span class="n">getPlatformByName</span><span class="p">(</span><span class="s1">&#39;Reference&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span><span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="n">integrator</span><span class="p">,</span> <span class="n">platform</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">integrator</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">VerletIntegrator</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">platform</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Platform</span><span class="o">.</span><span class="n">getPlatformByName</span><span class="p">(</span><span class="s1">&#39;Reference&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="n">integrator</span><span class="p">,</span> <span class="n">platform</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">theta1</span> <span class="o">=</span> <span class="n">angle1</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">)</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">radian</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">theta2</span> <span class="o">=</span> <span class="n">angle2</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">)</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">radian</span><span class="p">)</span>
