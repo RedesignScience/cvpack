@@ -32,23 +32,26 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
     .. math::
 
         S_{\\rm attr}({\\bf r}) =
-            &-\\sum_{i \\in {\\bf g}_1} \\sum_{\\substack{j \\in {\\bf g}_2 \\\\ j \\neq i}}
-                \\epsilon_{ij} u_{\\rm disp}\\left(
-                    \\frac{\\|{\\bf r}_i - {\\bf r}_j\\|}{\\sigma_{ij}}
-                \\right) \\\\
-            &-\\sum_{i \\in {\\bf g}_1} \\sum_{\\substack{j \\in {\\bf g}_2 \\\\ q_jq_i < 0}}
-            \\frac{q_i q_j}{4 \\pi \\varepsilon_0 r_{\\rm c}} u_{\\rm elec}\\left(
-                \\frac{\\|{\\bf r}_i - {\\bf r}_j\\|}{r_{\\rm c}}
-            \\right)
+            &-\\sum_{i \\in {\\bf g}_1}
+                \\sum_{\\substack{j \\in {\\bf g}_2 \\\\ j \\neq i}}
+                    \\epsilon_{ij} u_{\\rm disp}\\left(
+                        \\frac{\\|{\\bf r}_i - {\\bf r}_j\\|}{\\sigma_{ij}}
+                    \\right) \\\\
+            &-\\sum_{i \\in {\\bf g}_1}
+            \\sum_{\\substack{j \\in {\\bf g}_2 \\\\ q_jq_i < 0}}
+                \\frac{q_i q_j}{4 \\pi \\varepsilon_0 r_{\\rm c}} u_{\\rm elec}\\left(
+                    \\frac{\\|{\\bf r}_i - {\\bf r}_j\\|}{r_{\\rm c}}
+                \\right)
 
-    where :math:`{\\bf g}_1` and :math:`{\\bf g}_2` are the two atom groups, :math:`r_{\\rm c}`
-    is the cutoff distance, :math:`\\varepsilon_0` is the permittivity of empty space, and
-    :math:`q_i` is the charge of atom :math:`i`. The Lennard-Jones parameters are given by the
-    Lorentz-Berthelot mixing rule, i.e. :math:`\\epsilon_{ij} = \\sqrt{\\epsilon_i \\epsilon_j}`,
-    and :math:`\\sigma_{ij} = (\\sigma_i + \\sigma_j)/2`.
+    where :math:`{\\bf g}_1` and :math:`{\\bf g}_2` are the two atom groups,
+    :math:`r_{\\rm c}` is the cutoff distance, :math:`\\varepsilon_0` is the
+    permittivity of empty space, and :math:`q_i` is the charge of atom :math:`i`. The
+    Lennard-Jones parameters are given by the Lorentz-Berthelot mixing rule, i.e.
+    :math:`\\epsilon_{ij} = \\sqrt{\\epsilon_i \\epsilon_j}`, and
+    :math:`\\sigma_{ij} = (\\sigma_i + \\sigma_j)/2`.
 
-    The function :math:`u_{\\rm disp}(x)` is a Lennard-Jones-like reduced potential with a
-    highly softened repulsion part, defined as
+    The function :math:`u_{\\rm disp}(x)` is a Lennard-Jones-like reduced potential with
+    a highly softened repulsion part, defined as
 
     .. math::
 
@@ -56,25 +59,27 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
         \\quad \\text{where} \\quad
         y = |x^6 - 2| + 2
 
-    The function :math:`u_{\\rm elec}(x)` provides a Coulomb-like decay with reaction-field
-    screening, defined as
+    The function :math:`u_{\\rm elec}(x)` provides a Coulomb-like decay with
+    reaction-field screening, defined as
 
     .. math::
 
         u_{\\rm elec}(x) = \\frac{1}{x} + \\frac{x^2 - 3}{2}
 
-    The screening considers a perfect conductor as the surrounding medium :cite:`Correa_2022`.
+    The screening considers a perfect conductor as the surrounding medium
+    :cite:`Correa_2022`.
 
     .. note::
 
-        Only attractive electrostatic interactions are considered (:math:`q_i q_i < 0`). This makes
-        :math:`S_{\\rm attr}({\\bf r})` exclusively non-negative. Its upper bound depends on the
-        system and the chosen groups of atoms.
+        Only attractive electrostatic interactions are considered (:math:`q_i q_i < 0`).
+        This makes :math:`S_{\\rm attr}({\\bf r})` exclusively non-negative. Its upper
+        bound depends on the system and the chosen groups of atoms.
 
-    The Lennard-Jones parameters, atomic charges, cutoff distance, boundary conditions, as well as
-    whether to use a switching function and its corresponding switching distance, are taken from
-    :openmm:`NonbondedForce` object. Any non-exclusion exceptions involving atoms in
-    :math:`{\\bf g}_1` and :math:`{\\bf g}_2` are turned into exclusions.
+    The Lennard-Jones parameters, atomic charges, cutoff distance, boundary conditions,
+    as well as whether to use a switching function and its corresponding switching
+    distance, are taken from :openmm:`NonbondedForce` object. Any non-exclusion
+    exceptions involving atoms in :math:`{\\bf g}_1` and :math:`{\\bf g}_2` are turned
+    into exclusions.
 
     Parameters
     ----------
@@ -83,7 +88,8 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
     group2
         The second atom group.
     nonbondedForce
-        The :openmm:`NonbondedForce` object from which to collect the necessary parameters.
+        The :openmm:`NonbondedForce` object from which to collect the necessary
+        parameters.
 
     Examples
     --------

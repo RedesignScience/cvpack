@@ -37,44 +37,44 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
             {\\bf r}_{i,1}, {\\bf r}_{i,2}, \\dots, {\\bf r}_{i,n}
         \\right)
 
-    where :math:`F` is a user-defined function and :math:`{\\bf r}_{i,j}` is the position of the
-    :math:`j`-th atom of the :math:`i`-th group.
+    where :math:`F` is a user-defined function and :math:`{\\bf r}_{i,j}` is the
+    position of the :math:`j`-th atom of the :math:`i`-th group.
 
     The function :math:`F` is defined as a string and can be any expression supported by
-    :OpenMM:`CustomCompoundBondForce`. If it contains named parameters, they must be passed as
-    keyword arguments to the :class:`AtomicFunction` constructor. The parameters can be scalars
-    or arrays of length :math:`m`. In the latter case, each value will be assigned to the
-    corresponding group of atoms.
+    :OpenMM:`CustomCompoundBondForce`. If it contains named parameters, they must be
+    passed as keyword arguments to the :class:`AtomicFunction` constructor. The
+    parameters can be scalars or arrays of length :math:`m`. In the latter case, each
+    value will be assigned to the corresponding group of atoms.
 
     Parameters
     ----------
         atomsPerGroup
             The number of atoms in each group
         function
-            The function to be evaluated. It must be a valid :OpenMM:`CustomCompoundBondForce`
-            expression
+            The function to be evaluated. It must be a valid
+            :OpenMM:`CustomCompoundBondForce` expression
         atoms
-            The indices of the atoms in each group, passed as a 2D array-like object of shape
-            `(m, n)`, where `m` is the number of groups and `n` is the number of atoms per group,
-            or as a 1D array-like object of length `m*n`, where the first `n` elements are the
-            indices of the atoms in the first group, the next `n` elements are the indices of the
-            atoms in the second group, and so on.
+            The indices of the atoms in each group, passed as a 2D array-like object of
+            shape `(m, n)`, where `m` is the number of groups and `n` is the number of
+            atoms per group, or as a 1D array-like object of length `m*n`, where the
+            first `n` elements are the indices of the atoms in the first group, the next
+            `n` elements are the indices of the atoms in the second group, and so on.
         unit
-            The unit of measurement of the collective variable. It must be compatible with the
-            MD unit system (mass in `daltons`, distance in `nanometers`, time in `picoseconds`,
-            temperature in `kelvin`, energy in `kilojoules_per_mol`, angle in `radians`). If the
-            collective variables does not have a unit, use `unit.dimensionless`
+            The unit of measurement of the collective variable. It must be compatible
+            with the MD unit system (mass in `daltons`, distance in `nanometers`, time
+            in `picoseconds`, temperature in `kelvin`, energy in `kilojoules_per_mol`,
+            angle in `radians`). If the collective variables does not have a unit, use
+            `unit.dimensionless`
         pbc
             Whether to use periodic boundary conditions
 
     Keyword Args
     ------------
         **parameters
-            The named parameters of the function. Each parameter can be specified as single
-            value for all groups of atoms, or as a sequence of values, one for each group.
-            In the latter case, the length of the sequence must be equal to `m` (see the
-            `atoms` argument description). If the specified values have units, they will be
-            converted to the MD unit system.
+            The named parameters of the function. Each parameter can be a scalar
+            quantity or a 1D array-like object of length `m`, where `m` is the number of
+            groups. In the latter case, each entry of the array is used for the
+            corresponding group of atoms.
 
     Raises
     ------
@@ -198,9 +198,10 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
             if isinstance(force, openmm.CustomCompoundBondForce):
                 indices, per_item_parameters = force.getBondParameters(i)
             else:
-                *indices, per_item_parameters = getattr(force, f"get{item}Parameters")(
-                    i
-                )
+                *indices, per_item_parameters = getattr(
+                    force,
+                    f"get{item}Parameters",
+                )(i)
             atoms.append(indices)
             for name, value in zip(per_item_parameter_names, per_item_parameters):
                 parameters[name].append(value)
@@ -285,10 +286,11 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
             force
                 The force to be converted
             unit
-                The unit of measurement of the collective variable. It must be compatible with the
-                MD unit system (mass in `daltons`, distance in `nanometers`, time in `picoseconds`,
-                temperature in `kelvin`, energy in `kilojoules_per_mol`, angle in `radians`). If
-                the collective variables does not have a unit, use `unit.dimensionless`
+                The unit of measurement of the collective variable. It must be
+                compatible with the MD unit system (mass in `daltons`, distance in
+                `nanometers`, time in `picoseconds`, temperature in `kelvin`, energy in
+                `kilojoules_per_mol`, angle in `radians`). If the collective variables
+                does not have a unit, use `unit.dimensionless`
             pbc
                 Whether to use periodic boundary conditions
 

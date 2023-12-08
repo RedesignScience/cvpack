@@ -28,10 +28,10 @@ class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
             \\frac{\\| {\\bf r}^{\\rm H}_i - {\\bf r}^{\\rm O}_{i-4} \\|}{d_{\\rm HB}}
         \\right)
 
-    where :math:`{\\bf r}^{\\rm H}_k` and :math:`{\\bf r}^{\\rm O}_k` are the positions of the
-    hydrogen and oxygen atoms bonded, respectively, to the backbone nitrogen and carbon atoms of
-    residue :math:`k`. In addition, :math:`d_{\\rm HB}` is the threshold distance for a hydrogen
-    bond and :math:`B_m(x)` is a smooth step function given by
+    where :math:`{\\bf r}^{\\rm H}_k` and :math:`{\\bf r}^{\\rm O}_k` are the positions
+    of the hydrogen and oxygen atoms bonded, respectively, to the backbone nitrogen and
+    carbon atoms of residue :math:`k`. In addition, :math:`d_{\\rm HB}` is the threshold
+    distance for a hydrogen bond and :math:`B_m(x)` is a smooth step function given by
 
     .. math::
         B_m(x) = \\frac{1}{1 + x^{2m}}
@@ -42,8 +42,9 @@ class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
 
     .. note::
 
-        The residues must be a contiguous sequence from a single chain, ordered from the N- to
-        the C-terminus. Due to an OpenMM limitation, the maximum supported number of residues is 37.
+        The residues must be a contiguous sequence from a single chain, ordered from the
+        N- to the C-terminus. Due to an OpenMM limitation, the maximum supported number
+        of residues is 37.
 
     Parameters
     ----------
@@ -63,9 +64,13 @@ class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
         >>> from openmm import app, unit
         >>> from openmmtools import testsystems
         >>> model = testsystems.LysozymeImplicit()
-        >>> residues = [r for r in model.topology.residues() if 59 <= r.index <= 79]
+        >>> residues = [
+        ...     r
+        ...     for r in model.topology.residues()
+        ...     if 59 <= r.index <= 79
+        ... ]
         >>> print(*[r.name for r in residues])
-        LYS ASP GLU ALA GLU LYS LEU PHE ASN GLN ASP VAL ASP ALA ALA VAL ARG GLY ILE LEU ARG
+        LYS ASP GLU ... ILE LEU ARG
         >>> helix_content = cvpack.HelixHBondContent(residues)
         >>> model.system.addForce(helix_content)
         6

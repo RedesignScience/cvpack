@@ -59,8 +59,8 @@ class SerializableUnit(_mmunit.Unit):
         >>> import yaml
         >>> from cvpack.unit import SerializableUnit
         >>> from openmm.unit import nanometer, picosecond
-        >>> SerializableUnit(nanometer)
-        Unit({BaseUnit(base_dim=BaseDimension("length"), name="nanometer", symbol="nm"): 1.0})
+        >>> SerializableUnit(nanometer)  # doctest: +ELLIPSIS
+        Unit(..., name="nanometer", symbol="nm"): 1.0})
         >>> dump = yaml.dump(SerializableUnit(nanometer/picosecond))
         >>> print(dump)
         !!python/object:cvpack.unit.SerializableUnit
@@ -140,8 +140,9 @@ class SerializableQuantity(_mmunit.Quantity):
 
     def value_in_md_units(self):  # pylint: disable=invalid-name
         """
-        Return the numerical value of the quantity in the MD unit system (e.g. mass in Da,
-        distance in nm, time in ps, temperature in K, energy in kJ/mol, angle in rad).
+        Return the numerical value of the quantity in the MD unit system (e.g. mass in
+        Da, distance in nm, time in ps, temperature in K, energy in kJ/mol, angle in
+        rad).
         """
         return value_in_md_units(self)
 
@@ -150,8 +151,8 @@ def value_in_md_units(  # pylint: disable=redefined-outer-name
     quantity: Union[ScalarQuantity, VectorQuantity, MatrixQuantity]
 ) -> Union[float, np.ndarray, openmm.Vec3, List[openmm.Vec3], List[np.ndarray]]:
     """
-    Return the numerical value of a quantity in the MD unit system (e.g. mass in Da, distance in nm,
-    time in ps, temperature in K, energy in kJ/mol, angle in rad).
+    Return the numerical value of a quantity in the MD unit system (e.g. mass in Da,
+    distance in nm, time in ps, temperature in K, energy in kJ/mol, angle in rad).
 
     Parameters
     ----------
@@ -207,9 +208,10 @@ def value_in_md_units(  # pylint: disable=redefined-outer-name
 
 def convert_quantities(func):
     """
-    A decorator that converts all instances of openmm.unit.Quantity in a function's list of
-    arguments to their numerical values in the MD unit system (e.g. mass in Da, distance in nm,
-    time in ps, charge in e, temperature in K, angle in rad, energy in kJ/mol).
+    A decorator that converts all instances of openmm.unit.Quantity in a function's list
+    of arguments to their numerical values in the MD unit system (e.g. mass in Da,
+    distance in nm, time in ps, charge in e, temperature in K, angle in rad, energy in
+    kJ/mol).
 
     Parameters
     ----------
