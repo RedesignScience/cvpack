@@ -131,6 +131,22 @@ class AbstractCollectiveVariable(openmm.Force):
         power = f"{number:e}".split("e")[1]
         return round(number, -(int(power) - digits))
 
+    @staticmethod
+    def _checkUnitCompatibility(unit: mmunit.Unit) -> None:
+        """
+        Check if the given unit is compatible with the MD unit system.
+
+        Parameters
+        ----------
+            unit
+                The unit to check
+        """
+        if not np.isclose(
+            mmunit.Quantity(1.0, unit).value_in_unit_system(mmunit.md_unit_system),
+            1.0,
+        ):
+            raise ValueError(f"Unit {unit} is not compatible with the MD unit system.")
+
     @classmethod
     def getArguments(cls) -> Tuple[OrderedDict, OrderedDict]:
         """
