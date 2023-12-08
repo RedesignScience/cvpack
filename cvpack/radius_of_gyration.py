@@ -62,8 +62,8 @@ class RadiusOfGyration(_RadiusOfGyrationBase):
 
     .. note::
 
-        This collective variable lacks parallelization and might be slow when the group of atoms
-        is large. In this case, :class:`RadiusOfGyrationSq` might be preferred.
+        This collective variable lacks parallelization and might be slow when the group
+        of atoms is large. In this case, :class:`RadiusOfGyrationSq` might be preferred.
 
     Parameters
     ----------

@@ -33,34 +33,36 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
             \\right\\|^2}
         \\right)
 
-    where :math:`{\\bf g}_i` represents a group of 30 atoms selected from residues :math:`i` to
-    :math:`i+5` of the sequence, :math:`{\\bf g}_{\\rm ref}` represents the same 30 atoms in an
-    ideal alpha-helix configuration, :math:`\\hat{\\bf r}_j({\\bf g})` is the position of the
-    :math:`j`-th atom in a group :math:`{\\bf g}` relative to the group's center of geometry
-    (centroid), :math:`{\\bf A}({\\bf g})` is the rotation matrix that minimizes the RMSD between
-    :math:`{\\bf g}` and :math:`{\\bf g}_{\\rm ref}`, and :math:`B_m(x)` is a smooth step function
-    given by
+    where :math:`{\\bf g}_i` represents a group of 30 atoms selected from residues
+    :math:`i` to :math:`i+5` of the sequence, :math:`{\\bf g}_{\\rm ref}` represents the
+    same 30 atoms in an ideal alpha-helix configuration,
+    :math:`\\hat{\\bf r}_j({\\bf g})` is the position of the :math:`j`-th atom in a
+    group :math:`{\\bf g}` relative to the group's center of geometry (centroid),
+    :math:`{\\bf A}({\\bf g})` is the rotation matrix that minimizes the RMSD between
+    :math:`{\\bf g}` and :math:`{\\bf g}_{\\rm ref}`, and :math:`B_m(x)` is a smooth
+    step function given by
 
     .. math::
         B_m(x) = \\frac{1}{1 + x^{2m}}
 
     where :math:`m` is an integer parameter that controls its steepness.
 
-    Each group :math:`{\\bf g}_i` is formed by the N, :math:`{\\rm C}_\\alpha`, C, and O atoms of
-    the backbone, as well as the :math:`{\\rm C}_\\beta` atoms of the six consecutive residues
-    starting from residue :math:`i`. In the case of glycine, the missing :math:`{\\rm C}_\\beta` is
-    replaced by the corresponding H atom.
+    Each group :math:`{\\bf g}_i` is formed by the N, :math:`{\\rm C}_\\alpha`, C, and
+    O atoms of the backbone, as well as the :math:`{\\rm C}_\\beta` atoms of the six
+    consecutive residues starting from residue :math:`i`. In the case of glycine, the
+    missing :math:`{\\rm C}_\\beta` is replaced by the corresponding H atom.
 
     .. note::
 
-        The residues must be a contiguous sequence from a single chain, ordered from the N- to
-        the C-terminus. Due to an OpenMM limitation, the maximum supported number of residues is 37.
+        The residues must be a contiguous sequence from a single chain, ordered from the
+        N- to the C-terminus. Due to an OpenMM limitation, the maximum supported number
+        of residues is 37.
 
-    This collective variable was introduced in Ref. :cite:`Pietrucci_2009` with a slightly
-    different step function. The ideal alpha-helix configuration is the same used in `PLUMED v2.8.1
-    <https://github.com/plumed/plumed2>`_ for its collective variable `ALPHARMSD`_. By setting
-    :math:`{\\rm NN}=2m` and :math:`{\\rm MM}=4m`, PLUMED's ALPHARMSD will match the collective
-    variable implemented here.
+    This collective variable was introduced in Ref. :cite:`Pietrucci_2009` with a
+    slightly different step function. The ideal alpha-helix configuration is the same
+    used in `PLUMED v2.8.1 <https://github.com/plumed/plumed2>`_ for its collective
+    variable `ALPHARMSD`_. By setting :math:`{\\rm NN}=2m` and :math:`{\\rm MM}=4m`,
+    PLUMED's ALPHARMSD will match the collective variable implemented here.
 
     Optionally, this collective variable can be normalized to the range :math:`[0, 1]`.
 
@@ -91,10 +93,16 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
         >>> from openmm import app, unit
         >>> from openmmtools import testsystems
         >>> model = testsystems.LysozymeImplicit()
-        >>> residues = [r for r in model.topology.residues() if 59 <= r.index <= 79]
+        >>> residues = [
+        ...     r
+        ...     for r in model.topology.residues()
+        ...     if 59 <= r.index <= 79
+        ... ]
         >>> print(*[r.name for r in residues])
-        LYS ASP GLU ALA GLU LYS LEU PHE ASN GLN ASP VAL ASP ALA ALA VAL ARG GLY ILE LEU ARG
-        >>> helix_content = cvpack.HelixRMSDContent(residues, model.system.getNumParticles())
+        LYS ASP GLU ... ILE LEU ARG
+        >>> helix_content = cvpack.HelixRMSDContent(
+        ...     residues, model.system.getNumParticles()
+        ... )
         >>> model.system.addForce(helix_content)
         6
         >>> platform = openmm.Platform.getPlatformByName('Reference')
