@@ -132,7 +132,8 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
             if isinstance(data, Sequence):
                 if len(data) != groups.shape[0]:
                     raise ValueError(
-                        f"The length of the parameter {name} must be equal to {groups.shape[0]}."
+                        f"The length of the parameter {name} "
+                        f"must be equal to {groups.shape[0]}."
                     )
                 self.addPerBondParameter(name)
                 perbond_parameters.append(data)

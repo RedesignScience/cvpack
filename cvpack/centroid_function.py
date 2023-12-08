@@ -64,14 +64,14 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         pbc
             Whether to use periodic boundary conditions
         weighByMass
-            Whether to define the centroid as the center of mass of the group instead of the
-            geometric center
+            Whether to define the centroid as the center of mass of the group instead of
+            the geometric center
 
     Keyword Args
     ------------
         **parameters
-            The named parameters of the function. If the specified value has units, it will be
-            converted to the MD unit system.
+            The named parameters of the function. If the specified value has units, it
+            will be converted to the MD unit system.
 
     Raises
     ------
