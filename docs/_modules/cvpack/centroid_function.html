@@ -62,9 +62,9 @@
 
 <span class="sd">        f({\\bf r}) = F({\\bf R}_1, {\\bf R}_2, \\dots, {\\bf R}_n)</span>
 
-<span class="sd">    where :math:`F` is a user-defined function and :math:`{\\bf R}_i` is the centroid of the</span>
-<span class="sd">    :math:`i`-th group of atoms. The function :math:`F` is defined as a string and can be any valid</span>
-<span class="sd">    :OpenMM:`CustomCentroidBondForce` expression.</span>
+<span class="sd">    where :math:`F` is a user-defined function and :math:`{\\bf R}_i` is the centroid of</span>
+<span class="sd">    the :math:`i`-th group of atoms. The function :math:`F` is defined as a string and</span>
+<span class="sd">    can be any valid :OpenMM:`CustomCentroidBondForce` expression.</span>
 
 <span class="sd">    The centroid of a group of atoms is defined as:</span>
 
@@ -72,30 +72,32 @@
 
 <span class="sd">        {\\bf R}_i({\\bf r}) = \\frac{1}{n_i} \\sum_{j=1}^{n_i} {\\bf r}_{j, i}</span>
 
-<span class="sd">    where :math:`n_i` is the number of atoms in group :math:`i` and :math:`{\\bf r}_{j, i}` is the</span>
-<span class="sd">    position of the :math:`j`-th atom in group :math:`i`. Optionally, the centroid can be weighted</span>
-<span class="sd">    by the mass of each atom in the group. In this case, it is defined as:</span>
+<span class="sd">    where :math:`n_i` is the number of atoms in group :math:`i` and</span>
+<span class="sd">    :math:`{\\bf r}_{j, i}` is the position of the :math:`j`-th atom in group :math:`i`.</span>
+<span class="sd">    Optionally, the centroid can be weighted by the mass of each atom in the group. In</span>
+<span class="sd">    this case, it is defined as:</span>
 
 <span class="sd">    .. math::</span>
 
 <span class="sd">        {\\bf R}_i({\\bf r}) = \\frac{1}{M_i} \\sum_{j=1}^{n_i} m_{j, i} {\\bf r}_{j, i}</span>
 
-<span class="sd">    where :math:`M_i` is the total mass of group :math:`i` and :math:`m_{j, i}` is the mass of the</span>
-<span class="sd">    :math:`j`-th atom in group :math:`i`.</span>
+<span class="sd">    where :math:`M_i` is the total mass of group :math:`i` and :math:`m_{j, i}` is the</span>
+<span class="sd">    mass of the :math:`j`-th atom in group :math:`i`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">        function</span>
-<span class="sd">            The function to be evaluated. It must be a valid :OpenMM:`CustomCentroidBondForce`</span>
-<span class="sd">            expression</span>
+<span class="sd">            The function to be evaluated. It must be a valid</span>
+<span class="sd">            :OpenMM:`CustomCentroidBondForce` expression</span>
 <span class="sd">        groups</span>
-<span class="sd">            The groups of atoms to be used in the function. Each group must be a list of atom</span>
-<span class="sd">            indices</span>
+<span class="sd">            The groups of atoms to be used in the function. Each group must be a list of</span>
+<span class="sd">            atom indices</span>
 <span class="sd">        unit</span>
-<span class="sd">            The unit of measurement of the collective variable. It must be compatible with the</span>
-<span class="sd">            MD unit system (mass in `daltons`, distance in `nanometers`, time in `picoseconds`,</span>
-<span class="sd">            temperature in `kelvin`, energy in `kilojoules_per_mol`, angle in `radians`). If</span>
-<span class="sd">            the collective variables does not have a unit, use `dimensionless`</span>
+<span class="sd">            The unit of measurement of the collective variable. It must be compatible</span>
+<span class="sd">            with the MD unit system (mass in `daltons`, distance in `nanometers`, time</span>
+<span class="sd">            in `picoseconds`, temperature in `kelvin`, energy in `kilojoules_per_mol`,</span>
+<span class="sd">            angle in `radians`). If the collective variables does not have a unit, use</span>
+<span class="sd">            `dimensionless`</span>
 <span class="sd">        pbc</span>
 <span class="sd">            Whether to use periodic boundary conditions</span>
 

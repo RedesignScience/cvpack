@@ -57,8 +57,8 @@
 <a class="viewcode-back" href="../../api/RMSD.html#cvpack.RMSD">[docs]</a>
 <span class="k">class</span> <span class="nc">RMSD</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">RMSDForce</span><span class="p">,</span> <span class="n">AbstractCollectiveVariable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The minimum root-mean-square deviation (RMSD) between the current and reference coordinates of a</span>
-<span class="sd">    group of `n` atoms:</span>
+<span class="sd">    The minimum root-mean-square deviation (RMSD) between the current and reference</span>
+<span class="sd">    coordinates of a group of `n` atoms:</span>
 
 <span class="sd">    .. math::</span>
 
@@ -68,26 +68,27 @@
 <span class="sd">            \\right\\|^2</span>
 <span class="sd">        }</span>
 
-<span class="sd">    where :math:`\\hat{\\bf r}_i` is the position of the :math:`i`-th atom in the group relative to</span>
-<span class="sd">    the group&#39;s center of geometry (centroid), :math:`\\hat{\\bf r}_i^{\\rm ref}` is the</span>
-<span class="sd">    centroid-centered position of the same atom in a reference configuration, and</span>
-<span class="sd">    :math:`{\\bf A}({\\bf r})` is the rotation matrix that minimizes the RMSD between the group and</span>
-<span class="sd">    the reference structure.</span>
+<span class="sd">    where :math:`\\hat{\\bf r}_i` is the position of the :math:`i`-th atom in the group</span>
+<span class="sd">    relative to the group&#39;s center of geometry (centroid),</span>
+<span class="sd">    :math:`\\hat{\\bf r}_i^{\\rm ref}` is the centroid-centered position of the same</span>
+<span class="sd">    atom in a reference configuration, and :math:`{\\bf A}({\\bf r})` is the rotation</span>
+<span class="sd">    matrix that minimizes the RMSD between the group and the reference structure.</span>
 
 <span class="sd">    .. warning::</span>
 
 <span class="sd">        Periodic boundary conditions are `not supported</span>
-<span class="sd">        &lt;https://github.com/openmm/openmm/issues/2913&gt;`_. It atoms in the group belong to distinct</span>
-<span class="sd">        molecules, calling :func:`getNullBondForce` and adding the resulting force to the system</span>
-<span class="sd">        might circumvent any potential issues.</span>
+<span class="sd">        &lt;https://github.com/openmm/openmm/issues/2913&gt;`_. It atoms in the group belong</span>
+<span class="sd">        to distinct molecules, calling :func:`getNullBondForce` and adding the resulting</span>
+<span class="sd">        force to the system might circumvent any potential issues.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">        referencePositions</span>
-<span class="sd">            The reference coordinates. If there are ``n`` coordinates,  with ``n=len(group)``, they</span>
-<span class="sd">            must refer to the group atoms in the same order as they appear in ``group``. Otherwise,</span>
-<span class="sd">            if there are ``numAtoms`` coordinates (see below), they must refer to the the system</span>
-<span class="sd">            atoms and be sorted accordingly. The first criterion has precedence over the second when</span>
+<span class="sd">            The reference coordinates. If there are ``n`` coordinates,  with</span>
+<span class="sd">            ``n=len(group)``, they must refer to the group atoms in the same order as</span>
+<span class="sd">            they appear in ``group``. Otherwise, if there are ``numAtoms`` coordinates</span>
+<span class="sd">            (see below), they must refer to the the system atoms and be sorted</span>
+<span class="sd">            accordingly. The first criterion has precedence over the second when</span>
 <span class="sd">            ``n == numAtoms``.</span>
 <span class="sd">        group</span>
 <span class="sd">            The index of the atoms in the group</span>
@@ -147,7 +148,8 @@
 <a class="viewcode-back" href="../../api/RMSD.html#cvpack.RMSD.getNullBondForce">[docs]</a>
     <span class="k">def</span> <span class="nf">getNullBondForce</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">openmm</span><span class="o">.</span><span class="n">HarmonicBondForce</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get a null bond force that creates a connected graph with all the atoms in the group.</span>
+<span class="sd">        Get a null bond force that creates a connected graph with all the atoms in the</span>
+<span class="sd">        group.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -159,9 +161,18 @@
 <span class="sd">            &gt;&gt;&gt; import openmm</span>
 <span class="sd">            &gt;&gt;&gt; from openmm import app, unit</span>
 <span class="sd">            &gt;&gt;&gt; from openmmtools import testsystems</span>
-<span class="sd">            &gt;&gt;&gt; model = testsystems.WaterBox(box_edge=10*unit.angstroms, cutoff=5*unit.angstroms)</span>
-<span class="sd">            &gt;&gt;&gt; group = [atom.index for atom in model.topology.atoms() if atom.residue.index &lt; 3]</span>
-<span class="sd">            &gt;&gt;&gt; rmsd = cvpack.RMSD(model.positions, group, model.topology.getNumAtoms())</span>
+<span class="sd">            &gt;&gt;&gt; model = testsystems.WaterBox(</span>
+<span class="sd">            ...     box_edge=10*unit.angstroms,</span>
+<span class="sd">            ...     cutoff=5*unit.angstroms,</span>
+<span class="sd">            ... )</span>
+<span class="sd">            &gt;&gt;&gt; group = [</span>
+<span class="sd">            ...     atom.index</span>
+<span class="sd">            ...     for atom in model.topology.atoms()</span>
+<span class="sd">            ...     if atom.residue.index &lt; 3</span>
+<span class="sd">            ... ]</span>
+<span class="sd">            &gt;&gt;&gt; rmsd = cvpack.RMSD(</span>
+<span class="sd">            ...     model.positions, group, model.topology.getNumAtoms()</span>
+<span class="sd">            ... )</span>
 <span class="sd">            &gt;&gt;&gt; [model.system.addForce(f) for f in [rmsd, rmsd.getNullBondForce()]]</span>
 <span class="sd">            [3, 4]</span>
 <span class="sd">            &gt;&gt;&gt; integrator = openmm.VerletIntegrator(2*unit.femtoseconds)</span>

@@ -65,10 +65,10 @@
 <span class="sd">            \\frac{\\| {\\bf r}^{\\rm H}_i - {\\bf r}^{\\rm O}_{i-4} \\|}{d_{\\rm HB}}</span>
 <span class="sd">        \\right)</span>
 
-<span class="sd">    where :math:`{\\bf r}^{\\rm H}_k` and :math:`{\\bf r}^{\\rm O}_k` are the positions of the</span>
-<span class="sd">    hydrogen and oxygen atoms bonded, respectively, to the backbone nitrogen and carbon atoms of</span>
-<span class="sd">    residue :math:`k`. In addition, :math:`d_{\\rm HB}` is the threshold distance for a hydrogen</span>
-<span class="sd">    bond and :math:`B_m(x)` is a smooth step function given by</span>
+<span class="sd">    where :math:`{\\bf r}^{\\rm H}_k` and :math:`{\\bf r}^{\\rm O}_k` are the positions</span>
+<span class="sd">    of the hydrogen and oxygen atoms bonded, respectively, to the backbone nitrogen and</span>
+<span class="sd">    carbon atoms of residue :math:`k`. In addition, :math:`d_{\\rm HB}` is the threshold</span>
+<span class="sd">    distance for a hydrogen bond and :math:`B_m(x)` is a smooth step function given by</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        B_m(x) = \\frac{1}{1 + x^{2m}}</span>
@@ -79,8 +79,9 @@
 
 <span class="sd">    .. note::</span>
 
-<span class="sd">        The residues must be a contiguous sequence from a single chain, ordered from the N- to</span>
-<span class="sd">        the C-terminus. Due to an OpenMM limitation, the maximum supported number of residues is 37.</span>
+<span class="sd">        The residues must be a contiguous sequence from a single chain, ordered from the</span>
+<span class="sd">        N- to the C-terminus. Due to an OpenMM limitation, the maximum supported number</span>
+<span class="sd">        of residues is 37.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -100,9 +101,13 @@
 <span class="sd">        &gt;&gt;&gt; from openmm import app, unit</span>
 <span class="sd">        &gt;&gt;&gt; from openmmtools import testsystems</span>
 <span class="sd">        &gt;&gt;&gt; model = testsystems.LysozymeImplicit()</span>
-<span class="sd">        &gt;&gt;&gt; residues = [r for r in model.topology.residues() if 59 &lt;= r.index &lt;= 79]</span>
+<span class="sd">        &gt;&gt;&gt; residues = [</span>
+<span class="sd">        ...     r</span>
+<span class="sd">        ...     for r in model.topology.residues()</span>
+<span class="sd">        ...     if 59 &lt;= r.index &lt;= 79</span>
+<span class="sd">        ... ]</span>
 <span class="sd">        &gt;&gt;&gt; print(*[r.name for r in residues])</span>
-<span class="sd">        LYS ASP GLU ALA GLU LYS LEU PHE ASN GLN ASP VAL ASP ALA ALA VAL ARG GLY ILE LEU ARG</span>
+<span class="sd">        LYS ASP GLU ... ILE LEU ARG</span>
 <span class="sd">        &gt;&gt;&gt; helix_content = cvpack.HelixHBondContent(residues)</span>
 <span class="sd">        &gt;&gt;&gt; model.system.addForce(helix_content)</span>
 <span class="sd">        6</span>

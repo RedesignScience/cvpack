@@ -69,23 +69,26 @@
 <span class="sd">    .. math::</span>
 
 <span class="sd">        S_{\\rm attr}({\\bf r}) =</span>
-<span class="sd">            &amp;-\\sum_{i \\in {\\bf g}_1} \\sum_{\\substack{j \\in {\\bf g}_2 \\\\ j \\neq i}}</span>
-<span class="sd">                \\epsilon_{ij} u_{\\rm disp}\\left(</span>
-<span class="sd">                    \\frac{\\|{\\bf r}_i - {\\bf r}_j\\|}{\\sigma_{ij}}</span>
-<span class="sd">                \\right) \\\\</span>
-<span class="sd">            &amp;-\\sum_{i \\in {\\bf g}_1} \\sum_{\\substack{j \\in {\\bf g}_2 \\\\ q_jq_i &lt; 0}}</span>
-<span class="sd">            \\frac{q_i q_j}{4 \\pi \\varepsilon_0 r_{\\rm c}} u_{\\rm elec}\\left(</span>
-<span class="sd">                \\frac{\\|{\\bf r}_i - {\\bf r}_j\\|}{r_{\\rm c}}</span>
-<span class="sd">            \\right)</span>
+<span class="sd">            &amp;-\\sum_{i \\in {\\bf g}_1}</span>
+<span class="sd">                \\sum_{\\substack{j \\in {\\bf g}_2 \\\\ j \\neq i}}</span>
+<span class="sd">                    \\epsilon_{ij} u_{\\rm disp}\\left(</span>
+<span class="sd">                        \\frac{\\|{\\bf r}_i - {\\bf r}_j\\|}{\\sigma_{ij}}</span>
+<span class="sd">                    \\right) \\\\</span>
+<span class="sd">            &amp;-\\sum_{i \\in {\\bf g}_1}</span>
+<span class="sd">            \\sum_{\\substack{j \\in {\\bf g}_2 \\\\ q_jq_i &lt; 0}}</span>
+<span class="sd">                \\frac{q_i q_j}{4 \\pi \\varepsilon_0 r_{\\rm c}} u_{\\rm elec}\\left(</span>
+<span class="sd">                    \\frac{\\|{\\bf r}_i - {\\bf r}_j\\|}{r_{\\rm c}}</span>
+<span class="sd">                \\right)</span>
 
-<span class="sd">    where :math:`{\\bf g}_1` and :math:`{\\bf g}_2` are the two atom groups, :math:`r_{\\rm c}`</span>
-<span class="sd">    is the cutoff distance, :math:`\\varepsilon_0` is the permittivity of empty space, and</span>
-<span class="sd">    :math:`q_i` is the charge of atom :math:`i`. The Lennard-Jones parameters are given by the</span>
-<span class="sd">    Lorentz-Berthelot mixing rule, i.e. :math:`\\epsilon_{ij} = \\sqrt{\\epsilon_i \\epsilon_j}`,</span>
-<span class="sd">    and :math:`\\sigma_{ij} = (\\sigma_i + \\sigma_j)/2`.</span>
+<span class="sd">    where :math:`{\\bf g}_1` and :math:`{\\bf g}_2` are the two atom groups,</span>
+<span class="sd">    :math:`r_{\\rm c}` is the cutoff distance, :math:`\\varepsilon_0` is the</span>
+<span class="sd">    permittivity of empty space, and :math:`q_i` is the charge of atom :math:`i`. The</span>
+<span class="sd">    Lennard-Jones parameters are given by the Lorentz-Berthelot mixing rule, i.e.</span>
+<span class="sd">    :math:`\\epsilon_{ij} = \\sqrt{\\epsilon_i \\epsilon_j}`, and</span>
+<span class="sd">    :math:`\\sigma_{ij} = (\\sigma_i + \\sigma_j)/2`.</span>
 
-<span class="sd">    The function :math:`u_{\\rm disp}(x)` is a Lennard-Jones-like reduced potential with a</span>
-<span class="sd">    highly softened repulsion part, defined as</span>
+<span class="sd">    The function :math:`u_{\\rm disp}(x)` is a Lennard-Jones-like reduced potential with</span>
+<span class="sd">    a highly softened repulsion part, defined as</span>
 
 <span class="sd">    .. math::</span>
 
@@ -93,25 +96,27 @@
 <span class="sd">        \\quad \\text{where} \\quad</span>
 <span class="sd">        y = |x^6 - 2| + 2</span>
 
-<span class="sd">    The function :math:`u_{\\rm elec}(x)` provides a Coulomb-like decay with reaction-field</span>
-<span class="sd">    screening, defined as</span>
+<span class="sd">    The function :math:`u_{\\rm elec}(x)` provides a Coulomb-like decay with</span>
+<span class="sd">    reaction-field screening, defined as</span>
 
 <span class="sd">    .. math::</span>
 
 <span class="sd">        u_{\\rm elec}(x) = \\frac{1}{x} + \\frac{x^2 - 3}{2}</span>
 
-<span class="sd">    The screening considers a perfect conductor as the surrounding medium :cite:`Correa_2022`.</span>
+<span class="sd">    The screening considers a perfect conductor as the surrounding medium</span>
+<span class="sd">    :cite:`Correa_2022`.</span>
 
 <span class="sd">    .. note::</span>
 
-<span class="sd">        Only attractive electrostatic interactions are considered (:math:`q_i q_i &lt; 0`). This makes</span>
-<span class="sd">        :math:`S_{\\rm attr}({\\bf r})` exclusively non-negative. Its upper bound depends on the</span>
-<span class="sd">        system and the chosen groups of atoms.</span>
+<span class="sd">        Only attractive electrostatic interactions are considered (:math:`q_i q_i &lt; 0`).</span>
+<span class="sd">        This makes :math:`S_{\\rm attr}({\\bf r})` exclusively non-negative. Its upper</span>
+<span class="sd">        bound depends on the system and the chosen groups of atoms.</span>
 
-<span class="sd">    The Lennard-Jones parameters, atomic charges, cutoff distance, boundary conditions, as well as</span>
-<span class="sd">    whether to use a switching function and its corresponding switching distance, are taken from</span>
-<span class="sd">    :openmm:`NonbondedForce` object. Any non-exclusion exceptions involving atoms in</span>
-<span class="sd">    :math:`{\\bf g}_1` and :math:`{\\bf g}_2` are turned into exclusions.</span>
+<span class="sd">    The Lennard-Jones parameters, atomic charges, cutoff distance, boundary conditions,</span>
+<span class="sd">    as well as whether to use a switching function and its corresponding switching</span>
+<span class="sd">    distance, are taken from :openmm:`NonbondedForce` object. Any non-exclusion</span>
+<span class="sd">    exceptions involving atoms in :math:`{\\bf g}_1` and :math:`{\\bf g}_2` are turned</span>
+<span class="sd">    into exclusions.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -120,7 +125,8 @@
 <span class="sd">    group2</span>
 <span class="sd">        The second atom group.</span>
 <span class="sd">    nonbondedForce</span>
-<span class="sd">        The :openmm:`NonbondedForce` object from which to collect the necessary parameters.</span>
+<span class="sd">        The :openmm:`NonbondedForce` object from which to collect the necessary</span>
+<span class="sd">        parameters.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>

@@ -45,23 +45,24 @@
 <div class="math notranslate nohighlight">
 \[N({\bf r}) = \sum_{i \in {\bf g}_1} \sum_{j \in {\bf g}_2}
                 S\left(\frac{\|{\bf r}_j - {\bf r}_i\|}{r_0}\right)\]</div>
-<p>where <span class="math notranslate nohighlight">\(r_0\)</span> is the threshold distance for defining a contact and <span class="math notranslate nohighlight">\(S(x)\)</span> is
-a step function equal to <span class="math notranslate nohighlight">\(1\)</span> if a contact is made or equal to <span class="math notranslate nohighlight">\(0\)</span> otherwise.
-For trajectory analysis, it is fine to make <span class="math notranslate nohighlight">\(S(x) = H(1-x)\)</span>, where <cite>H</cite> is the
-<a class="reference external" href="https://en.wikipedia.org/wiki/Heaviside_step_function">Heaviside step function</a>. For
-molecular dynamics, however, <span class="math notranslate nohighlight">\(S(x)\)</span> should be a continuous approximation of
-<span class="math notranslate nohighlight">\(H(1-x)\)</span> for <span class="math notranslate nohighlight">\(x \geq 0\)</span>. By default <span id="id1">[<a class="reference internal" href="../references.html#id5" title="Marcella Iannuzzi, Alessandro Laio, and Michele Parrinello. Efficient exploration of reactive potential energy surfaces using car-parrinello molecular dynamics. Physical Review Letters, jun 2003. doi:10.1103/physrevlett.90.238302.">5</a>]</span>, the following
-function is used:</p>
+<p>where <span class="math notranslate nohighlight">\(r_0\)</span> is the threshold distance for defining a contact and <span class="math notranslate nohighlight">\(S(x)\)</span>
+is a step function equal to <span class="math notranslate nohighlight">\(1\)</span> if a contact is made or equal to <span class="math notranslate nohighlight">\(0\)</span>
+otherwise. For trajectory analysis, it is fine to make <span class="math notranslate nohighlight">\(S(x) = H(1-x)\)</span>, where
+<cite>H</cite> is the <a class="reference external" href="https://en.wikipedia.org/wiki/Heaviside_step_function">Heaviside step function</a>. For molecular dynamics,
+however, <span class="math notranslate nohighlight">\(S(x)\)</span> should be a continuous approximation of <span class="math notranslate nohighlight">\(H(1-x)\)</span> for
+<span class="math notranslate nohighlight">\(x \geq 0\)</span>. By default <span id="id1">[<a class="reference internal" href="../references.html#id5" title="Marcella Iannuzzi, Alessandro Laio, and Michele Parrinello. Efficient exploration of reactive potential energy surfaces using car-parrinello molecular dynamics. Physical Review Letters, jun 2003. doi:10.1103/physrevlett.90.238302.">5</a>]</span>, the following function is used:</p>
 <div class="math notranslate nohighlight">
 \[S(x) = \frac{1-x^6}{1-x^{12}} = \frac{1}{1+x^6}\]</div>
-<p>In fact, a cutoff distance <span class="math notranslate nohighlight">\(r_c = x_c r_0\)</span> (typically, <span class="math notranslate nohighlight">\(x_c = 2\)</span>) is applied
-so that <span class="math notranslate nohighlight">\(S(x) = 0\)</span> for <span class="math notranslate nohighlight">\(x \geq x_c\)</span>. To avoid discontinuities, there is also
-the option to smoothly switch off <span class="math notranslate nohighlight">\(S(x)\)</span> starting from <span class="math notranslate nohighlight">\(r_s = x_s r_0\)</span>
-(typically, <span class="math notranslate nohighlight">\(x_s = 1.5\)</span>) instead of doing it abruptly at <span class="math notranslate nohighlight">\(r_c\)</span>.</p>
+<p>In fact, a cutoff distance <span class="math notranslate nohighlight">\(r_c = x_c r_0\)</span> (typically, <span class="math notranslate nohighlight">\(x_c = 2\)</span>) is
+applied so that <span class="math notranslate nohighlight">\(S(x) = 0\)</span> for <span class="math notranslate nohighlight">\(x \geq x_c\)</span>. To avoid discontinuities,
+there is also the option to smoothly switch off <span class="math notranslate nohighlight">\(S(x)\)</span> starting from
+<span class="math notranslate nohighlight">\(r_s = x_s r_0\)</span> (typically, <span class="math notranslate nohighlight">\(x_s = 1.5\)</span>) instead of doing it abruptly at
+<span class="math notranslate nohighlight">\(r_c\)</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Atoms are allowed to be in both groups. In this case, self-contacts (<span class="math notranslate nohighlight">\(i = j\)</span>)
-are ignored and each pair of distinct atoms (<span class="math notranslate nohighlight">\(i \neq j\)</span>) is counted only once.</p>
+<p>Atoms are allowed to be in both groups. In this case, self-contacts
+(<span class="math notranslate nohighlight">\(i = j\)</span>) are ignored and each pair of distinct atoms (<span class="math notranslate nohighlight">\(i \neq j\)</span>)
+is counted only once.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -88,14 +89,22 @@ If None, it switches off abruptly at the cutoff distance.</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">app</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">openmmtools</span> <span class="kn">import</span> <span class="n">testsystems</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">testsystems</span><span class="o">.</span><span class="n">AlanineDipeptideVacuum</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">carbons</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">index</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">atoms</span><span class="p">()</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">element</span> <span class="o">==</span> <span class="n">app</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">carbon</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">carbons</span> <span class="o">=</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="n">a</span><span class="o">.</span><span class="n">index</span>
+<span class="gp">... </span>    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">atoms</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">element</span> <span class="o">==</span> <span class="n">app</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">carbon</span>
+<span class="gp">... </span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">num_atoms</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">getNumAtoms</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">optionals</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;pbc&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;stepFunction&quot;</span><span class="p">:</span> <span class="s2">&quot;step(1-x)&quot;</span><span class="p">}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">nc</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">NumberOfContacts</span><span class="p">(</span><span class="n">carbons</span><span class="p">,</span> <span class="n">carbons</span><span class="p">,</span> <span class="n">num_atoms</span><span class="p">,</span> <span class="o">**</span><span class="n">optionals</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nc</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">NumberOfContacts</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">carbons</span><span class="p">,</span> <span class="n">carbons</span><span class="p">,</span> <span class="n">num_atoms</span><span class="p">,</span> <span class="o">**</span><span class="n">optionals</span>
+<span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="n">nc</span><span class="p">)</span>
 <span class="go">5</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">platform</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Platform</span><span class="o">.</span><span class="n">getPlatformByName</span><span class="p">(</span><span class="s1">&#39;Reference&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="n">openmm</span><span class="o">.</span><span class="n">CustomIntegrator</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">platform</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="n">openmm</span><span class="o">.</span><span class="n">CustomIntegrator</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">platform</span>
+<span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">digits</span><span class="o">=</span><span class="mi">6</span><span class="p">))</span>
 <span class="go">6.0 dimensionless</span>
@@ -105,7 +114,8 @@ If None, it switches off abruptly at the cutoff distance.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="cvpack.NumberOfContacts.getArguments">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getArguments</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.NumberOfContacts.getArguments" title="Link to this definition">¶</a></dt>
-<dd><p>Inspect the arguments needed for constructing an instance of this collective variable.</p>
+<dd><p>Inspect the arguments needed for constructing an instance of this collective
+variable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
@@ -121,8 +131,11 @@ If None, it switches off abruptly at the cutoff distance.</p></li>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cvpack</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">args</span><span class="p">,</span> <span class="n">defaults</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">RadiusOfGyration</span><span class="o">.</span><span class="n">getArguments</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
-<span class="go">(&#39;group&#39;, typing.Sequence[int]) (&#39;pbc&#39;, &lt;class &#39;bool&#39;&gt;) (&#39;weighByMass&#39;, &lt;class &#39;bool&#39;&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">annotation</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">annotation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">group: typing.Sequence[int]</span>
+<span class="go">pbc: &lt;class &#39;bool&#39;&gt;</span>
+<span class="go">weighByMass: &lt;class &#39;bool&#39;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">defaults</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
 <span class="go">(&#39;pbc&#39;, False) (&#39;weighByMass&#39;, False)</span>
 </pre></div>
@@ -132,21 +145,26 @@ If None, it switches off abruptly at the cutoff distance.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="cvpack.NumberOfContacts.getEffectiveMass">
 <span class="sig-name descname"><span class="pre">getEffectiveMass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.NumberOfContacts.getEffectiveMass" title="Link to this definition">¶</a></dt>
-<dd><p>Compute the effective mass of this collective variable at a given <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html">openmm.Context</a>.</p>
+<dd><p>Compute the effective mass of this collective variable at a given
+<a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html">openmm.Context</a>.</p>
 <p>The effective mass of a collective variable <span class="math notranslate nohighlight">\(q({\bf r})\)</span> is defined as
 <span id="id2">[<a class="reference internal" href="../references.html#id2" title="Christophe Chipot and Andrew Pohorille, editors. Free Energy Calculations. Springer Berlin Heidelberg, 2007. URL: https://doi.org/10.1007/978-3-540-38448-9, doi:10.1007/978-3-540-38448-9.">1</a>]</span>:</p>
 <div class="math notranslate nohighlight">
 \[m_\mathrm{eff}({\bf r}) = \left(
-    \sum_{i=1}^N \frac{1}{m_i} \left\|\frac{dq}{d{\bf r}_i}\right\|^2
+    \sum_{i=1}^N \frac{1}{m_i} \left\|
+        \frac{dq}{d{\bf r}_i}
+    \right\|^2
 \right)^{-1}\]</div>
-<p>Optionally, effective mass of this collective variable can be rounded to a specified number
-of precision digits, which is the number of digits after the decimal point of the effective
-mass in scientific notation.</p>
+<p>Optionally, effective mass of this collective variable can be rounded to a
+specified number of precision digits, which is the number of digits after the
+decimal point of the effective mass in scientific notation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>context</strong> (<em>Context</em>) – The context at which this collective variable’s effective mass should be evaluated</p></li>
-<li><p><strong>digits</strong> (<em>int</em><em> | </em><em>None</em>) – The number of precision digits to round to. If None, the value will not be rounded.</p></li>
+<li><p><strong>context</strong> (<em>Context</em>) – The context at which this collective variable’s effective mass should be
+evaluated</p></li>
+<li><p><strong>digits</strong> (<em>int</em><em> | </em><em>None</em>) – The number of precision digits to round to. If None, the value will not
+be rounded.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -158,12 +176,18 @@ mass in scientific notation.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">openmm</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">openmmtools</span> <span class="kn">import</span> <span class="n">testsystems</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">testsystems</span><span class="o">.</span><span class="n">AlanineDipeptideImplicit</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">peptide</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">index</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">atoms</span><span class="p">()</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;HOH&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">peptide</span> <span class="o">=</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="n">a</span><span class="o">.</span><span class="n">index</span>
+<span class="gp">... </span>    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">atoms</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;HOH&#39;</span>
+<span class="gp">... </span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">radius_of_gyration</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">RadiusOfGyration</span><span class="p">(</span><span class="n">peptide</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="n">radius_of_gyration</span><span class="p">)</span>
 <span class="go">6</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">platform</span> <span class="o">=</span><span class="n">openmm</span><span class="o">.</span><span class="n">Platform</span><span class="o">.</span><span class="n">getPlatformByName</span><span class="p">(</span><span class="s1">&#39;Reference&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span><span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">,</span><span class="n">openmm</span><span class="o">.</span><span class="n">VerletIntegrator</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">platform</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span><span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">,</span><span class="n">openmm</span><span class="o">.</span><span class="n">VerletIntegrator</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">platform</span>
+<span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">radius_of_gyration</span><span class="o">.</span><span class="n">getEffectiveMass</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">digits</span><span class="o">=</span><span class="mi">6</span><span class="p">))</span>
 <span class="go">30.94693 Da</span>
@@ -186,13 +210,15 @@ mass in scientific notation.</p>
 <dt class="sig sig-object py" id="cvpack.NumberOfContacts.getValue">
 <span class="sig-name descname"><span class="pre">getValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.NumberOfContacts.getValue" title="Link to this definition">¶</a></dt>
 <dd><p>Evaluate this collective variable at a given <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html">openmm.Context</a>.</p>
-<p>Optionally, the value can be rounded to a specified number of precision digits, which is
-the number of digits after the decimal point of the value in scientific notation.</p>
+<p>Optionally, the value can be rounded to a specified number of precision digits,
+which is the number of digits after the decimal point of the value in scientific
+notation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>context</strong> (<em>Context</em>) – The context at which this collective variable should be evaluated</p></li>
-<li><p><strong>digits</strong> (<em>int</em><em> | </em><em>None</em>) – The number of precision digits to round to. If None, the value will not be rounded.</p></li>
+<li><p><strong>digits</strong> (<em>int</em><em> | </em><em>None</em>) – The number of precision digits to round to. If None, the value will not
+be rounded.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>

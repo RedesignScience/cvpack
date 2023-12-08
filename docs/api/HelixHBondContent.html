@@ -46,18 +46,19 @@
 \[\alpha_{\rm HB}({\bf r}) = \sum_{i=5}^n B_m\left(
     \frac{\| {\bf r}^{\rm H}_i - {\bf r}^{\rm O}_{i-4} \|}{d_{\rm HB}}
 \right)\]</div>
-<p>where <span class="math notranslate nohighlight">\({\bf r}^{\rm H}_k\)</span> and <span class="math notranslate nohighlight">\({\bf r}^{\rm O}_k\)</span> are the positions of the
-hydrogen and oxygen atoms bonded, respectively, to the backbone nitrogen and carbon atoms of
-residue <span class="math notranslate nohighlight">\(k\)</span>. In addition, <span class="math notranslate nohighlight">\(d_{\rm HB}\)</span> is the threshold distance for a hydrogen
-bond and <span class="math notranslate nohighlight">\(B_m(x)\)</span> is a smooth step function given by</p>
+<p>where <span class="math notranslate nohighlight">\({\bf r}^{\rm H}_k\)</span> and <span class="math notranslate nohighlight">\({\bf r}^{\rm O}_k\)</span> are the positions
+of the hydrogen and oxygen atoms bonded, respectively, to the backbone nitrogen and
+carbon atoms of residue <span class="math notranslate nohighlight">\(k\)</span>. In addition, <span class="math notranslate nohighlight">\(d_{\rm HB}\)</span> is the threshold
+distance for a hydrogen bond and <span class="math notranslate nohighlight">\(B_m(x)\)</span> is a smooth step function given by</p>
 <div class="math notranslate nohighlight">
 \[B_m(x) = \frac{1}{1 + x^{2m}}\]</div>
 <p>where <span class="math notranslate nohighlight">\(m\)</span> is an integer parameter that controls its steepness.</p>
 <p>Optionally, this collective variable can be normalized to the range <span class="math notranslate nohighlight">\([0, 1]\)</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The residues must be a contiguous sequence from a single chain, ordered from the N- to
-the C-terminus. Due to an OpenMM limitation, the maximum supported number of residues is 37.</p>
+<p>The residues must be a contiguous sequence from a single chain, ordered from the
+N- to the C-terminus. Due to an OpenMM limitation, the maximum supported number
+of residues is 37.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -75,9 +76,13 @@ the C-terminus. Due to an OpenMM limitation, the maximum supported number of res
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">app</span><span class="p">,</span> <span class="n">unit</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">openmmtools</span> <span class="kn">import</span> <span class="n">testsystems</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">testsystems</span><span class="o">.</span><span class="n">LysozymeImplicit</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">residues</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">residues</span><span class="p">()</span> <span class="k">if</span> <span class="mi">59</span> <span class="o">&lt;=</span> <span class="n">r</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;=</span> <span class="mi">79</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">residues</span> <span class="o">=</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="n">r</span>
+<span class="gp">... </span>    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">residues</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="mi">59</span> <span class="o">&lt;=</span> <span class="n">r</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;=</span> <span class="mi">79</span>
+<span class="gp">... </span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">residues</span><span class="p">])</span>
-<span class="go">LYS ASP GLU ALA GLU LYS LEU PHE ASN GLN ASP VAL ASP ALA ALA VAL ARG GLY ILE LEU ARG</span>
+<span class="go">LYS ASP GLU ... ILE LEU ARG</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">helix_content</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">HelixHBondContent</span><span class="p">(</span><span class="n">residues</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="n">helix_content</span><span class="p">)</span>
 <span class="go">6</span>
@@ -93,7 +98,8 @@ the C-terminus. Due to an OpenMM limitation, the maximum supported number of res
 <dl class="py method">
 <dt class="sig sig-object py" id="cvpack.HelixHBondContent.getArguments">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getArguments</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.HelixHBondContent.getArguments" title="Link to this definition">¶</a></dt>
-<dd><p>Inspect the arguments needed for constructing an instance of this collective variable.</p>
+<dd><p>Inspect the arguments needed for constructing an instance of this collective
+variable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
@@ -109,8 +115,11 @@ the C-terminus. Due to an OpenMM limitation, the maximum supported number of res
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cvpack</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">args</span><span class="p">,</span> <span class="n">defaults</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">RadiusOfGyration</span><span class="o">.</span><span class="n">getArguments</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
-<span class="go">(&#39;group&#39;, typing.Sequence[int]) (&#39;pbc&#39;, &lt;class &#39;bool&#39;&gt;) (&#39;weighByMass&#39;, &lt;class &#39;bool&#39;&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">annotation</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">annotation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">group: typing.Sequence[int]</span>
+<span class="go">pbc: &lt;class &#39;bool&#39;&gt;</span>
+<span class="go">weighByMass: &lt;class &#39;bool&#39;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">defaults</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
 <span class="go">(&#39;pbc&#39;, False) (&#39;weighByMass&#39;, False)</span>
 </pre></div>
@@ -120,21 +129,26 @@ the C-terminus. Due to an OpenMM limitation, the maximum supported number of res
 <dl class="py method">
 <dt class="sig sig-object py" id="cvpack.HelixHBondContent.getEffectiveMass">
 <span class="sig-name descname"><span class="pre">getEffectiveMass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.HelixHBondContent.getEffectiveMass" title="Link to this definition">¶</a></dt>
-<dd><p>Compute the effective mass of this collective variable at a given <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html">openmm.Context</a>.</p>
+<dd><p>Compute the effective mass of this collective variable at a given
+<a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html">openmm.Context</a>.</p>
 <p>The effective mass of a collective variable <span class="math notranslate nohighlight">\(q({\bf r})\)</span> is defined as
 <span id="id1">[<a class="reference internal" href="../references.html#id2" title="Christophe Chipot and Andrew Pohorille, editors. Free Energy Calculations. Springer Berlin Heidelberg, 2007. URL: https://doi.org/10.1007/978-3-540-38448-9, doi:10.1007/978-3-540-38448-9.">1</a>]</span>:</p>
 <div class="math notranslate nohighlight">
 \[m_\mathrm{eff}({\bf r}) = \left(
-    \sum_{i=1}^N \frac{1}{m_i} \left\|\frac{dq}{d{\bf r}_i}\right\|^2
+    \sum_{i=1}^N \frac{1}{m_i} \left\|
+        \frac{dq}{d{\bf r}_i}
+    \right\|^2
 \right)^{-1}\]</div>
-<p>Optionally, effective mass of this collective variable can be rounded to a specified number
-of precision digits, which is the number of digits after the decimal point of the effective
-mass in scientific notation.</p>
+<p>Optionally, effective mass of this collective variable can be rounded to a
+specified number of precision digits, which is the number of digits after the
+decimal point of the effective mass in scientific notation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>context</strong> (<em>Context</em>) – The context at which this collective variable’s effective mass should be evaluated</p></li>
-<li><p><strong>digits</strong> (<em>int</em><em> | </em><em>None</em>) – The number of precision digits to round to. If None, the value will not be rounded.</p></li>
+<li><p><strong>context</strong> (<em>Context</em>) – The context at which this collective variable’s effective mass should be
+evaluated</p></li>
+<li><p><strong>digits</strong> (<em>int</em><em> | </em><em>None</em>) – The number of precision digits to round to. If None, the value will not
+be rounded.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -146,12 +160,18 @@ mass in scientific notation.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">openmm</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">openmmtools</span> <span class="kn">import</span> <span class="n">testsystems</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">testsystems</span><span class="o">.</span><span class="n">AlanineDipeptideImplicit</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">peptide</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">index</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">atoms</span><span class="p">()</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;HOH&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">peptide</span> <span class="o">=</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="n">a</span><span class="o">.</span><span class="n">index</span>
+<span class="gp">... </span>    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">atoms</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;HOH&#39;</span>
+<span class="gp">... </span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">radius_of_gyration</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">RadiusOfGyration</span><span class="p">(</span><span class="n">peptide</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="n">radius_of_gyration</span><span class="p">)</span>
 <span class="go">6</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">platform</span> <span class="o">=</span><span class="n">openmm</span><span class="o">.</span><span class="n">Platform</span><span class="o">.</span><span class="n">getPlatformByName</span><span class="p">(</span><span class="s1">&#39;Reference&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span><span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">,</span><span class="n">openmm</span><span class="o">.</span><span class="n">VerletIntegrator</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">platform</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span><span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">,</span><span class="n">openmm</span><span class="o">.</span><span class="n">VerletIntegrator</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">platform</span>
+<span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">radius_of_gyration</span><span class="o">.</span><span class="n">getEffectiveMass</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">digits</span><span class="o">=</span><span class="mi">6</span><span class="p">))</span>
 <span class="go">30.94693 Da</span>
@@ -174,13 +194,15 @@ mass in scientific notation.</p>
 <dt class="sig sig-object py" id="cvpack.HelixHBondContent.getValue">
 <span class="sig-name descname"><span class="pre">getValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.HelixHBondContent.getValue" title="Link to this definition">¶</a></dt>
 <dd><p>Evaluate this collective variable at a given <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html">openmm.Context</a>.</p>
-<p>Optionally, the value can be rounded to a specified number of precision digits, which is
-the number of digits after the decimal point of the value in scientific notation.</p>
+<p>Optionally, the value can be rounded to a specified number of precision digits,
+which is the number of digits after the decimal point of the value in scientific
+notation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>context</strong> (<em>Context</em>) – The context at which this collective variable should be evaluated</p></li>
-<li><p><strong>digits</strong> (<em>int</em><em> | </em><em>None</em>) – The number of precision digits to round to. If None, the value will not be rounded.</p></li>
+<li><p><strong>digits</strong> (<em>int</em><em> | </em><em>None</em>) – The number of precision digits to round to. If None, the value will not
+be rounded.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>

@@ -70,34 +70,36 @@
 <span class="sd">            \\right\\|^2}</span>
 <span class="sd">        \\right)</span>
 
-<span class="sd">    where :math:`{\\bf g}_i` represents a group of 30 atoms selected from residues :math:`i` to</span>
-<span class="sd">    :math:`i+5` of the sequence, :math:`{\\bf g}_{\\rm ref}` represents the same 30 atoms in an</span>
-<span class="sd">    ideal alpha-helix configuration, :math:`\\hat{\\bf r}_j({\\bf g})` is the position of the</span>
-<span class="sd">    :math:`j`-th atom in a group :math:`{\\bf g}` relative to the group&#39;s center of geometry</span>
-<span class="sd">    (centroid), :math:`{\\bf A}({\\bf g})` is the rotation matrix that minimizes the RMSD between</span>
-<span class="sd">    :math:`{\\bf g}` and :math:`{\\bf g}_{\\rm ref}`, and :math:`B_m(x)` is a smooth step function</span>
-<span class="sd">    given by</span>
+<span class="sd">    where :math:`{\\bf g}_i` represents a group of 30 atoms selected from residues</span>
+<span class="sd">    :math:`i` to :math:`i+5` of the sequence, :math:`{\\bf g}_{\\rm ref}` represents the</span>
+<span class="sd">    same 30 atoms in an ideal alpha-helix configuration,</span>
+<span class="sd">    :math:`\\hat{\\bf r}_j({\\bf g})` is the position of the :math:`j`-th atom in a</span>
+<span class="sd">    group :math:`{\\bf g}` relative to the group&#39;s center of geometry (centroid),</span>
+<span class="sd">    :math:`{\\bf A}({\\bf g})` is the rotation matrix that minimizes the RMSD between</span>
+<span class="sd">    :math:`{\\bf g}` and :math:`{\\bf g}_{\\rm ref}`, and :math:`B_m(x)` is a smooth</span>
+<span class="sd">    step function given by</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        B_m(x) = \\frac{1}{1 + x^{2m}}</span>
 
 <span class="sd">    where :math:`m` is an integer parameter that controls its steepness.</span>
 
-<span class="sd">    Each group :math:`{\\bf g}_i` is formed by the N, :math:`{\\rm C}_\\alpha`, C, and O atoms of</span>
-<span class="sd">    the backbone, as well as the :math:`{\\rm C}_\\beta` atoms of the six consecutive residues</span>
-<span class="sd">    starting from residue :math:`i`. In the case of glycine, the missing :math:`{\\rm C}_\\beta` is</span>
-<span class="sd">    replaced by the corresponding H atom.</span>
+<span class="sd">    Each group :math:`{\\bf g}_i` is formed by the N, :math:`{\\rm C}_\\alpha`, C, and</span>
+<span class="sd">    O atoms of the backbone, as well as the :math:`{\\rm C}_\\beta` atoms of the six</span>
+<span class="sd">    consecutive residues starting from residue :math:`i`. In the case of glycine, the</span>
+<span class="sd">    missing :math:`{\\rm C}_\\beta` is replaced by the corresponding H atom.</span>
 
 <span class="sd">    .. note::</span>
 
-<span class="sd">        The residues must be a contiguous sequence from a single chain, ordered from the N- to</span>
-<span class="sd">        the C-terminus. Due to an OpenMM limitation, the maximum supported number of residues is 37.</span>
+<span class="sd">        The residues must be a contiguous sequence from a single chain, ordered from the</span>
+<span class="sd">        N- to the C-terminus. Due to an OpenMM limitation, the maximum supported number</span>
+<span class="sd">        of residues is 37.</span>
 
-<span class="sd">    This collective variable was introduced in Ref. :cite:`Pietrucci_2009` with a slightly</span>
-<span class="sd">    different step function. The ideal alpha-helix configuration is the same used in `PLUMED v2.8.1</span>
-<span class="sd">    &lt;https://github.com/plumed/plumed2&gt;`_ for its collective variable `ALPHARMSD`_. By setting</span>
-<span class="sd">    :math:`{\\rm NN}=2m` and :math:`{\\rm MM}=4m`, PLUMED&#39;s ALPHARMSD will match the collective</span>
-<span class="sd">    variable implemented here.</span>
+<span class="sd">    This collective variable was introduced in Ref. :cite:`Pietrucci_2009` with a</span>
+<span class="sd">    slightly different step function. The ideal alpha-helix configuration is the same</span>
+<span class="sd">    used in `PLUMED v2.8.1 &lt;https://github.com/plumed/plumed2&gt;`_ for its collective</span>
+<span class="sd">    variable `ALPHARMSD`_. By setting :math:`{\\rm NN}=2m` and :math:`{\\rm MM}=4m`,</span>
+<span class="sd">    PLUMED&#39;s ALPHARMSD will match the collective variable implemented here.</span>
 
 <span class="sd">    Optionally, this collective variable can be normalized to the range :math:`[0, 1]`.</span>
 
@@ -128,10 +130,16 @@
 <span class="sd">        &gt;&gt;&gt; from openmm import app, unit</span>
 <span class="sd">        &gt;&gt;&gt; from openmmtools import testsystems</span>
 <span class="sd">        &gt;&gt;&gt; model = testsystems.LysozymeImplicit()</span>
-<span class="sd">        &gt;&gt;&gt; residues = [r for r in model.topology.residues() if 59 &lt;= r.index &lt;= 79]</span>
+<span class="sd">        &gt;&gt;&gt; residues = [</span>
+<span class="sd">        ...     r</span>
+<span class="sd">        ...     for r in model.topology.residues()</span>
+<span class="sd">        ...     if 59 &lt;= r.index &lt;= 79</span>
+<span class="sd">        ... ]</span>
 <span class="sd">        &gt;&gt;&gt; print(*[r.name for r in residues])</span>
-<span class="sd">        LYS ASP GLU ALA GLU LYS LEU PHE ASN GLN ASP VAL ASP ALA ALA VAL ARG GLY ILE LEU ARG</span>
-<span class="sd">        &gt;&gt;&gt; helix_content = cvpack.HelixRMSDContent(residues, model.system.getNumParticles())</span>
+<span class="sd">        LYS ASP GLU ... ILE LEU ARG</span>
+<span class="sd">        &gt;&gt;&gt; helix_content = cvpack.HelixRMSDContent(</span>
+<span class="sd">        ...     residues, model.system.getNumParticles()</span>
+<span class="sd">        ... )</span>
 <span class="sd">        &gt;&gt;&gt; model.system.addForce(helix_content)</span>
 <span class="sd">        6</span>
 <span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>

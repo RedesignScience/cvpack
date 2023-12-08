@@ -69,28 +69,30 @@
 <span class="sd">            \\right)</span>
 <span class="sd">        \\right]</span>
 
-<span class="sd">    where :math:`\\phi_i({\\bf r})` and :math:`\\psi_i({\\bf r})` are the Ramachandran dihedral</span>
-<span class="sd">    angles of residue :math:`i`, :math:`\\phi_{\\rm ref}` and :math:`\\psi_{\\rm ref}` are their</span>
-<span class="sd">    reference values in an alpha helix :cite:`Hovmoller_2002`, and :math:`\\theta_{\\rm tol}` is</span>
-<span class="sd">    the threshold tolerance around these refenrences. :math:`B_m(x)` is a smooth boxcar function</span>
-<span class="sd">    given by</span>
+<span class="sd">    where :math:`\\phi_i({\\bf r})` and :math:`\\psi_i({\\bf r})` are the Ramachandran</span>
+<span class="sd">    dihedral angles of residue :math:`i`, :math:`\\phi_{\\rm ref}` and</span>
+<span class="sd">    :math:`\\psi_{\\rm ref}` are their reference values in an alpha helix</span>
+<span class="sd">    :cite:`Hovmoller_2002`, and :math:`\\theta_{\\rm tol}` is the threshold tolerance</span>
+<span class="sd">    around these refenrences. :math:`B_m(x)` is a smooth boxcar function given by</span>
 
 <span class="sd">    .. math::</span>
 <span class="sd">        B_m(x) = \\frac{1}{1 + x^{2m}}</span>
 
-<span class="sd">    where :math:`m` is an integer parameter that controls its steepness. Note that :math:`x` needs</span>
-<span class="sd">    to be elevated to an even power for :math:`B_m(x)` to be an even function.</span>
+<span class="sd">    where :math:`m` is an integer parameter that controls its steepness. Note that</span>
+<span class="sd">    :math:`x` needs to be elevated to an even power for :math:`B_m(x)` to be an even</span>
+<span class="sd">    function.</span>
 
 <span class="sd">    Optionally, this collective variable can be normalized to the range :math:`[0, 1]`.</span>
 
 <span class="sd">    .. note::</span>
 
-<span class="sd">        The :math:`\\phi` and :math:`\\psi` angles of the first and last residues are not</span>
-<span class="sd">        considered. They are used to compute the dihedral angles of the second and penultimate</span>
-<span class="sd">        residues, respectively.</span>
+<span class="sd">        The :math:`\\phi` and :math:`\\psi` angles of the first and last residues are</span>
+<span class="sd">        not considered. They are used to compute the dihedral angles of the second and</span>
+<span class="sd">        penultimate residues, respectively.</span>
 
-<span class="sd">        The residues must be a contiguous sequence from a single chain, ordered from the N- to</span>
-<span class="sd">        the C-terminus. Due to an OpenMM limitation, the maximum supported number of residues is 37.</span>
+<span class="sd">        The residues must be a contiguous sequence from a single chain, ordered from the</span>
+<span class="sd">        N- to the C-terminus. Due to an OpenMM limitation, the maximum supported number</span>
+<span class="sd">        of residues is 37.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -121,9 +123,13 @@
 <span class="sd">        &gt;&gt;&gt; from openmm import app, unit</span>
 <span class="sd">        &gt;&gt;&gt; from openmmtools import testsystems</span>
 <span class="sd">        &gt;&gt;&gt; model = testsystems.LysozymeImplicit()</span>
-<span class="sd">        &gt;&gt;&gt; residues = [r for r in model.topology.residues() if 59 &lt;= r.index &lt;= 79]</span>
+<span class="sd">        &gt;&gt;&gt; residues = [</span>
+<span class="sd">        ...     r</span>
+<span class="sd">        ...     for r in model.topology.residues()</span>
+<span class="sd">        ...     if 59 &lt;= r.index &lt;= 79</span>
+<span class="sd">        ... ]</span>
 <span class="sd">        &gt;&gt;&gt; print(*[r.name for r in residues])</span>
-<span class="sd">        LYS ASP GLU ALA GLU LYS LEU PHE ASN GLN ASP VAL ASP ALA ALA VAL ARG GLY ILE LEU ARG</span>
+<span class="sd">        LYS ASP GLU ... ILE LEU ARG</span>
 <span class="sd">        &gt;&gt;&gt; helix_content = cvpack.HelixTorsionContent(residues)</span>
 <span class="sd">        &gt;&gt;&gt; model.system.addForce(helix_content)</span>
 <span class="sd">        6</span>

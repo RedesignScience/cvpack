@@ -61,27 +61,29 @@
 <span class="sd">        N({\\bf r}) = \\sum_{i \\in {\\bf g}_1} \\sum_{j \\in {\\bf g}_2}</span>
 <span class="sd">                        S\\left(\\frac{\\|{\\bf r}_j - {\\bf r}_i\\|}{r_0}\\right)</span>
 
-<span class="sd">    where :math:`r_0` is the threshold distance for defining a contact and :math:`S(x)` is</span>
-<span class="sd">    a step function equal to :math:`1` if a contact is made or equal to :math:`0` otherwise.</span>
-<span class="sd">    For trajectory analysis, it is fine to make :math:`S(x) = H(1-x)`, where `H` is the</span>
-<span class="sd">    `Heaviside step function &lt;https://en.wikipedia.org/wiki/Heaviside_step_function&gt;`_. For</span>
-<span class="sd">    molecular dynamics, however, :math:`S(x)` should be a continuous approximation of</span>
-<span class="sd">    :math:`H(1-x)` for :math:`x \\geq 0`. By default :cite:`Iannuzzi_2003`, the following</span>
-<span class="sd">    function is used:</span>
+<span class="sd">    where :math:`r_0` is the threshold distance for defining a contact and :math:`S(x)`</span>
+<span class="sd">    is a step function equal to :math:`1` if a contact is made or equal to :math:`0`</span>
+<span class="sd">    otherwise. For trajectory analysis, it is fine to make :math:`S(x) = H(1-x)`, where</span>
+<span class="sd">    `H` is the `Heaviside step function</span>
+<span class="sd">    &lt;https://en.wikipedia.org/wiki/Heaviside_step_function&gt;`_. For molecular dynamics,</span>
+<span class="sd">    however, :math:`S(x)` should be a continuous approximation of :math:`H(1-x)` for</span>
+<span class="sd">    :math:`x \\geq 0`. By default :cite:`Iannuzzi_2003`, the following function is used:</span>
 
 <span class="sd">    .. math::</span>
 
 <span class="sd">        S(x) = \\frac{1-x^6}{1-x^{12}} = \\frac{1}{1+x^6}</span>
 
-<span class="sd">    In fact, a cutoff distance :math:`r_c = x_c r_0` (typically, :math:`x_c = 2`) is applied</span>
-<span class="sd">    so that :math:`S(x) = 0` for :math:`x \\geq x_c`. To avoid discontinuities, there is also</span>
-<span class="sd">    the option to smoothly switch off :math:`S(x)` starting from :math:`r_s = x_s r_0`</span>
-<span class="sd">    (typically, :math:`x_s = 1.5`) instead of doing it abruptly at :math:`r_c`.</span>
+<span class="sd">    In fact, a cutoff distance :math:`r_c = x_c r_0` (typically, :math:`x_c = 2`) is</span>
+<span class="sd">    applied so that :math:`S(x) = 0` for :math:`x \\geq x_c`. To avoid discontinuities,</span>
+<span class="sd">    there is also the option to smoothly switch off :math:`S(x)` starting from</span>
+<span class="sd">    :math:`r_s = x_s r_0` (typically, :math:`x_s = 1.5`) instead of doing it abruptly at</span>
+<span class="sd">    :math:`r_c`.</span>
 
 <span class="sd">    .. note::</span>
 
-<span class="sd">        Atoms are allowed to be in both groups. In this case, self-contacts (:math:`i = j`)</span>
-<span class="sd">        are ignored and each pair of distinct atoms (:math:`i \\neq j`) is counted only once.</span>
+<span class="sd">        Atoms are allowed to be in both groups. In this case, self-contacts</span>
+<span class="sd">        (:math:`i = j`) are ignored and each pair of distinct atoms (:math:`i \\neq j`)</span>
+<span class="sd">        is counted only once.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -114,14 +116,22 @@
 <span class="sd">        &gt;&gt;&gt; from openmm import app</span>
 <span class="sd">        &gt;&gt;&gt; from openmmtools import testsystems</span>
 <span class="sd">        &gt;&gt;&gt; model = testsystems.AlanineDipeptideVacuum()</span>
-<span class="sd">        &gt;&gt;&gt; carbons = [a.index for a in model.topology.atoms() if a.element == app.element.carbon]</span>
+<span class="sd">        &gt;&gt;&gt; carbons = [</span>
+<span class="sd">        ...     a.index</span>
+<span class="sd">        ...     for a in model.topology.atoms()</span>
+<span class="sd">        ...     if a.element == app.element.carbon</span>
+<span class="sd">        ... ]</span>
 <span class="sd">        &gt;&gt;&gt; num_atoms = model.topology.getNumAtoms()</span>
 <span class="sd">        &gt;&gt;&gt; optionals = {&quot;pbc&quot;: False, &quot;stepFunction&quot;: &quot;step(1-x)&quot;}</span>
-<span class="sd">        &gt;&gt;&gt; nc = cvpack.NumberOfContacts(carbons, carbons, num_atoms, **optionals)</span>
+<span class="sd">        &gt;&gt;&gt; nc = cvpack.NumberOfContacts(</span>
+<span class="sd">        ...     carbons, carbons, num_atoms, **optionals</span>
+<span class="sd">        ... )</span>
 <span class="sd">        &gt;&gt;&gt; model.system.addForce(nc)</span>
 <span class="sd">        5</span>
 <span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; context = openmm.Context(model.system, openmm.CustomIntegrator(0), platform)</span>
+<span class="sd">        &gt;&gt;&gt; context = openmm.Context(</span>
+<span class="sd">        ...     model.system, openmm.CustomIntegrator(0), platform</span>
+<span class="sd">        ... )</span>
 <span class="sd">        &gt;&gt;&gt; context.setPositions(model.positions)</span>
 <span class="sd">        &gt;&gt;&gt; print(nc.getValue(context, digits=6))</span>
 <span class="sd">        6.0 dimensionless</span>
