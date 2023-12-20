@@ -140,7 +140,8 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
         cutoff = mmunit.value_in_md_units(nonbondedForce.getCutoffDistance())
         ref = 1 if reference is None else mmunit.value_in_md_units(reference)
         super().__init__(
-            f"{4 / ref}*epsilon*(1/y - 1/y^2) + {ONE_4PI_EPS0 / ref}*q12sq*(1/x + (x^2 - 3)/2)"
+            f"{4 / ref}*epsilon*(1/y - 1/y^2)"
+            f" + {ONE_4PI_EPS0 / ref}*q12sq*(1/x + (x^2 - 3)/2)"
             f"; x = r/{cutoff}"
             "; y = abs((r/sigma)^6 - 2) + 2"
             "; q12sq = max(0, -charge1*charge2)"
