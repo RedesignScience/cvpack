@@ -42,7 +42,7 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">t</span>
 
 <span class="kn">import</span> <span class="nn">openmm</span>
 <span class="kn">import</span> <span class="nn">xmltodict</span>
@@ -51,12 +51,14 @@
 
 <span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">AbstractCollectiveVariable</span>
 
+<span class="n">ONE_4PI_EPS0</span> <span class="o">=</span> <span class="mf">138.93545764438198</span>
+
 
 <span class="k">class</span> <span class="nc">_NonbondedForce</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">NonbondedForce</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">XmlSerializer</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">XmlSerializer</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">xmltodict</span><span class="o">.</span><span class="n">unparse</span><span class="p">(</span><span class="n">state</span><span class="p">)))</span>
 
 
@@ -127,9 +129,14 @@
 <span class="sd">    nonbondedForce</span>
 <span class="sd">        The :openmm:`NonbondedForce` object from which to collect the necessary</span>
 <span class="sd">        parameters.</span>
+<span class="sd">    reference</span>
+<span class="sd">        A reference value (in energy units per mole) to which the collective variable</span>
+<span class="sd">        should be normalized. If provided, the collective variable will become</span>
+<span class="sd">        dimensionless.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from openmm import unit</span>
 <span class="sd">    &gt;&gt;&gt; from openmmtools import testsystems</span>
 <span class="sd">    &gt;&gt;&gt; model = testsystems.HostGuestExplicit()</span>
 <span class="sd">    &gt;&gt;&gt; group1, group2 = [], []</span>
@@ -143,6 +150,11 @@
 <span class="sd">    ... )</span>
 <span class="sd">    &gt;&gt;&gt; model.system.addForce(attraction_strength)</span>
 <span class="sd">    5</span>
+<span class="sd">    &gt;&gt;&gt; normalized_attraction_strength = AttractionStrength(</span>
+<span class="sd">    ...     group1, group2, forces[&quot;NonbondedForce&quot;], 100*unit.kilojoules_per_mole,</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; model.system.addForce(normalized_attraction_strength)</span>
+<span class="sd">    6</span>
 <span class="sd">    &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&quot;Reference&quot;)</span>
 <span class="sd">    &gt;&gt;&gt; integrator = openmm.VerletIntegrator(1.0 * mmunit.femtoseconds)</span>
 <span class="sd">    &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
@@ -151,18 +163,22 @@
 <span class="sd">    4912.514 kJ/mol</span>
 <span class="sd">    &gt;&gt;&gt; print(attraction_strength.getEffectiveMass(context, 6))</span>
 <span class="sd">    2.163946e-07 nm**2 mol**2 Da/(kJ**2)</span>
+<span class="sd">    &gt;&gt;&gt; print(normalized_attraction_strength.getValue(context, 6))</span>
+<span class="sd">    49.12514 dimensionless</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">group1</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
-        <span class="n">group2</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">group1</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">group2</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
         <span class="n">nonbondedForce</span><span class="p">:</span> <span class="n">openmm</span><span class="o">.</span><span class="n">NonbondedForce</span><span class="p">,</span>
+        <span class="n">reference</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">one_4pi_eps0</span> <span class="o">=</span> <span class="mf">138.93545764438198</span>
         <span class="n">cutoff</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">value_in_md_units</span><span class="p">(</span><span class="n">nonbondedForce</span><span class="o">.</span><span class="n">getCutoffDistance</span><span class="p">())</span>
+        <span class="n">ref</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">reference</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">value_in_md_units</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;4*epsilon*(1/y - 1/y^2) + </span><span class="si">{</span><span class="n">one_4pi_eps0</span><span class="si">}</span><span class="s2">*q12sq*(1/x + (x^2 - 3)/2)&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="mi">4</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">ref</span><span class="si">}</span><span class="s2">*epsilon*(1/y - 1/y^2)&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot; + </span><span class="si">{</span><span class="n">ONE_4PI_EPS0</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">ref</span><span class="si">}</span><span class="s2">*q12sq*(1/x + (x^2 - 3)/2)&quot;</span>
             <span class="sa">f</span><span class="s2">&quot;; x = r/</span><span class="si">{</span><span class="n">cutoff</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="s2">&quot;; y = abs((r/sigma)^6 - 2) + 2&quot;</span>
             <span class="s2">&quot;; q12sq = max(0, -charge1*charge2)&quot;</span>
@@ -183,10 +199,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">setUseLongRangeCorrection</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">addInteractionGroup</span><span class="p">(</span><span class="n">group1</span><span class="p">,</span> <span class="n">group2</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span>
-            <span class="n">mmunit</span><span class="o">.</span><span class="n">kilojoules_per_mole</span><span class="p">,</span>
+            <span class="n">mmunit</span><span class="o">.</span><span class="n">kilojoules_per_mole</span> <span class="k">if</span> <span class="n">reference</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">,</span>
             <span class="n">group1</span><span class="p">,</span>
             <span class="n">group2</span><span class="p">,</span>
             <span class="n">_NonbondedForce</span><span class="p">(</span><span class="n">nonbondedForce</span><span class="p">),</span>
+            <span class="kc">None</span> <span class="k">if</span> <span class="n">reference</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">SerializableQuantity</span><span class="p">(</span><span class="n">reference</span><span class="p">),</span>
         <span class="p">)</span></div>
 
 </pre></div>
