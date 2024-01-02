@@ -42,8 +42,8 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">t</span>
 <span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">resources</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Sequence</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">openmm</span>
@@ -92,8 +92,7 @@
 <span class="sd">    .. note::</span>
 
 <span class="sd">        The residues must be a contiguous sequence from a single chain, ordered from the</span>
-<span class="sd">        N- to the C-terminus. Due to an OpenMM limitation, the maximum supported number</span>
-<span class="sd">        of residues is 37.</span>
+<span class="sd">        N- to the C-terminus. The maximum supported number of residues is 1024.</span>
 
 <span class="sd">    This collective variable was introduced in Ref. :cite:`Pietrucci_2009` with a</span>
 <span class="sd">    slightly different step function. The ideal alpha-helix configuration is the same</span>
@@ -160,42 +159,43 @@
     <span class="nd">@mmunit</span><span class="o">.</span><span class="n">convert_quantities</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">residues</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">mmapp</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">Residue</span><span class="p">],</span>
+        <span class="n">residues</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">mmapp</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">Residue</span><span class="p">],</span>
         <span class="n">numAtoms</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">thresholdRMSD</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="mf">0.08</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span><span class="p">),</span>
         <span class="n">halfExponent</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
         <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">assert</span> <span class="p">(</span>
-            <span class="mi">6</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">residues</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">37</span>
-        <span class="p">),</span> <span class="s2">&quot;The number of residues must be between 6 and 37&quot;</span>
-
-        <span class="k">def</span> <span class="nf">step_function</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
-            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;1/(1 + (rmsd</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">thresholdRMSD</span><span class="si">}</span><span class="s2">)^</span><span class="si">{</span><span class="mi">2</span><span class="o">*</span><span class="n">halfExponent</span><span class="si">}</span><span class="s2">)&quot;</span>
-
-        <span class="k">def</span> <span class="nf">atoms_list</span><span class="p">(</span><span class="n">residue</span><span class="p">:</span> <span class="n">mmapp</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">Residue</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-            <span class="n">indices</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;CA&quot;</span><span class="p">,</span> <span class="s2">&quot;CB&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;O&quot;</span><span class="p">]:</span>
-                    <span class="n">indices</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">index</span>
-                <span class="k">elif</span> <span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;GLY&quot;</span> <span class="ow">and</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;HA2&quot;</span><span class="p">:</span>
-                    <span class="n">indices</span><span class="p">[</span><span class="s2">&quot;CB&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">index</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">5</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Could not find all atoms in residue </span><span class="si">{</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="si">}{</span><span class="n">residue</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span>
-            <span class="k">return</span> <span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;CA&quot;</span><span class="p">,</span> <span class="s2">&quot;CB&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;O&quot;</span><span class="p">]]</span>
-
+            <span class="mi">6</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">residues</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1029</span>
+        <span class="p">),</span> <span class="s2">&quot;The number of residues must be between 6 and 1029&quot;</span>
         <span class="n">num_residue_blocks</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">residues</span><span class="p">)</span> <span class="o">-</span> <span class="mi">5</span>
-        <span class="n">function</span> <span class="o">=</span> <span class="s2">&quot; + &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">step_function</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_residue_blocks</span><span class="p">)))</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">function</span><span class="si">}</span><span class="s2">)/</span><span class="si">{</span><span class="n">num_residue_blocks</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">normalize</span> <span class="k">else</span> <span class="n">function</span>
-        <span class="p">)</span>
-        <span class="n">atoms</span> <span class="o">=</span> <span class="p">[</span><span class="n">atoms_list</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">residues</span><span class="p">]</span>
+        <span class="n">atoms</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_getAtomList</span><span class="p">,</span> <span class="n">residues</span><span class="p">))</span>
         <span class="n">positions</span> <span class="o">=</span> <span class="p">[</span><span class="n">openmm</span><span class="o">.</span><span class="n">Vec3</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ideal_helix_positions</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_residue_blocks</span><span class="p">):</span>
-            <span class="n">group</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">atoms</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">6</span><span class="p">],</span> <span class="p">[])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">addCollectiveVariable</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;rmsd</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">RMSD</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">numAtoms</span><span class="p">))</span>
+
+        <span class="k">def</span> <span class="nf">expression</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;+&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;1/(1+(rmsd</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">thresholdRMSD</span><span class="si">}</span><span class="s2">)^</span><span class="si">{</span><span class="mi">2</span><span class="o">*</span><span class="n">halfExponent</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">num_residue_blocks</span><span class="p">))</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">num_residue_blocks</span> <span class="o">&lt;=</span> <span class="mi">32</span><span class="p">:</span>
+            <span class="n">summation</span> <span class="o">=</span> <span class="n">expression</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_residue_blocks</span><span class="p">)</span>
+            <span class="n">force</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">summation</span> <span class="o">=</span> <span class="s2">&quot;+&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;chunk</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">((</span><span class="n">num_residue_blocks</span> <span class="o">+</span> <span class="mi">31</span><span class="p">)</span> <span class="o">//</span> <span class="mi">32</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">summation</span><span class="si">}</span><span class="s2">)/</span><span class="si">{</span><span class="n">num_residue_blocks</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">normalize</span> <span class="k">else</span> <span class="n">summation</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_residue_blocks</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">num_residue_blocks</span> <span class="o">&gt;</span> <span class="mi">32</span> <span class="ow">and</span> <span class="n">index</span> <span class="o">%</span> <span class="mi">32</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">force</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">CustomCVForce</span><span class="p">(</span><span class="n">expression</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">32</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">addCollectiveVariable</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;chunk</span><span class="si">{</span><span class="n">index</span><span class="o">//</span><span class="mi">32</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">force</span><span class="p">)</span>
+            <span class="n">force</span><span class="o">.</span><span class="n">addCollectiveVariable</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;rmsd</span><span class="si">{</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">RMSD</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">atoms</span><span class="p">[</span><span class="n">index</span> <span class="p">:</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">6</span><span class="p">],</span> <span class="p">[]),</span> <span class="n">numAtoms</span><span class="p">),</span>
+            <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span>  <span class="c1"># pylint: disable=duplicate-code</span>
             <span class="n">mmunit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">,</span>
@@ -204,7 +204,22 @@
             <span class="n">thresholdRMSD</span><span class="p">,</span>
             <span class="n">halfExponent</span><span class="p">,</span>
             <span class="n">normalize</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_getAtomList</span><span class="p">(</span><span class="n">residue</span><span class="p">:</span> <span class="n">mmapp</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">Residue</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="n">residue_atoms</span> <span class="o">=</span> <span class="p">{</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">atom</span><span class="o">.</span><span class="n">index</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">()}</span>
+        <span class="k">if</span> <span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;GLY&quot;</span><span class="p">:</span>
+            <span class="n">residue_atoms</span><span class="p">[</span><span class="s2">&quot;CB&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">residue_atoms</span><span class="p">[</span><span class="s2">&quot;HA2&quot;</span><span class="p">]</span>
+        <span class="n">atom_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;CA&quot;</span><span class="p">,</span> <span class="s2">&quot;CB&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;O&quot;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">atom_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">residue_atoms</span><span class="p">[</span><span class="n">atom</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Atom </span><span class="si">{</span><span class="n">atom</span><span class="si">}</span><span class="s2"> not found in residue </span><span class="si">{</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="si">}{</span><span class="n">residue</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span> <span class="kn">from</span> <span class="nn">error</span>
+        <span class="k">return</span> <span class="n">atom_list</span></div>
 
 </pre></div>
 
