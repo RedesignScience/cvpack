@@ -452,8 +452,10 @@ def test_helix_rmsd_content():
         helix_content = cvpack.HelixRMSDContent(
             residues[len(residues) - 37 :], num_atoms
         )
-    assert str(excinfo.value) == "Could not find all atoms in residue TMP163"
-    helix_content = cvpack.HelixRMSDContent(residues[59:80], num_atoms)
+    assert str(excinfo.value) == "Atom N not found in residue TMP163"
+
+    start, end = 59, 80
+    helix_content = cvpack.HelixRMSDContent(residues[start:end], num_atoms)
     model.system.addForce(helix_content)
     context = openmm.Context(
         model.system,
@@ -466,29 +468,38 @@ def test_helix_rmsd_content():
     traj = mdtraj.Trajectory(
         model.positions, mdtraj.Topology.from_openmm(model.topology)
     )
-    atoms = sum(
-        zip(
-            traj.top.select("resSeq 60 to 80 and name N"),
-            traj.top.select("resSeq 60 to 80 and name CA"),
-            traj.top.select(
-                "resSeq 60 to 80 and (name CB or (resname GLY and name HA2))"
-            ),
-            traj.top.select("resSeq 60 to 80 and name C"),
-            traj.top.select("resSeq 60 to 80 and name O"),
-        ),
-        (),
-    )
-
     ref = copy.deepcopy(traj)
     positions = helix_content._ideal_helix_positions  # pylint: disable=protected-access
-    computed_value = 0
-    for i in range(16):
-        group = atoms[5 * i : 5 * i + 30]
-        ref.xyz[:, group, :] = positions
-        computed_value += 1 / (
-            1 + (mdtraj.rmsd(traj, ref, 0, group).item() / 0.08) ** 6
-        )
 
+    def compute_cv_value(atoms):
+        computed_value = 0
+        for i in range(len(atoms) // 5 - 5):
+            group = atoms[5 * i : 5 * i + 30]
+            ref.xyz[:, group, :] = positions
+            computed_value += 1 / (
+                1 + (mdtraj.rmsd(traj, ref, 0, group).item() / 0.08) ** 6
+            )
+        return computed_value
+
+    def select_atoms(stard, end):
+        atoms = ()
+        for residue in residues[stard:end]:
+            residue_atoms = {atom.name: atom.index for atom in residue.atoms()}
+            if residue.name == "GLY":
+                residue_atoms["CB"] = residue_atoms["HA2"]
+            atoms += tuple(residue_atoms[name] for name in ["N", "CA", "CB", "C", "O"])
+        return atoms
+
+    computed_value = compute_cv_value(select_atoms(start, end))
+    assert cv_value / cv_value.unit == pytest.approx(computed_value)
+    perform_common_tests(helix_content, context)
+
+    start, end = 0, 80
+    helix_content2 = cvpack.HelixRMSDContent(residues[start:end], num_atoms)
+    model.system.addForce(helix_content2)
+    context.reinitialize(preserveState=True)
+    cv_value = helix_content2.getValue(context)
+    computed_value = compute_cv_value(select_atoms(start, end))
     assert cv_value / cv_value.unit == pytest.approx(computed_value)
     perform_common_tests(helix_content, context)
 

@@ -7,8 +7,8 @@
 
 """
 
+import typing as t
 from importlib import resources
-from typing import List, Sequence
 
 import numpy as np
 import openmm
@@ -55,8 +55,7 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
     .. note::
 
         The residues must be a contiguous sequence from a single chain, ordered from the
-        N- to the C-terminus. Due to an OpenMM limitation, the maximum supported number
-        of residues is 37.
+        N- to the C-terminus. The maximum supported number of residues is 1024.
 
     This collective variable was introduced in Ref. :cite:`Pietrucci_2009` with a
     slightly different step function. The ideal alpha-helix configuration is the same
@@ -123,42 +122,41 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
     @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        residues: Sequence[mmapp.topology.Residue],
+        residues: t.Sequence[mmapp.topology.Residue],
         numAtoms: int,
         thresholdRMSD: mmunit.ScalarQuantity = mmunit.Quantity(0.08, mmunit.nanometers),
         halfExponent: int = 3,
         normalize: bool = False,
     ) -> None:
-        assert (
-            6 <= len(residues) <= 37
-        ), "The number of residues must be between 6 and 37"
-
-        def step_function(i):
-            return f"1/(1 + (rmsd{i+1}/{thresholdRMSD})^{2*halfExponent})"
-
-        def atoms_list(residue: mmapp.topology.Residue) -> List[int]:
-            indices = {}
-            for atom in residue.atoms():
-                if atom.name in ["N", "CA", "CB", "C", "O"]:
-                    indices[atom.name] = atom.index
-                elif residue.name == "GLY" and atom.name == "HA2":
-                    indices["CB"] = atom.index
-            if len(indices) != 5:
-                raise ValueError(
-                    f"Could not find all atoms in residue {residue.name}{residue.id}"
-                )
-            return [indices[atom] for atom in ["N", "CA", "CB", "C", "O"]]
-
+        assert 6 <= len(residues) <= 1029, "The number of residues must be between 6 and 1029"
         num_residue_blocks = len(residues) - 5
-        function = " + ".join(map(step_function, range(num_residue_blocks)))
-        super().__init__(
-            f"({function})/{num_residue_blocks}" if normalize else function
-        )
-        atoms = [atoms_list(r) for r in residues]
+        atoms = list(map(self._get_atom_list, residues))
         positions = [openmm.Vec3(*x) for x in self._ideal_helix_positions]
-        for i in range(num_residue_blocks):
-            group = sum(atoms[i : i + 6], [])
-            self.addCollectiveVariable(f"rmsd{i+1}", RMSD(positions, group, numAtoms))
+
+        def expression(start, end):
+            return "+".join(
+                f"1/(1+(rmsd{i+1}/{thresholdRMSD})^{2*halfExponent})"
+                for i in range(start, min(end, num_residue_blocks))
+            )
+
+        if num_residue_blocks <= 32:
+            summation = expression(0, num_residue_blocks)
+            force = self
+        else:
+            summation = "+".join(
+                f"chunk{i+1}" for i in range((num_residue_blocks + 31) // 32)
+            )
+        super().__init__(
+            f"({summation})/{num_residue_blocks}" if normalize else summation
+        )
+        for index in range(num_residue_blocks):
+            if num_residue_blocks > 32 and index % 32 == 0:
+                force = openmm.CustomCVForce(expression(index, index + 32))
+                self.addCollectiveVariable(f"chunk{index//32+1}", force)
+            force.addCollectiveVariable(
+                f"rmsd{index+1}",
+                RMSD(positions, sum(atoms[index : index + 6], []), numAtoms),
+            )
 
         self._registerCV(  # pylint: disable=duplicate-code
             mmunit.dimensionless,
@@ -168,3 +166,18 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
             halfExponent,
             normalize,
         )
+
+    @staticmethod
+    def _get_atom_list(residue: mmapp.topology.Residue) -> t.List[int]:
+        residue_atoms = {atom.name: atom.index for atom in residue.atoms()}
+        if residue.name == "GLY":
+            residue_atoms["CB"] = residue_atoms["HA2"]
+        atom_list = []
+        for atom in ("N", "CA", "CB", "C", "O"):
+            try:
+                atom_list.append(residue_atoms[atom])
+            except KeyError:
+                raise ValueError(
+                    f"Atom {atom} not found in residue {residue.name}{residue.id}"
+                )
+        return atom_list
