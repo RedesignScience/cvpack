@@ -132,7 +132,7 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
             6 <= len(residues) <= 1029
         ), "The number of residues must be between 6 and 1029"
         num_residue_blocks = len(residues) - 5
-        atoms = list(map(self._get_atom_list, residues))
+        atoms = list(map(self._getAtomList, residues))
         positions = [openmm.Vec3(*x) for x in self._ideal_helix_positions]
 
         def expression(start, end):
@@ -170,7 +170,7 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
         )
 
     @staticmethod
-    def _get_atom_list(residue: mmapp.topology.Residue) -> t.List[int]:
+    def _getAtomList(residue: mmapp.topology.Residue) -> t.List[int]:
         residue_atoms = {atom.name: atom.index for atom in residue.atoms()}
         if residue.name == "GLY":
             residue_atoms["CB"] = residue_atoms["HA2"]
@@ -178,8 +178,8 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
         for atom in ("N", "CA", "CB", "C", "O"):
             try:
                 atom_list.append(residue_atoms[atom])
-            except KeyError:
+            except KeyError as error:
                 raise ValueError(
                     f"Atom {atom} not found in residue {residue.name}{residue.id}"
-                )
+                ) from error
         return atom_list
