@@ -128,7 +128,9 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
         halfExponent: int = 3,
         normalize: bool = False,
     ) -> None:
-        assert 6 <= len(residues) <= 1029, "The number of residues must be between 6 and 1029"
+        assert (
+            6 <= len(residues) <= 1029
+        ), "The number of residues must be between 6 and 1029"
         num_residue_blocks = len(residues) - 5
         atoms = list(map(self._get_atom_list, residues))
         positions = [openmm.Vec3(*x) for x in self._ideal_helix_positions]
