@@ -476,9 +476,8 @@ def test_helix_rmsd_content():
         for i in range(len(atoms) // 5 - 5):
             group = atoms[5 * i : 5 * i + 30]
             ref.xyz[:, group, :] = positions
-            computed_value += 1 / (
-                1 + (mdtraj.rmsd(traj, ref, 0, group).item() / 0.08) ** 6
-            )
+            x4 = (mdtraj.rmsd(traj, ref, 0, group).item() / 0.08) ** 4
+            computed_value += (1 + x4) / (1 + x4 + x4**2)
         return computed_value
 
     def select_atoms(stard, end):
