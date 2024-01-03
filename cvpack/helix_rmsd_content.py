@@ -1,5 +1,5 @@
 """
-.. class:: HelixTorsionContent
+.. class:: HelixRMSDContent
    :platform: Linux, MacOS, Windows
    :synopsis: Alpha-helix RMSD content of a sequence of residues
 
@@ -8,19 +8,18 @@
 """
 
 import typing as t
-from importlib import resources
 
-import numpy as np
 import openmm
 from openmm import app as mmapp
 
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable, SerializableResidue
+from .cvpack import SerializableResidue
 from .rmsd import RMSD
+from .rmsd_content import RMSDContent
 
 
-class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
+class HelixRMSDContent(RMSDContent):
     """
     The alpha-helix RMSD content of a sequence of `n` residues :cite:`Pietrucci_2009`:
 
@@ -117,12 +116,7 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
         15.981 dimensionless
     """
 
-    _ideal_helix_positions = 0.1 * np.loadtxt(
-        str(
-            resources.files("cvpack").joinpath("data").joinpath("ideal_alpha_helix.csv")
-        ),
-        delimiter=",",
-    )
+    _ideal_helix_positions = RMSDContent.load_positions("ideal_alpha_helix.csv")
 
     @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
@@ -137,7 +131,7 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
             6 <= len(residues) <= 1029
         ), "The number of residues must be between 6 and 1029"
         num_residue_blocks = len(residues) - 5
-        atoms = list(map(self._getAtomList, residues))
+        atoms = list(map(self.getAtomList, residues))
         positions = [openmm.Vec3(*x) for x in self._ideal_helix_positions]
 
         def expression(start, end):
@@ -175,18 +169,3 @@ class HelixRMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
             stepFunction,
             normalize,
         )
-
-    @staticmethod
-    def _getAtomList(residue: mmapp.topology.Residue) -> t.List[int]:
-        residue_atoms = {atom.name: atom.index for atom in residue.atoms()}
-        if residue.name == "GLY":
-            residue_atoms["CB"] = residue_atoms["HA2"]
-        atom_list = []
-        for atom in ("N", "CA", "CB", "C", "O"):
-            try:
-                atom_list.append(residue_atoms[atom])
-            except KeyError as error:
-                raise ValueError(
-                    f"Atom {atom} not found in residue {residue.name}{residue.id}"
-                ) from error
-        return atom_list
