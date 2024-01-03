@@ -63,51 +63,55 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        \\alpha_{\\rm rmsd}({\\bf r}) = \\sum_{i=1}^{n-5} B_m\\left(</span>
+<span class="sd">        \\alpha_{\\rm rmsd}({\\bf r}) = \\sum_{i=1}^{n-5} S\\left(</span>
+<span class="sd">            \\frac{r_{\\rm rmsd}({\\bf g}_i, {\\bf g}_{\\rm ref})}{r_0}</span>
+<span class="sd">        \\right)</span>
+
+<span class="sd">    where :math:`{\\bf g}_i` represents a group of atoms selected from residues</span>
+<span class="sd">    :math:`i` to :math:`i+5` of the sequence, :math:`{\\bf g}_{\\rm ref}` represents</span>
+<span class="sd">    the same atoms in an ideal alpha-helix configuration,</span>
+<span class="sd">    :math:`r_{\\rm rmsd}({\\bf g}_i, {\\bf g}_{\\rm ref})` is the root-mean-square</span>
+<span class="sd">    distance (RMSD) between :math:`{\\bf g}_i` and :math:`{\\bf g}_{\\rm ref}`,</span>
+<span class="sd">    :math:`r_0` is a threshold RMSD value, and :math:`S(x)` is a smooth step function</span>
+<span class="sd">    whose default form is</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        S(x) = \\frac{1 + x^4}{1 + x^4 + x^8}</span>
+
+<span class="sd">    Each group :math:`{\\bf g}_i` is formed by the N, :math:`{\\rm C}_\\alpha`,</span>
+<span class="sd">    :math:`{\\rm C}_\\beta`, C, and O atoms of consecutive residues from :math:`i`</span>
+<span class="sd">    to :math:`i+5`, thus comprising a total of 30 atoms.  In the case glycine, the</span>
+<span class="sd">    missing :math:`{\\rm C}_\\beta` is replaced by the corresponding H atom. The</span>
+<span class="sd">    root-mean-square distance is then defined as</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        r_{\\rm rmsd}({\\bf g}_i, {\\bf g}_{\\rm ref}) =</span>
 <span class="sd">            \\sqrt{\\frac{1}{30} \\sum_{j=1}^{30} \\left\\|</span>
 <span class="sd">                \\hat{\\bf r}_j({\\bf g}_i) -</span>
 <span class="sd">                {\\bf A}({\\bf g}_i)\\hat{\\bf r}_j({\\bf g}_{\\rm ref})</span>
 <span class="sd">            \\right\\|^2}</span>
-<span class="sd">        \\right)</span>
 
-<span class="sd">    where :math:`{\\bf g}_i` represents a group of 30 atoms selected from residues</span>
-<span class="sd">    :math:`i` to :math:`i+5` of the sequence, :math:`{\\bf g}_{\\rm ref}` represents the</span>
-<span class="sd">    same 30 atoms in an ideal alpha-helix configuration,</span>
-<span class="sd">    :math:`\\hat{\\bf r}_j({\\bf g})` is the position of the :math:`j`-th atom in a</span>
-<span class="sd">    group :math:`{\\bf g}` relative to the group&#39;s center of geometry (centroid),</span>
+<span class="sd">    where :math:`\\hat{\\bf r}_j({\\bf g})` is the position of the :math:`j`-th atom in</span>
+<span class="sd">    a group :math:`{\\bf g}` relative to the group&#39;s center of geometry (centroid),</span>
 <span class="sd">    :math:`{\\bf A}({\\bf g})` is the rotation matrix that minimizes the RMSD between</span>
-<span class="sd">    :math:`{\\bf g}` and :math:`{\\bf g}_{\\rm ref}`, and :math:`B_m(x)` is a smooth</span>
-<span class="sd">    step function given by</span>
+<span class="sd">    :math:`{\\bf g}` and :math:`{\\bf g}_{\\rm ref}`.</span>
 
-<span class="sd">    .. math::</span>
-<span class="sd">        B_m(x) = \\frac{1}{1 + x^{2m}}</span>
+<span class="sd">    Optionally, alpha-helix RMSD content can be normalized to the range :math:`[0, 1]`.</span>
 
-<span class="sd">    where :math:`m` is an integer parameter that controls its steepness.</span>
-
-<span class="sd">    Each group :math:`{\\bf g}_i` is formed by the N, :math:`{\\rm C}_\\alpha`, C, and</span>
-<span class="sd">    O atoms of the backbone, as well as the :math:`{\\rm C}_\\beta` atoms of the six</span>
-<span class="sd">    consecutive residues starting from residue :math:`i`. In the case of glycine, the</span>
-<span class="sd">    missing :math:`{\\rm C}_\\beta` is replaced by the corresponding H atom.</span>
+<span class="sd">    This collective variable was introduced in Ref. :cite:`Pietrucci_2009`. The default</span>
+<span class="sd">    step function shown above is identical to the one in the original paper, but written</span>
+<span class="sd">    in a numerically safe form. The ideal alpha-helix configuration is the same used for</span>
+<span class="sd">    the collective variable `ALPHARMSD`_ in `PLUMED v2.8.1</span>
+<span class="sd">    &lt;https://github.com/plumed/plumed2&gt;`_ .</span>
 
 <span class="sd">    .. note::</span>
 
-<span class="sd">        The residues must be a contiguous sequence from a single chain, ordered from the</span>
-<span class="sd">        N- to the C-terminus. The maximum supported number of residues is 1024.</span>
-
-<span class="sd">    This collective variable was introduced in Ref. :cite:`Pietrucci_2009` with a</span>
-<span class="sd">    slightly different step function. The ideal alpha-helix configuration is the same</span>
-<span class="sd">    used in `PLUMED v2.8.1 &lt;https://github.com/plumed/plumed2&gt;`_ for its collective</span>
-<span class="sd">    variable `ALPHARMSD`_. By setting :math:`{\\rm NN}=2m` and :math:`{\\rm MM}=4m`,</span>
-<span class="sd">    PLUMED&#39;s ALPHARMSD will match the collective variable implemented here.</span>
-
-<span class="sd">    Optionally, this collective variable can be normalized to the range :math:`[0, 1]`.</span>
+<span class="sd">        The residues must be a contiguous sequence from a single chain, ordered from</span>
+<span class="sd">        the N-terminus to the C-terminus. The minimum and maximum numbers of residues</span>
+<span class="sd">        supported in this implementation are 6 and 1029, respectively.</span>
 
 <span class="sd">    .. _ALPHARMSD: https://www.plumed.org/doc-v2.8/user-doc/html/_a_l_p_h_a_r_m_s_d.html</span>
-
-<span class="sd">    .. warning::</span>
-
-<span class="sd">        Periodic boundary conditions are `not supported</span>
-<span class="sd">        &lt;https://github.com/openmm/openmm/issues/2913&gt;`_.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -116,9 +120,10 @@
 <span class="sd">        numAtoms</span>
 <span class="sd">            The total number of atoms in the system (required by OpenMM).</span>
 <span class="sd">        thresholdRMSD</span>
-<span class="sd">            The threshold RMSD value for the step function.</span>
-<span class="sd">        halfExponent</span>
-<span class="sd">            The parameter :math:`m` of the step function.</span>
+<span class="sd">            The threshold RMSD value for considering a group of residues as matching an</span>
+<span class="sd">            alpha-helix.</span>
+<span class="sd">        stepFunction</span>
+<span class="sd">            The form of the step function :math:`S(x)`.</span>
 <span class="sd">        normalize</span>
 <span class="sd">            Whether to normalize the collective variable to the range :math:`[0, 1]`.</span>
 
@@ -145,8 +150,8 @@
 <span class="sd">        &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
 <span class="sd">        &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
 <span class="sd">        &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">        &gt;&gt;&gt; print(helix_content.getValue(context, digits=7))</span>
-<span class="sd">        15.915198 dimensionless</span>
+<span class="sd">        &gt;&gt;&gt; print(helix_content.getValue(context, digits=4))</span>
+<span class="sd">        15.981 dimensionless</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_ideal_helix_positions</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span>
@@ -162,7 +167,7 @@
         <span class="n">residues</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">mmapp</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">Residue</span><span class="p">],</span>
         <span class="n">numAtoms</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">thresholdRMSD</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="mf">0.08</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span><span class="p">),</span>
-        <span class="n">halfExponent</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">stepFunction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;(1+x^4)/(1+x^4+x^8)&quot;</span><span class="p">,</span>
         <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">assert</span> <span class="p">(</span>
@@ -173,17 +178,19 @@
         <span class="n">positions</span> <span class="o">=</span> <span class="p">[</span><span class="n">openmm</span><span class="o">.</span><span class="n">Vec3</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ideal_helix_positions</span><span class="p">]</span>
 
         <span class="k">def</span> <span class="nf">expression</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
-            <span class="k">return</span> <span class="s2">&quot;+&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;1/(1+(rmsd</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">thresholdRMSD</span><span class="si">}</span><span class="s2">)^</span><span class="si">{</span><span class="mi">2</span><span class="o">*</span><span class="n">halfExponent</span><span class="si">}</span><span class="s2">)&quot;</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">num_residue_blocks</span><span class="p">))</span>
-            <span class="p">)</span>
+            <span class="n">summands</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">definitions</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">num_residue_blocks</span><span class="p">)):</span>
+                <span class="n">summands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stepFunction</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;x</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+                <span class="n">definitions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;x</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">=rmsd</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">thresholdRMSD</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;+&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">summands</span><span class="p">)]</span> <span class="o">+</span> <span class="n">definitions</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">num_residue_blocks</span> <span class="o">&lt;=</span> <span class="mi">32</span><span class="p">:</span>
             <span class="n">summation</span> <span class="o">=</span> <span class="n">expression</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_residue_blocks</span><span class="p">)</span>
             <span class="n">force</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">summation</span> <span class="o">=</span> <span class="s2">&quot;+&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;chunk</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">((</span><span class="n">num_residue_blocks</span> <span class="o">+</span> <span class="mi">31</span><span class="p">)</span> <span class="o">//</span> <span class="mi">32</span><span class="p">)</span>
+                <span class="sa">f</span><span class="s2">&quot;chunk</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">((</span><span class="n">num_residue_blocks</span> <span class="o">+</span> <span class="mi">31</span><span class="p">)</span> <span class="o">//</span> <span class="mi">32</span><span class="p">)</span>
             <span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">summation</span><span class="si">}</span><span class="s2">)/</span><span class="si">{</span><span class="n">num_residue_blocks</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">normalize</span> <span class="k">else</span> <span class="n">summation</span>
@@ -191,9 +198,9 @@
         <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_residue_blocks</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">num_residue_blocks</span> <span class="o">&gt;</span> <span class="mi">32</span> <span class="ow">and</span> <span class="n">index</span> <span class="o">%</span> <span class="mi">32</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">force</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">CustomCVForce</span><span class="p">(</span><span class="n">expression</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">32</span><span class="p">))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">addCollectiveVariable</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;chunk</span><span class="si">{</span><span class="n">index</span><span class="o">//</span><span class="mi">32</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">force</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">addCollectiveVariable</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;chunk</span><span class="si">{</span><span class="n">index</span><span class="o">//</span><span class="mi">32</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">force</span><span class="p">)</span>
             <span class="n">force</span><span class="o">.</span><span class="n">addCollectiveVariable</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;rmsd</span><span class="si">{</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;rmsd</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
                 <span class="n">RMSD</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">atoms</span><span class="p">[</span><span class="n">index</span> <span class="p">:</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">6</span><span class="p">],</span> <span class="p">[]),</span> <span class="n">numAtoms</span><span class="p">),</span>
             <span class="p">)</span>
 
@@ -202,7 +209,7 @@
             <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">SerializableResidue</span><span class="p">,</span> <span class="n">residues</span><span class="p">)),</span>
             <span class="n">numAtoms</span><span class="p">,</span>
             <span class="n">thresholdRMSD</span><span class="p">,</span>
-            <span class="n">halfExponent</span><span class="p">,</span>
+            <span class="n">stepFunction</span><span class="p">,</span>
             <span class="n">normalize</span><span class="p">,</span>
         <span class="p">)</span>
 
