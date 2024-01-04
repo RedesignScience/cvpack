@@ -1,5 +1,6 @@
 # Ideal parallel beta sheet structure according to:
 # https://github.com/plumed/plumed2/releases/tag/v2.8.1
+# Reproduced here in accordance with their LGPL-3.0 license
 # Order: N, CA, CB, C, O (residues i to i+2 and j to j+2)
 -1.439, -5.122, -1.144
 -0.816, -3.803, -1.013

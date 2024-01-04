@@ -9,13 +9,11 @@
 
 import typing as t
 
-import openmm
 from openmm import app as mmapp
 
 from cvpack import unit as mmunit
 
 from .cvpack import SerializableResidue
-from .rmsd import RMSD
 from .rmsd_content import RMSDContent
 
 
@@ -70,8 +68,8 @@ class HelixRMSDContent(RMSDContent):
     .. note::
 
         The residues must be a contiguous sequence from a single chain, ordered from
-        the N-terminus to the C-terminus. The minimum and maximum numbers of residues
-        supported in this implementation are 6 and 1029, respectively.
+        the N-terminus to the C-terminus. This implementation is limited to a minimum
+        of 6 and a maximum of 1029 residues.
 
     .. _ALPHARMSD: https://www.plumed.org/doc-v2.8/user-doc/html/_a_l_p_h_a_r_m_s_d.html
 
@@ -127,40 +125,18 @@ class HelixRMSDContent(RMSDContent):
         stepFunction: str = "(1+x^4)/(1+x^4+x^8)",
         normalize: bool = False,
     ) -> None:
-        assert (
-            6 <= len(residues) <= 1029
-        ), "The number of residues must be between 6 and 1029"
-        num_residue_blocks = len(residues) - 5
-        atoms = list(map(self.getAtomList, residues))
-        positions = [openmm.Vec3(*x) for x in self._ideal_helix_positions]
-
-        def expression(start, end):
-            summands = []
-            definitions = []
-            for i in range(start, min(end, num_residue_blocks)):
-                summands.append(stepFunction.replace("x", f"x{i}"))
-                definitions.append(f"x{i}=rmsd{i}/{thresholdRMSD}")
-            return ";".join(["+".join(summands)] + definitions)
-
-        if num_residue_blocks <= 32:
-            summation = expression(0, num_residue_blocks)
-            force = self
-        else:
-            summation = "+".join(
-                f"chunk{i}" for i in range((num_residue_blocks + 31) // 32)
-            )
+        residue_blocks = [
+            list(range(index, index + 6)) for index in range(len(residues) - 5)
+        ]
         super().__init__(
-            f"({summation})/{num_residue_blocks}" if normalize else summation
+            residue_blocks,
+            self._ideal_helix_positions,
+            residues,
+            numAtoms,
+            thresholdRMSD,
+            stepFunction,
+            normalize,
         )
-        for index in range(num_residue_blocks):
-            if num_residue_blocks > 32 and index % 32 == 0:
-                force = openmm.CustomCVForce(expression(index, index + 32))
-                self.addCollectiveVariable(f"chunk{index//32}", force)
-            force.addCollectiveVariable(
-                f"rmsd{index}",
-                RMSD(positions, sum(atoms[index : index + 6], []), numAtoms),
-            )
-
         self._registerCV(  # pylint: disable=duplicate-code
             mmunit.dimensionless,
             list(map(SerializableResidue, residues)),
