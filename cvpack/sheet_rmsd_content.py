@@ -1,7 +1,7 @@
 """
-.. class:: HelixRMSDContent
+.. class:: SheetRMSDContent
    :platform: Linux, MacOS, Windows
-   :synopsis: Alpha-helix RMSD content of a sequence of residues
+   :synopsis: Beta-sheet RMSD content of a sequence of residues
 
 .. classauthor:: Charlles Abreu <craabreu@gmail.com>
 
@@ -17,11 +17,12 @@ from .cvpack import SerializableResidue
 from .rmsd_content import RMSDContent
 
 # pylint: disable=protected-access
-_IDEAL_HELIX = RMSDContent._loadPositions("ideal_alpha_helix.csv")
+_PARABETA_POSITIONS = RMSDContent._loadPositions("ideal_parallel_beta_sheet.csv")
+_ANTIBETA_POSITIONS = RMSDContent._loadPositions("ideal_antiparallel_beta_sheet.csv")
 # pylint: enable=protected-access
 
 
-class HelixRMSDContent(RMSDContent):
+class SheetRMSDContent(RMSDContent):
     """
     The alpha-helix RMSD content of a sequence of `n` residues :cite:`Pietrucci_2009`:
 
@@ -83,6 +84,8 @@ class HelixRMSDContent(RMSDContent):
             The residues to be used in the calculation.
         numAtoms
             The total number of atoms in the system (required by OpenMM).
+        parallel
+            Whether to consider a parallel beta sheet instead of an antiparallel one.
         thresholdRMSD
             The threshold RMSD value for considering a group of residues as matching an
             alpha-helix.
@@ -98,23 +101,23 @@ class HelixRMSDContent(RMSDContent):
         >>> import openmm
         >>> from openmm import app, unit
         >>> from openmmtools import testsystems
-        >>> model = testsystems.LysozymeImplicit()
-        >>> residues = list(it.islice(model.topology.residues(), 59, 80))
+        >>> model = testsystems.SrcImplicit()
+        >>> residues = list(it.islice(model.topology.residues(), 8, 41))
         >>> print(*[r.name for r in residues])
-        LYS ASP GLU ... ILE LEU ARG
-        >>> helix_content = cvpack.HelixRMSDContent(
+        SER LEU ARG ... THR LEU LYS
+        >>> sheet_content = cvpack.SheetRMSDContent(
         ...     residues, model.system.getNumParticles()
         ... )
-        >>> helix_content.getNumResidueBlocks()
-        16
-        >>> model.system.addForce(helix_content)
+        >>> sheet_content.getNumResidueBlocks()
+        325
+        >>> model.system.addForce(sheet_content)
         6
         >>> platform = openmm.Platform.getPlatformByName('Reference')
         >>> integrator = openmm.VerletIntegrator(0)
         >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
-        >>> print(helix_content.getValue(context, digits=4))
-        15.981 dimensionless
+        >>> print(sheet_content.getValue(context, digits=4))
+        4.1366 dimensionless
     """
 
     @mmunit.convert_quantities
@@ -122,17 +125,21 @@ class HelixRMSDContent(RMSDContent):
         self,
         residues: t.Sequence[mmapp.topology.Residue],
         numAtoms: int,
+        parallel: bool = False,
         thresholdRMSD: mmunit.ScalarQuantity = mmunit.Quantity(0.08, mmunit.nanometers),
         stepFunction: str = "(1+x^4)/(1+x^4+x^8)",
         normalize: bool = False,
     ) -> None:
+        min_separation = 3 if parallel else 2
         residue_blocks = [
-            list(range(index, index + 6)) for index in range(len(residues) - 5)
+            [i, i + 1, i + 2, j, j + 1, j + 2]
+            for i in range(len(residues) - 3 - min_separation)
+            for j in range(i + 3 + min_separation, len(residues) - 3)
         ]
         # pylint: disable=duplicate-code
         super().__init__(
             residue_blocks,
-            _IDEAL_HELIX,
+            _PARABETA_POSITIONS if parallel else _ANTIBETA_POSITIONS,
             residues,
             numAtoms,
             thresholdRMSD,
@@ -143,6 +150,7 @@ class HelixRMSDContent(RMSDContent):
             mmunit.dimensionless,
             list(map(SerializableResidue, residues)),
             numAtoms,
+            parallel,
             thresholdRMSD,
             stepFunction,
             normalize,

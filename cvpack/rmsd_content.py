@@ -23,7 +23,7 @@ class RMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
     Abstract class for secondary-structure RMSD content of a sequence of `n` residues.
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         residue_blocks: t.List[int],
         ideal_positions: t.List[openmm.Vec3],
@@ -33,13 +33,13 @@ class RMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
         stepFunction: str = "(1+x^4)/(1+x^4+x^8)",
         normalize: bool = False,
     ):
-        num_residue_blocks = len(residue_blocks)
+        num_residue_blocks = self._num_residue_blocks = len(residue_blocks)
         if not 1 <= num_residue_blocks <= 1024:
             raise ValueError(
                 f"{len(residues)} residues yield {num_residue_blocks} blocks, "
                 "which is not between 1 and 1024"
             )
-        residue_atoms = list(map(self.getAtomList, residues))
+        residue_atoms = list(map(self._getAtomList, residues))
         block_atoms = [
             sum([residue_atoms[index] for index in block], [])
             for block in residue_blocks
@@ -72,7 +72,7 @@ class RMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
             )
 
     @classmethod
-    def load_positions(cls, filename: str) -> t.List[openmm.Vec3]:
+    def _loadPositions(cls, filename: str) -> t.List[openmm.Vec3]:
         positions = 0.1 * np.loadtxt(
             str(resources.files("cvpack").joinpath("data").joinpath(filename)),
             delimiter=",",
@@ -80,7 +80,7 @@ class RMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
         return [openmm.Vec3(*position) for position in positions]
 
     @staticmethod
-    def getAtomList(residue: mmapp.topology.Residue) -> t.List[int]:
+    def _getAtomList(residue: mmapp.topology.Residue) -> t.List[int]:
         residue_atoms = {atom.name: atom.index for atom in residue.atoms()}
         if residue.name == "GLY":
             residue_atoms["CB"] = residue_atoms["HA2"]
@@ -93,3 +93,13 @@ class RMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
                     f"Atom {atom} not found in residue {residue.name}{residue.id}"
                 ) from error
         return atom_list
+
+    def getNumResidueBlocks(self) -> int:
+        """
+        Get the number of residue blocks.
+
+        Returns
+        -------
+            The number of residue blocks.
+        """
+        return self._num_residue_blocks

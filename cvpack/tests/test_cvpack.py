@@ -469,7 +469,9 @@ def test_helix_rmsd_content():
         model.positions, mdtraj.Topology.from_openmm(model.topology)
     )
     ref = copy.deepcopy(traj)
-    positions = helix_content._ideal_helix_positions  # pylint: disable=protected-access
+    # pylint: disable=protected-access
+    positions = cvpack.helix_rmsd_content._IDEAL_HELIX
+    # pylint: enable=protected-access
 
     def compute_cv_value(atoms):
         computed_value = 0
