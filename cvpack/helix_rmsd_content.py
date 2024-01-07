@@ -17,7 +17,7 @@ from .cvpack import SerializableResidue
 from .rmsd_content import RMSDContent
 
 # pylint: disable=protected-access
-_IDEAL_HELIX = RMSDContent._loadPositions("ideal_alpha_helix.csv")
+ALPHA_POSITIONS = RMSDContent._loadPositions("ideal_alpha_helix.csv")
 # pylint: enable=protected-access
 
 
@@ -132,7 +132,7 @@ class HelixRMSDContent(RMSDContent):
         # pylint: disable=duplicate-code
         super().__init__(
             residue_blocks,
-            _IDEAL_HELIX,
+            ALPHA_POSITIONS,
             residues,
             numAtoms,
             thresholdRMSD,

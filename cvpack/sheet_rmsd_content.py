@@ -17,8 +17,8 @@ from .cvpack import SerializableResidue
 from .rmsd_content import RMSDContent
 
 # pylint: disable=protected-access
-_PARABETA_POSITIONS = RMSDContent._loadPositions("ideal_parallel_beta_sheet.csv")
-_ANTIBETA_POSITIONS = RMSDContent._loadPositions("ideal_antiparallel_beta_sheet.csv")
+PARABETA_POSITIONS = RMSDContent._loadPositions("ideal_parallel_beta_sheet.csv")
+ANTIBETA_POSITIONS = RMSDContent._loadPositions("ideal_antiparallel_beta_sheet.csv")
 # pylint: enable=protected-access
 
 
@@ -133,13 +133,13 @@ class SheetRMSDContent(RMSDContent):
         min_separation = 3 if parallel else 2
         residue_blocks = [
             [i, i + 1, i + 2, j, j + 1, j + 2]
-            for i in range(len(residues) - 3 - min_separation)
+            for i in range(len(residues) - 6 - min_separation)
             for j in range(i + 3 + min_separation, len(residues) - 3)
         ]
         # pylint: disable=duplicate-code
         super().__init__(
             residue_blocks,
-            _PARABETA_POSITIONS if parallel else _ANTIBETA_POSITIONS,
+            PARABETA_POSITIONS if parallel else ANTIBETA_POSITIONS,
             residues,
             numAtoms,
             thresholdRMSD,
