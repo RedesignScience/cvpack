@@ -540,7 +540,9 @@ def test_sheet_rmsd_content():
 
     """
     model = testsystems.SrcImplicit()
-    positions = np.vstack(map(np.array, unit.value_in_md_units(model.positions)))
+    positions = np.vstack(
+        [np.array(pos) for pos in unit.value_in_md_units(model.positions)]
+    )
     topology = mdtraj.Topology.from_openmm(model.topology)
     residues = list(it.islice(model.topology.residues(), 8, 40))
 
