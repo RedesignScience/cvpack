@@ -67,7 +67,7 @@ where = ["."]
 [tool.setuptools.package-data]
 cvpack = [
     "py.typed",
-    "data/ideal_alpha_helix.csv"
+    "data/*.csv"
 ]
 
 [tool.versioningit]
