@@ -44,7 +44,7 @@ class HelixRMSDContent(RMSDContent):
 
     Each group :math:`{\\bf g}_i` is formed by the N, :math:`{\\rm C}_\\alpha`,
     :math:`{\\rm C}_\\beta`, C, and O atoms of consecutive residues from :math:`i`
-    to :math:`i+5`, thus comprising a total of 30 atoms.  In the case glycine, the
+    to :math:`i+5`, thus comprising a total of 30 atoms. In the case of glycine, the
     missing :math:`{\\rm C}_\\beta` is replaced by the corresponding H atom. The
     root-mean-square distance is then defined as
 
