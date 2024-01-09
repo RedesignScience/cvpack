@@ -34,34 +34,39 @@ class HelixRMSDContent(RMSDContent):
     where :math:`{\\bf g}_i` represents a group of atoms selected from residues
     :math:`i` to :math:`i+5` of the sequence, :math:`{\\bf g}_{\\rm ref}` represents
     the same atoms in an ideal alpha-helix configuration,
-    :math:`r_{\\rm rmsd}({\\bf g}_i, {\\bf g}_{\\rm ref})` is the root-mean-square
-    distance (RMSD) between :math:`{\\bf g}_i` and :math:`{\\bf g}_{\\rm ref}`,
+    :math:`r_{\\rm rmsd}({\\bf g}, {\\bf g}_{\\rm ref})` is the root-mean-square
+    distance (RMSD) between groups :math:`{\\bf g}` and :math:`{\\bf g}_{\\rm ref}`,
     :math:`r_0` is a threshold RMSD value, and :math:`S(x)` is a smooth step function
     whose default form is
 
     .. math::
         S(x) = \\frac{1 + x^4}{1 + x^4 + x^8}
 
-    Each group :math:`{\\bf g}_i` is formed by the N, :math:`{\\rm C}_\\alpha`,
-    :math:`{\\rm C}_\\beta`, C, and O atoms of consecutive residues from :math:`i`
-    to :math:`i+5`, thus comprising a total of 30 atoms. In the case of glycine, the
-    missing :math:`{\\rm C}_\\beta` is replaced by the corresponding H atom. The
-    root-mean-square distance is then defined as
+    The residues must be a contiguous sequence from a single chain, ordered from
+    the N-terminus to the C-terminus.
+
+    Every group :math:`{\\bf g}_{i,j}` is formed by the N, :math:`{\\rm C}_\\alpha`,
+    :math:`{\\rm C}_\\beta`, C, and O atoms of the six residues involvend, thus
+    comprising 30 atoms in total. In the case of glycine, the missing
+    :math:`{\\rm C}_\\beta` atom is replaced by the corresponding H atom. The RMSD is
+    then defined as
 
     .. math::
 
-        r_{\\rm rmsd}({\\bf g}_i, {\\bf g}_{\\rm ref}) =
+        r_{\\rm rmsd}({\\bf g}, {\\bf g}_{\\rm ref}) =
             \\sqrt{\\frac{1}{30} \\sum_{j=1}^{30} \\left\\|
-                \\hat{\\bf r}_j({\\bf g}_i) -
-                {\\bf A}({\\bf g}_i)\\hat{\\bf r}_j({\\bf g}_{\\rm ref})
+                \\hat{\\bf r}_j({\\bf g}) -
+                {\\bf A}({\\bf g})\\hat{\\bf r}_j({\\bf g}_{\\rm ref})
             \\right\\|^2}
 
-    where :math:`\\hat{\\bf r}_j({\\bf g})` is the position of the :math:`j`-th atom in
-    a group :math:`{\\bf g}` relative to the group's center of geometry (centroid),
+    where :math:`\\hat{\\bf r}_k({\\bf g})` is the position of the :math:`k`-th atom in
+    a group :math:`{\\bf g}` relative to the group's center of geometry and
     :math:`{\\bf A}({\\bf g})` is the rotation matrix that minimizes the RMSD between
     :math:`{\\bf g}` and :math:`{\\bf g}_{\\rm ref}`.
 
-    Optionally, alpha-helix RMSD content can be normalized to the range :math:`[0, 1]`.
+    Optionally, the alpha-helix RMSD content can be normalized to the range
+    :math:`[0, 1]`. This is done by dividing its value by :math:`N_{\\rm groups} =
+    n - 5`.
 
     This collective variable was introduced in Ref. :cite:`Pietrucci_2009`. The default
     step function shown above is identical to the one in the original paper, but written
@@ -71,21 +76,20 @@ class HelixRMSDContent(RMSDContent):
 
     .. note::
 
-        The residues must be a contiguous sequence from a single chain, ordered from
-        the N-terminus to the C-terminus. This implementation is limited to a minimum
-        of 6 and a maximum of 1029 residues.
+        The present implementation is limited to :math:`1 \\leq N_{\\rm groups} \\leq
+        1024`.
 
     .. _ALPHARMSD: https://www.plumed.org/doc-v2.8/user-doc/html/_a_l_p_h_a_r_m_s_d.html
 
     Parameters
     ----------
         residues
-            The residues to be used in the calculation.
+            The residue sequence to be used in the calculation.
         numAtoms
             The total number of atoms in the system (required by OpenMM).
         thresholdRMSD
-            The threshold RMSD value for considering a group of residues as matching an
-            alpha-helix.
+            The threshold RMSD value for considering a group of residues as a close
+            match to an ideal alpha-helix.
         stepFunction
             The form of the step function :math:`S(x)`.
         normalize

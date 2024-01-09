@@ -24,8 +24,7 @@ ANTIBETA_POSITIONS = RMSDContent._loadPositions("ideal_antiparallel_beta_sheet.c
 
 class SheetRMSDContent(RMSDContent):
     """
-    The beta-sheet RMSD content of a contiguous sequence of `n` residues
-    :cite:`Pietrucci_2009`:
+    The beta-sheet RMSD content of `n` residues :cite:`Pietrucci_2009`:
 
     .. math::
 
@@ -123,14 +122,14 @@ class SheetRMSDContent(RMSDContent):
     Parameters
     ----------
         residues
-            The residues to be used in the calculation.
+            The residue sequence or residue blocks to be used in the calculation.
         numAtoms
             The total number of atoms in the system (required by OpenMM).
         parallel
             Whether to consider a parallel beta sheet instead of an antiparallel one.
         thresholdRMSD
-            The threshold RMSD value for considering a group of residues as matching an
-            alpha-helix.
+            The threshold RMSD value for considering a group of residues as a close
+            match to an ideal beta sheet.
         stepFunction
             The form of the step function :math:`S(x)`.
         normalize
