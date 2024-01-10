@@ -150,7 +150,7 @@ class SheetRMSDContent(RMSDContent):
         ...     residues, model.system.getNumParticles()
         ... )
         >>> sheet_content.getNumResidueBlocks()
-        325
+        351
         >>> model.system.addForce(sheet_content)
         6
         >>> platform = openmm.Platform.getPlatformByName('Reference')
@@ -158,7 +158,7 @@ class SheetRMSDContent(RMSDContent):
         >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
         >>> print(sheet_content.getValue(context, digits=4))
-        4.1366 dimensionless
+        4.2364 dimensionless
     """
 
     @mmunit.convert_quantities
@@ -171,11 +171,11 @@ class SheetRMSDContent(RMSDContent):
         stepFunction: str = "(1+x^4)/(1+x^4+x^8)",
         normalize: bool = False,
     ) -> None:
-        min_separation = 3 if parallel else 2
+        min_distance = 6 if parallel else 5
         residue_blocks = [
             [i, i + 1, i + 2, j, j + 1, j + 2]
-            for i in range(len(residues) - 6 - min_separation)
-            for j in range(i + 3 + min_separation, len(residues) - 3)
+            for i in range(len(residues) - 2 - min_distance)
+            for j in range(i + min_distance, len(residues) - 2)
         ]
         # pylint: disable=duplicate-code
         super().__init__(

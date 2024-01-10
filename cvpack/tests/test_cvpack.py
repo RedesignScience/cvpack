@@ -575,7 +575,7 @@ def test_sheet_rmsd_content():
     min_separation = 5
     computed_value = sum(
         compute_step_function([i, i + 1, i + 2, j, j + 1, j + 2])
-        for i, j in it.combinations(range(len(residues) - 3), 2)
+        for i, j in it.combinations(range(len(residues) - 2), 2)
         if j - i >= min_separation
     )
 
