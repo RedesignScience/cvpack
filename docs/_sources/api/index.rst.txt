@@ -17,6 +17,7 @@ Python API
     RadiusOfGyration
     RadiusOfGyrationSq
     RMSD
+    SheetRMSDContent
     Torsion
     TorsionSimilarity
 
