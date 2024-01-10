@@ -222,6 +222,7 @@ class SheetRMSDContent(RMSDContent):
             list(map(SerializableResidue, residues)),
             numAtoms,
             parallel,
+            blockSizes,
             thresholdRMSD,
             stepFunction,
             normalize,
