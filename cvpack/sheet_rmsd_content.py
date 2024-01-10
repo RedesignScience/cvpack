@@ -9,6 +9,7 @@
 
 import typing as t
 
+import numpy as np
 from openmm import app as mmapp
 
 from cvpack import unit as mmunit
@@ -127,6 +128,9 @@ class SheetRMSDContent(RMSDContent):
             The total number of atoms in the system (required by OpenMM).
         parallel
             Whether to consider a parallel beta sheet instead of an antiparallel one.
+        blockSizes
+            The number of residues in each block. If ``None``, a single contiguous
+            sequence of residues is assumed.
         thresholdRMSD
             The threshold RMSD value for considering a group of residues as a close
             match to an ideal beta sheet.
@@ -143,14 +147,14 @@ class SheetRMSDContent(RMSDContent):
         >>> from openmm import app, unit
         >>> from openmmtools import testsystems
         >>> model = testsystems.SrcImplicit()
-        >>> residues = list(it.islice(model.topology.residues(), 8, 41))
+        >>> residues = list(it.islice(model.topology.residues(), 10, 41))
         >>> print(*[r.name for r in residues])
-        SER LEU ARG ... THR LEU LYS
+        ARG LEU GLU ... THR LEU LYS
         >>> sheet_content = cvpack.SheetRMSDContent(
         ...     residues, model.system.getNumParticles()
         ... )
         >>> sheet_content.getNumResidueBlocks()
-        351
+        300
         >>> model.system.addForce(sheet_content)
         6
         >>> platform = openmm.Platform.getPlatformByName('Reference')
@@ -158,7 +162,17 @@ class SheetRMSDContent(RMSDContent):
         >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
         >>> print(sheet_content.getValue(context, digits=4))
-        4.2364 dimensionless
+        4.011 dimensionless
+        >>> blockwise_sheet_content = cvpack.SheetRMSDContent(
+        ...     residues, model.system.getNumParticles(), blockSizes=[11, 11, 9]
+        ... )
+        >>> blockwise_sheet_content.getNumResidueBlocks()
+        144
+        >>> model.system.addForce(blockwise_sheet_content)
+        7
+        >>> context.reinitialize(preserveState=True)
+        >>> print(blockwise_sheet_content.getValue(context, digits=4))
+        3.8748 dimensionless
     """
 
     @mmunit.convert_quantities
@@ -167,19 +181,35 @@ class SheetRMSDContent(RMSDContent):
         residues: t.Sequence[mmapp.topology.Residue],
         numAtoms: int,
         parallel: bool = False,
+        blockSizes: t.Optional[t.Sequence[int]] = None,
         thresholdRMSD: mmunit.ScalarQuantity = mmunit.Quantity(0.08, mmunit.nanometers),
         stepFunction: str = "(1+x^4)/(1+x^4+x^8)",
         normalize: bool = False,
     ) -> None:
-        min_distance = 6 if parallel else 5
-        residue_blocks = [
-            [i, i + 1, i + 2, j, j + 1, j + 2]
-            for i in range(len(residues) - 2 - min_distance)
-            for j in range(i + min_distance, len(residues) - 2)
-        ]
+        if blockSizes is None:
+            min_distance = 6 if parallel else 5
+            residue_groups = [
+                [i, i + 1, i + 2, j, j + 1, j + 2]
+                for i in range(len(residues) - 2 - min_distance)
+                for j in range(i + min_distance, len(residues) - 2)
+            ]
+        elif sum(blockSizes) == len(residues):
+            bounds = np.insert(np.cumsum(blockSizes), 0, 0)
+            residue_groups = [
+                [i, i + 1, i + 2, j, j + 1, j + 2]
+                for k in range(len(blockSizes) - 1)
+                for i in range(bounds[k], bounds[k + 1] - 2)
+                for j in range(bounds[k + 1], bounds[k + 2] - 2)
+            ]
+        else:
+            raise ValueError(
+                f"The sum of block sizes ({sum(blockSizes)}) and the "
+                f"number of residues ({len(residues)}) must be equal."
+            )
+
         # pylint: disable=duplicate-code
         super().__init__(
-            residue_blocks,
+            residue_groups,
             PARABETA_POSITIONS if parallel else ANTIBETA_POSITIONS,
             residues,
             numAtoms,
