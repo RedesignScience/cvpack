@@ -1,5 +1,6 @@
 # Ideal alpha-helix structure according to:
 # https://github.com/plumed/plumed2/releases/tag/v2.8.1
+# Reproduced here in accordance with their LGPL-3.0 license
 # Order: N, CA, CB, C, O (residues i to i+5)
    0.733,  0.519,  5.298
    1.763,  0.810,  4.301

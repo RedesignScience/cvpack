@@ -16,7 +16,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          path: cvpack
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Additional info about the build
@@ -28,8 +27,7 @@ jobs:
 
       - uses: mamba-org/setup-micromamba@v1
         with:
-          micromamba-version: '1.4.3-0'
-          environment-file: cvpack/devtools/conda-envs/docs_env.yaml
+          environment-file: devtools/conda-envs/docs_env.yaml
           environment-name: docs
           create-args: >-
             python=3.9
@@ -37,27 +35,23 @@ jobs:
       - name: Install package
         shell: bash -l {0}
         run: |
-          cd cvpack/
           python -m pip install . --no-deps
           micromamba list
 
       - name: Build Documentation
         shell: bash -l {0}
         run: |
-          cd cvpack/
           sphinx-build ./docs ./html
 
       - name: Run tests
         shell: bash -l {0}
         run: |
-          cd cvpack/
           pytest
 
       - name: Get coverage report
         id:  coverage
         shell: bash -l {0}
         run: |
-          cd cvpack/
           COVERAGE=$(coverage report | tail -1 | awk '{print $4}')
           OFFSET=$(((${COVERAGE::-1}-35)/6-1))
           [[ $OFFSET < 0 ]] && OFFSET=0
@@ -74,7 +68,7 @@ jobs:
           label-color: 'black'
           status: ${{ steps.coverage.outputs.coverage }}
           color: ${{ steps.coverage.outputs.color }}
-          path: 'cvpack/htmlcov/coverage.svg'
+          path: 'htmlcov/coverage.svg'
 
       - name: Deploy documentation
         shell: bash -l {0}
@@ -82,7 +76,6 @@ jobs:
           if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
             echo "Deployment is deactivated on pull requests"
           else
-            cd cvpack/
             git reset --hard HEAD
             set -x
             echo "::group::Push page to gh-pages branch"

@@ -5,7 +5,7 @@ Unit and regression test for the cvpack package.
 import copy
 import inspect
 import io
-import itertools
+import itertools as it
 import sys
 from typing import Sequence
 
@@ -256,7 +256,7 @@ def test_number_of_contacts():
         a.index for a in model.topology.atoms() if a.element == app.element.oxygen
     ]
     pairs = set()
-    for i, j in itertools.product(group1, group2):
+    for i, j in it.product(group1, group2):
         if j != i and (j, i) not in pairs:
             pairs.add((i, j))
     distances = np.array([np.linalg.norm(pos[i] - pos[j]) for i, j in pairs])
@@ -469,7 +469,8 @@ def test_helix_rmsd_content():
         model.positions, mdtraj.Topology.from_openmm(model.topology)
     )
     ref = copy.deepcopy(traj)
-    positions = helix_content._ideal_helix_positions  # pylint: disable=protected-access
+    positions = cvpack.helix_rmsd_content.ALPHA_POSITIONS
+    # pylint: enable=protected-access
 
     def compute_cv_value(atoms):
         computed_value = 0
@@ -531,6 +532,55 @@ def test_helix_torsion_similarity():
     deltas = np.array([min(delta, 2 * np.pi - delta) for delta in deltas])
     assert cv_value / cv_value.unit == pytest.approx(np.sum(0.5 * (1 + np.cos(deltas))))
     perform_common_tests(torsion_similarity, context)
+
+
+def test_sheet_rmsd_content():
+    """
+    Test whether a sheet rmsd content is computed correctly.
+
+    """
+    model = testsystems.SrcImplicit()
+    positions = np.vstack(
+        [np.array(pos) for pos in unit.value_in_md_units(model.positions)]
+    )
+    topology = mdtraj.Topology.from_openmm(model.topology)
+    residues = list(it.islice(model.topology.residues(), 8, 40))
+
+    sheet_content = cvpack.SheetRMSDContent(residues, topology.n_atoms)
+    model.system.addForce(sheet_content)
+    context = openmm.Context(
+        model.system,
+        openmm.VerletIntegrator(0),
+        openmm.Platform.getPlatformByName("Reference"),
+    )
+    context.setPositions(positions)
+    cv_value = sheet_content.getValue(context)
+
+    traj = mdtraj.Trajectory(positions, topology)
+    ref = copy.deepcopy(traj)
+
+    def compute_step_function(indices):
+        group = sum((residue_atoms[i] for i in indices), ())
+        ref.xyz[:, group, :] = cvpack.sheet_rmsd_content.ANTIBETA_POSITIONS
+        x4 = (mdtraj.rmsd(traj, ref, 0, group).item() / 0.08) ** 4
+        return (1 + x4) / (1 + x4 + x4**2)
+
+    residue_atoms = []
+    for residue in residues:
+        atoms = {atom.name: atom.index for atom in residue.atoms()}
+        if residue.name == "GLY":
+            atoms["CB"] = atoms["HA2"]
+        residue_atoms.append(tuple(atoms[name] for name in ["N", "CA", "CB", "C", "O"]))
+
+    min_separation = 5
+    computed_value = sum(
+        compute_step_function([i, i + 1, i + 2, j, j + 1, j + 2])
+        for i, j in it.combinations(range(len(residues) - 2), 2)
+        if j - i >= min_separation
+    )
+
+    assert cv_value / cv_value.unit == pytest.approx(computed_value)
+    perform_common_tests(sheet_content, context)
 
 
 def test_atomic_function():
