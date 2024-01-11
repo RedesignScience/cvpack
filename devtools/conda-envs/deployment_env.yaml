@@ -2,7 +2,7 @@ name: build
 channels:
   - conda-forge
 dependencies:
-    # Base depends
+  # Base dependencies
   - python
   - pip
   - numpy
@@ -10,7 +10,12 @@ dependencies:
   - pyyaml
   - xmltodict
 
-    # Conda build
+  # Conda build
   - anaconda-client
   - conda-build
   - boa
+
+  # PyPI build
+  - pip:
+    - build
+    - twine
