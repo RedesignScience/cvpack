@@ -722,7 +722,7 @@ def test_residue_coordination():
     ]
     centroids = [
         np.vstack(
-            np.mean(positions[[a.index for a in r.atoms()]], axis=0) for r in group
+            [np.mean(positions[[a.index for a in r.atoms()]], axis=0) for r in group]
         )
         for group in groups
     ]
