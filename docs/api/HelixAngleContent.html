@@ -152,6 +152,11 @@ variable.</p>
 <p>Optionally, effective mass of this collective variable can be rounded to a
 specified number of precision digits, which is the number of digits after the
 decimal point of the effective mass in scientific notation.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method will be more efficient if the collective variable is the only
+force in its force group (see <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Force.html">openmm.Force</a>).</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -176,6 +181,7 @@ be rounded.</p></li>
 <span class="gp">... </span>    <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;HOH&#39;</span>
 <span class="gp">... </span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">radius_of_gyration</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">RadiusOfGyration</span><span class="p">(</span><span class="n">peptide</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">radius_of_gyration</span><span class="o">.</span><span class="n">setForceGroup</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="n">radius_of_gyration</span><span class="p">)</span>
 <span class="go">6</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">platform</span> <span class="o">=</span><span class="n">openmm</span><span class="o">.</span><span class="n">Platform</span><span class="o">.</span><span class="n">getPlatformByName</span><span class="p">(</span><span class="s1">&#39;Reference&#39;</span><span class="p">)</span>
@@ -207,6 +213,11 @@ be rounded.</p></li>
 <p>Optionally, the value can be rounded to a specified number of precision digits,
 which is the number of digits after the decimal point of the value in scientific
 notation.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method will be more efficient if the collective variable is the only
+force in its force group (see <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Force.html">openmm.Force</a>).</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
