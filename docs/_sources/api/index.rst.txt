@@ -16,6 +16,7 @@ Python API
     NumberOfContacts
     RadiusOfGyration
     RadiusOfGyrationSq
+    ResidueCoordination
     RMSD
     SheetRMSDContent
     Torsion
