@@ -707,3 +707,37 @@ def test_attraction_strength():
     context.setPositions(positions)
     assert unit.value_in_md_units(colvar.getValue(context)) == pytest.approx(strength)
     perform_common_tests(colvar, context)
+
+
+def test_residue_coordination():
+    """
+    Test whether a residue coordination CV is computed correctly.
+
+    """
+    model = testsystems.LysozymeImplicit()
+    positions = model.positions.value_in_unit(unit.nanometers)
+    groups = [
+        list(it.islice(model.topology.residues(), start, end))
+        for start, end in [(125, 142), (142, 156)]
+    ]
+    centroids = [
+        np.vstack(
+            np.mean(positions[[a.index for a in r.atoms()]], axis=0) for r in group
+        )
+        for group in groups
+    ]
+    distances = np.linalg.norm(centroids[0][:, None, :] - centroids[1], axis=2)
+    computed_cv = np.sum(1 / (1 + distances**6))
+
+    res_coord = cvpack.ResidueCoordination(*groups, pbc=False, weighByMass=False)
+    model.system.addForce(res_coord)
+    context = openmm.Context(
+        model.system,
+        openmm.VerletIntegrator(0),
+        openmm.Platform.getPlatformByName("Reference"),
+    )
+    context.setPositions(positions)
+    cv_value = res_coord.getValue(context)
+
+    assert cv_value / cv_value.unit == pytest.approx(computed_cv)
+    perform_common_tests(res_coord, context)

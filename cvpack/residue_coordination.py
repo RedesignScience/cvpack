@@ -133,4 +133,5 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, AbstractCollectiveVari
             stepFunction,
             thresholdDistance,
             normalize,
+            weighByMass,
         )
