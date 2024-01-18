@@ -12,114 +12,115 @@ import typing as t
 import openmm
 from openmm.app.topology import Residue
 
-from .cvpack import unit as mmunit
+from cvpack import unit as mmunit
+
 from .cvpack import AbstractCollectiveVariable, SerializableResidue
 
 
-class ResidueCoordinationNumber(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):
+class ResidueCoordination(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):
     """
-    The number of contacts between two atom groups:
+    The number of contacts between two disjoint groups of residues:
 
     .. math::
-        N({\\bf r}) = \\sum_{i \\in {\\bf g}_1} \\sum_{j \\in {\\bf g}_2}
-                        S\\left(\\frac{\\|{\\bf r}_j - {\\bf r}_i\\|}{r_0}\\right)
+        N({\\bf r}) = \\sum_{i \\in {\\bf G}_1} \\sum_{j \\in {\\bf G}_2} S\\left(
+            \\frac{\\|{\\bf R}_j({\\bf r}) - {\\bf R}_i({\\bf r})\\|}{r_0}
+        \\right)
 
-    where :math:`r_0` is the threshold distance for defining a contact and :math:`S(x)`
-    is a step function equal to :math:`1` if a contact is made or equal to :math:`0`
-    otherwise. For trajectory analysis, it is fine to make :math:`S(x) = H(1-x)`, where
-    `H` is the `Heaviside step function
-    <https://en.wikipedia.org/wiki/Heaviside_step_function>`_. For molecular dynamics,
-    however, :math:`S(x)` should be a continuous approximation of :math:`H(1-x)` for
-    :math:`x \\geq 0`. By default :cite:`Iannuzzi_2003`, the following function is used:
+    where :math:`{\\bf G}_1` and :math:`{\\bf G}_2` are the two groups of residues,
+    :math:`{\\bf R}_i` is the centroid of the residue :math:`i`, :math:`r_0` is the
+    threshold distance for defining a contact and :math:`S(x)` is a step function equal
+    to :math:`1` if a contact is made or equal to :math:`0` otherwise. For trajectory
+    analysis, it is fine to make :math:`S(x) = H(1-x)`, where `H` is the `Heaviside step
+    function <https://en.wikipedia.org/wiki/Heaviside_step_function>`_. For molecular
+    dynamics, however, :math:`S(x)` should be a continuous approximation of
+    :math:`H(1-x)` for :math:`x \\geq 0`. By default :cite:`Iannuzzi_2003`, the
+    following function is used:
 
     .. math::
 
         S(x) = \\frac{1-x^6}{1-x^{12}} = \\frac{1}{1+x^6}
 
-    In fact, a cutoff distance :math:`r_c = x_c r_0` (typically, :math:`x_c = 2`) is
-    applied so that :math:`S(x) = 0` for :math:`x \\geq x_c`. To avoid discontinuities,
-    there is also the option to smoothly switch off :math:`S(x)` starting from
-    :math:`r_s = x_s r_0` (typically, :math:`x_s = 1.5`) instead of doing it abruptly at
-    :math:`r_c`.
-
-    .. note::
-
-        Atoms are allowed to be in both groups. In this case, self-contacts
-        (:math:`i = j`) are ignored and each pair of distinct atoms (:math:`i \\neq j`)
-        is counted only once.
-
     Parameters
     ----------
-        group1
-            The indices of the atoms in the first group
+        residueGroup1
+            The residues in the first group
         group2
-            The indices of the atoms in the second group
-        numAtoms
-            The total number of atoms in the system (required by OpenMM)
+            The residues in the second group
         pbc
             Whether the system has periodic boundary conditions
         stepFunction
             The function "step(1-x)" (for analysis only) or a continuous approximation
             thereof
         thresholdDistance
-            The threshold distance (:math:`r_0`) for considering two atoms as being in
-            contact
-        cutoffFactor
-            The factor :math:`x_c` that multiplies the threshold distance to define
-            the cutoff distance
-        switchFactor
-            The factor :math:`x_s` that multiplies the threshold distance to define
-            the distance at which the step function starts switching off smoothly.
-            If None, it switches off abruptly at the cutoff distance.
+            The threshold distance (:math:`r_0`) for considering two residues as being
+            in contact
+        normalize
+            Whether the number of contacts should be normalized by the total number of
+            possible contacts
+        weighByMass
+            Whether the centroid of each residue should be weighted by the mass of the
+            atoms in the residue
+
+    Raises
+    ------
+        ValueError
+            If the two groups of residues are not disjoint
 
     Example
     -------
         >>> import cvpack
+        >>> import itertools as it
         >>> import openmm
-        >>> from openmm import app
+        >>> from openmm import app, unit
         >>> from openmmtools import testsystems
-        >>> model = testsystems.AlanineDipeptideVacuum()
-        >>> carbons = [
-        ...     a.index
-        ...     for a in model.topology.atoms()
-        ...     if a.element == app.element.carbon
-        ... ]
-        >>> num_atoms = model.topology.getNumAtoms()
-        >>> optionals = {"pbc": False, "stepFunction": "step(1-x)"}
-        >>> nc = cvpack.NumberOfContacts(
-        ...     carbons, carbons, num_atoms, **optionals
+        >>> model = testsystems.LysozymeImplicit()
+        >>> group1 = list(it.islice(model.topology.residues(), 125, 142))
+        >>> print(*[r.name for r in group1])  # doctest: +ELLIPSIS
+        TRP ASP GLU ... ASN GLN THR
+        >>> group2 = list(it.islice(model.topology.residues(), 142, 156))
+        >>> print(*[r.name for r in group2])  # doctest: +ELLIPSIS
+        PRO ASN ARG ... ARG THR GLY
+        >>> residue_coordination = cvpack.ResidueCoordination(
+        ...     group1,
+        ...     group2,
+        ...     stepFunction="step(1-x)",
+        ...     thresholdDistance=0.6*unit.nanometers,
         ... )
-        >>> model.system.addForce(nc)
-        5
+        >>> model.system.addForce(residue_coordination)
+        6
         >>> platform = openmm.Platform.getPlatformByName('Reference')
         >>> context = openmm.Context(
         ...     model.system, openmm.CustomIntegrator(0), platform
         ... )
         >>> context.setPositions(model.positions)
-        >>> print(nc.getValue(context, digits=6))
-        6.0 dimensionless
-
+        >>> print(residue_coordination.getValue(context))
+        26.0 dimensionless
     """
+
     @mmunit.convert_quantities
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         residueGroup1: t.Sequence[Residue],
         residueGroup2: t.Sequence[Residue],
         pbc: bool = True,
         stepFunction: str = "1/(1+x^6)",
-        thresholdDistance: mmunit.ScalarQuantity = mmunit.Quantity(1.0, mmunit.nanometers),
+        thresholdDistance: mmunit.ScalarQuantity = mmunit.Quantity(
+            1.0, mmunit.nanometers
+        ),
         normalize: bool = False,
         weighByMass: bool = True,
     ) -> None:
         nr1 = len(residueGroup1)
         nr2 = len(residueGroup2)
+        if {res.index for res in residueGroup1} & {res.index for res in residueGroup2}:
+            raise ValueError("The two groups of residues must be disjoint")
         energy = f"({stepFunction})/{nr1 * nr2}" if normalize else stepFunction
         super().__init__(2, energy + f"; x=distance(g1,g2)/{thresholdDistance}")
         self.setUsesPeriodicBoundaryConditions(pbc)
-        for residue in residueGroup1 + residueGroup2:
+        for res in residueGroup1 + residueGroup2:
             self.addGroup(
-                [atom.index for atom in residue.atoms()],
-                *([] if weighByMass else [[1] * len(residue)]),
+                [atom.index for atom in res.atoms()],
+                *([] if weighByMass else [[1] * len(res)]),
             )
         for idx1 in range(nr1):
             for idx2 in range(nr1, nr1 + nr2):
