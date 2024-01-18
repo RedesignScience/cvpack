@@ -47,6 +47,7 @@ The CVs implemented in CVPack are listed in the table below.
 | [Number of contacts]    | number of contacts between two groups of atoms                   |
 | [Radius of gyration]    | radius of gyration of a group of atoms                           |
 | [Radius of gyration Sq.]| square of the radius of gyration of a group of atoms             |
+| [Residue coordination]  | number of contacts between two disjoint groups of residues       |
 | [RMSD]                  | root-mean-square deviation with respect to a reference structure |
 | [Sheet RMSD content]    | beta-sheet RMSD content of a sequence of residues                |
 | [Torsion]               | torsion angle formed by four atoms                               |
@@ -107,6 +108,7 @@ Project based on the [CMS Cookiecutter] version 1.1.
 [Number of contacts]:     https://redesignscience.github.io/cvpack/api/NumberOfContacts.html
 [Radius of gyration]:     https://redesignscience.github.io/cvpack/api/RadiusOfGyration.html
 [Radius of gyration Sq.]: https://redesignscience.github.io/cvpack/api/RadiusOfGyrationSq.html
+[Residue coordination]:   https://redesignscience.github.io/cvpack/api/ResidueCoordination.html
 [RMSD]:                   https://redesignscience.github.io/cvpack/api/RMSD.html
 [Sheet RMSD content]:     https://redesignscience.github.io/cvpack/api/SheetRMSDContent.html
 [Torsion]:                https://redesignscience.github.io/cvpack/api/Torsion.html

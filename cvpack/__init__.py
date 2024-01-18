@@ -14,6 +14,7 @@ from .helix_torsion_content import HelixTorsionContent  # noqa: F401
 from .number_of_contacts import NumberOfContacts  # noqa: F401
 from .radius_of_gyration import RadiusOfGyration  # noqa: F401
 from .radius_of_gyration_sq import RadiusOfGyrationSq  # noqa: F401
+from .residue_coordination import ResidueCoordination  # noqa: F401
 from .rmsd import RMSD  # noqa: F401
 from .sheet_rmsd_content import SheetRMSDContent  # noqa: F401
 from .torsion import Torsion  # noqa: F401
