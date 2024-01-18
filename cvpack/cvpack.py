@@ -95,7 +95,15 @@ class AbstractCollectiveVariable(openmm.Force):
         forces = context.getSystem().getForces()
         if not any(force.this == self.this for force in forces):
             raise RuntimeError("This force is not present in the given context.")
-        free_groups = set(range(32)) - set(f.getForceGroup() for f in forces)
+        self_group = self.getForceGroup()
+        other_groups = {
+            force.getForceGroup() for force in forces if force.this != self.this
+        }
+        if self_group not in other_groups:
+            return context.getState(
+                getEnergy=getEnergy, getForces=getForces, groups=1 << self_group
+            )
+        free_groups = set(range(32)) - other_groups
         old_group = self.getForceGroup()
         new_group = next(iter(free_groups))
         self.setForceGroup(new_group)
@@ -206,6 +214,11 @@ class AbstractCollectiveVariable(openmm.Force):
         which is the number of digits after the decimal point of the value in scientific
         notation.
 
+        .. note::
+
+            This method will be more efficient if the collective variable is the only
+            force in its force group (see :OpenMM:`Force`).
+
         Parameters
         ----------
             context
@@ -244,6 +257,11 @@ class AbstractCollectiveVariable(openmm.Force):
         specified number of precision digits, which is the number of digits after the
         decimal point of the effective mass in scientific notation.
 
+        .. note::
+
+            This method will be more efficient if the collective variable is the only
+            force in its force group (see :OpenMM:`Force`).
+
         Parameters
         ----------
             context
@@ -269,6 +287,7 @@ class AbstractCollectiveVariable(openmm.Force):
             ...     if a.residue.name != 'HOH'
             ... ]
             >>> radius_of_gyration = cvpack.RadiusOfGyration(peptide)
+            >>> radius_of_gyration.setForceGroup(1)
             >>> model.system.addForce(radius_of_gyration)
             6
             >>> platform =openmm.Platform.getPlatformByName('Reference')
