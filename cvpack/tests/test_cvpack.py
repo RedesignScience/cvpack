@@ -630,14 +630,15 @@ def test_centroid_function():
     np.random.shuffle(atoms)
     num_groups = num_atoms // 3
     groups = np.reshape(atoms[: 3 * num_groups], (num_groups, 3))
+    collection = list(range(num_groups))
     function = "+".join(f"distance(g{i+1}, g{i+2})" for i in range(num_groups - 1))
     with pytest.raises(ValueError) as excinfo:
-        colvar = cvpack.CentroidFunction(function, groups, unit.angstrom)
+        colvar = cvpack.CentroidFunction(function, groups, collection, unit.angstrom)
     assert (
         str(excinfo.value) == "Unit angstrom is not compatible with the MD unit system."
     )
     colvar = cvpack.CentroidFunction(
-        function, groups, unit.nanometers, weighByMass=False
+        function, groups, collection, unit.nanometers, weighByMass=False
     )
     model.system.addForce(colvar)
     context = openmm.Context(

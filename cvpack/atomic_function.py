@@ -27,6 +27,27 @@ from cvpack import unit as mmunit
 from .cvpack import AbstractCollectiveVariable
 
 
+def _add_parameters(
+    force: openmm.Force,
+    size: int,
+    **parameters: t.Union[mmunit.ScalarQuantity, t.Sequence[mmunit.ScalarQuantity]],
+) -> t.List[t.Union[float, t.Sequence[mmunit.ScalarQuantity]]]:
+    perbond_parameters = []
+    for name, data in parameters.items():
+        if isinstance(data, mmunit.Quantity):
+            data = data.value_in_unit_system(mmunit.md_unit_system)
+        if isinstance(data, t.Sequence):
+            if len(data) != size:
+                raise ValueError(
+                    f"The length of parameter {name} is {len(data)}. Should be {size}."
+                )
+            force.addPerBondParameter(name)
+            perbond_parameters.append(data)
+        else:
+            force.addGlobalParameter(name, data)
+    return perbond_parameters
+
+
 class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable):
     """
     A generic function of the coordinates of atoms split into `m` groups of `n`
@@ -125,32 +146,13 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         if others:
             raise ValueError("Array `groups` cannot have more than 2 dimensions")
         super().__init__(atoms_per_group, function)
-        perbond_parameters = []
-        for name, data in parameters.items():
-            if isinstance(data, mmunit.Quantity):
-                data = data.value_in_unit_system(mmunit.md_unit_system)
-            if isinstance(data, t.Sequence):
-                if len(data) != num_groups:
-                    raise ValueError(
-                        f"The length of parameter {name} is {len(data)}. "
-                        f"Should be {num_groups}."
-                    )
-                self.addPerBondParameter(name)
-                perbond_parameters.append(data)
-            else:
-                self.addGlobalParameter(name, data)
+        perbond_parameters = _add_parameters(self, num_groups, **parameters)
         for group, *values in zip(groups, *perbond_parameters):
             self.addBond(group, values)
         self.setUsesPeriodicBoundaryConditions(pbc)
         self._checkUnitCompatibility(unit)
-        self._registerCV(
-            unit,
-            function,
-            groups,
-            mmunit.SerializableUnit(unit),
-            pbc,
-            **parameters,
-        )
+        unit = mmunit.SerializableUnit(unit)
+        self._registerCV(unit, function, groups, unit, pbc, **parameters)
 
     @classmethod
     def _fromCustomForce(
