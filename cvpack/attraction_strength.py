@@ -7,8 +7,8 @@
 
 """
 
-import typing as t
 import numbers
+import typing as t
 
 import openmm
 import xmltodict
@@ -181,7 +181,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
         self.setUseLongRangeCorrection(False)
         self.addInteractionGroup(group1, group2)
         if isinstance(reference, openmm.Context):
-            reference = self._get_value(reference)
+            reference = self._getValue(reference)
         if isinstance(reference, numbers.Number):
             self.setEnergyFunction(
                 expression.replace("refval = 1", f"refval = {reference}")
@@ -194,7 +194,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
             reference,
         )
 
-    def _get_value(self, context: openmm.Context) -> float:
+    def _getValue(self, context: openmm.Context) -> float:
         system = openmm.System()
         for _ in range(context.getSystem().getNumParticles()):
             system.addParticle(1.0)
@@ -203,5 +203,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
         context = openmm.Context(system, openmm.VerletIntegrator(1.0))
         context.setPositions(state.getPositions())
         context.setPeriodicBoxVectors(*state.getPeriodicBoxVectors())
+        # pylint: disable=unexpected-keyword-arg # to avoid false positive
         state = context.getState(getEnergy=True)
+        # pylint: enable=unexpected-keyword-arg
         return mmunit.value_in_md_units(state.getPotentialEnergy())
