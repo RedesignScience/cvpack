@@ -131,14 +131,15 @@ match to an ideal beta sheet.</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">app</span><span class="p">,</span> <span class="n">unit</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">openmmtools</span> <span class="kn">import</span> <span class="n">testsystems</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">testsystems</span><span class="o">.</span><span class="n">SrcImplicit</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">residues</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">it</span><span class="o">.</span><span class="n">islice</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">residues</span><span class="p">(),</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">41</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">residues</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">it</span><span class="o">.</span><span class="n">islice</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">residues</span><span class="p">(),</span> <span class="mi">68</span><span class="p">,</span> <span class="mi">82</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">residues</span><span class="p">])</span>
-<span class="go">ARG LEU GLU ... THR LEU LYS</span>
+<span class="go">TYR ALA VAL ... VAL THR GLU</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sheet_content</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">SheetRMSDContent</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">residues</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()</span>
 <span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sheet_content</span><span class="o">.</span><span class="n">setForceGroup</span><span class="p">(</span><span class="mi">31</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sheet_content</span><span class="o">.</span><span class="n">getNumResidueBlocks</span><span class="p">()</span>
-<span class="go">300</span>
+<span class="go">28</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="n">sheet_content</span><span class="p">)</span>
 <span class="go">6</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">platform</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Platform</span><span class="o">.</span><span class="n">getPlatformByName</span><span class="p">(</span><span class="s1">&#39;Reference&#39;</span><span class="p">)</span>
@@ -146,17 +147,20 @@ match to an ideal beta sheet.</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="n">integrator</span><span class="p">,</span> <span class="n">platform</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sheet_content</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">digits</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
-<span class="go">4.011 dimensionless</span>
+<span class="go">1.0466 dimensionless</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">blockwise_sheet_content</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">SheetRMSDContent</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">residues</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">(),</span> <span class="n">blockSizes</span><span class="o">=</span><span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="n">residues</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span> <span class="o">+</span> <span class="n">residues</span><span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">:],</span>
+<span class="gp">... </span>    <span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">(),</span>
+<span class="gp">... </span>    <span class="n">blockSizes</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
 <span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">blockwise_sheet_content</span><span class="o">.</span><span class="n">setForceGroup</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">blockwise_sheet_content</span><span class="o">.</span><span class="n">getNumResidueBlocks</span><span class="p">()</span>
-<span class="go">144</span>
+<span class="go">9</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="n">blockwise_sheet_content</span><span class="p">)</span>
 <span class="go">7</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">reinitialize</span><span class="p">(</span><span class="n">preserveState</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">blockwise_sheet_content</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">digits</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
-<span class="go">3.8748 dimensionless</span>
+<span class="go">0.98594 dimensionless</span>
 </pre></div>
 </div>
 <p class="rubric">Methods</p>
