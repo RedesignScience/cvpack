@@ -153,7 +153,8 @@ class SheetRMSDContent(RMSDContent):
         >>> sheet_content = cvpack.SheetRMSDContent(
         ...     residues, model.system.getNumParticles()
         ... )
-        >>> sheet_content.setForceGroup(31)
+        >>> sheet_content.setUnusedForceGroup(0, model.system)
+        1
         >>> sheet_content.getNumResidueBlocks()
         28
         >>> model.system.addForce(sheet_content)
@@ -169,7 +170,8 @@ class SheetRMSDContent(RMSDContent):
         ...     model.system.getNumParticles(),
         ...     blockSizes=[5, 5],
         ... )
-        >>> blockwise_sheet_content.setForceGroup(30)
+        >>> blockwise_sheet_content.setUnusedForceGroup(0, model.system)
+        2
         >>> blockwise_sheet_content.getNumResidueBlocks()
         9
         >>> model.system.addForce(blockwise_sheet_content)
