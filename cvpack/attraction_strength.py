@@ -19,12 +19,73 @@ from .cvpack import AbstractCollectiveVariable
 ONE_4PI_EPS0 = 138.93545764438198
 
 
-class _NonbondedForce(openmm.NonbondedForce):
+class _NonbondedForceSurrogate:
+    def __init__(self, other: openmm.NonbondedForce) -> None:
+        self._cutoff = other.getCutoffDistance()
+        self._uses_pbc = other.usesPeriodicBoundaryConditions()
+        self._num_particles = other.getNumParticles()
+        self._particle_parameters = list(
+            map(other.getParticleParameters, range(self._num_particles))
+        )
+        self._num_exceptions = other.getNumExceptions()
+        self._exception_parameters = list(
+            map(other.getExceptionParameters, range(self._num_exceptions))
+        )
+        self._use_switching_function = other.getUseSwitchingFunction()
+        self._switching_distance = other.getSwitchingDistance()
+
     def __getstate__(self) -> t.Dict[str, str]:
-        return xmltodict.parse(openmm.XmlSerializer.serialize(self))
+        return {
+            "cutoff": self.getCutoffDistance(),
+            "uses_pbc": self.usesPeriodicBoundaryConditions(),
+            "num_particles": self.getNumParticles(),
+            "particle_parameters": [
+                self.getParticleParameters(i) for i in range(self.getNumParticles())
+            ],
+            "num_exceptions": self.getNumExceptions(),
+            "exception_parameters": [
+                self.getExceptionParameters(i) for i in range(self.getNumExceptions())
+            ],
+            "use_switching_function": self.getUseSwitchingFunction(),
+            "switching_distance": self.getSwitchingDistance(),
+        }
 
     def __setstate__(self, state: t.Dict[str, str]) -> None:
-        self.__init__(openmm.XmlSerializer.deserialize(xmltodict.unparse(state)))
+        self._cutoff = state["cutoff"]
+        self._uses_pbc = state["uses_pbc"]
+        self._num_particles = state["num_particles"]
+        self._particle_parameters = state["particle_parameters"]
+        self._num_exceptions = state["num_exceptions"]
+        self._exception_parameters = state["exception_parameters"]
+        self._use_switching_function = state["use_switching_function"]
+        self._switching_distance = state["switching_distance"]
+
+    def getCutoffDistance(self) -> float:
+        return mmunit.value_in_md_units(self._cutoff)
+
+    def usesPeriodicBoundaryConditions(self) -> bool:
+        return self._uses_pbc
+
+    def getNumParticles(self) -> int:
+        return self._num_particles
+
+    def getParticleParameters(self, index: int) -> t.Tuple[float, float, float]:
+        return tuple(map(mmunit.value_in_md_units, self._particle_parameters[index]))
+
+    def getNumExceptions(self):
+        return self._num_exceptions
+
+    def getExceptionParameters(
+        self, index: int
+    ) -> t.Tuple[int, int, float, float, float]:
+        i, j, *params = self._exception_parameters[index]
+        return i, j, *map(mmunit.value_in_md_units, params)
+
+    def getUseSwitchingFunction(self) -> bool:
+        return self._use_switching_function
+
+    def getSwitchingDistance(self) -> float:
+        return mmunit.value_in_md_units(self._switching_distance)
 
 
 class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
@@ -153,7 +214,8 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
             1.0, mmunit.kilojoule_per_mole
         ),
     ) -> None:
-        cutoff = mmunit.value_in_md_units(nonbondedForce.getCutoffDistance())
+        nonbondedForce = _NonbondedForceSurrogate(nonbondedForce)
+        cutoff = nonbondedForce.getCutoffDistance()
         expression = (
             "-(lj + coul)/ref"
             "; lj = 4*epsilon*(1/y^2 - 1/y)"
@@ -186,11 +248,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
             reference = self._getValue(reference)
         self.setEnergyFunction(expression.replace("ref = 1", f"ref = {reference}"))
         self._registerCV(
-            mmunit.dimensionless,
-            group1,
-            group2,
-            _NonbondedForce(nonbondedForce),
-            reference,
+            mmunit.dimensionless, group1, group2, nonbondedForce, reference
         )
 
     def _getValue(self, context: openmm.Context) -> float:
