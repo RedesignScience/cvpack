@@ -84,6 +84,8 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
         >>> print(*[r.name for r in residues])  # doctest: +ELLIPSIS
         LYS ASP GLU ... ILE LEU ARG
         >>> helix_content = cvpack.HelixAngleContent(residues)
+        >>> helix_content.setUnusedForceGroup(0, model.system)
+        1
         >>> model.system.addForce(helix_content)
         6
         >>> platform = openmm.Platform.getPlatformByName('Reference')
