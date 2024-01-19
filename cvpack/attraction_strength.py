@@ -8,6 +8,7 @@
 """
 
 import typing as t
+import numbers
 
 import openmm
 import xmltodict
@@ -94,11 +95,13 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
         parameters.
     reference
         A reference value (in energy units per mole) to which the collective variable
-        should be normalized. If provided, the collective variable will become
-        dimensionless.
+        should be normalized. One can also provide an :OpenMM:`Context` object from
+        which to obtain the reference value. If either is provided, the collective
+        variable will become dimensionless.
 
     Examples
     --------
+    >>> import cvpack
     >>> from openmm import unit
     >>> from openmmtools import testsystems
     >>> model = testsystems.HostGuestExplicit()
@@ -108,46 +111,59 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
     ...         group = group1 if residue.name == "B2" else group2
     ...         group.extend(atom.index for atom in residue.atoms())
     >>> forces = {f.getName(): f for f in model.system.getForces()}
-    >>> attraction_strength = AttractionStrength(
-    ...     group1, group2, forces["NonbondedForce"]
-    ... )
-    >>> model.system.addForce(attraction_strength)
+    >>> cv1 = cvpack.AttractionStrength(group1, group2, forces["NonbondedForce"])
+    >>> model.system.addForce(cv1)
     5
-    >>> normalized_attraction_strength = AttractionStrength(
+    >>> cv2 = cvpack.AttractionStrength(
     ...     group1, group2, forces["NonbondedForce"], 100*unit.kilojoules_per_mole,
     ... )
-    >>> model.system.addForce(normalized_attraction_strength)
+    >>> model.system.addForce(cv2)
     6
     >>> platform = openmm.Platform.getPlatformByName("Reference")
     >>> integrator = openmm.VerletIntegrator(1.0 * mmunit.femtoseconds)
     >>> context = openmm.Context(model.system, integrator, platform)
     >>> context.setPositions(model.positions)
-    >>> print(attraction_strength.getValue(context, 6))
-    4912.514 kJ/mol
-    >>> print(attraction_strength.getEffectiveMass(context, 6))
-    2.163946e-07 nm**2 mol**2 Da/(kJ**2)
-    >>> print(normalized_attraction_strength.getValue(context, 6))
-    49.12514 dimensionless
+    >>> print(cv1.getValue(context, 4))
+    4912.5 kJ/mol
+    >>> print(cv1.getEffectiveMass(context, 4))
+    2.1639e-07 nm**2 mol**2 Da/(kJ**2)
+    >>> print(cv2.getValue(context, 4))
+    49.125 dimensionless
+    >>> print(cv2.getEffectiveMass(context, 4))
+    0.0021639 nm**2 Da
+    >>> cv3 = cvpack.AttractionStrength(
+    ...     group1, group2, forces["NonbondedForce"], context,
+    ... )
+    >>> model.system.addForce(cv3)
+    7
+    >>> context.reinitialize(preserveState=True)
+    >>> print(cv3.getValue(context, 4))
+    1.0 dimensionless
+    >>> print(cv3.getEffectiveMass(context, 4))
+    5.2222 nm**2 Da
     """
 
+    @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
         group1: t.Sequence[int],
         group2: t.Sequence[int],
         nonbondedForce: openmm.NonbondedForce,
-        reference: t.Optional[mmunit.Quantity] = None,
+        reference: t.Union[mmunit.ScalarQuantity, openmm.Context, None] = None,
     ) -> None:
         cutoff = mmunit.value_in_md_units(nonbondedForce.getCutoffDistance())
-        ref = 1 if reference is None else mmunit.value_in_md_units(reference)
-        super().__init__(
-            f"{4 / ref}*epsilon*(1/y - 1/y^2)"
-            f" + {ONE_4PI_EPS0 / ref}*q12sq*(1/x + (x^2 - 3)/2)"
+        expression = (
+            "-(lj + coul)/refval"
+            "; lj = 4*epsilon*(1/y^2 - 1/y)"
+            f"; coul = {ONE_4PI_EPS0}*q1q2*(1/x + (x^2 - 3)/2)"
             f"; x = r/{cutoff}"
             "; y = abs((r/sigma)^6 - 2) + 2"
-            "; q12sq = max(0, -charge1*charge2)"
+            "; q1q2 = min(0, charge1*charge2)"
             "; epsilon = sqrt(epsilon1*epsilon2)"
             "; sigma = (sigma1 + sigma2)/2"
+            "; refval = 1"
         )
+        super().__init__(expression)
         if nonbondedForce.usesPeriodicBoundaryConditions():
             self.setNonbondedMethod(self.CutoffPeriodic)
         else:
@@ -157,14 +173,35 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
             self.addPerParticleParameter(parameter)
         for atom in range(nonbondedForce.getNumParticles()):
             self.addParticle(nonbondedForce.getParticleParameters(atom))
+        for exception in range(nonbondedForce.getNumExceptions()):
+            i, j, *_ = nonbondedForce.getExceptionParameters(exception)
+            self.addExclusion(i, j)
         self.setUseSwitchingFunction(nonbondedForce.getUseSwitchingFunction())
         self.setSwitchingDistance(nonbondedForce.getSwitchingDistance())
         self.setUseLongRangeCorrection(False)
         self.addInteractionGroup(group1, group2)
+        if isinstance(reference, openmm.Context):
+            reference = self._get_value(reference)
+        if isinstance(reference, numbers.Number):
+            self.setEnergyFunction(
+                expression.replace("refval = 1", f"refval = {reference}")
+            )
         self._registerCV(
             mmunit.kilojoules_per_mole if reference is None else mmunit.dimensionless,
             group1,
             group2,
             _NonbondedForce(nonbondedForce),
-            None if reference is None else mmunit.SerializableQuantity(reference),
+            reference,
         )
+
+    def _get_value(self, context: openmm.Context) -> float:
+        system = openmm.System()
+        for _ in range(context.getSystem().getNumParticles()):
+            system.addParticle(1.0)
+        system.addForce(openmm.CustomNonbondedForce(self))
+        state = context.getState(getPositions=True)
+        context = openmm.Context(system, openmm.VerletIntegrator(1.0))
+        context.setPositions(state.getPositions())
+        context.setPeriodicBoxVectors(*state.getPeriodicBoxVectors())
+        state = context.getState(getEnergy=True)
+        return mmunit.value_in_md_units(state.getPotentialEnergy())
