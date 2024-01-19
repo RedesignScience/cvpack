@@ -7,7 +7,6 @@
 
 """
 
-import numbers
 import typing as t
 
 import openmm
@@ -34,22 +33,23 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
 
     .. math::
 
-        S_{\\rm attr}({\\bf r}) =
-            &-\\sum_{i \\in {\\bf g}_1}
+        S_{\\rm attr}({\\bf r}) = &-\\frac{1}{E_{\\rm ref}} \\Bigg[
+            \\sum_{i \\in {\\bf g}_1}
                 \\sum_{\\substack{j \\in {\\bf g}_2 \\\\ j \\neq i}}
                     \\epsilon_{ij} u_{\\rm disp}\\left(
                         \\frac{\\|{\\bf r}_i - {\\bf r}_j\\|}{\\sigma_{ij}}
                     \\right) \\\\
-            &-\\sum_{i \\in {\\bf g}_1}
+            &+\\sum_{i \\in {\\bf g}_1}
             \\sum_{\\substack{j \\in {\\bf g}_2 \\\\ q_jq_i < 0}}
                 \\frac{q_i q_j}{4 \\pi \\varepsilon_0 r_{\\rm c}} u_{\\rm elec}\\left(
                     \\frac{\\|{\\bf r}_i - {\\bf r}_j\\|}{r_{\\rm c}}
-                \\right)
+                \\right) \\Bigg]
 
     where :math:`{\\bf g}_1` and :math:`{\\bf g}_2` are the two atom groups,
     :math:`r_{\\rm c}` is the cutoff distance, :math:`\\varepsilon_0` is the
-    permittivity of empty space, and :math:`q_i` is the charge of atom :math:`i`. The
-    Lennard-Jones parameters are given by the Lorentz-Berthelot mixing rule, i.e.
+    permittivity of empty space, :math:`q_i` is the charge of atom :math:`i`, and
+    :math:`E_{\\rm ref}` is a reference value (in energy units per mole).
+    The Lennard-Jones parameters are given by the Lorentz-Berthelot mixing rule, i.e.
     :math:`\\epsilon_{ij} = \\sqrt{\\epsilon_i \\epsilon_j}`, and
     :math:`\\sigma_{ij} = (\\sigma_i + \\sigma_j)/2`.
 
@@ -74,9 +74,10 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
 
     .. note::
 
-        Only attractive electrostatic interactions are considered (:math:`q_i q_i < 0`).
-        This makes :math:`S_{\\rm attr}({\\bf r})` exclusively non-negative. Its upper
-        bound depends on the system and the chosen groups of atoms.
+        Only attractive electrostatic interactions are considered (:math:`q_i q_i < 0`),
+        which gives :math:`S_{\\rm attr}({\\bf r})` a lower bound of zero. The upper
+        bound will depends on the system details, the chosen groups of atoms, and the
+        adopted reference value.
 
     The Lennard-Jones parameters, atomic charges, cutoff distance, boundary conditions,
     as well as whether to use a switching function and its corresponding switching
@@ -96,8 +97,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
     reference
         A reference value (in energy units per mole) to which the collective variable
         should be normalized. One can also provide an :OpenMM:`Context` object from
-        which to obtain the reference value. If either is provided, the collective
-        variable will become dimensionless.
+        which to obtain the reference value.
 
     Examples
     --------
@@ -124,9 +124,9 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
     >>> context = openmm.Context(model.system, integrator, platform)
     >>> context.setPositions(model.positions)
     >>> print(cv1.getValue(context, 4))
-    4912.5 kJ/mol
+    4912.5 dimensionless
     >>> print(cv1.getEffectiveMass(context, 4))
-    2.1639e-07 nm**2 mol**2 Da/(kJ**2)
+    2.1639e-07 nm**2 Da
     >>> print(cv2.getValue(context, 4))
     49.125 dimensionless
     >>> print(cv2.getEffectiveMass(context, 4))
@@ -149,11 +149,13 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
         group1: t.Sequence[int],
         group2: t.Sequence[int],
         nonbondedForce: openmm.NonbondedForce,
-        reference: t.Union[mmunit.ScalarQuantity, openmm.Context, None] = None,
+        reference: t.Union[mmunit.ScalarQuantity, openmm.Context] = mmunit.Quantity(
+            1.0, mmunit.kilojoule_per_mole
+        ),
     ) -> None:
         cutoff = mmunit.value_in_md_units(nonbondedForce.getCutoffDistance())
         expression = (
-            "-(lj + coul)/refval"
+            "-(lj + coul)/ref"
             "; lj = 4*epsilon*(1/y^2 - 1/y)"
             f"; coul = {ONE_4PI_EPS0}*q1q2*(1/x + (x^2 - 3)/2)"
             f"; x = r/{cutoff}"
@@ -161,7 +163,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
             "; q1q2 = min(0, charge1*charge2)"
             "; epsilon = sqrt(epsilon1*epsilon2)"
             "; sigma = (sigma1 + sigma2)/2"
-            "; refval = 1"
+            "; ref = 1"
         )
         super().__init__(expression)
         if nonbondedForce.usesPeriodicBoundaryConditions():
@@ -182,12 +184,9 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
         self.addInteractionGroup(group1, group2)
         if isinstance(reference, openmm.Context):
             reference = self._getValue(reference)
-        if isinstance(reference, numbers.Number):
-            self.setEnergyFunction(
-                expression.replace("refval = 1", f"refval = {reference}")
-            )
+        self.setEnergyFunction(expression.replace("ref = 1", f"ref = {reference}"))
         self._registerCV(
-            mmunit.kilojoules_per_mole if reference is None else mmunit.dimensionless,
+            mmunit.dimensionless,
             group1,
             group2,
             _NonbondedForce(nonbondedForce),
