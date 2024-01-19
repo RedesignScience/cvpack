@@ -104,7 +104,7 @@ class AbstractCollectiveVariable(openmm.Force):
                 getEnergy=getEnergy, getForces=getForces, groups=1 << self_group
             )
         old_group = self.getForceGroup()
-        new_group = self.setFreeForceGroup(context.getSystem())
+        new_group = self.setUnusedForceGroup(0, context.getSystem())
         context.reinitialize(preserveState=True)
         state = context.getState(
             getEnergy=getEnergy, getForces=getForces, groups=1 << new_group
@@ -202,10 +202,10 @@ class AbstractCollectiveVariable(openmm.Force):
         """
         return self._unit
 
-    def setFreeForceGroup(self, system: openmm.System) -> int:
+    def setUnusedForceGroup(self, position: int, system: openmm.System) -> int:
         """
-        Set the force group of this collective variable to the first group that is not
-        being used by other forces in the system.
+        Set the force group of this collective variable to the one at a given position
+        in the ascending ordered list of unused force groups in an :OpenMM:`System`.
 
         .. note::
 
@@ -213,21 +213,29 @@ class AbstractCollectiveVariable(openmm.Force):
             effective mass (see :meth:`getEffectiveMass`) is more efficient when the
             collective variable is the only force in its own force group.
 
+        Parameters
+        ----------
+            position
+                The position of the force group in the ascending ordered list of unused
+                force groups in the system
+            system
+                The system to search for unused force groups
+
         Returns
         -------
-            The new force group
+            The index of the force group that was set
 
         Raises
         ------
             RuntimeError
-                If there are no free force groups in the system
+                If all force groups are already in use
         """
         free_groups = sorted(
             set(range(32)) - {force.getForceGroup() for force in system.getForces()}
         )
         if not free_groups:
-            raise RuntimeError("There are no free force groups in the system.")
-        new_group = free_groups[0]
+            raise RuntimeError("All force groups are already in use.")
+        new_group = free_groups[position]
         self.setForceGroup(new_group)
         return new_group
 
