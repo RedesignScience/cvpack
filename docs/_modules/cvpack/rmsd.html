@@ -111,6 +111,8 @@
 <span class="sd">        &gt;&gt;&gt; num_atoms = model.topology.getNumAtoms()</span>
 <span class="sd">        &gt;&gt;&gt; group = list(range(num_atoms))</span>
 <span class="sd">        &gt;&gt;&gt; rmsd = cvpack.RMSD(model.positions, group, num_atoms)</span>
+<span class="sd">        &gt;&gt;&gt; rmsd.setUnusedForceGroup(0, model.system)</span>
+<span class="sd">        1</span>
 <span class="sd">        &gt;&gt;&gt; model.system.addForce(rmsd)</span>
 <span class="sd">        6</span>
 <span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>

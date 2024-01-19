@@ -102,6 +102,8 @@
 <span class="sd">        &gt;&gt;&gt; model = testsystems.AlanineDipeptideVacuum()</span>
 <span class="sd">        &gt;&gt;&gt; num_atoms = model.system.getNumParticles()</span>
 <span class="sd">        &gt;&gt;&gt; rgsq = cvpack.RadiusOfGyrationSq(list(range(num_atoms)))</span>
+<span class="sd">        &gt;&gt;&gt; rgsq.setUnusedForceGroup(0, model.system)</span>
+<span class="sd">        1</span>
 <span class="sd">        &gt;&gt;&gt; model.system.addForce(rgsq)</span>
 <span class="sd">        5</span>
 <span class="sd">        &gt;&gt;&gt; platform =openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>

@@ -127,6 +127,8 @@
 <span class="sd">        &gt;&gt;&gt; nc = cvpack.NumberOfContacts(</span>
 <span class="sd">        ...     carbons, carbons, num_atoms, **optionals</span>
 <span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; nc.setUnusedForceGroup(0, model.system)</span>
+<span class="sd">        1</span>
 <span class="sd">        &gt;&gt;&gt; model.system.addForce(nc)</span>
 <span class="sd">        5</span>
 <span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>

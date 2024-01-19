@@ -12,3 +12,4 @@ HelixHBondContent
     .. automethod:: getUnit
     .. automethod:: getValue
     .. automethod:: setUnit
+    .. automethod:: setUnusedForceGroup

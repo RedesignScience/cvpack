@@ -134,6 +134,8 @@
 <span class="sd">        &gt;&gt;&gt; colvar = cvpack.CentroidFunction(</span>
 <span class="sd">        ...     function, groups, unit.nanometers, n=num_atoms,</span>
 <span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; colvar.setUnusedForceGroup(0, model.system)</span>
+<span class="sd">        1</span>
 <span class="sd">        &gt;&gt;&gt; model.system.addForce(colvar)</span>
 <span class="sd">        5</span>
 <span class="sd">        &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>

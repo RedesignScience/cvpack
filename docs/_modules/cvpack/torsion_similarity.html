@@ -105,6 +105,8 @@
 <span class="sd">        &gt;&gt;&gt; torsion_similarity = cvpack.TorsionSimilarity(</span>
 <span class="sd">        ...     phi_atoms[1:], phi_atoms[:-1]</span>
 <span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; torsion_similarity.setUnusedForceGroup(0, model.system)</span>
+<span class="sd">        1</span>
 <span class="sd">        &gt;&gt;&gt; model.system.addForce(torsion_similarity)</span>
 <span class="sd">        6</span>
 <span class="sd">        &gt;&gt;&gt; integrator =openmm.VerletIntegrator(0)</span>

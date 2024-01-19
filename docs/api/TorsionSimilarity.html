@@ -85,6 +85,8 @@ angle in each pair.</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">torsion_similarity</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">TorsionSimilarity</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">phi_atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">phi_atoms</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 <span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">torsion_similarity</span><span class="o">.</span><span class="n">setUnusedForceGroup</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">)</span>
+<span class="go">1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="n">torsion_similarity</span><span class="p">)</span>
 <span class="go">6</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">integrator</span> <span class="o">=</span><span class="n">openmm</span><span class="o">.</span><span class="n">VerletIntegrator</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -173,6 +175,8 @@ be rounded.</p></li>
 <span class="gp">... </span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">radius_of_gyration</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">RadiusOfGyration</span><span class="p">(</span><span class="n">peptide</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">radius_of_gyration</span><span class="o">.</span><span class="n">setForceGroup</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">radius_of_gyration</span><span class="o">.</span><span class="n">setUnusedForceGroup</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">)</span>
+<span class="go">1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="n">radius_of_gyration</span><span class="p">)</span>
 <span class="go">6</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">platform</span> <span class="o">=</span><span class="n">openmm</span><span class="o">.</span><span class="n">Platform</span><span class="o">.</span><span class="n">getPlatformByName</span><span class="p">(</span><span class="s1">&#39;Reference&#39;</span><span class="p">)</span>
@@ -230,6 +234,34 @@ be rounded.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>unit</strong> (<em>Unit</em>) – The unit of measurement of this collective variable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cvpack.TorsionSimilarity.setUnusedForceGroup">
+<span class="sig-name descname"><span class="pre">setUnusedForceGroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.TorsionSimilarity.setUnusedForceGroup" title="Link to this definition">¶</a></dt>
+<dd><p>Set the force group of this collective variable to the one at a given position
+in the ascending ordered list of unused force groups in an <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.System.html">openmm.System</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Evaluating a collective variable (see <a class="reference internal" href="#cvpack.TorsionSimilarity.getValue" title="cvpack.TorsionSimilarity.getValue"><code class="xref py py-meth docutils literal notranslate"><span class="pre">getValue()</span></code></a>) or computing its
+effective mass (see <a class="reference internal" href="#cvpack.TorsionSimilarity.getEffectiveMass" title="cvpack.TorsionSimilarity.getEffectiveMass"><code class="xref py py-meth docutils literal notranslate"><span class="pre">getEffectiveMass()</span></code></a>) is more efficient when the
+collective variable is the only force in its own force group.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>position</strong> (<em>int</em>) – The position of the force group in the ascending ordered list of unused
+force groups in the system</p></li>
+<li><p><strong>system</strong> (<em>System</em>) – The system to search for unused force groups</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>The index of the force group that was set</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>RuntimeError</strong> – If all force groups are already in use</p>
 </dd>
 </dl>
 </dd></dl>

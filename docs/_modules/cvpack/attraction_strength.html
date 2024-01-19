@@ -220,11 +220,15 @@
 <span class="sd">    ...         group.extend(atom.index for atom in residue.atoms())</span>
 <span class="sd">    &gt;&gt;&gt; forces = {f.getName(): f for f in model.system.getForces()}</span>
 <span class="sd">    &gt;&gt;&gt; cv1 = cvpack.AttractionStrength(group1, group2, forces[&quot;NonbondedForce&quot;])</span>
+<span class="sd">    &gt;&gt;&gt; cv1.setUnusedForceGroup(0, model.system)</span>
+<span class="sd">    1</span>
 <span class="sd">    &gt;&gt;&gt; model.system.addForce(cv1)</span>
 <span class="sd">    5</span>
 <span class="sd">    &gt;&gt;&gt; cv2 = cvpack.AttractionStrength(</span>
 <span class="sd">    ...     group1, group2, forces[&quot;NonbondedForce&quot;], 100*unit.kilojoules_per_mole,</span>
 <span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; cv2.setUnusedForceGroup(0, model.system)</span>
+<span class="sd">    2</span>
 <span class="sd">    &gt;&gt;&gt; model.system.addForce(cv2)</span>
 <span class="sd">    6</span>
 <span class="sd">    &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&quot;Reference&quot;)</span>
@@ -242,6 +246,8 @@
 <span class="sd">    &gt;&gt;&gt; cv3 = cvpack.AttractionStrength(</span>
 <span class="sd">    ...     group1, group2, forces[&quot;NonbondedForce&quot;], context,</span>
 <span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; cv3.setUnusedForceGroup(0, model.system)</span>
+<span class="sd">    3</span>
 <span class="sd">    &gt;&gt;&gt; model.system.addForce(cv3)</span>
 <span class="sd">    7</span>
 <span class="sd">    &gt;&gt;&gt; context.reinitialize(preserveState=True)</span>
