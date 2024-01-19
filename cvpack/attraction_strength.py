@@ -10,7 +10,6 @@
 import typing as t
 
 import openmm
-import xmltodict
 
 from cvpack import unit as mmunit
 
@@ -19,7 +18,9 @@ from .cvpack import AbstractCollectiveVariable
 ONE_4PI_EPS0 = 138.93545764438198
 
 
-class _NonbondedForceSurrogate:
+class _NonbondedForceSurrogate:  # pylint: disable=too-many-instance-attributes
+    """A surrogate class for the NonbondedForce class in OpenMM."""
+
     def __init__(self, other: openmm.NonbondedForce) -> None:
         self._cutoff = other.getCutoffDistance()
         self._uses_pbc = other.usesPeriodicBoundaryConditions()
@@ -61,30 +62,38 @@ class _NonbondedForceSurrogate:
         self._switching_distance = state["switching_distance"]
 
     def getCutoffDistance(self) -> float:
+        """Get the cutoff distance."""
         return mmunit.value_in_md_units(self._cutoff)
 
     def usesPeriodicBoundaryConditions(self) -> bool:
+        """Return whether periodic boundary conditions are used."""
         return self._uses_pbc
 
     def getNumParticles(self) -> int:
+        """Get the number of particles."""
         return self._num_particles
 
     def getParticleParameters(self, index: int) -> t.Tuple[float, float, float]:
+        """Get the parameters of a particle at the given index."""
         return tuple(map(mmunit.value_in_md_units, self._particle_parameters[index]))
 
     def getNumExceptions(self):
+        """Get the number of exceptions."""
         return self._num_exceptions
 
     def getExceptionParameters(
         self, index: int
     ) -> t.Tuple[int, int, float, float, float]:
+        """Get the parameters of an exception at the given index."""
         i, j, *params = self._exception_parameters[index]
         return i, j, *map(mmunit.value_in_md_units, params)
 
     def getUseSwitchingFunction(self) -> bool:
+        """Return whether a switching function is used."""
         return self._use_switching_function
 
     def getSwitchingDistance(self) -> float:
+        """Get the switching distance."""
         return mmunit.value_in_md_units(self._switching_distance)
 
 
