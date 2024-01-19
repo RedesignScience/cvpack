@@ -147,14 +147,15 @@ class SheetRMSDContent(RMSDContent):
         >>> from openmm import app, unit
         >>> from openmmtools import testsystems
         >>> model = testsystems.SrcImplicit()
-        >>> residues = list(it.islice(model.topology.residues(), 10, 41))
+        >>> residues = list(it.islice(model.topology.residues(), 68, 82))
         >>> print(*[r.name for r in residues])
-        ARG LEU GLU ... THR LEU LYS
+        TYR ALA VAL ... VAL THR GLU
         >>> sheet_content = cvpack.SheetRMSDContent(
         ...     residues, model.system.getNumParticles()
         ... )
+        >>> sheet_content.setForceGroup(31)
         >>> sheet_content.getNumResidueBlocks()
-        300
+        28
         >>> model.system.addForce(sheet_content)
         6
         >>> platform = openmm.Platform.getPlatformByName('Reference')
@@ -162,17 +163,20 @@ class SheetRMSDContent(RMSDContent):
         >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
         >>> print(sheet_content.getValue(context, digits=4))
-        4.011 dimensionless
+        1.0466 dimensionless
         >>> blockwise_sheet_content = cvpack.SheetRMSDContent(
-        ...     residues, model.system.getNumParticles(), blockSizes=[11, 11, 9]
+        ...     residues[:5] + residues[-5:],
+        ...     model.system.getNumParticles(),
+        ...     blockSizes=[5, 5],
         ... )
+        >>> blockwise_sheet_content.setForceGroup(30)
         >>> blockwise_sheet_content.getNumResidueBlocks()
-        144
+        9
         >>> model.system.addForce(blockwise_sheet_content)
         7
         >>> context.reinitialize(preserveState=True)
         >>> print(blockwise_sheet_content.getValue(context, digits=4))
-        3.8748 dimensionless
+        0.98594 dimensionless
     """
 
     @mmunit.convert_quantities
