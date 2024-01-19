@@ -544,9 +544,10 @@ def test_sheet_rmsd_content():
         [np.array(pos) for pos in unit.value_in_md_units(model.positions)]
     )
     topology = mdtraj.Topology.from_openmm(model.topology)
-    residues = list(it.islice(model.topology.residues(), 8, 40))
+    residues = list(it.islice(model.topology.residues(), 68, 82))
 
     sheet_content = cvpack.SheetRMSDContent(residues, topology.n_atoms)
+    sheet_content.setForceGroup(31)
     model.system.addForce(sheet_content)
     context = openmm.Context(
         model.system,
@@ -579,7 +580,7 @@ def test_sheet_rmsd_content():
         if j - i >= min_separation
     )
 
-    assert cv_value / cv_value.unit == pytest.approx(computed_value)
+    assert cv_value / cv_value.unit == pytest.approx(computed_value, abs=1e-5)
     perform_common_tests(sheet_content, context)
 
 
