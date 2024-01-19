@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-from typing import Sequence, Union
+import typing as t
 
 import numpy as np
 import openmm
@@ -29,7 +29,8 @@ from .cvpack import AbstractCollectiveVariable
 
 class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable):
     """
-    A generic function of the coordinates of `m` groups of `n` atoms:
+    A generic function of the coordinates of atoms split into `m` groups of `n`
+    atoms each:
 
     .. math::
 
@@ -38,7 +39,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         \\right)
 
     where :math:`F` is a user-defined function and :math:`{\\bf r}_{i,j}` is the
-    position of the :math:`j`-th atom of the :math:`i`-th group.
+    coordinate of the :math:`j`-th atom of the :math:`i`-th group.
 
     The function :math:`F` is defined as a string and can be any expression supported by
     :OpenMM:`CustomCompoundBondForce`. If it contains named parameters, they must be
@@ -48,38 +49,37 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
 
     Parameters
     ----------
-        atomsPerGroup
-            The number of atoms in each group
-        function
-            The function to be evaluated. It must be a valid
-            :OpenMM:`CustomCompoundBondForce` expression
-        atoms
-            The indices of the atoms in each group, passed as a 2D array-like object of
-            shape `(m, n)`, where `m` is the number of groups and `n` is the number of
-            atoms per group, or as a 1D array-like object of length `m*n`, where the
-            first `n` elements are the indices of the atoms in the first group, the next
-            `n` elements are the indices of the atoms in the second group, and so on.
-        unit
-            The unit of measurement of the collective variable. It must be compatible
-            with the MD unit system (mass in `daltons`, distance in `nanometers`, time
-            in `picoseconds`, temperature in `kelvin`, energy in `kilojoules_per_mol`,
-            angle in `radians`). If the collective variables does not have a unit, use
-            `unit.dimensionless`
-        pbc
-            Whether to use periodic boundary conditions
+    function
+        The function to be evaluated. It must be a valid
+        :OpenMM:`CustomCompoundBondForce` expression
+    groups
+        The indices of the atoms in each group, passed as a 2D array-like object of
+        shape `(m, n)`, where `m` is the number of groups and `n` is the number of
+        atoms per group. If a 1D object is passed, it is assumed that `m` is 1 and
+        `n` is the length of the object.
+    unit
+        The unit of measurement of the collective variable. It must be compatible
+        with the MD unit system (mass in `daltons`, distance in `nanometers`, time
+        in `picoseconds`, temperature in `kelvin`, energy in `kilojoules_per_mol`,
+        angle in `radians`). If the collective variables does not have a unit, use
+        `unit.dimensionless`
+    pbc
+        Whether to use periodic boundary conditions
 
     Keyword Args
     ------------
-        **parameters
-            The named parameters of the function. Each parameter can be a scalar
-            quantity or a 1D array-like object of length `m`, where `m` is the number of
-            groups. In the latter case, each entry of the array is used for the
-            corresponding group of atoms.
+    **parameters
+        The named parameters of the function. Each parameter can be a scalar
+        quantity or a 1D array-like object of length `m`, where `m` is the number of
+        groups. In the latter case, each entry of the array is used for the
+        corresponding group of atoms.
 
     Raises
     ------
-        ValueError
-            If the collective variable is not compatible with the MD unit system
+    ValueError
+        If the groups are not specified as a 1D or 2D array-like object
+    ValueError
+        If the unit of the collective variable is not compatible with the MD unit system
 
     Example
     -------
@@ -92,7 +92,6 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         >>> angle1 = cvpack.Angle(0, 5, 10)
         >>> angle2 = cvpack.Angle(10, 15, 20)
         >>> colvar = cvpack.AtomicFunction(
-        ...     3,
         ...     "(k/2)*(angle(p1, p2, p3) - theta0)^2",
         ...     [[0, 5, 10], [10, 15, 20]],
         ...     unit.kilojoules_per_mole,
@@ -113,27 +112,28 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         429.479 kJ/mol
     """
 
-    @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        atomsPerGroup: int,
         function: str,
-        indices: ArrayLike,
+        groups: ArrayLike,
         unit: mmunit.Unit,
         pbc: bool = False,
-        **parameters: Union[mmunit.ScalarQuantity, Sequence[mmunit.ScalarQuantity]],
+        **parameters: t.Union[mmunit.ScalarQuantity, t.Sequence[mmunit.ScalarQuantity]],
     ) -> None:
-        groups = np.asarray(indices, dtype=np.int32).reshape(-1, atomsPerGroup)
-        super().__init__(atomsPerGroup, function)
+        groups = np.atleast_2d(groups)
+        num_groups, atoms_per_group, *others = groups.shape
+        if others:
+            raise ValueError("Array `groups` cannot have more than 2 dimensions")
+        super().__init__(atoms_per_group, function)
         perbond_parameters = []
         for name, data in parameters.items():
             if isinstance(data, mmunit.Quantity):
                 data = data.value_in_unit_system(mmunit.md_unit_system)
-            if isinstance(data, Sequence):
-                if len(data) != groups.shape[0]:
+            if isinstance(data, t.Sequence):
+                if len(data) != num_groups:
                     raise ValueError(
-                        f"The length of the parameter {name} "
-                        f"must be equal to {groups.shape[0]}."
+                        f"The length of parameter {name} is {len(data)}. "
+                        f"Should be {num_groups}."
                     )
                 self.addPerBondParameter(name)
                 perbond_parameters.append(data)
@@ -145,7 +145,6 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         self._checkUnitCompatibility(unit)
         self._registerCV(
             unit,
-            atomsPerGroup,
             function,
             groups,
             mmunit.SerializableUnit(unit),
@@ -156,7 +155,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
     @classmethod
     def _fromCustomForce(
         cls,
-        force: Union[
+        force: t.Union[
             CustomAngleForce,
             CustomBondForce,
             CustomCompoundBondForce,
@@ -206,7 +205,8 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
             atoms.append(indices)
             for name, value in zip(per_item_parameter_names, per_item_parameters):
                 parameters[name].append(value)
-        return cls(number, function, atoms, unit, pbc, **parameters)
+        atoms = np.asarray(atoms).reshape(-1, number)
+        return cls(function, atoms, unit, pbc, **parameters)
 
     @classmethod
     def _fromHarmonicBondForce(
@@ -225,7 +225,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
             atoms.append(indices)
             parameters["r0"].append(length)
             parameters["k"].append(k)
-        return cls(2, "(k/2)*(distance(p1, p2)-r0)^2", atoms, unit, pbc, **parameters)
+        return cls("(k/2)*(distance(p1, p2)-r0)^2", atoms, unit, pbc, **parameters)
 
     @classmethod
     def _fromHarmonicAngleForce(
@@ -244,9 +244,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
             atoms.append(indices)
             parameters["theta0"].append(angle)
             parameters["k"].append(k)
-        return cls(
-            3, "(k/2)*(angle(p1, p2, p3)-theta0)^2", atoms, unit, pbc, **parameters
-        )
+        return cls("(k/2)*(angle(p1, p2, p3)-theta0)^2", atoms, unit, pbc, **parameters)
 
     @classmethod
     def _fromPeriodicTorsionForce(
@@ -267,7 +265,6 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
             parameters["phase"].append(phase)
             parameters["k"].append(k)
         return cls(
-            4,
             "k*(1 + cos(periodicity*dihedral(p1, p2, p3, p4) - phase))",
             atoms,
             unit,
