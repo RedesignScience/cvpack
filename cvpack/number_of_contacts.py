@@ -89,6 +89,8 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
         >>> nc = cvpack.NumberOfContacts(
         ...     carbons, carbons, num_atoms, **optionals
         ... )
+        >>> nc.setUnusedForceGroup(0, model.system)
+        1
         >>> model.system.addForce(nc)
         5
         >>> platform = openmm.Platform.getPlatformByName('Reference')

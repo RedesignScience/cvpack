@@ -83,6 +83,8 @@ class RadiusOfGyration(_RadiusOfGyrationBase):
         >>> model = testsystems.AlanineDipeptideVacuum()
         >>> num_atoms = model.system.getNumParticles()
         >>> radius_of_gyration = cvpack.RadiusOfGyration(list(range(num_atoms)))
+        >>> radius_of_gyration.setUnusedForceGroup(0, model.system)
+        1
         >>> model.system.addForce(radius_of_gyration)
         5
         >>> platform =openmm.Platform.getPlatformByName('Reference')

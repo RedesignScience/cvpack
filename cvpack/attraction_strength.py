@@ -182,11 +182,15 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
     ...         group.extend(atom.index for atom in residue.atoms())
     >>> forces = {f.getName(): f for f in model.system.getForces()}
     >>> cv1 = cvpack.AttractionStrength(group1, group2, forces["NonbondedForce"])
+    >>> cv1.setUnusedForceGroup(0, model.system)
+    1
     >>> model.system.addForce(cv1)
     5
     >>> cv2 = cvpack.AttractionStrength(
     ...     group1, group2, forces["NonbondedForce"], 100*unit.kilojoules_per_mole,
     ... )
+    >>> cv2.setUnusedForceGroup(0, model.system)
+    2
     >>> model.system.addForce(cv2)
     6
     >>> platform = openmm.Platform.getPlatformByName("Reference")
@@ -204,6 +208,8 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
     >>> cv3 = cvpack.AttractionStrength(
     ...     group1, group2, forces["NonbondedForce"], context,
     ... )
+    >>> cv3.setUnusedForceGroup(0, model.system)
+    3
     >>> model.system.addForce(cv3)
     7
     >>> context.reinitialize(preserveState=True)

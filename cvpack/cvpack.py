@@ -323,6 +323,8 @@ class AbstractCollectiveVariable(openmm.Force):
             ... ]
             >>> radius_of_gyration = cvpack.RadiusOfGyration(peptide)
             >>> radius_of_gyration.setForceGroup(1)
+            >>> radius_of_gyration.setUnusedForceGroup(0, model.system)
+            1
             >>> model.system.addForce(radius_of_gyration)
             6
             >>> platform =openmm.Platform.getPlatformByName('Reference')

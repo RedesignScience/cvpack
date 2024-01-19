@@ -86,6 +86,8 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, AbstractCollectiveVari
         ...     stepFunction="step(1-x)",
         ...     thresholdDistance=0.6*unit.nanometers,
         ... )
+        >>> residue_coordination.setUnusedForceGroup(0, model.system)
+        1
         >>> model.system.addForce(residue_coordination)
         6
         >>> platform = openmm.Platform.getPlatformByName('Reference')

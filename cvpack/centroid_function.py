@@ -96,6 +96,8 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         >>> colvar = cvpack.CentroidFunction(
         ...     function, groups, unit.nanometers, n=num_atoms,
         ... )
+        >>> colvar.setUnusedForceGroup(0, model.system)
+        1
         >>> model.system.addForce(colvar)
         5
         >>> integrator = openmm.VerletIntegrator(0)
