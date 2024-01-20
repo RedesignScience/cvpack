@@ -138,7 +138,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         function: str,
         unit: mmunit.Unit,
         groups: ArrayLike,
-        pbc: bool = False,
+        pbc: bool = True,
         **parameters: t.Union[mmunit.ScalarQuantity, t.Sequence[mmunit.ScalarQuantity]],
     ) -> None:
         groups = np.atleast_2d(groups)

@@ -106,31 +106,48 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
     Example
     -------
         >>> import cvpack
+        >>> import itertools as it
+        >>> import numpy as np
         >>> import openmm
         >>> from openmm import unit
         >>> from openmmtools import testsystems
-        >>> model = testsystems.AlanineDipeptideVacuum()
-        >>> num_atoms = model.system.getNumParticles()
-        >>> atoms = list(range(num_atoms))
-        >>> groups = [[i] for i in atoms]  # Each atom is a group
-        >>> groups.append(atoms)  # The whole molecule is also a group
-        >>> sum_dist_sq = "+".join(
-        ...     f'distance(g{i+1}, g{num_atoms+1})^2' for i in atoms
+        >>> model = testsystems.LysozymeImplicit()
+        >>> residues = list(model.topology.residues())
+        >>> atoms = [[a.index for a in r.atoms()] for r in residues]
+
+        Compute the residue coordination between two helices:
+
+        >>> res_coord = cvpack.ResidueCoordination(
+        ...     residues[115:124], residues[126:135], stepFunction="step(1-x)"
         ... )
-        >>> function = f"sqrt(({sum_dist_sq})/n)"  # The radius of gyration
-        >>> colvar = cvpack.CentroidFunction(
-        ...     function, unit.nanometers, groups, n=num_atoms,
-        ... )
-        >>> colvar.setUnusedForceGroup(0, model.system)
+        >>> res_coord.setUnusedForceGroup(0, model.system)
         1
-        >>> model.system.addForce(colvar)
-        5
+        >>> model.system.addForce(res_coord)
+        6
         >>> integrator = openmm.VerletIntegrator(0)
         >>> platform = openmm.Platform.getPlatformByName('Reference')
         >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
-        >>> print(colvar.getValue(context, digits=6))
-        0.2951431 nm
+        >>> print(res_coord.getValue(context))
+        33.0 dimensionless
+
+        Recompute the residue coordination using the centroid function:
+
+        >>> groups = [atoms[115:124], atoms[126:135]]
+        >>> collections = list(it.product(range(9), range(9, 18)))
+        >>> colvar = cvpack.CentroidFunction(
+        ...    "step(1 - distance(g1, g2))",
+        ...    unit.dimensionless,
+        ...    atoms[115:124] + atoms[126:135],
+        ...    list(it.product(range(9), range(9, 18))),
+        ... )
+        >>> colvar.setUnusedForceGroup(0, model.system)
+        2
+        >>> model.system.addForce(colvar)
+        7
+        >>> context.reinitialize(preserveState=True)
+        >>> print(colvar.getValue(context))
+        33.0 dimensionless
     """
 
     def __init__(  # pylint: disable=too-many-arguments
@@ -139,8 +156,8 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         unit: mmunit.Unit,
         groups: t.Sequence[t.Sequence[int]],
         collections: t.Optional[ArrayLike] = None,
-        pbc: bool = False,
-        weighByMass: bool = False,
+        pbc: bool = True,
+        weighByMass: bool = True,
         **parameters: mmunit.ScalarQuantity,
     ) -> None:
         collections = np.atleast_2d(
@@ -154,7 +171,7 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
             raise ValueError("Group index out of bounds")
         super().__init__(groups_per_collection, function)
         for group in groups:
-            self.addGroup(group, None if weighByMass else [1] * len(group))
+            self.addGroup(group, *([] if weighByMass else [[1] * len(group)]))
         perbond_parameters = _add_parameters(self, num_collections, **parameters)
         for collection, *values in zip(collections, *perbond_parameters):
             self.addBond(collection, values)
