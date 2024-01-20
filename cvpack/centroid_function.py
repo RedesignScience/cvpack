@@ -117,10 +117,9 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         >>> sum_dist_sq = "+".join(
         ...     f'distance(g{i+1}, g{num_atoms+1})^2' for i in atoms
         ... )
-        >>> collection = list(range(num_atoms + 1))
         >>> function = f"sqrt(({sum_dist_sq})/n)"  # The radius of gyration
         >>> colvar = cvpack.CentroidFunction(
-        ...     function, groups, collection, unit.nanometers, n=num_atoms,
+        ...     function, unit.nanometers, groups, n=num_atoms,
         ... )
         >>> model.system.addForce(colvar)
         5
@@ -135,14 +134,16 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
     def __init__(  # pylint: disable=too-many-arguments
         self,
         function: str,
-        groups: t.Sequence[t.Sequence[int]],
-        collections: ArrayLike,
         unit: mmunit.Unit,
+        groups: t.Sequence[t.Sequence[int]],
+        collections: t.Optional[ArrayLike] = None,
         pbc: bool = False,
         weighByMass: bool = False,
         **parameters: mmunit.ScalarQuantity,
     ) -> None:
-        collections = np.atleast_2d(collections)
+        collections = np.atleast_2d(
+            np.arange(len(groups)) if collections is None else collections
+        )
         num_collections, groups_per_collection, *others = collections.shape
         if others:
             raise ValueError("Array `collections` cannot have more than 2 dimensions")
@@ -158,4 +159,6 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
         self.setUsesPeriodicBoundaryConditions(pbc)
         self._checkUnitCompatibility(unit)
         unit = mmunit.SerializableUnit(unit)
-        self._registerCV(unit, function, groups, collections, unit, pbc, **parameters)
+        self._registerCV(
+            unit, function, unit, groups, collections, pbc, weighByMass, **parameters
+        )
