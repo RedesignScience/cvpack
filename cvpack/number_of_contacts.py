@@ -14,6 +14,7 @@ import openmm
 from cvpack import unit as mmunit
 
 from .cvpack import AbstractCollectiveVariable
+from .utils import NonbondedForceSurrogate
 
 
 class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
@@ -48,59 +49,63 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
         (:math:`i = j`) are ignored and each pair of distinct atoms (:math:`i \\neq j`)
         is counted only once.
 
+    .. note::
+        Any non-exclusion exceptions involving atoms in :math:`{\\bf g}_1` and
+        :math:`{\\bf g}_2` in the provided :class:`openmm.NonbondedForce` are turned
+        into exclusions in this collective variable.
+
     Parameters
     ----------
-        group1
-            The indices of the atoms in the first group
-        group2
-            The indices of the atoms in the second group
-        numAtoms
-            The total number of atoms in the system (required by OpenMM)
-        pbc
-            Whether the system has periodic boundary conditions
-        stepFunction
-            The function "step(1-x)" (for analysis only) or a continuous approximation
-            thereof
-        thresholdDistance
-            The threshold distance (:math:`r_0`) for considering two atoms as being in
-            contact
-        cutoffFactor
-            The factor :math:`x_c` that multiplies the threshold distance to define
-            the cutoff distance
-        switchFactor
-            The factor :math:`x_s` that multiplies the threshold distance to define
-            the distance at which the step function starts switching off smoothly.
-            If None, it switches off abruptly at the cutoff distance.
+    group1
+        The indices of the atoms in the first group
+    group2
+        The indices of the atoms in the second group
+    nonbondedForce
+        The :class:`openmm.NonbondedForce` object from which the total number of
+        atoms, the exclusions, and whether to use periodic boundary conditions are
+        taken
+    stepFunction
+        The function "step(1-x)" (for analysis only) or a continuous approximation
+        thereof
+    thresholdDistance
+        The threshold distance (:math:`r_0`) for considering two atoms as being in
+        contact
+    cutoffFactor
+        The factor :math:`x_c` that multiplies the threshold distance to define
+        the cutoff distance
+    switchFactor
+        The factor :math:`x_s` that multiplies the threshold distance to define
+        the distance at which the step function starts switching off smoothly.
+        If None, it switches off abruptly at the cutoff distance.
 
     Example
     -------
-        >>> import cvpack
-        >>> import openmm
-        >>> from openmm import app
-        >>> from openmmtools import testsystems
-        >>> model = testsystems.AlanineDipeptideVacuum()
-        >>> carbons = [
-        ...     a.index
-        ...     for a in model.topology.atoms()
-        ...     if a.element == app.element.carbon
-        ... ]
-        >>> num_atoms = model.topology.getNumAtoms()
-        >>> optionals = {"pbc": False, "stepFunction": "step(1-x)"}
-        >>> nc = cvpack.NumberOfContacts(
-        ...     carbons, carbons, num_atoms, **optionals
-        ... )
-        >>> nc.setUnusedForceGroup(0, model.system)
-        1
-        >>> model.system.addForce(nc)
-        5
-        >>> platform = openmm.Platform.getPlatformByName('Reference')
-        >>> context = openmm.Context(
-        ...     model.system, openmm.CustomIntegrator(0), platform
-        ... )
-        >>> context.setPositions(model.positions)
-        >>> print(nc.getValue(context, digits=6))
-        6.0 dimensionless
-
+    >>> import cvpack
+    >>> from openmm import unit
+    >>> from openmmtools import testsystems
+    >>> model = testsystems.HostGuestExplicit()
+    >>> group1, group2 = [], []
+    >>> for residue in model.topology.residues():
+    ...     if residue.name != "HOH":
+    ...         group = group1 if residue.name == "B2" else group2
+    ...         group.extend(atom.index for atom in residue.atoms())
+    >>> forces = {f.getName(): f for f in model.system.getForces()}
+    >>> nc = cvpack.NumberOfContacts(
+    ...     group1,
+    ...     group2,
+    ...     forces["NonbondedForce"],
+    ...     stepFunction="step(1-x)",
+    ... )
+    >>> nc.setUnusedForceGroup(0, model.system)
+    1
+    >>> model.system.addForce(nc)
+    5
+    >>> platform = openmm.Platform.getPlatformByName("Reference")
+    >>> integrator = openmm.VerletIntegrator(1.0 * mmunit.femtoseconds)
+    >>> context = openmm.Context(model.system, integrator, platform)
+    >>> context.setPositions(model.positions)
+    >>> print(nc.getValue(context, 4))
+    30.0 dimensionless
     """
 
     @mmunit.convert_quantities
@@ -108,8 +113,7 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
         self,
         group1: t.Sequence[int],
         group2: t.Sequence[int],
-        numAtoms: int,
-        pbc: bool,
+        nonbondedForce: openmm.NonbondedForce,
         stepFunction: str = "1/(1+x^6)",
         thresholdDistance: mmunit.ScalarQuantity = mmunit.Quantity(
             0.3, mmunit.nanometers
@@ -117,11 +121,17 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
         cutoffFactor: float = 2.0,
         switchFactor: t.Optional[float] = 1.5,
     ) -> None:
+        nonbondedForce = NonbondedForceSurrogate(nonbondedForce)
+        num_atoms = nonbondedForce.getNumParticles()
+        pbc = nonbondedForce.usesPeriodicBoundaryConditions()
         super().__init__(stepFunction + f"; x=r/{thresholdDistance}")
         nonbonded_method = self.CutoffPeriodic if pbc else self.CutoffNonPeriodic
         self.setNonbondedMethod(nonbonded_method)
-        for _ in range(numAtoms):
+        for _ in range(num_atoms):
             self.addParticle([])
+        for index in range(nonbondedForce.getNumExceptions()):
+            i, j, *_ = nonbondedForce.getExceptionParameters(index)
+            self.addExclusion(i, j)
         self.setCutoffDistance(cutoffFactor * thresholdDistance)
         use_switching_function = switchFactor is not None
         self.setUseSwitchingFunction(use_switching_function)
@@ -133,8 +143,7 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
             mmunit.dimensionless,
             group1,
             group2,
-            numAtoms,
-            pbc,
+            nonbondedForce,
             stepFunction,
             thresholdDistance,
             cutoffFactor,
