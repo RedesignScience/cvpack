@@ -617,12 +617,8 @@ def test_atomic_function():
     assert (
         str(excinfo.value) == "Unit angstrom is not compatible with the MD unit system."
     )
-<<<<<<< HEAD
     colvar = cvpack.AtomicFunction(function, unit.nanometers, atoms)
-=======
-    colvar = cvpack.AtomicFunction(num_atoms, function, atoms, unit.nanometers)
     colvar.setUnusedForceGroup(0, model.system)
->>>>>>> main
     model.system.addForce(colvar)
     context = openmm.Context(
         model.system,
@@ -662,7 +658,6 @@ def test_centroid_function():
     colvar = cvpack.CentroidFunction(
         function, unit.nanometers, groups, weighByMass=False
     )
-    colvar.setUnusedForceGroup(0, model.system)
     colvar.setUnusedForceGroup(0, model.system)
     model.system.addForce(colvar)
     context = openmm.Context(
