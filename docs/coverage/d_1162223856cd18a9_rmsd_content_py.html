@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for cvpack/rmsd_content.py: 98%</title>
+    <title>Coverage for cvpack/rmsd_content.py: 92%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="coverage_html.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>cvpack/rmsd_content.py</b>:
-            <span class="pc_cov">98%</span>
+            <span class="pc_cov">92%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">49 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">48<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">1<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">45<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">4<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_a8e999f563ad3ffa___init___py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.0">coverage.py v7.4.0</a>,
-            created at 2024-01-20 17:33 +0000
+            created at 2024-01-20 17:41 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -139,7 +139,7 @@
     <p class="run"><span class="n"><a id="t57" href="#t57">57</a></span><span class="t">            <span class="nam">summation</span> <span class="op">=</span> <span class="nam">expression</span><span class="op">(</span><span class="num">0</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t58" href="#t58">58</a></span><span class="t">            <span class="nam">force</span> <span class="op">=</span> <span class="nam">self</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t59" href="#t59">59</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t60" href="#t60">60</a></span><span class="t">            <span class="nam">summation</span> <span class="op">=</span> <span class="str">"+"</span><span class="op">.</span><span class="nam">join</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t60" href="#t60">60</a></span><span class="t">            <span class="nam">summation</span> <span class="op">=</span> <span class="str">"+"</span><span class="op">.</span><span class="nam">join</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t61" href="#t61">61</a></span><span class="t">                <span class="str">f"chunk{i}"</span> <span class="key">for</span> <span class="nam">i</span> <span class="key">in</span> <span class="nam">range</span><span class="op">(</span><span class="op">(</span><span class="nam">num_residue_blocks</span> <span class="op">+</span> <span class="num">31</span><span class="op">)</span> <span class="op">//</span> <span class="num">32</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t62" href="#t62">62</a></span><span class="t">            <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t63" href="#t63">63</a></span><span class="t">        <span class="nam">super</span><span class="op">(</span><span class="op">)</span><span class="op">.</span><span class="nam">__init__</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
@@ -147,8 +147,8 @@
     <p class="pln"><span class="n"><a id="t65" href="#t65">65</a></span><span class="t">        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t66" href="#t66">66</a></span><span class="t">        <span class="key">for</span> <span class="nam">index</span> <span class="key">in</span> <span class="nam">range</span><span class="op">(</span><span class="nam">num_residue_blocks</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t67" href="#t67">67</a></span><span class="t">            <span class="key">if</span> <span class="nam">num_residue_blocks</span> <span class="op">></span> <span class="num">32</span> <span class="key">and</span> <span class="nam">index</span> <span class="op">%</span> <span class="num">32</span> <span class="op">==</span> <span class="num">0</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t68" href="#t68">68</a></span><span class="t">                <span class="nam">force</span> <span class="op">=</span> <span class="nam">openmm</span><span class="op">.</span><span class="nam">CustomCVForce</span><span class="op">(</span><span class="nam">expression</span><span class="op">(</span><span class="nam">index</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t69" href="#t69">69</a></span><span class="t">                <span class="nam">self</span><span class="op">.</span><span class="nam">addCollectiveVariable</span><span class="op">(</span><span class="str">f"chunk{index//32}"</span><span class="op">,</span> <span class="nam">force</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t68" href="#t68">68</a></span><span class="t">                <span class="nam">force</span> <span class="op">=</span> <span class="nam">openmm</span><span class="op">.</span><span class="nam">CustomCVForce</span><span class="op">(</span><span class="nam">expression</span><span class="op">(</span><span class="nam">index</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t69" href="#t69">69</a></span><span class="t">                <span class="nam">self</span><span class="op">.</span><span class="nam">addCollectiveVariable</span><span class="op">(</span><span class="str">f"chunk{index//32}"</span><span class="op">,</span> <span class="nam">force</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t70" href="#t70">70</a></span><span class="t">            <span class="nam">force</span><span class="op">.</span><span class="nam">addCollectiveVariable</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t71" href="#t71">71</a></span><span class="t">                <span class="str">f"rmsd{index}"</span><span class="op">,</span> <span class="nam">RMSD</span><span class="op">(</span><span class="nam">ideal_positions</span><span class="op">,</span> <span class="nam">block_atoms</span><span class="op">[</span><span class="nam">index</span><span class="op">]</span><span class="op">,</span> <span class="nam">numAtoms</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t72" href="#t72">72</a></span><span class="t">            <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -194,7 +194,7 @@
             <a id="nextFileLink" class="nav" href="d_a8e999f563ad3ffa___init___py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.0">coverage.py v7.4.0</a>,
-            created at 2024-01-20 17:33 +0000
+            created at 2024-01-20 17:41 +0000
         </p>
     </div>
 </footer>
