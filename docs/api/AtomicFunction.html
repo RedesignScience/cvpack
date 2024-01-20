@@ -41,14 +41,15 @@
 <h1>AtomicFunction<a class="headerlink" href="#atomicfunction" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="cvpack.AtomicFunction">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">AtomicFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">atomsPerGroup</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/atomic_function.html#AtomicFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.AtomicFunction" title="Link to this definition">¶</a></dt>
-<dd><p>A generic function of the coordinates of <cite>m</cite> groups of <cite>n</cite> atoms:</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">AtomicFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/atomic_function.html#AtomicFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.AtomicFunction" title="Link to this definition">¶</a></dt>
+<dd><p>A generic function of the coordinates of atoms split into <cite>m</cite> groups of <cite>n</cite>
+atoms each:</p>
 <div class="math notranslate nohighlight">
 \[f({\bf r}) = \sum_{i=1}^m F\left(
     {\bf r}_{i,1}, {\bf r}_{i,2}, \dots, {\bf r}_{i,n}
 \right)\]</div>
 <p>where <span class="math notranslate nohighlight">\(F\)</span> is a user-defined function and <span class="math notranslate nohighlight">\({\bf r}_{i,j}\)</span> is the
-position of the <span class="math notranslate nohighlight">\(j\)</span>-th atom of the <span class="math notranslate nohighlight">\(i\)</span>-th group.</p>
+coordinate of the <span class="math notranslate nohighlight">\(j\)</span>-th atom of the <span class="math notranslate nohighlight">\(i\)</span>-th group.</p>
 <p>The function <span class="math notranslate nohighlight">\(F\)</span> is defined as a string and can be any expression supported by
 <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.CustomCompoundBondForce.html">openmm.CustomCompoundBondForce</a>. If it contains named parameters, they must be
 passed as keyword arguments to the <a class="reference internal" href="#cvpack.AtomicFunction" title="cvpack.AtomicFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">AtomicFunction</span></code></a> constructor. The
@@ -57,14 +58,12 @@ value will be assigned to the corresponding group of atoms.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>atomsPerGroup</strong> (<em>int</em>) – The number of atoms in each group</p></li>
 <li><p><strong>function</strong> (<em>str</em>) – The function to be evaluated. It must be a valid
 <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.CustomCompoundBondForce.html">openmm.CustomCompoundBondForce</a> expression</p></li>
-<li><p><strong>atoms</strong> – The indices of the atoms in each group, passed as a 2D array-like object of
+<li><p><strong>groups</strong> (<em>ArrayLike</em>) – The indices of the atoms in each group, passed as a 2D array-like object of
 shape <cite>(m, n)</cite>, where <cite>m</cite> is the number of groups and <cite>n</cite> is the number of
-atoms per group, or as a 1D array-like object of length <cite>m*n</cite>, where the
-first <cite>n</cite> elements are the indices of the atoms in the first group, the next
-<cite>n</cite> elements are the indices of the atoms in the second group, and so on.</p></li>
+atoms per group. If a 1D object is passed, it is assumed that <cite>m</cite> is 1 and
+<cite>n</cite> is the length of the object.</p></li>
 <li><p><strong>unit</strong> (<em>mmunit.Unit</em>) – The unit of measurement of the collective variable. It must be compatible
 with the MD unit system (mass in <cite>daltons</cite>, distance in <cite>nanometers</cite>, time
 in <cite>picoseconds</cite>, temperature in <cite>kelvin</cite>, energy in <cite>kilojoules_per_mol</cite>,
@@ -80,7 +79,10 @@ groups. In the latter case, each entry of the array is used for the
 corresponding group of atoms.</p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ValueError</strong> – If the collective variable is not compatible with the MD unit system</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the groups are not specified as a 1D or 2D array-like object</p></li>
+<li><p><strong>ValueError</strong> – If the unit of the collective variable is not compatible with the MD unit system</p></li>
+</ul>
 </dd>
 </dl>
 <p class="rubric">Example</p>
@@ -93,10 +95,9 @@ corresponding group of atoms.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">angle1</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">Angle</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">angle2</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">Angle</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">colvar</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">AtomicFunction</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="mi">3</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="s2">&quot;(k/2)*(angle(p1, p2, p3) - theta0)^2&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">]],</span>
 <span class="gp">... </span>    <span class="n">unit</span><span class="o">.</span><span class="n">kilojoules_per_mole</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">]],</span>
 <span class="gp">... </span>    <span class="n">k</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">kilojoules_per_mole</span><span class="o">/</span><span class="n">unit</span><span class="o">.</span><span class="n">radian</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">theta0</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">radian</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>

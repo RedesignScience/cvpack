@@ -43,128 +43,182 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">t</span>
 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">openmm</span>
+<span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">ArrayLike</span>
 
 <span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
+<span class="kn">from</span> <span class="nn">.atomic_function</span> <span class="kn">import</span> <span class="n">_add_parameters</span>
 <span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">AbstractCollectiveVariable</span>
-<span class="kn">from</span> <span class="nn">.unit</span> <span class="kn">import</span> <span class="n">SerializableUnit</span>
 
 
 <div class="viewcode-block" id="CentroidFunction">
 <a class="viewcode-back" href="../../api/CentroidFunction.html#cvpack.CentroidFunction">[docs]</a>
 <span class="k">class</span> <span class="nc">CentroidFunction</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomCentroidBondForce</span><span class="p">,</span> <span class="n">AbstractCollectiveVariable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A generic function of the centroids of `n` groups of atoms:</span>
+<span class="sd">    A generic function of the centroids of :math:`m \\times n` atoms groups split</span>
+<span class="sd">    into `m` collections of `n` groups each:</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        f({\\bf r}) = F({\\bf R}_1, {\\bf R}_2, \\dots, {\\bf R}_n)</span>
+<span class="sd">        f({\\bf r}) = \\sum_{i=1}^m F\\Big(</span>
+<span class="sd">            {\\bf g}^i_1({\\bf r}),</span>
+<span class="sd">            {\\bf g}^i_2({\\bf r}),</span>
+<span class="sd">            \\dots,</span>
+<span class="sd">            {\\bf g}^i_n({\\bf r})</span>
+<span class="sd">        \\Big)</span>
 
-<span class="sd">    where :math:`F` is a user-defined function and :math:`{\\bf R}_i` is the centroid of</span>
-<span class="sd">    the :math:`i`-th group of atoms. The function :math:`F` is defined as a string and</span>
-<span class="sd">    can be any valid :OpenMM:`CustomCentroidBondForce` expression.</span>
+<span class="sd">    where :math:`F` is a user-defined function and :math:`{\\bf g}^i_1({\\bf r})` is the</span>
+<span class="sd">    centroid of the :math:`j`-th group of atoms of the :math:`i`-th collection of</span>
+<span class="sd">    groups.</span>
+
+<span class="sd">    The function :math:`F` is defined as a string and can be any expression supported</span>
+<span class="sd">    by :OpenMM:`CustomCentroidBondForce`. If it contains named parameters, they must</span>
+<span class="sd">    be passed as keyword arguments to the :class:`CentroidFunction` constructor. The</span>
+<span class="sd">    parameters can be scalars or arrays of length :math:`m`. In the latter case, each</span>
+<span class="sd">    value will be assigned to the corresponding collection of atom groups.</span>
 
 <span class="sd">    The centroid of a group of atoms is defined as:</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        {\\bf R}_i({\\bf r}) = \\frac{1}{n_i} \\sum_{j=1}^{n_i} {\\bf r}_{j, i}</span>
+<span class="sd">        {\\bf g}_j({\\bf r}) = \\frac{1}{N_j} \\sum_{k=1}^{N_j} {\\bf r}_{k,j}</span>
 
-<span class="sd">    where :math:`n_i` is the number of atoms in group :math:`i` and</span>
-<span class="sd">    :math:`{\\bf r}_{j, i}` is the position of the :math:`j`-th atom in group :math:`i`.</span>
-<span class="sd">    Optionally, the centroid can be weighted by the mass of each atom in the group. In</span>
-<span class="sd">    this case, it is defined as:</span>
+<span class="sd">    where :math:`N_j` is the number of atoms in group :math:`j` and</span>
+<span class="sd">    :math:`{\\bf r}_{k,j}` is the coordinate of the :math:`k`-th atom of group</span>
+<span class="sd">    :math:`j`. Optionally, the centroid can be weighted by the mass of each atom</span>
+<span class="sd">    in the group. In this case, it is redefined as:</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        {\\bf R}_i({\\bf r}) = \\frac{1}{M_i} \\sum_{j=1}^{n_i} m_{j, i} {\\bf r}_{j, i}</span>
+<span class="sd">        {\\bf g}_j({\\bf r}) = \\frac{1}{M_j} \\sum_{k=1}^{N_j} m_{k,j} {\\bf r}_{k,j}</span>
 
-<span class="sd">    where :math:`M_i` is the total mass of group :math:`i` and :math:`m_{j, i}` is the</span>
-<span class="sd">    mass of the :math:`j`-th atom in group :math:`i`.</span>
+<span class="sd">    where :math:`M_j` is the total mass of atom group :math:`j` and :math:`m_{k,j}` is</span>
+<span class="sd">    the mass of the :math:`k`-th atom in group :math:`j`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">        function</span>
-<span class="sd">            The function to be evaluated. It must be a valid</span>
-<span class="sd">            :OpenMM:`CustomCentroidBondForce` expression</span>
-<span class="sd">        groups</span>
-<span class="sd">            The groups of atoms to be used in the function. Each group must be a list of</span>
-<span class="sd">            atom indices</span>
-<span class="sd">        unit</span>
-<span class="sd">            The unit of measurement of the collective variable. It must be compatible</span>
-<span class="sd">            with the MD unit system (mass in `daltons`, distance in `nanometers`, time</span>
-<span class="sd">            in `picoseconds`, temperature in `kelvin`, energy in `kilojoules_per_mol`,</span>
-<span class="sd">            angle in `radians`). If the collective variables does not have a unit, use</span>
-<span class="sd">            `dimensionless`</span>
-<span class="sd">        pbc</span>
-<span class="sd">            Whether to use periodic boundary conditions</span>
-<span class="sd">        weighByMass</span>
-<span class="sd">            Whether to define the centroid as the center of mass of the group instead of</span>
-<span class="sd">            the geometric center</span>
+<span class="sd">    function</span>
+<span class="sd">        The function to be evaluated. It must be a valid</span>
+<span class="sd">        :OpenMM:`CustomCentroidBondForce` expression</span>
+<span class="sd">    groups</span>
+<span class="sd">        The groups of atoms to be used in the function. Each group must be specified</span>
+<span class="sd">        as a list of atom indices with arbitrary length</span>
+<span class="sd">    collections</span>
+<span class="sd">        The indices of the groups in each collection, passed as a 2D array-like object</span>
+<span class="sd">        of shape `(m, n)`, where `m` is the number of collections and `n` is the number</span>
+<span class="sd">        groups per collection. If a 1D object is passed, it is assumed that `m` is 1 and</span>
+<span class="sd">        `n` is the length of the object.</span>
+<span class="sd">    unit</span>
+<span class="sd">        The unit of measurement of the collective variable. It must be compatible</span>
+<span class="sd">        with the MD unit system (mass in `daltons`, distance in `nanometers`, time</span>
+<span class="sd">        in `picoseconds`, temperature in `kelvin`, energy in `kilojoules_per_mol`,</span>
+<span class="sd">        angle in `radians`). If the collective variables does not have a unit, use</span>
+<span class="sd">        `dimensionless`</span>
+<span class="sd">    pbc</span>
+<span class="sd">        Whether to use periodic boundary conditions</span>
+<span class="sd">    weighByMass</span>
+<span class="sd">        Whether to define the centroid as the center of mass of the group instead of</span>
+<span class="sd">        the geometric center</span>
 
 <span class="sd">    Keyword Args</span>
 <span class="sd">    ------------</span>
-<span class="sd">        **parameters</span>
-<span class="sd">            The named parameters of the function. If the specified value has units, it</span>
-<span class="sd">            will be converted to the MD unit system.</span>
+<span class="sd">    **parameters</span>
+<span class="sd">        The named parameters of the function. Each parameter can be a scalar</span>
+<span class="sd">        quantity or a 1D array-like object of length `m`, where `m` is the number of</span>
+<span class="sd">        group collections. In the latter case, each entry of the array is used for</span>
+<span class="sd">        the corresponding collection of groups.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
-<span class="sd">        ValueError</span>
-<span class="sd">            If the collective variable is not compatible with the MD unit system</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the collections are not specified as a 1D or 2D array-like object</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If group indices are out of bounds</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the unit of the collective variable is not compatible with the MD unit system</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
 <span class="sd">        &gt;&gt;&gt; import cvpack</span>
+<span class="sd">        &gt;&gt;&gt; import itertools as it</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
 <span class="sd">        &gt;&gt;&gt; import openmm</span>
 <span class="sd">        &gt;&gt;&gt; from openmm import unit</span>
 <span class="sd">        &gt;&gt;&gt; from openmmtools import testsystems</span>
-<span class="sd">        &gt;&gt;&gt; model = testsystems.AlanineDipeptideVacuum()</span>
-<span class="sd">        &gt;&gt;&gt; num_atoms = model.system.getNumParticles()</span>
-<span class="sd">        &gt;&gt;&gt; atoms = list(range(num_atoms))</span>
-<span class="sd">        &gt;&gt;&gt; groups = [[i] for i in atoms]  # Each atom is a group</span>
-<span class="sd">        &gt;&gt;&gt; groups.append(atoms)  # The whole molecule is a group</span>
-<span class="sd">        &gt;&gt;&gt; sum_dist_sq = &quot;+&quot;.join(</span>
-<span class="sd">        ...     f&#39;distance(g{i+1}, g{num_atoms+1})^2&#39; for i in atoms</span>
+<span class="sd">        &gt;&gt;&gt; model = testsystems.LysozymeImplicit()</span>
+<span class="sd">        &gt;&gt;&gt; residues = list(model.topology.residues())</span>
+<span class="sd">        &gt;&gt;&gt; atoms = [[a.index for a in r.atoms()] for r in residues]</span>
+
+<span class="sd">        Compute the residue coordination between two helices:</span>
+
+<span class="sd">        &gt;&gt;&gt; res_coord = cvpack.ResidueCoordination(</span>
+<span class="sd">        ...     residues[115:124], residues[126:135], stepFunction=&quot;step(1-x)&quot;</span>
 <span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; function = f&quot;sqrt(({sum_dist_sq})/n)&quot;  # The radius of gyration</span>
-<span class="sd">        &gt;&gt;&gt; colvar = cvpack.CentroidFunction(</span>
-<span class="sd">        ...     function, groups, unit.nanometers, n=num_atoms,</span>
-<span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; colvar.setUnusedForceGroup(0, model.system)</span>
+<span class="sd">        &gt;&gt;&gt; res_coord.setUnusedForceGroup(0, model.system)</span>
 <span class="sd">        1</span>
-<span class="sd">        &gt;&gt;&gt; model.system.addForce(colvar)</span>
-<span class="sd">        5</span>
+<span class="sd">        &gt;&gt;&gt; model.system.addForce(res_coord)</span>
+<span class="sd">        6</span>
 <span class="sd">        &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
 <span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
 <span class="sd">        &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">        &gt;&gt;&gt; print(colvar.getValue(context, digits=6))</span>
-<span class="sd">        0.2951431 nm</span>
+<span class="sd">        &gt;&gt;&gt; print(res_coord.getValue(context))</span>
+<span class="sd">        33.0 dimensionless</span>
+
+<span class="sd">        Recompute the residue coordination using the centroid function:</span>
+
+<span class="sd">        &gt;&gt;&gt; groups = [atoms[115:124], atoms[126:135]]</span>
+<span class="sd">        &gt;&gt;&gt; collections = list(it.product(range(9), range(9, 18)))</span>
+<span class="sd">        &gt;&gt;&gt; colvar = cvpack.CentroidFunction(</span>
+<span class="sd">        ...    &quot;step(1 - distance(g1, g2))&quot;,</span>
+<span class="sd">        ...    unit.dimensionless,</span>
+<span class="sd">        ...    atoms[115:124] + atoms[126:135],</span>
+<span class="sd">        ...    list(it.product(range(9), range(9, 18))),</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; colvar.setUnusedForceGroup(0, model.system)</span>
+<span class="sd">        2</span>
+<span class="sd">        &gt;&gt;&gt; model.system.addForce(colvar)</span>
+<span class="sd">        7</span>
+<span class="sd">        &gt;&gt;&gt; context.reinitialize(preserveState=True)</span>
+<span class="sd">        &gt;&gt;&gt; print(colvar.getValue(context))</span>
+<span class="sd">        33.0 dimensionless</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">function</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">groups</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
         <span class="n">unit</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Unit</span><span class="p">,</span>
-        <span class="n">pbc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">weighByMass</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">groups</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
+        <span class="n">collections</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">ArrayLike</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">pbc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">weighByMass</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="o">**</span><span class="n">parameters</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">collections</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">))</span> <span class="k">if</span> <span class="n">collections</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">collections</span>
+        <span class="p">)</span>
+        <span class="n">num_collections</span><span class="p">,</span> <span class="n">groups_per_collection</span><span class="p">,</span> <span class="o">*</span><span class="n">others</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">if</span> <span class="n">others</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Array `collections` cannot have more than 2 dimensions&quot;</span><span class="p">)</span>
         <span class="n">num_groups</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">num_groups</span><span class="p">,</span> <span class="n">function</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">collections</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">collections</span> <span class="o">&gt;=</span> <span class="n">num_groups</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Group index out of bounds&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">groups_per_collection</span><span class="p">,</span> <span class="n">function</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">addGroup</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">weighByMass</span> <span class="k">else</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">group</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">addBond</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">num_groups</span><span class="p">)),</span> <span class="p">[])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addGroup</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="o">*</span><span class="p">([]</span> <span class="k">if</span> <span class="n">weighByMass</span> <span class="k">else</span> <span class="p">[[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">group</span><span class="p">)]))</span>
+        <span class="n">perbond_parameters</span> <span class="o">=</span> <span class="n">_add_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_collections</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">collection</span><span class="p">,</span> <span class="o">*</span><span class="n">values</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">collections</span><span class="p">,</span> <span class="o">*</span><span class="n">perbond_parameters</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addBond</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setUsesPeriodicBoundaryConditions</span><span class="p">(</span><span class="n">pbc</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_checkUnitCompatibility</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">SerializableUnit</span><span class="p">(</span><span class="n">unit</span><span class="p">),</span> <span class="n">pbc</span><span class="p">)</span></div>
+        <span class="n">unit</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">SerializableUnit</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span>
+            <span class="n">unit</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">collections</span><span class="p">,</span> <span class="n">pbc</span><span class="p">,</span> <span class="n">weighByMass</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span>
+        <span class="p">)</span></div>
 
 </pre></div>
 

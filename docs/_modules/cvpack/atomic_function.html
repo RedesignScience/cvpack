@@ -45,7 +45,7 @@
 
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">t</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">openmm</span>
@@ -63,11 +63,33 @@
 <span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">AbstractCollectiveVariable</span>
 
 
+<span class="k">def</span> <span class="nf">_add_parameters</span><span class="p">(</span>
+    <span class="n">force</span><span class="p">:</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Force</span><span class="p">,</span>
+    <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">parameters</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">]],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">]]]:</span>
+    <span class="n">perbond_parameters</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">value_in_unit_system</span><span class="p">(</span><span class="n">mmunit</span><span class="o">.</span><span class="n">md_unit_system</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">!=</span> <span class="n">size</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The length of parameter </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> is </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">. Should be </span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
+            <span class="n">force</span><span class="o">.</span><span class="n">addPerBondParameter</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">perbond_parameters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">force</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">perbond_parameters</span>
+
+
 <div class="viewcode-block" id="AtomicFunction">
 <a class="viewcode-back" href="../../api/AtomicFunction.html#cvpack.AtomicFunction">[docs]</a>
 <span class="k">class</span> <span class="nc">AtomicFunction</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomCompoundBondForce</span><span class="p">,</span> <span class="n">AbstractCollectiveVariable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A generic function of the coordinates of `m` groups of `n` atoms:</span>
+<span class="sd">    A generic function of the coordinates of atoms split into `m` groups of `n`</span>
+<span class="sd">    atoms each:</span>
 
 <span class="sd">    .. math::</span>
 
@@ -76,7 +98,7 @@
 <span class="sd">        \\right)</span>
 
 <span class="sd">    where :math:`F` is a user-defined function and :math:`{\\bf r}_{i,j}` is the</span>
-<span class="sd">    position of the :math:`j`-th atom of the :math:`i`-th group.</span>
+<span class="sd">    coordinate of the :math:`j`-th atom of the :math:`i`-th group.</span>
 
 <span class="sd">    The function :math:`F` is defined as a string and can be any expression supported by</span>
 <span class="sd">    :OpenMM:`CustomCompoundBondForce`. If it contains named parameters, they must be</span>
@@ -86,38 +108,37 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">        atomsPerGroup</span>
-<span class="sd">            The number of atoms in each group</span>
-<span class="sd">        function</span>
-<span class="sd">            The function to be evaluated. It must be a valid</span>
-<span class="sd">            :OpenMM:`CustomCompoundBondForce` expression</span>
-<span class="sd">        atoms</span>
-<span class="sd">            The indices of the atoms in each group, passed as a 2D array-like object of</span>
-<span class="sd">            shape `(m, n)`, where `m` is the number of groups and `n` is the number of</span>
-<span class="sd">            atoms per group, or as a 1D array-like object of length `m*n`, where the</span>
-<span class="sd">            first `n` elements are the indices of the atoms in the first group, the next</span>
-<span class="sd">            `n` elements are the indices of the atoms in the second group, and so on.</span>
-<span class="sd">        unit</span>
-<span class="sd">            The unit of measurement of the collective variable. It must be compatible</span>
-<span class="sd">            with the MD unit system (mass in `daltons`, distance in `nanometers`, time</span>
-<span class="sd">            in `picoseconds`, temperature in `kelvin`, energy in `kilojoules_per_mol`,</span>
-<span class="sd">            angle in `radians`). If the collective variables does not have a unit, use</span>
-<span class="sd">            `unit.dimensionless`</span>
-<span class="sd">        pbc</span>
-<span class="sd">            Whether to use periodic boundary conditions</span>
+<span class="sd">    function</span>
+<span class="sd">        The function to be evaluated. It must be a valid</span>
+<span class="sd">        :OpenMM:`CustomCompoundBondForce` expression</span>
+<span class="sd">    groups</span>
+<span class="sd">        The indices of the atoms in each group, passed as a 2D array-like object of</span>
+<span class="sd">        shape `(m, n)`, where `m` is the number of groups and `n` is the number of</span>
+<span class="sd">        atoms per group. If a 1D object is passed, it is assumed that `m` is 1 and</span>
+<span class="sd">        `n` is the length of the object.</span>
+<span class="sd">    unit</span>
+<span class="sd">        The unit of measurement of the collective variable. It must be compatible</span>
+<span class="sd">        with the MD unit system (mass in `daltons`, distance in `nanometers`, time</span>
+<span class="sd">        in `picoseconds`, temperature in `kelvin`, energy in `kilojoules_per_mol`,</span>
+<span class="sd">        angle in `radians`). If the collective variables does not have a unit, use</span>
+<span class="sd">        `unit.dimensionless`</span>
+<span class="sd">    pbc</span>
+<span class="sd">        Whether to use periodic boundary conditions</span>
 
 <span class="sd">    Keyword Args</span>
 <span class="sd">    ------------</span>
-<span class="sd">        **parameters</span>
-<span class="sd">            The named parameters of the function. Each parameter can be a scalar</span>
-<span class="sd">            quantity or a 1D array-like object of length `m`, where `m` is the number of</span>
-<span class="sd">            groups. In the latter case, each entry of the array is used for the</span>
-<span class="sd">            corresponding group of atoms.</span>
+<span class="sd">    **parameters</span>
+<span class="sd">        The named parameters of the function. Each parameter can be a scalar</span>
+<span class="sd">        quantity or a 1D array-like object of length `m`, where `m` is the number of</span>
+<span class="sd">        groups. In the latter case, each entry of the array is used for the</span>
+<span class="sd">        corresponding group of atoms.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
-<span class="sd">        ValueError</span>
-<span class="sd">            If the collective variable is not compatible with the MD unit system</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the groups are not specified as a 1D or 2D array-like object</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the unit of the collective variable is not compatible with the MD unit system</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
@@ -130,10 +151,9 @@
 <span class="sd">        &gt;&gt;&gt; angle1 = cvpack.Angle(0, 5, 10)</span>
 <span class="sd">        &gt;&gt;&gt; angle2 = cvpack.Angle(10, 15, 20)</span>
 <span class="sd">        &gt;&gt;&gt; colvar = cvpack.AtomicFunction(</span>
-<span class="sd">        ...     3,</span>
 <span class="sd">        ...     &quot;(k/2)*(angle(p1, p2, p3) - theta0)^2&quot;,</span>
-<span class="sd">        ...     [[0, 5, 10], [10, 15, 20]],</span>
 <span class="sd">        ...     unit.kilojoules_per_mole,</span>
+<span class="sd">        ...     [[0, 5, 10], [10, 15, 20]],</span>
 <span class="sd">        ...     k = 1000 * unit.kilojoules_per_mole/unit.radian**2,</span>
 <span class="sd">        ...     theta0 = [np.pi/2, np.pi/3] * unit.radian,</span>
 <span class="sd">        ... )</span>
@@ -151,50 +171,31 @@
 <span class="sd">        429.479 kJ/mol</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="nd">@mmunit</span><span class="o">.</span><span class="n">convert_quantities</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">atomsPerGroup</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">function</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">indices</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
         <span class="n">unit</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Unit</span><span class="p">,</span>
-        <span class="n">pbc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">parameters</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">]],</span>
+        <span class="n">groups</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+        <span class="n">pbc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">parameters</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">]],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">groups</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">atomsPerGroup</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">atomsPerGroup</span><span class="p">,</span> <span class="n">function</span><span class="p">)</span>
-        <span class="n">perbond_parameters</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">value_in_unit_system</span><span class="p">(</span><span class="n">mmunit</span><span class="o">.</span><span class="n">md_unit_system</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">!=</span> <span class="n">groups</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;The length of the parameter </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> &quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot;must be equal to </span><span class="si">{</span><span class="n">groups</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span>
-                    <span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">addPerBondParameter</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-                <span class="n">perbond_parameters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
+        <span class="n">num_groups</span><span class="p">,</span> <span class="n">atoms_per_group</span><span class="p">,</span> <span class="o">*</span><span class="n">others</span> <span class="o">=</span> <span class="n">groups</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">if</span> <span class="n">others</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Array `groups` cannot have more than 2 dimensions&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">atoms_per_group</span><span class="p">,</span> <span class="n">function</span><span class="p">)</span>
+        <span class="n">perbond_parameters</span> <span class="o">=</span> <span class="n">_add_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_groups</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">group</span><span class="p">,</span> <span class="o">*</span><span class="n">values</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">groups</span><span class="p">,</span> <span class="o">*</span><span class="n">perbond_parameters</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">addBond</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setUsesPeriodicBoundaryConditions</span><span class="p">(</span><span class="n">pbc</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_checkUnitCompatibility</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span>
-            <span class="n">unit</span><span class="p">,</span>
-            <span class="n">atomsPerGroup</span><span class="p">,</span>
-            <span class="n">function</span><span class="p">,</span>
-            <span class="n">groups</span><span class="p">,</span>
-            <span class="n">mmunit</span><span class="o">.</span><span class="n">SerializableUnit</span><span class="p">(</span><span class="n">unit</span><span class="p">),</span>
-            <span class="n">pbc</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">parameters</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="n">unit</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">SerializableUnit</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">pbc</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_fromCustomForce</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
-        <span class="n">force</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
+        <span class="n">force</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
             <span class="n">CustomAngleForce</span><span class="p">,</span>
             <span class="n">CustomBondForce</span><span class="p">,</span>
             <span class="n">CustomCompoundBondForce</span><span class="p">,</span>
@@ -244,7 +245,8 @@
             <span class="n">atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">per_item_parameter_names</span><span class="p">,</span> <span class="n">per_item_parameters</span><span class="p">):</span>
                 <span class="n">parameters</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">number</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">pbc</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">)</span>
+        <span class="n">atoms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">number</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">pbc</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_fromHarmonicBondForce</span><span class="p">(</span>
@@ -263,7 +265,7 @@
             <span class="n">atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
             <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;r0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
             <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;(k/2)*(distance(p1, p2)-r0)^2&quot;</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">pbc</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="s2">&quot;(k/2)*(distance(p1, p2)-r0)^2&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">pbc</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_fromHarmonicAngleForce</span><span class="p">(</span>
@@ -282,9 +284,7 @@
             <span class="n">atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
             <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;theta0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
             <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;(k/2)*(angle(p1, p2, p3)-theta0)^2&quot;</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">pbc</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="s2">&quot;(k/2)*(angle(p1, p2, p3)-theta0)^2&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">pbc</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_fromPeriodicTorsionForce</span><span class="p">(</span>
@@ -305,10 +305,9 @@
             <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;phase&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span>
             <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="mi">4</span><span class="p">,</span>
             <span class="s2">&quot;k*(1 + cos(periodicity*dihedral(p1, p2, p3, p4) - phase))&quot;</span><span class="p">,</span>
-            <span class="n">atoms</span><span class="p">,</span>
             <span class="n">unit</span><span class="p">,</span>
+            <span class="n">atoms</span><span class="p">,</span>
             <span class="n">pbc</span><span class="p">,</span>
             <span class="o">**</span><span class="n">parameters</span><span class="p">,</span>
         <span class="p">)</span>
