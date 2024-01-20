@@ -7,6 +7,7 @@
 
 """
 
+from copy import deepcopy
 import typing as t
 
 import openmm
@@ -91,3 +92,32 @@ class NonbondedForceSurrogate:  # pylint: disable=too-many-instance-attributes
     def getSwitchingDistance(self) -> float:
         """Get the switching distance."""
         return mmunit.value_in_md_units(self._switching_distance)
+
+
+def evaluate_in_context(force: openmm.Force, context: openmm.Context) -> float:
+    """Evaluate the potential energy of a force in a given context.
+
+    Parameters
+    ----------
+        force : openmm.Force
+            The force to be evaluated.
+        context : openmm.Context
+            The context in which the force will be evaluated.
+
+    Returns
+    -------
+        float
+            The potential energy of the force in the given context.
+    """
+    system = openmm.System()
+    for _ in range(context.getSystem().getNumParticles()):
+        system.addParticle(1.0)
+    system.addForce(deepcopy(force))
+    state = context.getState(getPositions=True)
+    context = openmm.Context(system, openmm.VerletIntegrator(1.0))
+    context.setPositions(state.getPositions())
+    context.setPeriodicBoxVectors(*state.getPeriodicBoxVectors())
+    # pylint: disable=unexpected-keyword-arg # to avoid false positive
+    state = context.getState(getEnergy=True)
+    # pylint: enable=unexpected-keyword-arg
+    return mmunit.value_in_md_units(state.getPotentialEnergy())

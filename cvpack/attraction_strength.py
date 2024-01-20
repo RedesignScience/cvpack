@@ -14,7 +14,7 @@ import openmm
 from cvpack import unit as mmunit
 
 from .cvpack import AbstractCollectiveVariable
-from .utils import NonbondedForceSurrogate
+from .utils import NonbondedForceSurrogate, evaluate_in_context
 
 ONE_4PI_EPS0 = 138.93545764438198
 
@@ -185,22 +185,8 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
         self.setUseLongRangeCorrection(False)
         self.addInteractionGroup(group1, group2)
         if isinstance(reference, openmm.Context):
-            reference = self._getValue(reference)
+            reference = evaluate_in_context(self, reference)
         self.setEnergyFunction(expression.replace("ref = 1", f"ref = {reference}"))
         self._registerCV(
             mmunit.dimensionless, group1, group2, nonbondedForce, reference
         )
-
-    def _getValue(self, context: openmm.Context) -> float:
-        system = openmm.System()
-        for _ in range(context.getSystem().getNumParticles()):
-            system.addParticle(1.0)
-        system.addForce(openmm.CustomNonbondedForce(self))
-        state = context.getState(getPositions=True)
-        context = openmm.Context(system, openmm.VerletIntegrator(1.0))
-        context.setPositions(state.getPositions())
-        context.setPeriodicBoxVectors(*state.getPeriodicBoxVectors())
-        # pylint: disable=unexpected-keyword-arg # to avoid false positive
-        state = context.getState(getEnergy=True)
-        # pylint: enable=unexpected-keyword-arg
-        return mmunit.value_in_md_units(state.getPotentialEnergy())
