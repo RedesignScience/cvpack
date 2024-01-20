@@ -114,8 +114,8 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         >>> angle2 = cvpack.Angle(10, 15, 20)
         >>> colvar = cvpack.AtomicFunction(
         ...     "(k/2)*(angle(p1, p2, p3) - theta0)^2",
-        ...     [[0, 5, 10], [10, 15, 20]],
         ...     unit.kilojoules_per_mole,
+        ...     [[0, 5, 10], [10, 15, 20]],
         ...     k = 1000 * unit.kilojoules_per_mole/unit.radian**2,
         ...     theta0 = [np.pi/2, np.pi/3] * unit.radian,
         ... )
@@ -136,8 +136,8 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
     def __init__(  # pylint: disable=too-many-arguments
         self,
         function: str,
-        groups: ArrayLike,
         unit: mmunit.Unit,
+        groups: ArrayLike,
         pbc: bool = False,
         **parameters: t.Union[mmunit.ScalarQuantity, t.Sequence[mmunit.ScalarQuantity]],
     ) -> None:
@@ -152,7 +152,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         self.setUsesPeriodicBoundaryConditions(pbc)
         self._checkUnitCompatibility(unit)
         unit = mmunit.SerializableUnit(unit)
-        self._registerCV(unit, function, groups, unit, pbc, **parameters)
+        self._registerCV(unit, function, unit, groups, pbc, **parameters)
 
     @classmethod
     def _fromCustomForce(
@@ -208,7 +208,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
             for name, value in zip(per_item_parameter_names, per_item_parameters):
                 parameters[name].append(value)
         atoms = np.asarray(atoms).reshape(-1, number)
-        return cls(function, atoms, unit, pbc, **parameters)
+        return cls(function, unit, atoms, pbc, **parameters)
 
     @classmethod
     def _fromHarmonicBondForce(
@@ -227,7 +227,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
             atoms.append(indices)
             parameters["r0"].append(length)
             parameters["k"].append(k)
-        return cls("(k/2)*(distance(p1, p2)-r0)^2", atoms, unit, pbc, **parameters)
+        return cls("(k/2)*(distance(p1, p2)-r0)^2", unit, atoms, pbc, **parameters)
 
     @classmethod
     def _fromHarmonicAngleForce(
@@ -246,7 +246,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
             atoms.append(indices)
             parameters["theta0"].append(angle)
             parameters["k"].append(k)
-        return cls("(k/2)*(angle(p1, p2, p3)-theta0)^2", atoms, unit, pbc, **parameters)
+        return cls("(k/2)*(angle(p1, p2, p3)-theta0)^2", unit, atoms, pbc, **parameters)
 
     @classmethod
     def _fromPeriodicTorsionForce(
@@ -268,8 +268,8 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
             parameters["k"].append(k)
         return cls(
             "k*(1 + cos(periodicity*dihedral(p1, p2, p3, p4) - phase))",
-            atoms,
             unit,
+            atoms,
             pbc,
             **parameters,
         )
