@@ -67,6 +67,8 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, AbstractCollectiveVariab
         >>> torsion_similarity = cvpack.TorsionSimilarity(
         ...     phi_atoms[1:], phi_atoms[:-1]
         ... )
+        >>> torsion_similarity.setUnusedForceGroup(0, model.system)
+        1
         >>> model.system.addForce(torsion_similarity)
         6
         >>> integrator =openmm.VerletIntegrator(0)

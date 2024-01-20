@@ -111,6 +111,8 @@ class HelixRMSDContent(RMSDContent):
         ... )
         >>> helix_content.getNumResidueBlocks()
         16
+        >>> helix_content.setUnusedForceGroup(0, model.system)
+        1
         >>> model.system.addForce(helix_content)
         6
         >>> platform = openmm.Platform.getPlatformByName('Reference')

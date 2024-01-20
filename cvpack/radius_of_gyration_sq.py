@@ -64,6 +64,8 @@ class RadiusOfGyrationSq(_RadiusOfGyrationBase):
         >>> model = testsystems.AlanineDipeptideVacuum()
         >>> num_atoms = model.system.getNumParticles()
         >>> rgsq = cvpack.RadiusOfGyrationSq(list(range(num_atoms)))
+        >>> rgsq.setUnusedForceGroup(0, model.system)
+        1
         >>> model.system.addForce(rgsq)
         5
         >>> platform =openmm.Platform.getPlatformByName('Reference')

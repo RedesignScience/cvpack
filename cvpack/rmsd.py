@@ -73,6 +73,8 @@ class RMSD(openmm.RMSDForce, AbstractCollectiveVariable):
         >>> num_atoms = model.topology.getNumAtoms()
         >>> group = list(range(num_atoms))
         >>> rmsd = cvpack.RMSD(model.positions, group, num_atoms)
+        >>> rmsd.setUnusedForceGroup(0, model.system)
+        1
         >>> model.system.addForce(rmsd)
         6
         >>> platform = openmm.Platform.getPlatformByName('Reference')

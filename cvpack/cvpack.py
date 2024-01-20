@@ -103,10 +103,8 @@ class AbstractCollectiveVariable(openmm.Force):
             return context.getState(
                 getEnergy=getEnergy, getForces=getForces, groups=1 << self_group
             )
-        free_groups = set(range(32)) - other_groups
         old_group = self.getForceGroup()
-        new_group = next(iter(free_groups))
-        self.setForceGroup(new_group)
+        new_group = self.setUnusedForceGroup(0, context.getSystem())
         context.reinitialize(preserveState=True)
         state = context.getState(
             getEnergy=getEnergy, getForces=getForces, groups=1 << new_group
@@ -204,6 +202,43 @@ class AbstractCollectiveVariable(openmm.Force):
         """
         return self._unit
 
+    def setUnusedForceGroup(self, position: int, system: openmm.System) -> int:
+        """
+        Set the force group of this collective variable to the one at a given position
+        in the ascending ordered list of unused force groups in an :OpenMM:`System`.
+
+        .. note::
+
+            Evaluating a collective variable (see :meth:`getValue`) or computing its
+            effective mass (see :meth:`getEffectiveMass`) is more efficient when the
+            collective variable is the only force in its own force group.
+
+        Parameters
+        ----------
+            position
+                The position of the force group in the ascending ordered list of unused
+                force groups in the system
+            system
+                The system to search for unused force groups
+
+        Returns
+        -------
+            The index of the force group that was set
+
+        Raises
+        ------
+            RuntimeError
+                If all force groups are already in use
+        """
+        free_groups = sorted(
+            set(range(32)) - {force.getForceGroup() for force in system.getForces()}
+        )
+        if not free_groups:
+            raise RuntimeError("All force groups are already in use.")
+        new_group = free_groups[position]
+        self.setForceGroup(new_group)
+        return new_group
+
     def getValue(
         self, context: openmm.Context, digits: Optional[int] = None
     ) -> mmunit.Quantity:
@@ -288,6 +323,8 @@ class AbstractCollectiveVariable(openmm.Force):
             ... ]
             >>> radius_of_gyration = cvpack.RadiusOfGyration(peptide)
             >>> radius_of_gyration.setForceGroup(1)
+            >>> radius_of_gyration.setUnusedForceGroup(0, model.system)
+            1
             >>> model.system.addForce(radius_of_gyration)
             6
             >>> platform =openmm.Platform.getPlatformByName('Reference')

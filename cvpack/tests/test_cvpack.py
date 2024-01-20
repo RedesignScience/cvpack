@@ -37,6 +37,7 @@ def test_effective_mass():
     """
     model = testsystems.AlanineDipeptideVacuum()
     rg_cv = cvpack.RadiusOfGyration(range(model.system.getNumParticles()))
+    rg_cv.setUnusedForceGroup(0, model.system)
     model.system.addForce(rg_cv)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -125,6 +126,7 @@ def test_distance():
     model = testsystems.AlanineDipeptideVacuum()
     atom1, atom2 = 0, 5
     distance = cvpack.Distance(atom1, atom2)
+    distance.setUnusedForceGroup(0, model.system)
     model.system.addForce(distance)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -144,6 +146,7 @@ def test_angle():
     model = testsystems.AlanineDipeptideVacuum()
     atoms = [0, 5, 10]
     angle = cvpack.Angle(*atoms)
+    angle.setUnusedForceGroup(0, model.system)
     model.system.addForce(angle)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -165,6 +168,7 @@ def test_torsion():
     model = testsystems.AlanineDipeptideVacuum()
     atoms = [0, 5, 10, 15]
     torsion = cvpack.Torsion(*atoms)
+    torsion.setUnusedForceGroup(0, model.system)
     model.system.addForce(torsion)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -199,7 +203,9 @@ def test_radius_of_gyration():
     rg_cv = cvpack.RadiusOfGyration(range(num_atoms))
     weighted_rgsq = np.sum((positions - center_of_mass) ** 2) / num_atoms
     weighted_rg_cv = cvpack.RadiusOfGyration(range(num_atoms), weighByMass=True)
+    rg_cv.setUnusedForceGroup(0, model.system)
     model.system.addForce(rg_cv)
+    weighted_rg_cv.setUnusedForceGroup(0, model.system)
     model.system.addForce(weighted_rg_cv)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -229,7 +235,9 @@ def test_radius_of_gyration_squared():
     rg_sq = cvpack.RadiusOfGyrationSq(range(num_atoms))
     weighted_rgsq = np.sum((positions - center_of_mass) ** 2) / num_atoms
     weighted_rg_sq = cvpack.RadiusOfGyrationSq(range(num_atoms), weighByMass=True)
+    rg_sq.setUnusedForceGroup(0, model.system)
     model.system.addForce(rg_sq)
+    weighted_rg_sq.setUnusedForceGroup(0, model.system)
     model.system.addForce(weighted_rg_sq)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -269,6 +277,7 @@ def test_number_of_contacts():
         pbc=False,
         switchFactor=None,
     )
+    number_of_contacts.setUnusedForceGroup(0, model.system)
     model.system.addForce(number_of_contacts)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -300,6 +309,7 @@ def run_rmsd_test(
         group,
         num_atoms,
     )
+    rmsd.setUnusedForceGroup(0, model.system)
     model.system.addForce(rmsd)
     integrator = openmm.VerletIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -319,6 +329,7 @@ def test_rmsd():
     model = testsystems.AlanineDipeptideVacuum()
     num_atoms = model.topology.getNumAtoms()
     rmsd = cvpack.RMSD(model.positions, np.arange(num_atoms), num_atoms)
+    rmsd.setUnusedForceGroup(0, model.system)
     model.system.addForce(rmsd)
     integrator = openmm.VerletIntegrator(2 * unit.femtosecond)
     integrator.setIntegrationForceGroups({0})
@@ -365,6 +376,7 @@ def test_helix_torsion_content():
         helix_content = cvpack.HelixTorsionContent(residues)
     assert str(excinfo.value) == "Could not find atom N in residue TMP163"
     helix_content = cvpack.HelixTorsionContent(residues[0:-1])
+    helix_content.setUnusedForceGroup(0, model.system)
     model.system.addForce(helix_content)
     integrator = openmm.VerletIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -398,6 +410,7 @@ def test_helix_angle_content():
         helix_content = cvpack.HelixAngleContent(residues)
     assert str(excinfo.value) == "Could not find atom CA in residue TMP163"
     helix_content = cvpack.HelixAngleContent(residues[0:-1])
+    helix_content.setUnusedForceGroup(0, model.system)
     model.system.addForce(helix_content)
     integrator = openmm.VerletIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -429,6 +442,7 @@ def test_helix_hbond_content():
     with pytest.raises(ValueError):
         helix_content = cvpack.HelixHBondContent(residues)
     helix_content = cvpack.HelixHBondContent(residues[58:79])
+    helix_content.setUnusedForceGroup(0, model.system)
     model.system.addForce(helix_content)
     integrator = openmm.VerletIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -456,6 +470,7 @@ def test_helix_rmsd_content():
 
     start, end = 59, 80
     helix_content = cvpack.HelixRMSDContent(residues[start:end], num_atoms)
+    helix_content.setUnusedForceGroup(0, model.system)
     model.system.addForce(helix_content)
     context = openmm.Context(
         model.system,
@@ -496,6 +511,7 @@ def test_helix_rmsd_content():
 
     start, end = 0, 80
     helix_content2 = cvpack.HelixRMSDContent(residues[start:end], num_atoms)
+    helix_content2.setUnusedForceGroup(0, model.system)
     model.system.addForce(helix_content2)
     context.reinitialize(preserveState=True)
     cv_value = helix_content2.getValue(context)
@@ -518,6 +534,7 @@ def test_helix_torsion_similarity():
         np.vstack([phi_atoms[1:], psi_atoms[1:]]),
         np.vstack([phi_atoms[:-1], psi_atoms[:-1]]),
     )
+    torsion_similarity.setUnusedForceGroup(0, model.system)
     model.system.addForce(torsion_similarity)
     context = openmm.Context(
         model.system,
@@ -548,6 +565,7 @@ def test_sheet_rmsd_content():
 
     sheet_content = cvpack.SheetRMSDContent(residues, topology.n_atoms)
     sheet_content.setForceGroup(31)
+    sheet_content.setUnusedForceGroup(0, model.system)
     model.system.addForce(sheet_content)
     context = openmm.Context(
         model.system,
@@ -599,7 +617,12 @@ def test_atomic_function():
     assert (
         str(excinfo.value) == "Unit angstrom is not compatible with the MD unit system."
     )
+<<<<<<< HEAD
     colvar = cvpack.AtomicFunction(function, unit.nanometers, atoms)
+=======
+    colvar = cvpack.AtomicFunction(num_atoms, function, atoms, unit.nanometers)
+    colvar.setUnusedForceGroup(0, model.system)
+>>>>>>> main
     model.system.addForce(colvar)
     context = openmm.Context(
         model.system,
@@ -639,6 +662,8 @@ def test_centroid_function():
     colvar = cvpack.CentroidFunction(
         function, unit.nanometers, groups, weighByMass=False
     )
+    colvar.setUnusedForceGroup(0, model.system)
+    colvar.setUnusedForceGroup(0, model.system)
     model.system.addForce(colvar)
     context = openmm.Context(
         model.system,
@@ -731,6 +756,7 @@ def test_residue_coordination():
     computed_cv = np.sum(1 / (1 + distances**6))
 
     res_coord = cvpack.ResidueCoordination(*groups, pbc=False, weighByMass=False)
+    res_coord.setUnusedForceGroup(0, model.system)
     model.system.addForce(res_coord)
     context = openmm.Context(
         model.system,
