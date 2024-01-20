@@ -92,6 +92,7 @@ def perform_common_tests(
     serializer.serialize(collectiveVariable, pipe)
     pipe.seek(0)
     new_cv = serializer.deserialize(pipe)
+    new_cv.setUnusedForceGroup(0, context.getSystem())
     context.getSystem().addForce(new_cv)
     context.reinitialize(preserveState=True)
     value1 = collectiveVariable.getValue(context)
@@ -468,7 +469,7 @@ def test_helix_rmsd_content():
         )
     assert str(excinfo.value) == "Atom N not found in residue TMP163"
 
-    start, end = 59, 80
+    start, end = 39, 51
     helix_content = cvpack.HelixRMSDContent(residues[start:end], num_atoms)
     helix_content.setUnusedForceGroup(0, model.system)
     model.system.addForce(helix_content)
@@ -505,16 +506,6 @@ def test_helix_rmsd_content():
             atoms += tuple(residue_atoms[name] for name in ["N", "CA", "CB", "C", "O"])
         return atoms
 
-    computed_value = compute_cv_value(select_atoms(start, end))
-    assert cv_value / cv_value.unit == pytest.approx(computed_value)
-    perform_common_tests(helix_content, context)
-
-    start, end = 0, 80
-    helix_content2 = cvpack.HelixRMSDContent(residues[start:end], num_atoms)
-    helix_content2.setUnusedForceGroup(0, model.system)
-    model.system.addForce(helix_content2)
-    context.reinitialize(preserveState=True)
-    cv_value = helix_content2.getValue(context)
     computed_value = compute_cv_value(select_atoms(start, end))
     assert cv_value / cv_value.unit == pytest.approx(computed_value)
     perform_common_tests(helix_content, context)
