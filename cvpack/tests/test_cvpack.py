@@ -613,11 +613,11 @@ def test_atomic_function():
     np.random.shuffle(atoms)
     function = "+".join(f"distance(p{i+1}, p{i+2})" for i in range(num_atoms - 1))
     with pytest.raises(ValueError) as excinfo:
-        colvar = cvpack.AtomicFunction(num_atoms, function, atoms, unit.angstrom)
+        colvar = cvpack.AtomicFunction(function, unit.angstrom, atoms)
     assert (
         str(excinfo.value) == "Unit angstrom is not compatible with the MD unit system."
     )
-    colvar = cvpack.AtomicFunction(num_atoms, function, atoms, unit.nanometers)
+    colvar = cvpack.AtomicFunction(function, unit.nanometers, atoms)
     colvar.setUnusedForceGroup(0, model.system)
     model.system.addForce(colvar)
     context = openmm.Context(
@@ -651,14 +651,13 @@ def test_centroid_function():
     groups = np.reshape(atoms[: 3 * num_groups], (num_groups, 3))
     function = "+".join(f"distance(g{i+1}, g{i+2})" for i in range(num_groups - 1))
     with pytest.raises(ValueError) as excinfo:
-        colvar = cvpack.CentroidFunction(function, groups, unit.angstrom)
+        colvar = cvpack.CentroidFunction(function, unit.angstrom, groups)
     assert (
         str(excinfo.value) == "Unit angstrom is not compatible with the MD unit system."
     )
     colvar = cvpack.CentroidFunction(
-        function, groups, unit.nanometers, weighByMass=False
+        function, unit.nanometers, groups, weighByMass=False
     )
-    colvar.setUnusedForceGroup(0, model.system)
     colvar.setUnusedForceGroup(0, model.system)
     model.system.addForce(colvar)
     context = openmm.Context(
