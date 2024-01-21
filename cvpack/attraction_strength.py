@@ -14,87 +14,9 @@ import openmm
 from cvpack import unit as mmunit
 
 from .cvpack import AbstractCollectiveVariable
+from .utils import NonbondedForceSurrogate, evaluate_in_context
 
 ONE_4PI_EPS0 = 138.93545764438198
-
-
-class _NonbondedForceSurrogate:  # pylint: disable=too-many-instance-attributes
-    """A surrogate class for the NonbondedForce class in OpenMM."""
-
-    def __init__(self, other: openmm.NonbondedForce) -> None:
-        self._cutoff = other.getCutoffDistance()
-        self._uses_pbc = other.usesPeriodicBoundaryConditions()
-        self._num_particles = other.getNumParticles()
-        self._particle_parameters = list(
-            map(other.getParticleParameters, range(self._num_particles))
-        )
-        self._num_exceptions = other.getNumExceptions()
-        self._exception_parameters = list(
-            map(other.getExceptionParameters, range(self._num_exceptions))
-        )
-        self._use_switching_function = other.getUseSwitchingFunction()
-        self._switching_distance = other.getSwitchingDistance()
-
-    def __getstate__(self) -> t.Dict[str, str]:
-        return {
-            "cutoff": self.getCutoffDistance(),
-            "uses_pbc": self.usesPeriodicBoundaryConditions(),
-            "num_particles": self.getNumParticles(),
-            "particle_parameters": [
-                self.getParticleParameters(i) for i in range(self.getNumParticles())
-            ],
-            "num_exceptions": self.getNumExceptions(),
-            "exception_parameters": [
-                self.getExceptionParameters(i) for i in range(self.getNumExceptions())
-            ],
-            "use_switching_function": self.getUseSwitchingFunction(),
-            "switching_distance": self.getSwitchingDistance(),
-        }
-
-    def __setstate__(self, state: t.Dict[str, str]) -> None:
-        self._cutoff = state["cutoff"]
-        self._uses_pbc = state["uses_pbc"]
-        self._num_particles = state["num_particles"]
-        self._particle_parameters = state["particle_parameters"]
-        self._num_exceptions = state["num_exceptions"]
-        self._exception_parameters = state["exception_parameters"]
-        self._use_switching_function = state["use_switching_function"]
-        self._switching_distance = state["switching_distance"]
-
-    def getCutoffDistance(self) -> float:
-        """Get the cutoff distance."""
-        return mmunit.value_in_md_units(self._cutoff)
-
-    def usesPeriodicBoundaryConditions(self) -> bool:
-        """Return whether periodic boundary conditions are used."""
-        return self._uses_pbc
-
-    def getNumParticles(self) -> int:
-        """Get the number of particles."""
-        return self._num_particles
-
-    def getParticleParameters(self, index: int) -> t.Tuple[float, float, float]:
-        """Get the parameters of a particle at the given index."""
-        return tuple(map(mmunit.value_in_md_units, self._particle_parameters[index]))
-
-    def getNumExceptions(self):
-        """Get the number of exceptions."""
-        return self._num_exceptions
-
-    def getExceptionParameters(
-        self, index: int
-    ) -> t.Tuple[int, int, float, float, float]:
-        """Get the parameters of an exception at the given index."""
-        i, j, *params = self._exception_parameters[index]
-        return i, j, *map(mmunit.value_in_md_units, params)
-
-    def getUseSwitchingFunction(self) -> bool:
-        """Return whether a switching function is used."""
-        return self._use_switching_function
-
-    def getSwitchingDistance(self) -> float:
-        """Get the switching distance."""
-        return mmunit.value_in_md_units(self._switching_distance)
 
 
 class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
@@ -151,9 +73,12 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
 
     The Lennard-Jones parameters, atomic charges, cutoff distance, boundary conditions,
     as well as whether to use a switching function and its corresponding switching
-    distance, are taken from :openmm:`NonbondedForce` object. Any non-exclusion
-    exceptions involving atoms in :math:`{\\bf g}_1` and :math:`{\\bf g}_2` are turned
-    into exclusions.
+    distance, are taken from :openmm:`NonbondedForce` object.
+
+    .. note::
+        Any non-exclusion exceptions involving atoms in :math:`{\\bf g}_1` and
+        :math:`{\\bf g}_2` in the provided :class:`openmm.NonbondedForce` are turned
+        into exclusions in this collective variable.
 
     Parameters
     ----------
@@ -162,12 +87,12 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
     group2
         The second atom group.
     nonbondedForce
-        The :openmm:`NonbondedForce` object from which to collect the necessary
+        The :class:`openmm.NonbondedForce` object from which to collect the necessary
         parameters.
     reference
         A reference value (in energy units per mole) to which the collective variable
         should be normalized. One can also provide an :OpenMM:`Context` object from
-        which to obtain the reference value.
+        which to obtain a reference attraction strength.
 
     Examples
     --------
@@ -229,7 +154,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
             1.0, mmunit.kilojoule_per_mole
         ),
     ) -> None:
-        nonbondedForce = _NonbondedForceSurrogate(nonbondedForce)
+        nonbondedForce = NonbondedForceSurrogate(nonbondedForce)
         cutoff = nonbondedForce.getCutoffDistance()
         expression = (
             "-(lj + coul)/ref"
@@ -260,22 +185,8 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
         self.setUseLongRangeCorrection(False)
         self.addInteractionGroup(group1, group2)
         if isinstance(reference, openmm.Context):
-            reference = self._getValue(reference)
+            reference = evaluate_in_context(self, reference)
         self.setEnergyFunction(expression.replace("ref = 1", f"ref = {reference}"))
         self._registerCV(
             mmunit.dimensionless, group1, group2, nonbondedForce, reference
         )
-
-    def _getValue(self, context: openmm.Context) -> float:
-        system = openmm.System()
-        for _ in range(context.getSystem().getNumParticles()):
-            system.addParticle(1.0)
-        system.addForce(openmm.CustomNonbondedForce(self))
-        state = context.getState(getPositions=True)
-        context = openmm.Context(system, openmm.VerletIntegrator(1.0))
-        context.setPositions(state.getPositions())
-        context.setPeriodicBoxVectors(*state.getPeriodicBoxVectors())
-        # pylint: disable=unexpected-keyword-arg # to avoid false positive
-        state = context.getState(getEnergy=True)
-        # pylint: enable=unexpected-keyword-arg
-        return mmunit.value_in_md_units(state.getPotentialEnergy())

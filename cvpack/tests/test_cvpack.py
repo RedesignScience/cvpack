@@ -264,18 +264,24 @@ def test_number_of_contacts():
     group2 = [
         a.index for a in model.topology.atoms() if a.element == app.element.oxygen
     ]
+    forces = {f.getName(): f for f in model.system.getForces()}
+    nonbonded = forces["NonbondedForce"]
+    exclusions = set()
+    for index in range(nonbonded.getNumExceptions()):
+        i, j, *_ = nonbonded.getExceptionParameters(index)
+        exclusions.add((i, j) if i < j else (j, i))
     pairs = set()
     for i, j in it.product(group1, group2):
-        if j != i and (j, i) not in pairs:
-            pairs.add((i, j))
+        if j != i:
+            pair = (i, j) if i < j else (j, i)
+            if pair not in exclusions:
+                pairs.add(pair)
     distances = np.array([np.linalg.norm(pos[i] - pos[j]) for i, j in pairs])
     contacts = np.where(distances <= 0.6, 1 / (1 + (distances / 0.3) ** 6), 0)
-    num_atoms = model.topology.getNumAtoms()
     number_of_contacts = cvpack.NumberOfContacts(
         group1,
         group2,
-        num_atoms,
-        pbc=False,
+        forces["NonbondedForce"],
         switchFactor=None,
     )
     number_of_contacts.setUnusedForceGroup(0, model.system)
