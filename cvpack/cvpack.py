@@ -345,6 +345,8 @@ class AbstractCollectiveVariable(openmm.Force):
         # pylint: enable=protected-access
         squared_forces = np.sum(np.square(force_vectors), axis=1)
         nonzeros = np.nonzero(squared_forces)[0]
+        if nonzeros.size == 0:
+            return mmunit.Quantity(np.inf, self._mass_unit)
         mass_values = np.fromiter(map(get_mass, nonzeros), dtype=np.float64)
         effective_mass = 1.0 / np.sum(squared_forces[nonzeros] / mass_values)
         return mmunit.Quantity(
