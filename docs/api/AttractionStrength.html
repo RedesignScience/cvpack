@@ -83,19 +83,23 @@ adopted reference value.</p>
 </div>
 <p>The Lennard-Jones parameters, atomic charges, cutoff distance, boundary conditions,
 as well as whether to use a switching function and its corresponding switching
-distance, are taken from <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.NonbondedForce.html">openmm.NonbondedForce</a> object. Any non-exclusion
-exceptions involving atoms in <span class="math notranslate nohighlight">\({\bf g}_1\)</span> and <span class="math notranslate nohighlight">\({\bf g}_2\)</span> are turned
-into exclusions.</p>
+distance, are taken from <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.NonbondedForce.html">openmm.NonbondedForce</a> object.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Any non-exclusion exceptions involving atoms in <span class="math notranslate nohighlight">\({\bf g}_1\)</span> and
+<span class="math notranslate nohighlight">\({\bf g}_2\)</span> in the provided <code class="xref py py-class docutils literal notranslate"><span class="pre">openmm.NonbondedForce</span></code> are turned
+into exclusions in this collective variable.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>group1</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em>) – The first atom group.</p></li>
 <li><p><strong>group2</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em>) – The second atom group.</p></li>
-<li><p><strong>nonbondedForce</strong> (<em>NonbondedForce</em>) – The <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.NonbondedForce.html">openmm.NonbondedForce</a> object from which to collect the necessary
+<li><p><strong>nonbondedForce</strong> (<em>NonbondedForce</em>) – The <code class="xref py py-class docutils literal notranslate"><span class="pre">openmm.NonbondedForce</span></code> object from which to collect the necessary
 parameters.</p></li>
 <li><p><strong>reference</strong> (<em>Quantity</em><em> | </em><em>Real</em><em> | </em><em>Context</em>) – A reference value (in energy units per mole) to which the collective variable
 should be normalized. One can also provide an <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html">openmm.Context</a> object from
-which to obtain the reference value.</p></li>
+which to obtain a reference attraction strength.</p></li>
 </ul>
 </dd>
 </dl>

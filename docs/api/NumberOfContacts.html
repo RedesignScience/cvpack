@@ -41,7 +41,7 @@
 <h1>NumberOfContacts<a class="headerlink" href="#numberofcontacts" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="cvpack.NumberOfContacts">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">NumberOfContacts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numAtoms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stepFunction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1/(1+x^6)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresholdDistance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Quantity(value=0.3,</span> <span class="pre">unit=nanometer)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoffFactor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">switchFactor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/number_of_contacts.html#NumberOfContacts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.NumberOfContacts" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">NumberOfContacts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonbondedForce</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stepFunction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1/(1+x^6)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresholdDistance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Quantity(value=0.3,</span> <span class="pre">unit=nanometer)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoffFactor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">switchFactor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/number_of_contacts.html#NumberOfContacts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.NumberOfContacts" title="Link to this definition">¶</a></dt>
 <dd><p>The number of contacts between two atom groups:</p>
 <div class="math notranslate nohighlight">
 \[N({\bf r}) = \sum_{i \in {\bf g}_1} \sum_{j \in {\bf g}_2}
@@ -65,13 +65,23 @@ there is also the option to smoothly switch off <span class="math notranslate no
 (<span class="math notranslate nohighlight">\(i = j\)</span>) are ignored and each pair of distinct atoms (<span class="math notranslate nohighlight">\(i \neq j\)</span>)
 is counted only once.</p>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Any non-exclusion exceptions involving atoms in <span class="math notranslate nohighlight">\({\bf g}_1\)</span> and
+<span class="math notranslate nohighlight">\({\bf g}_2\)</span> in the provided <code class="xref py py-class docutils literal notranslate"><span class="pre">openmm.NonbondedForce</span></code> are turned
+into exclusions in this collective variable.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>group1</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em>) – The indices of the atoms in the first group</p></li>
 <li><p><strong>group2</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em>) – The indices of the atoms in the second group</p></li>
-<li><p><strong>numAtoms</strong> (<em>int</em>) – The total number of atoms in the system (required by OpenMM)</p></li>
-<li><p><strong>pbc</strong> (<em>bool</em>) – Whether the system has periodic boundary conditions</p></li>
+<li><p><strong>nonbondedForce</strong> (<em>NonbondedForce</em>) – The <code class="xref py py-class docutils literal notranslate"><span class="pre">openmm.NonbondedForce</span></code> object from which the total number of
+atoms, the exclusions, and whether to use periodic boundary conditions are
+taken</p></li>
+<li><p><strong>reference</strong> (<em>Quantity</em><em> | </em><em>Real</em><em> | </em><em>Context</em>) – A dimensionless reference value to which the collective variable should be
+normalized. One can also provide an <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html">openmm.Context</a> object from which to
+obtain the reference number of contacts.</p></li>
 <li><p><strong>stepFunction</strong> (<em>str</em>) – The function “step(1-x)” (for analysis only) or a continuous approximation
 thereof</p></li>
 <li><p><strong>thresholdDistance</strong> (<em>Quantity</em><em> | </em><em>Real</em>) – The threshold distance (<span class="math notranslate nohighlight">\(r_0\)</span>) for considering two atoms as being in
@@ -86,31 +96,45 @@ If None, it switches off abruptly at the cutoff distance.</p></li>
 </dl>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cvpack</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">openmm</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">app</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">openmmtools</span> <span class="kn">import</span> <span class="n">testsystems</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">testsystems</span><span class="o">.</span><span class="n">AlanineDipeptideVacuum</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">carbons</span> <span class="o">=</span> <span class="p">[</span>
-<span class="gp">... </span>    <span class="n">a</span><span class="o">.</span><span class="n">index</span>
-<span class="gp">... </span>    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">atoms</span><span class="p">()</span>
-<span class="gp">... </span>    <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">element</span> <span class="o">==</span> <span class="n">app</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">carbon</span>
-<span class="gp">... </span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">num_atoms</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">getNumAtoms</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">optionals</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;pbc&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;stepFunction&quot;</span><span class="p">:</span> <span class="s2">&quot;step(1-x)&quot;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">testsystems</span><span class="o">.</span><span class="n">HostGuestExplicit</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group1</span><span class="p">,</span> <span class="n">group2</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">residues</span><span class="p">():</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;HOH&quot;</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="n">group</span> <span class="o">=</span> <span class="n">group1</span> <span class="k">if</span> <span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;B2&quot;</span> <span class="k">else</span> <span class="n">group2</span>
+<span class="gp">... </span>        <span class="n">group</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">index</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">forces</span> <span class="o">=</span> <span class="p">{</span><span class="n">f</span><span class="o">.</span><span class="n">getName</span><span class="p">():</span> <span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">getForces</span><span class="p">()}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nc</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">NumberOfContacts</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">carbons</span><span class="p">,</span> <span class="n">carbons</span><span class="p">,</span> <span class="n">num_atoms</span><span class="p">,</span> <span class="o">**</span><span class="n">optionals</span>
+<span class="gp">... </span>    <span class="n">group1</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">group2</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">forces</span><span class="p">[</span><span class="s2">&quot;NonbondedForce&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">stepFunction</span><span class="o">=</span><span class="s2">&quot;step(1-x)&quot;</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nc</span><span class="o">.</span><span class="n">setUnusedForceGroup</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">)</span>
 <span class="go">1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="n">nc</span><span class="p">)</span>
 <span class="go">5</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">platform</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Platform</span><span class="o">.</span><span class="n">getPlatformByName</span><span class="p">(</span><span class="s1">&#39;Reference&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="n">openmm</span><span class="o">.</span><span class="n">CustomIntegrator</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">platform</span>
-<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">platform</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Platform</span><span class="o">.</span><span class="n">getPlatformByName</span><span class="p">(</span><span class="s2">&quot;Reference&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">integrator</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">VerletIntegrator</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">femtoseconds</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="n">integrator</span><span class="p">,</span> <span class="n">platform</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">digits</span><span class="o">=</span><span class="mi">6</span><span class="p">))</span>
-<span class="go">6.0 dimensionless</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">nc</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="go">30.0 dimensionless</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nc_normalized</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">NumberOfContacts</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">group1</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">group2</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">forces</span><span class="p">[</span><span class="s2">&quot;NonbondedForce&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">stepFunction</span><span class="o">=</span><span class="s2">&quot;step(1-x)&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">reference</span><span class="o">=</span><span class="n">context</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nc_normalized</span><span class="o">.</span><span class="n">setUnusedForceGroup</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="n">nc_normalized</span><span class="p">)</span>
+<span class="go">6</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">reinitialize</span><span class="p">(</span><span class="n">preserveState</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">nc_normalized</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="go">1.0 dimensionless</span>
 </pre></div>
 </div>
 <p class="rubric">Methods</p>

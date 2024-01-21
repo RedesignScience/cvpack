@@ -50,6 +50,7 @@
 <span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
 <span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">AbstractCollectiveVariable</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">NonbondedForceSurrogate</span><span class="p">,</span> <span class="n">evaluate_in_context</span>
 
 
 <div class="viewcode-block" id="NumberOfContacts">
@@ -86,59 +87,81 @@
 <span class="sd">        (:math:`i = j`) are ignored and each pair of distinct atoms (:math:`i \\neq j`)</span>
 <span class="sd">        is counted only once.</span>
 
+<span class="sd">    .. note::</span>
+<span class="sd">        Any non-exclusion exceptions involving atoms in :math:`{\\bf g}_1` and</span>
+<span class="sd">        :math:`{\\bf g}_2` in the provided :class:`openmm.NonbondedForce` are turned</span>
+<span class="sd">        into exclusions in this collective variable.</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">        group1</span>
-<span class="sd">            The indices of the atoms in the first group</span>
-<span class="sd">        group2</span>
-<span class="sd">            The indices of the atoms in the second group</span>
-<span class="sd">        numAtoms</span>
-<span class="sd">            The total number of atoms in the system (required by OpenMM)</span>
-<span class="sd">        pbc</span>
-<span class="sd">            Whether the system has periodic boundary conditions</span>
-<span class="sd">        stepFunction</span>
-<span class="sd">            The function &quot;step(1-x)&quot; (for analysis only) or a continuous approximation</span>
-<span class="sd">            thereof</span>
-<span class="sd">        thresholdDistance</span>
-<span class="sd">            The threshold distance (:math:`r_0`) for considering two atoms as being in</span>
-<span class="sd">            contact</span>
-<span class="sd">        cutoffFactor</span>
-<span class="sd">            The factor :math:`x_c` that multiplies the threshold distance to define</span>
-<span class="sd">            the cutoff distance</span>
-<span class="sd">        switchFactor</span>
-<span class="sd">            The factor :math:`x_s` that multiplies the threshold distance to define</span>
-<span class="sd">            the distance at which the step function starts switching off smoothly.</span>
-<span class="sd">            If None, it switches off abruptly at the cutoff distance.</span>
+<span class="sd">    group1</span>
+<span class="sd">        The indices of the atoms in the first group</span>
+<span class="sd">    group2</span>
+<span class="sd">        The indices of the atoms in the second group</span>
+<span class="sd">    nonbondedForce</span>
+<span class="sd">        The :class:`openmm.NonbondedForce` object from which the total number of</span>
+<span class="sd">        atoms, the exclusions, and whether to use periodic boundary conditions are</span>
+<span class="sd">        taken</span>
+<span class="sd">    reference</span>
+<span class="sd">        A dimensionless reference value to which the collective variable should be</span>
+<span class="sd">        normalized. One can also provide an :OpenMM:`Context` object from which to</span>
+<span class="sd">        obtain the reference number of contacts.</span>
+<span class="sd">    stepFunction</span>
+<span class="sd">        The function &quot;step(1-x)&quot; (for analysis only) or a continuous approximation</span>
+<span class="sd">        thereof</span>
+<span class="sd">    thresholdDistance</span>
+<span class="sd">        The threshold distance (:math:`r_0`) for considering two atoms as being in</span>
+<span class="sd">        contact</span>
+<span class="sd">    cutoffFactor</span>
+<span class="sd">        The factor :math:`x_c` that multiplies the threshold distance to define</span>
+<span class="sd">        the cutoff distance</span>
+<span class="sd">    switchFactor</span>
+<span class="sd">        The factor :math:`x_s` that multiplies the threshold distance to define</span>
+<span class="sd">        the distance at which the step function starts switching off smoothly.</span>
+<span class="sd">        If None, it switches off abruptly at the cutoff distance.</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
-<span class="sd">        &gt;&gt;&gt; import cvpack</span>
-<span class="sd">        &gt;&gt;&gt; import openmm</span>
-<span class="sd">        &gt;&gt;&gt; from openmm import app</span>
-<span class="sd">        &gt;&gt;&gt; from openmmtools import testsystems</span>
-<span class="sd">        &gt;&gt;&gt; model = testsystems.AlanineDipeptideVacuum()</span>
-<span class="sd">        &gt;&gt;&gt; carbons = [</span>
-<span class="sd">        ...     a.index</span>
-<span class="sd">        ...     for a in model.topology.atoms()</span>
-<span class="sd">        ...     if a.element == app.element.carbon</span>
-<span class="sd">        ... ]</span>
-<span class="sd">        &gt;&gt;&gt; num_atoms = model.topology.getNumAtoms()</span>
-<span class="sd">        &gt;&gt;&gt; optionals = {&quot;pbc&quot;: False, &quot;stepFunction&quot;: &quot;step(1-x)&quot;}</span>
-<span class="sd">        &gt;&gt;&gt; nc = cvpack.NumberOfContacts(</span>
-<span class="sd">        ...     carbons, carbons, num_atoms, **optionals</span>
-<span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; nc.setUnusedForceGroup(0, model.system)</span>
-<span class="sd">        1</span>
-<span class="sd">        &gt;&gt;&gt; model.system.addForce(nc)</span>
-<span class="sd">        5</span>
-<span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; context = openmm.Context(</span>
-<span class="sd">        ...     model.system, openmm.CustomIntegrator(0), platform</span>
-<span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">        &gt;&gt;&gt; print(nc.getValue(context, digits=6))</span>
-<span class="sd">        6.0 dimensionless</span>
-
+<span class="sd">    &gt;&gt;&gt; import cvpack</span>
+<span class="sd">    &gt;&gt;&gt; from openmm import unit</span>
+<span class="sd">    &gt;&gt;&gt; from openmmtools import testsystems</span>
+<span class="sd">    &gt;&gt;&gt; model = testsystems.HostGuestExplicit()</span>
+<span class="sd">    &gt;&gt;&gt; group1, group2 = [], []</span>
+<span class="sd">    &gt;&gt;&gt; for residue in model.topology.residues():</span>
+<span class="sd">    ...     if residue.name != &quot;HOH&quot;:</span>
+<span class="sd">    ...         group = group1 if residue.name == &quot;B2&quot; else group2</span>
+<span class="sd">    ...         group.extend(atom.index for atom in residue.atoms())</span>
+<span class="sd">    &gt;&gt;&gt; forces = {f.getName(): f for f in model.system.getForces()}</span>
+<span class="sd">    &gt;&gt;&gt; nc = cvpack.NumberOfContacts(</span>
+<span class="sd">    ...     group1,</span>
+<span class="sd">    ...     group2,</span>
+<span class="sd">    ...     forces[&quot;NonbondedForce&quot;],</span>
+<span class="sd">    ...     stepFunction=&quot;step(1-x)&quot;,</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; nc.setUnusedForceGroup(0, model.system)</span>
+<span class="sd">    1</span>
+<span class="sd">    &gt;&gt;&gt; model.system.addForce(nc)</span>
+<span class="sd">    5</span>
+<span class="sd">    &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&quot;Reference&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; integrator = openmm.VerletIntegrator(1.0 * mmunit.femtoseconds)</span>
+<span class="sd">    &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
+<span class="sd">    &gt;&gt;&gt; context.setPositions(model.positions)</span>
+<span class="sd">    &gt;&gt;&gt; print(nc.getValue(context, 4))</span>
+<span class="sd">    30.0 dimensionless</span>
+<span class="sd">    &gt;&gt;&gt; nc_normalized = cvpack.NumberOfContacts(</span>
+<span class="sd">    ...     group1,</span>
+<span class="sd">    ...     group2,</span>
+<span class="sd">    ...     forces[&quot;NonbondedForce&quot;],</span>
+<span class="sd">    ...     stepFunction=&quot;step(1-x)&quot;,</span>
+<span class="sd">    ...     reference=context,</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; nc_normalized.setUnusedForceGroup(0, model.system)</span>
+<span class="sd">    2</span>
+<span class="sd">    &gt;&gt;&gt; model.system.addForce(nc_normalized)</span>
+<span class="sd">    6</span>
+<span class="sd">    &gt;&gt;&gt; context.reinitialize(preserveState=True)</span>
+<span class="sd">    &gt;&gt;&gt; print(nc_normalized.getValue(context, 4))</span>
+<span class="sd">    1.0 dimensionless</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@mmunit</span><span class="o">.</span><span class="n">convert_quantities</span>
@@ -146,8 +169,8 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">group1</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
         <span class="n">group2</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
-        <span class="n">numAtoms</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">pbc</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">nonbondedForce</span><span class="p">:</span> <span class="n">openmm</span><span class="o">.</span><span class="n">NonbondedForce</span><span class="p">,</span>
+        <span class="n">reference</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
         <span class="n">stepFunction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;1/(1+x^6)&quot;</span><span class="p">,</span>
         <span class="n">thresholdDistance</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span>
             <span class="mf">0.3</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span>
@@ -155,11 +178,18 @@
         <span class="n">cutoffFactor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
         <span class="n">switchFactor</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">stepFunction</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;; x=r/</span><span class="si">{</span><span class="n">thresholdDistance</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">nonbondedForce</span> <span class="o">=</span> <span class="n">NonbondedForceSurrogate</span><span class="p">(</span><span class="n">nonbondedForce</span><span class="p">)</span>
+        <span class="n">num_atoms</span> <span class="o">=</span> <span class="n">nonbondedForce</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()</span>
+        <span class="n">pbc</span> <span class="o">=</span> <span class="n">nonbondedForce</span><span class="o">.</span><span class="n">usesPeriodicBoundaryConditions</span><span class="p">()</span>
+        <span class="n">expression</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">stepFunction</span><span class="si">}</span><span class="s2">)/1; x=r/</span><span class="si">{</span><span class="n">thresholdDistance</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">expression</span><span class="p">)</span>
         <span class="n">nonbonded_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">CutoffPeriodic</span> <span class="k">if</span> <span class="n">pbc</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">CutoffNonPeriodic</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setNonbondedMethod</span><span class="p">(</span><span class="n">nonbonded_method</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numAtoms</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_atoms</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">addParticle</span><span class="p">([])</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nonbondedForce</span><span class="o">.</span><span class="n">getNumExceptions</span><span class="p">()):</span>
+            <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">nonbondedForce</span><span class="o">.</span><span class="n">getExceptionParameters</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addExclusion</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setCutoffDistance</span><span class="p">(</span><span class="n">cutoffFactor</span> <span class="o">*</span> <span class="n">thresholdDistance</span><span class="p">)</span>
         <span class="n">use_switching_function</span> <span class="o">=</span> <span class="n">switchFactor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setUseSwitchingFunction</span><span class="p">(</span><span class="n">use_switching_function</span><span class="p">)</span>
@@ -167,12 +197,15 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">setSwitchingDistance</span><span class="p">(</span><span class="n">switchFactor</span> <span class="o">*</span> <span class="n">thresholdDistance</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setUseLongRangeCorrection</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">addInteractionGroup</span><span class="p">(</span><span class="n">group1</span><span class="p">,</span> <span class="n">group2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">):</span>
+            <span class="n">reference</span> <span class="o">=</span> <span class="n">evaluate_in_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setEnergyFunction</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/1;&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;/</span><span class="si">{</span><span class="n">reference</span><span class="si">}</span><span class="s2">;&quot;</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span>
             <span class="n">mmunit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">,</span>
             <span class="n">group1</span><span class="p">,</span>
             <span class="n">group2</span><span class="p">,</span>
-            <span class="n">numAtoms</span><span class="p">,</span>
-            <span class="n">pbc</span><span class="p">,</span>
+            <span class="n">nonbondedForce</span><span class="p">,</span>
+            <span class="n">reference</span><span class="p">,</span>
             <span class="n">stepFunction</span><span class="p">,</span>
             <span class="n">thresholdDistance</span><span class="p">,</span>
             <span class="n">cutoffFactor</span><span class="p">,</span>

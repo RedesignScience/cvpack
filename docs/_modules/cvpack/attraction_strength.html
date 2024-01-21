@@ -50,87 +50,9 @@
 <span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
 <span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">AbstractCollectiveVariable</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">NonbondedForceSurrogate</span><span class="p">,</span> <span class="n">evaluate_in_context</span>
 
 <span class="n">ONE_4PI_EPS0</span> <span class="o">=</span> <span class="mf">138.93545764438198</span>
-
-
-<span class="k">class</span> <span class="nc">_NonbondedForceSurrogate</span><span class="p">:</span>  <span class="c1"># pylint: disable=too-many-instance-attributes</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A surrogate class for the NonbondedForce class in OpenMM.&quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">openmm</span><span class="o">.</span><span class="n">NonbondedForce</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cutoff</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">getCutoffDistance</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_uses_pbc</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">usesPeriodicBoundaryConditions</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_num_particles</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_particle_parameters</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
-            <span class="nb">map</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">getParticleParameters</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_particles</span><span class="p">))</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_num_exceptions</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">getNumExceptions</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_exception_parameters</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
-            <span class="nb">map</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">getExceptionParameters</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_exceptions</span><span class="p">))</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_use_switching_function</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">getUseSwitchingFunction</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_switching_distance</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">getSwitchingDistance</span><span class="p">()</span>
-
-    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;cutoff&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">getCutoffDistance</span><span class="p">(),</span>
-            <span class="s2">&quot;uses_pbc&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">usesPeriodicBoundaryConditions</span><span class="p">(),</span>
-            <span class="s2">&quot;num_particles&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">(),</span>
-            <span class="s2">&quot;particle_parameters&quot;</span><span class="p">:</span> <span class="p">[</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">getParticleParameters</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">())</span>
-            <span class="p">],</span>
-            <span class="s2">&quot;num_exceptions&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">getNumExceptions</span><span class="p">(),</span>
-            <span class="s2">&quot;exception_parameters&quot;</span><span class="p">:</span> <span class="p">[</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">getExceptionParameters</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getNumExceptions</span><span class="p">())</span>
-            <span class="p">],</span>
-            <span class="s2">&quot;use_switching_function&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">getUseSwitchingFunction</span><span class="p">(),</span>
-            <span class="s2">&quot;switching_distance&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">getSwitchingDistance</span><span class="p">(),</span>
-        <span class="p">}</span>
-
-    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cutoff</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;cutoff&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_uses_pbc</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;uses_pbc&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_num_particles</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;num_particles&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_particle_parameters</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;particle_parameters&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_num_exceptions</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;num_exceptions&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_exception_parameters</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;exception_parameters&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_use_switching_function</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;use_switching_function&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_switching_distance</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;switching_distance&quot;</span><span class="p">]</span>
-
-    <span class="k">def</span> <span class="nf">getCutoffDistance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the cutoff distance.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">value_in_md_units</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cutoff</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">usesPeriodicBoundaryConditions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return whether periodic boundary conditions are used.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_uses_pbc</span>
-
-    <span class="k">def</span> <span class="nf">getNumParticles</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the number of particles.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_particles</span>
-
-    <span class="k">def</span> <span class="nf">getParticleParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the parameters of a particle at the given index.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">mmunit</span><span class="o">.</span><span class="n">value_in_md_units</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_particle_parameters</span><span class="p">[</span><span class="n">index</span><span class="p">]))</span>
-
-    <span class="k">def</span> <span class="nf">getNumExceptions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the number of exceptions.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_exceptions</span>
-
-    <span class="k">def</span> <span class="nf">getExceptionParameters</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the parameters of an exception at the given index.&quot;&quot;&quot;</span>
-        <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exception_parameters</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="o">*</span><span class="nb">map</span><span class="p">(</span><span class="n">mmunit</span><span class="o">.</span><span class="n">value_in_md_units</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">getUseSwitchingFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return whether a switching function is used.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_switching_function</span>
-
-    <span class="k">def</span> <span class="nf">getSwitchingDistance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the switching distance.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">value_in_md_units</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_switching_distance</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="AttractionStrength">
@@ -189,9 +111,12 @@
 
 <span class="sd">    The Lennard-Jones parameters, atomic charges, cutoff distance, boundary conditions,</span>
 <span class="sd">    as well as whether to use a switching function and its corresponding switching</span>
-<span class="sd">    distance, are taken from :openmm:`NonbondedForce` object. Any non-exclusion</span>
-<span class="sd">    exceptions involving atoms in :math:`{\\bf g}_1` and :math:`{\\bf g}_2` are turned</span>
-<span class="sd">    into exclusions.</span>
+<span class="sd">    distance, are taken from :openmm:`NonbondedForce` object.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        Any non-exclusion exceptions involving atoms in :math:`{\\bf g}_1` and</span>
+<span class="sd">        :math:`{\\bf g}_2` in the provided :class:`openmm.NonbondedForce` are turned</span>
+<span class="sd">        into exclusions in this collective variable.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -200,12 +125,12 @@
 <span class="sd">    group2</span>
 <span class="sd">        The second atom group.</span>
 <span class="sd">    nonbondedForce</span>
-<span class="sd">        The :openmm:`NonbondedForce` object from which to collect the necessary</span>
+<span class="sd">        The :class:`openmm.NonbondedForce` object from which to collect the necessary</span>
 <span class="sd">        parameters.</span>
 <span class="sd">    reference</span>
 <span class="sd">        A reference value (in energy units per mole) to which the collective variable</span>
 <span class="sd">        should be normalized. One can also provide an :OpenMM:`Context` object from</span>
-<span class="sd">        which to obtain the reference value.</span>
+<span class="sd">        which to obtain a reference attraction strength.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -267,7 +192,7 @@
             <span class="mf">1.0</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">kilojoule_per_mole</span>
         <span class="p">),</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">nonbondedForce</span> <span class="o">=</span> <span class="n">_NonbondedForceSurrogate</span><span class="p">(</span><span class="n">nonbondedForce</span><span class="p">)</span>
+        <span class="n">nonbondedForce</span> <span class="o">=</span> <span class="n">NonbondedForceSurrogate</span><span class="p">(</span><span class="n">nonbondedForce</span><span class="p">)</span>
         <span class="n">cutoff</span> <span class="o">=</span> <span class="n">nonbondedForce</span><span class="o">.</span><span class="n">getCutoffDistance</span><span class="p">()</span>
         <span class="n">expression</span> <span class="o">=</span> <span class="p">(</span>
             <span class="s2">&quot;-(lj + coul)/ref&quot;</span>
@@ -298,25 +223,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">setUseLongRangeCorrection</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">addInteractionGroup</span><span class="p">(</span><span class="n">group1</span><span class="p">,</span> <span class="n">group2</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">):</span>
-            <span class="n">reference</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getValue</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span>
+            <span class="n">reference</span> <span class="o">=</span> <span class="n">evaluate_in_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setEnergyFunction</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;ref = 1&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;ref = </span><span class="si">{</span><span class="n">reference</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span>
             <span class="n">mmunit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">,</span> <span class="n">group1</span><span class="p">,</span> <span class="n">group2</span><span class="p">,</span> <span class="n">nonbondedForce</span><span class="p">,</span> <span class="n">reference</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_getValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="n">system</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">System</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">getSystem</span><span class="p">()</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()):</span>
-            <span class="n">system</span><span class="o">.</span><span class="n">addParticle</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
-        <span class="n">system</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomNonbondedForce</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
-        <span class="n">state</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getPositions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">context</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">openmm</span><span class="o">.</span><span class="n">VerletIntegrator</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
-        <span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">getPositions</span><span class="p">())</span>
-        <span class="n">context</span><span class="o">.</span><span class="n">setPeriodicBoxVectors</span><span class="p">(</span><span class="o">*</span><span class="n">state</span><span class="o">.</span><span class="n">getPeriodicBoxVectors</span><span class="p">())</span>
-        <span class="c1"># pylint: disable=unexpected-keyword-arg # to avoid false positive</span>
-        <span class="n">state</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getEnergy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="c1"># pylint: enable=unexpected-keyword-arg</span>
-        <span class="k">return</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">value_in_md_units</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">getPotentialEnergy</span><span class="p">())</span></div>
+        <span class="p">)</span></div>
 
 </pre></div>
 
