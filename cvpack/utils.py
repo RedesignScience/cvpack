@@ -7,8 +7,8 @@
 
 """
 
-from copy import deepcopy
 import typing as t
+from copy import deepcopy
 
 import openmm
 

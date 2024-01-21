@@ -14,7 +14,7 @@ import openmm
 from cvpack import unit as mmunit
 
 from .cvpack import AbstractCollectiveVariable
-from .utils import NonbondedForceSurrogate
+from .utils import NonbondedForceSurrogate, evaluate_in_context
 
 
 class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
@@ -64,6 +64,10 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
         The :class:`openmm.NonbondedForce` object from which the total number of
         atoms, the exclusions, and whether to use periodic boundary conditions are
         taken
+    reference
+        A dimensionless reference value to which the collective variable should be
+        normalized. One can also provide an :OpenMM:`Context` object from which to
+        obtain the reference number of contacts.
     stepFunction
         The function "step(1-x)" (for analysis only) or a continuous approximation
         thereof
@@ -106,6 +110,20 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
     >>> context.setPositions(model.positions)
     >>> print(nc.getValue(context, 4))
     30.0 dimensionless
+    >>> nc_normalized = cvpack.NumberOfContacts(
+    ...     group1,
+    ...     group2,
+    ...     forces["NonbondedForce"],
+    ...     stepFunction="step(1-x)",
+    ...     reference=context,
+    ... )
+    >>> nc_normalized.setUnusedForceGroup(0, model.system)
+    2
+    >>> model.system.addForce(nc_normalized)
+    6
+    >>> context.reinitialize(preserveState=True)
+    >>> print(nc_normalized.getValue(context, 4))
+    1.0 dimensionless
     """
 
     @mmunit.convert_quantities
@@ -114,6 +132,7 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
         group1: t.Sequence[int],
         group2: t.Sequence[int],
         nonbondedForce: openmm.NonbondedForce,
+        reference: t.Union[mmunit.ScalarQuantity, openmm.Context] = 1.0,
         stepFunction: str = "1/(1+x^6)",
         thresholdDistance: mmunit.ScalarQuantity = mmunit.Quantity(
             0.3, mmunit.nanometers
@@ -124,7 +143,8 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
         nonbondedForce = NonbondedForceSurrogate(nonbondedForce)
         num_atoms = nonbondedForce.getNumParticles()
         pbc = nonbondedForce.usesPeriodicBoundaryConditions()
-        super().__init__(stepFunction + f"; x=r/{thresholdDistance}")
+        expression = f"({stepFunction})/1; x=r/{thresholdDistance}"
+        super().__init__(expression)
         nonbonded_method = self.CutoffPeriodic if pbc else self.CutoffNonPeriodic
         self.setNonbondedMethod(nonbonded_method)
         for _ in range(num_atoms):
@@ -139,11 +159,15 @@ class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
             self.setSwitchingDistance(switchFactor * thresholdDistance)
         self.setUseLongRangeCorrection(False)
         self.addInteractionGroup(group1, group2)
+        if isinstance(reference, openmm.Context):
+            reference = evaluate_in_context(self, reference)
+        self.setEnergyFunction(expression.replace("/1;", f"/{reference};"))
         self._registerCV(
             mmunit.dimensionless,
             group1,
             group2,
             nonbondedForce,
+            reference,
             stepFunction,
             thresholdDistance,
             cutoffFactor,

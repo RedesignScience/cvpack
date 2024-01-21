@@ -92,7 +92,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
     reference
         A reference value (in energy units per mole) to which the collective variable
         should be normalized. One can also provide an :OpenMM:`Context` object from
-        which to obtain the reference value.
+        which to obtain a reference attraction strength.
 
     Examples
     --------
