@@ -9,6 +9,7 @@
 
 import inspect
 from collections import OrderedDict
+from functools import partial
 from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
@@ -40,6 +41,7 @@ class AbstractCollectiveVariable(openmm.Force):
     """
 
     _unit: mmunit.Unit = mmunit.dimensionless
+    _mass_unit: mmunit.Unit = mmunit.dalton * mmunit.nanometers**2
     _args: Dict[str, Any] = {}
 
     def __getstate__(self) -> Dict[str, Any]:
@@ -67,6 +69,7 @@ class AbstractCollectiveVariable(openmm.Force):
         """
         self.setName(self.__class__.__name__)
         self.setUnit(unit)
+        self._mass_unit = mmunit.dalton * (mmunit.nanometers / self.getUnit()) ** 2
         arguments, _ = self.getArguments()
         self._args = dict(zip(arguments, args))
         self._args.update(kwargs)
@@ -327,8 +330,8 @@ class AbstractCollectiveVariable(openmm.Force):
             1
             >>> model.system.addForce(radius_of_gyration)
             6
-            >>> platform =openmm.Platform.getPlatformByName('Reference')
-            >>> context =openmm.Context(
+            >>> platform = openmm.Platform.getPlatformByName('Reference')
+            >>> context = openmm.Context(
             ...     model.system,openmm.VerletIntegrator(0), platform
             ... )
             >>> context.setPositions(model.positions)
@@ -336,11 +339,14 @@ class AbstractCollectiveVariable(openmm.Force):
             30.94693 Da
         """
         state = self._getSingleForceState(context, getForces=True)
-        force_values = value_in_md_units(state.getForces(asNumpy=True))
-        mass_values = [
-            value_in_md_units(context.getSystem().getParticleMass(i))
-            for i in range(context.getSystem().getNumParticles())
-        ]
-        effective_mass = 1.0 / np.sum(np.sum(force_values**2, axis=1) / mass_values)
-        unit = mmunit.dalton * (mmunit.nanometers / self.getUnit()) ** 2
-        return mmunit.Quantity(self._precisionRound(effective_mass, digits), unit)
+        # pylint: disable=protected-access
+        get_mass = partial(openmm._openmm.System_getParticleMass, context.getSystem())
+        force_vectors = state.getForces(asNumpy=True)._value
+        # pylint: enable=protected-access
+        squared_forces = np.sum(np.square(force_vectors), axis=1)
+        nonzeros = np.nonzero(squared_forces)[0]
+        mass_values = np.fromiter(map(get_mass, nonzeros), dtype=np.float64)
+        effective_mass = 1.0 / np.sum(squared_forces[nonzeros] / mass_values)
+        return mmunit.Quantity(
+            self._precisionRound(effective_mass, digits), self._mass_unit
+        )
