@@ -44,7 +44,7 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, AbstractCollectiveVari
     ----------
         residueGroup1
             The residues in the first group
-        group2
+        residueGroup2
             The residues in the second group
         pbc
             Whether the system has periodic boundary conditions
@@ -97,6 +97,10 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, AbstractCollectiveVari
         >>> context.setPositions(model.positions)
         >>> print(residue_coordination.getValue(context))
         26.0 dimensionless
+        >>> residue_coordination.setReferenceValue(26 * unit.dimensionless)
+        >>> context.reinitialize(preserveState=True)
+        >>> print(residue_coordination.getValue(context, digits=6))
+        1.0 dimensionless
     """
 
     @mmunit.convert_quantities
@@ -114,10 +118,13 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, AbstractCollectiveVari
     ) -> None:
         nr1 = len(residueGroup1)
         nr2 = len(residueGroup2)
-        if {res.index for res in residueGroup1} & {res.index for res in residueGroup2}:
-            raise ValueError("The two groups of residues must be disjoint")
-        energy = f"({stepFunction})/{nr1 * nr2}" if normalize else stepFunction
-        super().__init__(2, energy + f"; x=distance(g1,g2)/{thresholdDistance}")
+        self._ref_val = nr1 * nr2 if normalize else 1.0
+        expression = (
+            f"({stepFunction})/refval"
+            f"; x=distance(g1,g2)/{thresholdDistance}"
+            f"; refval={self._ref_val}"
+        )
+        super().__init__(2, expression)
         self.setUsesPeriodicBoundaryConditions(pbc)
         for res in residueGroup1 + residueGroup2:
             self.addGroup(
@@ -137,3 +144,30 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, AbstractCollectiveVari
             normalize,
             weighByMass,
         )
+
+    def getReferenceValue(self) -> mmunit.Quantity:
+        """
+        Get the reference value used for normalizing the residue coordination.
+
+        Returns
+        -------
+        mmunit.Quantity
+            The reference value.
+        """
+        return self._ref_val * self.getUnit()
+
+    @mmunit.convert_quantities
+    def setReferenceValue(self, value: mmunit.ScalarQuantity) -> None:
+        """
+        Set the reference value used for normalizing the residue coordination.
+
+        Parameters
+        ----------
+            value
+                The reference value.
+        """
+        expression = self.getEnergyFunction()
+        self.setEnergyFunction(
+            expression.replace(f"refval={self._ref_val}", f"refval={value}")
+        )
+        self._ref_val = value
