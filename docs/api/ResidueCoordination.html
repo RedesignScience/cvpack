@@ -62,7 +62,7 @@ following function is used:</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>residueGroup1</strong> (<em>Sequence</em><em>[</em><em>Residue</em><em>]</em>) – The residues in the first group</p></li>
-<li><p><strong>group2</strong> – The residues in the second group</p></li>
+<li><p><strong>residueGroup2</strong> (<em>Sequence</em><em>[</em><em>Residue</em><em>]</em>) – The residues in the second group</p></li>
 <li><p><strong>pbc</strong> (<em>bool</em>) – Whether the system has periodic boundary conditions</p></li>
 <li><p><strong>stepFunction</strong> (<em>str</em>) – The function “step(1-x)” (for analysis only) or a continuous approximation
 thereof</p></li>
@@ -108,6 +108,10 @@ atoms in the residue</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">residue_coordination</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
 <span class="go">26.0 dimensionless</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">residue_coordination</span><span class="o">.</span><span class="n">setReferenceValue</span><span class="p">(</span><span class="mi">26</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">reinitialize</span><span class="p">(</span><span class="n">preserveState</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">residue_coordination</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">digits</span><span class="o">=</span><span class="mi">6</span><span class="p">))</span>
+<span class="go">1.0 dimensionless</span>
 </pre></div>
 </div>
 <p class="rubric">Methods</p>
@@ -204,6 +208,20 @@ be rounded.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cvpack.ResidueCoordination.getReferenceValue">
+<span class="sig-name descname"><span class="pre">getReferenceValue</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/residue_coordination.html#ResidueCoordination.getReferenceValue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.ResidueCoordination.getReferenceValue" title="Link to this definition">¶</a></dt>
+<dd><p>Get the reference value used for normalizing the residue coordination.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The reference value.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>mmunit.Quantity</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cvpack.ResidueCoordination.getUnit">
 <span class="sig-name descname"><span class="pre">getUnit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.ResidueCoordination.getUnit" title="Link to this definition">¶</a></dt>
 <dd><p>Get the unit of measurement of this collective variable.</p>
@@ -236,6 +254,17 @@ be rounded.</p></li>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>The value of this collective variable at the given context</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cvpack.ResidueCoordination.setReferenceValue">
+<span class="sig-name descname"><span class="pre">setReferenceValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/residue_coordination.html#ResidueCoordination.setReferenceValue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.ResidueCoordination.setReferenceValue" title="Link to this definition">¶</a></dt>
+<dd><p>Set the reference value used for normalizing the residue coordination.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>Quantity</em><em> | </em><em>Real</em>) – The reference value.</p>
 </dd>
 </dl>
 </dd></dl>

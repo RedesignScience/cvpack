@@ -82,7 +82,7 @@
 <span class="sd">    ----------</span>
 <span class="sd">        residueGroup1</span>
 <span class="sd">            The residues in the first group</span>
-<span class="sd">        group2</span>
+<span class="sd">        residueGroup2</span>
 <span class="sd">            The residues in the second group</span>
 <span class="sd">        pbc</span>
 <span class="sd">            Whether the system has periodic boundary conditions</span>
@@ -135,6 +135,10 @@
 <span class="sd">        &gt;&gt;&gt; context.setPositions(model.positions)</span>
 <span class="sd">        &gt;&gt;&gt; print(residue_coordination.getValue(context))</span>
 <span class="sd">        26.0 dimensionless</span>
+<span class="sd">        &gt;&gt;&gt; residue_coordination.setReferenceValue(26 * unit.dimensionless)</span>
+<span class="sd">        &gt;&gt;&gt; context.reinitialize(preserveState=True)</span>
+<span class="sd">        &gt;&gt;&gt; print(residue_coordination.getValue(context, digits=6))</span>
+<span class="sd">        1.0 dimensionless</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@mmunit</span><span class="o">.</span><span class="n">convert_quantities</span>
@@ -152,10 +156,13 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">nr1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">residueGroup1</span><span class="p">)</span>
         <span class="n">nr2</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">residueGroup2</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">{</span><span class="n">res</span><span class="o">.</span><span class="n">index</span> <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">residueGroup1</span><span class="p">}</span> <span class="o">&amp;</span> <span class="p">{</span><span class="n">res</span><span class="o">.</span><span class="n">index</span> <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">residueGroup2</span><span class="p">}:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The two groups of residues must be disjoint&quot;</span><span class="p">)</span>
-        <span class="n">energy</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">stepFunction</span><span class="si">}</span><span class="s2">)/</span><span class="si">{</span><span class="n">nr1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">nr2</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">normalize</span> <span class="k">else</span> <span class="n">stepFunction</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">energy</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;; x=distance(g1,g2)/</span><span class="si">{</span><span class="n">thresholdDistance</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ref_val</span> <span class="o">=</span> <span class="n">nr1</span> <span class="o">*</span> <span class="n">nr2</span> <span class="k">if</span> <span class="n">normalize</span> <span class="k">else</span> <span class="mf">1.0</span>
+        <span class="n">expression</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">stepFunction</span><span class="si">}</span><span class="s2">)/refval&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;; x=distance(g1,g2)/</span><span class="si">{</span><span class="n">thresholdDistance</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;; refval=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_ref_val</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">expression</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setUsesPeriodicBoundaryConditions</span><span class="p">(</span><span class="n">pbc</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">residueGroup1</span> <span class="o">+</span> <span class="n">residueGroup2</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">addGroup</span><span class="p">(</span>
@@ -174,7 +181,40 @@
             <span class="n">thresholdDistance</span><span class="p">,</span>
             <span class="n">normalize</span><span class="p">,</span>
             <span class="n">weighByMass</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="ResidueCoordination.getReferenceValue">
+<a class="viewcode-back" href="../../api/ResidueCoordination.html#cvpack.ResidueCoordination.getReferenceValue">[docs]</a>
+    <span class="k">def</span> <span class="nf">getReferenceValue</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the reference value used for normalizing the residue coordination.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        mmunit.Quantity</span>
+<span class="sd">            The reference value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ref_val</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">getUnit</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ResidueCoordination.setReferenceValue">
+<a class="viewcode-back" href="../../api/ResidueCoordination.html#cvpack.ResidueCoordination.setReferenceValue">[docs]</a>
+    <span class="nd">@mmunit</span><span class="o">.</span><span class="n">convert_quantities</span>
+    <span class="k">def</span> <span class="nf">setReferenceValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the reference value used for normalizing the residue coordination.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            value</span>
+<span class="sd">                The reference value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">expression</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getEnergyFunction</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setEnergyFunction</span><span class="p">(</span>
+            <span class="n">expression</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;refval=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_ref_val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;refval=</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ref_val</span> <span class="o">=</span> <span class="n">value</span></div>
+</div>
 
 </pre></div>
 
