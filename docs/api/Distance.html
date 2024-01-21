@@ -155,8 +155,8 @@ be rounded.</p></li>
 <span class="go">1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="n">radius_of_gyration</span><span class="p">)</span>
 <span class="go">6</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">platform</span> <span class="o">=</span><span class="n">openmm</span><span class="o">.</span><span class="n">Platform</span><span class="o">.</span><span class="n">getPlatformByName</span><span class="p">(</span><span class="s1">&#39;Reference&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span><span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">platform</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Platform</span><span class="o">.</span><span class="n">getPlatformByName</span><span class="p">(</span><span class="s1">&#39;Reference&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">,</span><span class="n">openmm</span><span class="o">.</span><span class="n">VerletIntegrator</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">platform</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
