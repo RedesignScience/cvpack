@@ -41,6 +41,7 @@ jobs:
           environment-name: test
           create-args: >-
             python=${{ matrix.python-version }}
+            openmm=${{ matrix.openmm-version }}
 
       - name: Install package
         # conda setup requires this special shell
