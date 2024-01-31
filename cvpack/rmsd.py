@@ -7,7 +7,6 @@
 
 """
 
-import copy
 import typing as t
 
 import numpy as np
@@ -26,42 +25,39 @@ class RMSD(openmm.RMSDForce, BaseCollectiveVariable):
     .. math::
 
         d_{\rm rms}({\bf r}) = \sqrt{
-            \frac{1}{n} \sum_{i=1}^n \left\|
-                \hat{\bf r}_i - {\bf A}({\bf r}) \hat{\bf r}_i^{\rm ref}
+            \frac{1}{n} \min_{
+                \bf q \in \mathbb{R}^4 \atop \|{\bf q}\| = 1
+            } \sum_{i=1}^n \left\|
+                {\bf A}({\bf q}) \hat{\bf r}_i - \hat{\bf r}_i^{\rm ref}
             \right\|^2
         }
 
     where :math:`\hat{\bf r}_i` is the position of the :math:`i`-th atom in the group
-    relative to the group's center of geometry (centroid),
-    :math:`\hat{\bf r}_i^{\rm ref}` is the centroid-centered position of the same
-    atom in a reference configuration, and :math:`{\bf A}({\bf r})` is the rotation
-    matrix that minimizes the RMSD between the group and the reference structure.
+    relative to the group's center of geometry (centroid), the superscript
+    :math:`\rm ref` denotes the reference structure, :math:`{\bf q}` is a unit
+    quaternion, and :math:`{\bf A}({\bf q})` is the rotation matrix corresponding to
+    :math:`{\bf q}`.
 
     .. warning::
 
         Periodic boundary conditions are `not supported
-        <https://github.com/openmm/openmm/issues/2913>`_. It atoms in the group belong
-        to distinct molecules, calling :func:`getNullBondForce` and adding the resulting
-        force to the system might circumvent any potential issues.
+        <https://github.com/openmm/openmm/issues/2913>`_. This is not a problem if all
+        atoms in the group belong to the same molecule. If they belong to distinct
+        molecules, it is possible to circumvent the issue by calling the method
+        :func:`getNullBondForce` and adding the resulting force to the system.
 
     Parameters
     ----------
-        referencePositions
-            The reference coordinates. If there are ``n`` coordinates,  with
-            ``n=len(group)``, they must refer to the group atoms in the same order as
-            they appear in ``group``. Otherwise, if there are ``numAtoms`` coordinates
-            (see below), they must refer to the the system atoms and be sorted
-            accordingly. The first criterion has precedence over the second when
-            ``n == numAtoms``.
-        group
-            The index of the atoms in the group
-        numAtoms
-            The total number of atoms in the system (required by OpenMM)
-
-    Raises
-    ------
-        ValueError
-            If ``len(referencePositions)`` is neither ``numAtoms`` nor ``len(group)``
+    referencePositions
+        The reference coordinates, which can be either a coordinate matrix or a mapping
+        from atom indices to coordinate vectors. It must contain all atoms in ``group``,
+        and does not need to contain all atoms in the system. See ``numAtoms`` below.
+    groups
+        A sequence of atom indices.
+    numAtoms
+        The total number of atoms in the system, including those that are not in
+        ``group``. This argument is necessary only if ``referencePositions`` does not
+        contain all atoms in the system.
 
     Example
     -------
@@ -91,23 +87,19 @@ class RMSD(openmm.RMSDForce, BaseCollectiveVariable):
     @mmunit.convert_quantities
     def __init__(
         self,
-        referencePositions: mmunit.MatrixQuantity,
+        referencePositions: t.Union[
+            mmunit.MatrixQuantity, t.Dict[int, mmunit.VectorQuantity]
+        ],
         group: t.Sequence[int],
-        numAtoms: int,
+        numAtoms: t.Optional[int] = None,
     ) -> None:
-        coords = referencePositions
-        num_coords = coords.shape[0] if isinstance(coords, np.ndarray) else len(coords)
-        if num_coords == len(group):
-            positions = np.zeros((numAtoms, 3))
-            for i, atom in enumerate(group):
-                positions[atom, :] = np.array([coords[i][j] for j in range(3)])
-        elif num_coords == numAtoms:
-            positions = copy.deepcopy(coords)
-            coords = np.array([positions[atom] for atom in group])
-        else:
-            raise ValueError("Invalid number of coordinates")
-        super().__init__(positions, group)
-        self._registerCV(mmunit.nanometers, coords, group, numAtoms)
+        num_atoms = numAtoms or len(referencePositions)
+        defined_coords = {atom: referencePositions[atom] for atom in group}
+        all_coords = np.zeros((num_atoms, 3))
+        for atom, coords in defined_coords.items():
+            all_coords[atom, :] = coords
+        super().__init__(all_coords, group)
+        self._registerCV(mmunit.nanometers, defined_coords, group, num_atoms)
 
     def getNullBondForce(self) -> openmm.HarmonicBondForce:
         """
@@ -149,6 +141,6 @@ class RMSD(openmm.RMSDForce, BaseCollectiveVariable):
         """
         force = openmm.HarmonicBondForce()
         group = self._args["group"]
-        for i in range(len(group) - 1):
-            force.addBond(group[i], group[i + 1], 0.0, 0.0)
+        for i, j in zip(group[:-1], group[1:]):
+            force.addBond(i, j, 0.0, 0.0)
         return force

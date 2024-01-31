@@ -68,7 +68,12 @@ class BaseRMSDContent(openmm.CustomCVForce, BaseCollectiveVariable):
                 force = openmm.CustomCVForce(expression(index))
                 self.addCollectiveVariable(f"chunk{index//32}", force)
             force.addCollectiveVariable(
-                f"rmsd{index}", RMSD(ideal_positions, block_atoms[index], numAtoms)
+                f"rmsd{index}",
+                RMSD(
+                    dict(zip(block_atoms[index], ideal_positions)),
+                    block_atoms[index],
+                    numAtoms,
+                ),
             )
 
     @classmethod

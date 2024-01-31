@@ -312,7 +312,7 @@ def run_rmsd_test(
     if passVec3:
         reference = [openmm.Vec3(*row) for row in reference]
     rmsd = cvpack.RMSD(
-        group_ref if passGroupOnly else reference,
+        dict(zip(group, group_ref)) if passGroupOnly else reference,
         group,
         num_atoms,
     )
