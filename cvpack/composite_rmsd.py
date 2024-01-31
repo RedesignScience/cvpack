@@ -13,7 +13,7 @@ import numpy as np
 
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable
+from .cvpack import BaseCollectiveVariable
 
 
 class _Stub:  # pylint: disable=too-few-public-methods
@@ -29,7 +29,7 @@ except ImportError:
     CompositeRMSDForce = _Stub
 
 
-class CompositeRMSD(CompositeRMSDForce, AbstractCollectiveVariable):
+class CompositeRMSD(CompositeRMSDForce, BaseCollectiveVariable):
     r"""
     The composite root-mean-square deviation (RMSD) between the current and reference
     coordinates of :math:`m` groups of atoms:
@@ -63,9 +63,7 @@ class CompositeRMSD(CompositeRMSDForce, AbstractCollectiveVariable):
 
         To use this class, you must install the `openmm-cpp-forces`_ conda package.
 
-    .. _openmm-cpp-forces:
-
-        https://anaconda.org/mdtools/openmm-cpp-forces
+    .. _openmm-cpp-forces: https://anaconda.org/mdtools/openmm-cpp-forces
 
     Parameters
     ----------

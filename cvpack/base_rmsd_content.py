@@ -1,5 +1,5 @@
 """
-.. class:: RMSDContent
+.. class:: BaseRMSDContent
    :platform: Linux, MacOS, Windows
    :synopsis: Secondary-structure RMSD content of a sequence of residues
 
@@ -14,11 +14,11 @@ import numpy as np
 import openmm
 from openmm import app as mmapp
 
-from .cvpack import AbstractCollectiveVariable
+from .cvpack import BaseCollectiveVariable
 from .rmsd import RMSD
 
 
-class RMSDContent(openmm.CustomCVForce, AbstractCollectiveVariable):
+class BaseRMSDContent(openmm.CustomCVForce, BaseCollectiveVariable):
     """
     Abstract class for secondary-structure RMSD content of a sequence of `n` residues.
     """

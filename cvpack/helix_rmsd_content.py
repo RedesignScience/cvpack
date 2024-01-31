@@ -13,59 +13,59 @@ from openmm import app as mmapp
 
 from cvpack import unit as mmunit
 
+from .base_rmsd_content import BaseRMSDContent
 from .cvpack import SerializableResidue
-from .rmsd_content import RMSDContent
 
 # pylint: disable=protected-access
-ALPHA_POSITIONS = RMSDContent._loadPositions("ideal_alpha_helix.csv")
+ALPHA_POSITIONS = BaseRMSDContent._loadPositions("ideal_alpha_helix.csv")
 # pylint: enable=protected-access
 
 
-class HelixRMSDContent(RMSDContent):
-    """
+class HelixRMSDContent(BaseRMSDContent):
+    r"""
     The alpha-helix RMSD content of a sequence of `n` residues :cite:`Pietrucci_2009`:
 
     .. math::
 
-        \\alpha_{\\rm rmsd}({\\bf r}) = \\sum_{i=1}^{n-5} S\\left(
-            \\frac{r_{\\rm rmsd}({\\bf g}_i, {\\bf g}_{\\rm ref})}{r_0}
-        \\right)
+        \alpha_{\rm rmsd}({\bf r}) = \sum_{i=1}^{n-5} S\left(
+            \frac{r_{\rm rmsd}({\bf g}_i, {\bf g}_{\rm ref})}{r_0}
+        \right)
 
-    where :math:`{\\bf g}_i` represents a group of atoms selected from residues
-    :math:`i` to :math:`i+5` of the sequence, :math:`{\\bf g}_{\\rm ref}` represents
+    where :math:`{\bf g}_i` represents a group of atoms selected from residues
+    :math:`i` to :math:`i+5` of the sequence, :math:`{\bf g}_{\rm ref}` represents
     the same atoms in an ideal alpha-helix configuration,
-    :math:`r_{\\rm rmsd}({\\bf g}, {\\bf g}_{\\rm ref})` is the root-mean-square
-    distance (RMSD) between groups :math:`{\\bf g}` and :math:`{\\bf g}_{\\rm ref}`,
+    :math:`r_{\rm rmsd}({\bf g}, {\bf g}_{\rm ref})` is the root-mean-square
+    distance (RMSD) between groups :math:`{\bf g}` and :math:`{\bf g}_{\rm ref}`,
     :math:`r_0` is a threshold RMSD value, and :math:`S(x)` is a smooth step function
     whose default form is
 
     .. math::
-        S(x) = \\frac{1 + x^4}{1 + x^4 + x^8}
+        S(x) = \frac{1 + x^4}{1 + x^4 + x^8}
 
     The residues must be a contiguous sequence from a single chain, ordered from
     the N-terminus to the C-terminus.
 
-    Every group :math:`{\\bf g}_{i,j}` is formed by the N, :math:`{\\rm C}_\\alpha`,
-    :math:`{\\rm C}_\\beta`, C, and O atoms of the six residues involvend, thus
+    Every group :math:`{\bf g}_{i,j}` is formed by the N, :math:`{\rm C}_\alpha`,
+    :math:`{\rm C}_\beta`, C, and O atoms of the six residues involvend, thus
     comprising 30 atoms in total. In the case of glycine, the missing
-    :math:`{\\rm C}_\\beta` atom is replaced by the corresponding H atom. The RMSD is
+    :math:`{\rm C}_\beta` atom is replaced by the corresponding H atom. The RMSD is
     then defined as
 
     .. math::
 
-        r_{\\rm rmsd}({\\bf g}, {\\bf g}_{\\rm ref}) =
-            \\sqrt{\\frac{1}{30} \\sum_{j=1}^{30} \\left\\|
-                \\hat{\\bf r}_j({\\bf g}) -
-                {\\bf A}({\\bf g})\\hat{\\bf r}_j({\\bf g}_{\\rm ref})
-            \\right\\|^2}
+        r_{\rm rmsd}({\bf g}, {\bf g}_{\rm ref}) =
+            \sqrt{\frac{1}{30} \sum_{j=1}^{30} \left\|
+                \hat{\bf r}_j({\bf g}) -
+                {\bf A}({\bf g})\hat{\bf r}_j({\bf g}_{\rm ref})
+            \right\|^2}
 
-    where :math:`\\hat{\\bf r}_k({\\bf g})` is the position of the :math:`k`-th atom in
-    a group :math:`{\\bf g}` relative to the group's center of geometry and
-    :math:`{\\bf A}({\\bf g})` is the rotation matrix that minimizes the RMSD between
-    :math:`{\\bf g}` and :math:`{\\bf g}_{\\rm ref}`.
+    where :math:`\hat{\bf r}_k({\bf g})` is the position of the :math:`k`-th atom in
+    a group :math:`{\bf g}` relative to the group's center of geometry and
+    :math:`{\bf A}({\bf g})` is the rotation matrix that minimizes the RMSD between
+    :math:`{\bf g}` and :math:`{\bf g}_{\rm ref}`.
 
     Optionally, the alpha-helix RMSD content can be normalized to the range
-    :math:`[0, 1]`. This is done by dividing its value by :math:`N_{\\rm groups} =
+    :math:`[0, 1]`. This is done by dividing its value by :math:`N_{\rm groups} =
     n - 5`.
 
     This collective variable was introduced in Ref. :cite:`Pietrucci_2009`. The default
@@ -76,7 +76,7 @@ class HelixRMSDContent(RMSDContent):
 
     .. note::
 
-        The present implementation is limited to :math:`1 \\leq N_{\\rm groups} \\leq
+        The present implementation is limited to :math:`1 \leq N_{\rm groups} \leq
         1024`.
 
     .. _ALPHARMSD: https://www.plumed.org/doc-v2.8/user-doc/html/_a_l_p_h_a_r_m_s_d.html

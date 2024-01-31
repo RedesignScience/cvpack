@@ -7,58 +7,37 @@
 
 """
 
-from typing import Sequence
-
-import openmm
+import typing as t
 
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable
+from .base_radius_of_gyration import BaseRadiusOfGyration
 
 
-class _RadiusOfGyrationBase(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):
-    def __init__(  # pylint: disable=too-many-arguments
-        self,
-        num_groups: int,
-        expression: str,
-        group: Sequence[int],
-        pbc: bool = False,
-        weighByMass: bool = False,
-    ) -> None:
-        super().__init__(num_groups, expression)
-        for atom in group:
-            self.addGroup([atom])
-        if weighByMass:
-            self.addGroup(group)
-        else:
-            self.addGroup(group, [1] * len(group))
-        self.setUsesPeriodicBoundaryConditions(pbc)
-
-
-class RadiusOfGyration(_RadiusOfGyrationBase):
-    """
+class RadiusOfGyration(BaseRadiusOfGyration):
+    r"""
     The radius of gyration of a group of :math:`n` atoms:
 
     .. math::
 
-        r_g({\\bf r}) = \\sqrt{ \\frac{1}{n} \\sum_{i=1}^n \\left\\|
-            {\\bf r}_i - {\\bf r}_c({\\bf r})
-        \\right\\|^2 }.
+        r_g({\bf r}) = \sqrt{ \frac{1}{n} \sum_{i=1}^n \left\|
+            {\bf r}_i - {\bf r}_c({\bf r})
+        \right\|^2 }.
 
-    where :math:`{\\bf r}_c({\\bf r})` is the geometric center of the group:
+    where :math:`{\bf r}_c({\bf r})` is the geometric center of the group:
 
     .. math::
 
-        {\\bf r}_c({\\bf r}) = \\frac{1}{n} \\sum_{i=j}^n {\\bf r}_j
+        {\bf r}_c({\bf r}) = \frac{1}{n} \sum_{i=j}^n {\bf r}_j
 
     Optionally, the radius of gyration can be computed with respect to the center of
     mass of the group. In this case, the geometric center is replaced by:
 
     .. math::
 
-        {\\bf r}_m({\\bf r}) = \\frac{1}{M} \\sum_{i=1}^n m_i {\\bf r}_i
+        {\bf r}_m({\bf r}) = \frac{1}{M} \sum_{i=1}^n m_i {\bf r}_i
 
-    where :math:`M = \\sum_{i=1}^n m_i` is the total mass of the group.
+    where :math:`M = \sum_{i=1}^n m_i` is the total mass of the group.
 
     .. note::
 
@@ -97,7 +76,7 @@ class RadiusOfGyration(_RadiusOfGyrationBase):
     """
 
     def __init__(
-        self, group: Sequence[int], pbc: bool = False, weighByMass: bool = False
+        self, group: t.Sequence[int], pbc: bool = False, weighByMass: bool = False
     ) -> None:
         num_atoms = len(group)
         num_groups = num_atoms + 1

@@ -11,22 +11,22 @@ import openmm
 
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable
+from .cvpack import BaseCollectiveVariable
 
 
-class Angle(openmm.CustomAngleForce, AbstractCollectiveVariable):
-    """
+class Angle(openmm.CustomAngleForce, BaseCollectiveVariable):
+    r"""
     The angle formed by three atoms:
 
     .. math::
 
-        \\theta({\\bf r}) =
-            \\mathrm{acos}\\left(
-                \\frac{{\\bf r}_{2,1} \\cdot {\\bf r}_{2,3} }
-                       {\\| {\\bf r}_{2,1} \\| \\| {\\bf r}_{2,3} \\|}
-            \\right),
+        \theta({\bf r}) =
+            \mathrm{acos}\left(
+                \frac{{\bf r}_{2,1} \cdot {\bf r}_{2,3} }
+                       {\| {\bf r}_{2,1} \| \| {\bf r}_{2,3} \|}
+            \right),
 
-    where :math:`{\\bf r}_{i,j} = {\\bf r}_j - {\\bf r}_i`.
+    where :math:`{\bf r}_{i,j} = {\bf r}_j - {\bf r}_i`.
 
     Parameters
     ----------

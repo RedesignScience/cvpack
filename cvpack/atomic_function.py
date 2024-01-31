@@ -14,17 +14,10 @@ import typing as t
 import numpy as np
 import openmm
 from numpy.typing import ArrayLike
-from openmm import (
-    CustomAngleForce,
-    CustomBondForce,
-    CustomCompoundBondForce,
-    CustomExternalForce,
-    CustomTorsionForce,
-)
 
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable
+from .cvpack import BaseCollectiveVariable
 
 
 def _add_parameters(
@@ -48,18 +41,18 @@ def _add_parameters(
     return perbond_parameters
 
 
-class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable):
-    """
+class AtomicFunction(openmm.CustomCompoundBondForce, BaseCollectiveVariable):
+    r"""
     A generic function of the coordinates of atoms split into `m` groups of `n`
     atoms each:
 
     .. math::
 
-        f({\\bf r}) = \\sum_{i=1}^m F\\left(
-            {\\bf r}_{i,1}, {\\bf r}_{i,2}, \\dots, {\\bf r}_{i,n}
-        \\right)
+        f({\bf r}) = \sum_{i=1}^m F\left(
+            {\bf r}_{i,1}, {\bf r}_{i,2}, \dots, {\bf r}_{i,n}
+        \right)
 
-    where :math:`F` is a user-defined function and :math:`{\\bf r}_{i,j}` is the
+    where :math:`F` is a user-defined function and :math:`{\bf r}_{i,j}` is the
     coordinate of the :math:`j`-th atom of the :math:`i`-th group.
 
     The function :math:`F` is defined as a string and can be any expression supported by
@@ -158,11 +151,11 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
     def _fromCustomForce(
         cls,
         force: t.Union[
-            CustomAngleForce,
-            CustomBondForce,
-            CustomCompoundBondForce,
-            CustomExternalForce,
-            CustomTorsionForce,
+            openmm.CustomAngleForce,
+            openmm.CustomBondForce,
+            openmm.CustomCompoundBondForce,
+            openmm.CustomExternalForce,
+            openmm.CustomTorsionForce,
         ],
         unit: mmunit.Unit,
         pbc: bool = False,
@@ -359,11 +352,11 @@ class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable)
         if isinstance(
             force,
             (
-                CustomAngleForce,
-                CustomBondForce,
-                CustomCompoundBondForce,
-                CustomExternalForce,
-                CustomTorsionForce,
+                openmm.CustomAngleForce,
+                openmm.CustomBondForce,
+                openmm.CustomCompoundBondForce,
+                openmm.CustomExternalForce,
+                openmm.CustomTorsionForce,
             ),
         ):
             return cls._fromCustomForce(force, unit, pbc)

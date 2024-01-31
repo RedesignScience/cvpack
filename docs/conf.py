@@ -20,7 +20,7 @@ import sys
 
 # Incase the project was not installed
 import cvpack
-from cvpack.cvpack import AbstractCollectiveVariable
+from cvpack.cvpack import BaseCollectiveVariable
 
 sys.path.insert(0, os.path.abspath(".."))
 
@@ -28,7 +28,7 @@ sys.path.insert(0, os.path.abspath(".."))
 def create_rst_file(cls):
     name = cls.__name__
     methods = [
-        *filter(lambda x: not x.startswith("_"), AbstractCollectiveVariable.__dict__),
+        *filter(lambda x: not x.startswith("_"), BaseCollectiveVariable.__dict__),
         *filter(lambda x: not x.startswith("_"), cls.__dict__),
     ]
     methods.sort()

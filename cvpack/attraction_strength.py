@@ -13,53 +13,53 @@ import openmm
 
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable
+from .cvpack import BaseCollectiveVariable
 from .utils import NonbondedForceSurrogate, evaluate_in_context
 
 ONE_4PI_EPS0 = 138.93545764438198
 
 
-class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
-    """
+class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
+    r"""
     The strength of the attraction between two atom groups:
 
     .. math::
 
-        S_{\\rm attr}({\\bf r}) = &-\\frac{1}{E_{\\rm ref}} \\Bigg[
-            \\sum_{i \\in {\\bf g}_1}
-                \\sum_{\\substack{j \\in {\\bf g}_2 \\\\ j \\neq i}}
-                    \\epsilon_{ij} u_{\\rm disp}\\left(
-                        \\frac{\\|{\\bf r}_i - {\\bf r}_j\\|}{\\sigma_{ij}}
-                    \\right) \\\\
-            &+\\sum_{i \\in {\\bf g}_1}
-            \\sum_{\\substack{j \\in {\\bf g}_2 \\\\ q_jq_i < 0}}
-                \\frac{q_i q_j}{4 \\pi \\varepsilon_0 r_{\\rm c}} u_{\\rm elec}\\left(
-                    \\frac{\\|{\\bf r}_i - {\\bf r}_j\\|}{r_{\\rm c}}
-                \\right) \\Bigg]
+        S_{\rm attr}({\bf r}) = &-\frac{1}{E_{\rm ref}} \Bigg[
+            \sum_{i \in {\bf g}_1}
+                \sum_{\substack{j \in {\bf g}_2 \\ j \neq i}}
+                    \epsilon_{ij} u_{\rm disp}\left(
+                        \frac{\|{\bf r}_i - {\bf r}_j\|}{\sigma_{ij}}
+                    \right) \\
+            &+\sum_{i \in {\bf g}_1}
+            \sum_{\substack{j \in {\bf g}_2 \\ q_jq_i < 0}}
+                \frac{q_i q_j}{4 \pi \varepsilon_0 r_{\rm c}} u_{\rm elec}\left(
+                    \frac{\|{\bf r}_i - {\bf r}_j\|}{r_{\rm c}}
+                \right) \Bigg]
 
-    where :math:`{\\bf g}_1` and :math:`{\\bf g}_2` are the two atom groups,
-    :math:`r_{\\rm c}` is the cutoff distance, :math:`\\varepsilon_0` is the
+    where :math:`{\bf g}_1` and :math:`{\bf g}_2` are the two atom groups,
+    :math:`r_{\rm c}` is the cutoff distance, :math:`\varepsilon_0` is the
     permittivity of empty space, :math:`q_i` is the charge of atom :math:`i`, and
-    :math:`E_{\\rm ref}` is a reference value (in energy units per mole).
+    :math:`E_{\rm ref}` is a reference value (in energy units per mole).
     The Lennard-Jones parameters are given by the Lorentz-Berthelot mixing rule, i.e.
-    :math:`\\epsilon_{ij} = \\sqrt{\\epsilon_i \\epsilon_j}`, and
-    :math:`\\sigma_{ij} = (\\sigma_i + \\sigma_j)/2`.
+    :math:`\epsilon_{ij} = \sqrt{\epsilon_i \epsilon_j}`, and
+    :math:`\sigma_{ij} = (\sigma_i + \sigma_j)/2`.
 
-    The function :math:`u_{\\rm disp}(x)` is a Lennard-Jones-like reduced potential with
+    The function :math:`u_{\rm disp}(x)` is a Lennard-Jones-like reduced potential with
     a highly softened repulsion part, defined as
 
     .. math::
 
-        u_{\\rm disp}(x) = 4\\left(\\frac{1}{y^2} - \\frac{1}{y}\\right),
-        \\quad \\text{where} \\quad
+        u_{\rm disp}(x) = 4\left(\frac{1}{y^2} - \frac{1}{y}\right),
+        \quad \text{where} \quad
         y = |x^6 - 2| + 2
 
-    The function :math:`u_{\\rm elec}(x)` provides a Coulomb-like decay with
+    The function :math:`u_{\rm elec}(x)` provides a Coulomb-like decay with
     reaction-field screening, defined as
 
     .. math::
 
-        u_{\\rm elec}(x) = \\frac{1}{x} + \\frac{x^2 - 3}{2}
+        u_{\rm elec}(x) = \frac{1}{x} + \frac{x^2 - 3}{2}
 
     The screening considers a perfect conductor as the surrounding medium
     :cite:`Correa_2022`.
@@ -67,7 +67,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
     .. note::
 
         Only attractive electrostatic interactions are considered (:math:`q_i q_i < 0`),
-        which gives :math:`S_{\\rm attr}({\\bf r})` a lower bound of zero. The upper
+        which gives :math:`S_{\rm attr}({\bf r})` a lower bound of zero. The upper
         bound will depends on the system details, the chosen groups of atoms, and the
         adopted reference value.
 
@@ -76,8 +76,8 @@ class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable
     distance, are taken from :openmm:`NonbondedForce` object.
 
     .. note::
-        Any non-exclusion exceptions involving atoms in :math:`{\\bf g}_1` and
-        :math:`{\\bf g}_2` in the provided :class:`openmm.NonbondedForce` are turned
+        Any non-exclusion exceptions involving atoms in :math:`{\bf g}_1` and
+        :math:`{\bf g}_2` in the provided :class:`openmm.NonbondedForce` are turned
         into exclusions in this collective variable.
 
     Parameters

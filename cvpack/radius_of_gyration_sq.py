@@ -8,37 +8,37 @@
 
 """
 
-from typing import Sequence
+import typing as t
 
 from cvpack import unit as mmunit
 
-from .radius_of_gyration import _RadiusOfGyrationBase
+from .base_radius_of_gyration import BaseRadiusOfGyration
 
 
-class RadiusOfGyrationSq(_RadiusOfGyrationBase):
-    """
+class RadiusOfGyrationSq(BaseRadiusOfGyration):
+    r"""
     The square of the radius of gyration of a group of :math:`n` atoms:
 
     .. math::
 
-        r_g^2({\\bf r}) = \\frac{1}{n} \\sum_{i=1}^n \\left\\|
-            {\\bf r}_i - {\\bf r}_c({\\bf r})
-        \\right\\|^2.
+        r_g^2({\bf r}) = \frac{1}{n} \sum_{i=1}^n \left\|
+            {\bf r}_i - {\bf r}_c({\bf r})
+        \right\|^2.
 
-    where :math:`{\\bf r}_c({\\bf r})` is the geometric center of the group:
+    where :math:`{\bf r}_c({\bf r})` is the geometric center of the group:
 
     .. math::
 
-        {\\bf r}_c({\\bf r}) = \\frac{1}{n} \\sum_{i=j}^n {\\bf r}_j
+        {\bf r}_c({\bf r}) = \frac{1}{n} \sum_{i=j}^n {\bf r}_j
 
     Optionally, the radius of gyration can be computed with respect to the center of
     mass of the group. In this case, the geometric center is replaced by:
 
     .. math::
 
-        {\\bf r}_m({\\bf r}) = \\frac{1}{M} \\sum_{i=1}^n m_i {\\bf r}_i
+        {\bf r}_m({\bf r}) = \frac{1}{M} \sum_{i=1}^n m_i {\bf r}_i
 
-    where :math:`M = \\sum_{i=1}^n m_i` is the total mass of the group.
+    where :math:`M = \sum_{i=1}^n m_i` is the total mass of the group.
 
     .. note::
 
@@ -78,7 +78,7 @@ class RadiusOfGyrationSq(_RadiusOfGyrationBase):
     """
 
     def __init__(
-        self, group: Sequence[int], pbc: bool = False, weighByMass: bool = False
+        self, group: t.Sequence[int], pbc: bool = False, weighByMass: bool = False
     ) -> None:
         num_atoms = len(group)
         super().__init__(2, f"distance(g1, g2)^2/{num_atoms}", group, pbc, weighByMass)

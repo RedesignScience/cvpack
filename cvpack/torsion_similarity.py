@@ -7,27 +7,27 @@
 
 """
 
-from typing import Sequence
+import typing as t
 
 import numpy as np
 import openmm
 
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable
+from .cvpack import BaseCollectiveVariable
 
 
-class TorsionSimilarity(openmm.CustomCompoundBondForce, AbstractCollectiveVariable):
-    """
+class TorsionSimilarity(openmm.CustomCompoundBondForce, BaseCollectiveVariable):
+    r"""
     The degree of similarity between `n` pairs of torsion angles:
 
     .. math::
 
-        s({\\bf r}) = \\frac{n}{2} + \\frac{1}{2} \\sum_{i=1}^n \\cos\\Big(
-            \\phi^{\\rm 1st}_i({\\bf r}) - \\phi^{\\rm 2nd}_i({\\bf r})
-        \\Big)
+        s({\bf r}) = \frac{n}{2} + \frac{1}{2} \sum_{i=1}^n \cos\Big(
+            \phi^{\rm 1st}_i({\bf r}) - \phi^{\rm 2nd}_i({\bf r})
+        \Big)
 
-    where :math:`\\phi^{\\rm kth}_i` is the torsion angle at position :math:`i` in the
+    where :math:`\phi^{\rm kth}_i` is the torsion angle at position :math:`i` in the
     :math:`k`-th list.
 
     .. note::
@@ -81,8 +81,8 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, AbstractCollectiveVariab
 
     def __init__(
         self,
-        firstList: Sequence[Sequence[int]],
-        secondList: Sequence[Sequence[int]],
+        firstList: t.Sequence[t.Sequence[int]],
+        secondList: t.Sequence[t.Sequence[int]],
         pbc: bool = False,
     ) -> None:
         function = f"0.5*(1 + cos(min(delta, {2*np.pi} - delta)))"

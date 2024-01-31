@@ -7,33 +7,33 @@
 
 """
 
-from typing import Sequence
+import typing as t
 
 import openmm
 from openmm import app as mmapp
 
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable, SerializableResidue
+from .cvpack import BaseCollectiveVariable, SerializableResidue
 
 
-class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
-    """
+class HelixAngleContent(openmm.CustomAngleForce, BaseCollectiveVariable):
+    r"""
     The alpha-helix angle content of a sequence of `n` residues:
 
     .. math::
 
-        \\alpha_{\\theta}({\\bf r}) = \\sum_{i=2}^{n-1} B_m\\left(
-            \\frac{\\theta^\\alpha_i({\\bf r}) - \\theta_{\\rm ref}}{\\theta_{\\rm tol}}
-        \\right)
+        \alpha_{\theta}({\bf r}) = \sum_{i=2}^{n-1} B_m\left(
+            \frac{\theta^\alpha_i({\bf r}) - \theta_{\rm ref}}{\theta_{\rm tol}}
+        \right)
 
-    where :math:`\\theta^\\alpha_i` is the angle formed by the alpha-carbon atoms of
-    residues :math:`i-1`, :math:`i`, and :math:`i+1`, :math:`\\theta_{\\rm ref}` is its
-    reference value in an alpha helix, and :math:`\\theta_{\\rm tol}` is the threshold
+    where :math:`\theta^\alpha_i` is the angle formed by the alpha-carbon atoms of
+    residues :math:`i-1`, :math:`i`, and :math:`i+1`, :math:`\theta_{\rm ref}` is its
+    reference value in an alpha helix, and :math:`\theta_{\rm tol}` is the threshold
     tolerance around this reference. :math:`B_m(x)` is a smooth boxcar function given by
 
     .. math::
-        B_m(x) = \\frac{1}{1 + x^{2m}}
+        B_m(x) = \frac{1}{1 + x^{2m}}
 
     where :math:`m` is an integer parameter that controls its steepness. Note that
     :math:`x` needs to be elevated to an even power for :math:`B_m(x)` to be an even
@@ -55,7 +55,7 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
             Whether to use periodic boundary conditions
         thetaReference
             The reference value of the
-            :math:`{\\rm C}_\\alpha{\\rm -C}_\\alpha{\\rm -C}_\\alpha` angle in an alpha
+            :math:`{\rm C}_\alpha{\rm -C}_\alpha{\rm -C}_\alpha` angle in an alpha
             helix
         tolerance
             The threshold tolerance around the reference values
@@ -67,7 +67,7 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
     Raises
     ------
         ValueError
-            If some residue does not contain a :math:`{\\rm C}_\\alpha` atom
+            If some residue does not contain a :math:`{\rm C}_\alpha` atom
 
     Example
     -------
@@ -99,7 +99,7 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
     @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        residues: Sequence[mmapp.topology.Residue],
+        residues: t.Sequence[mmapp.topology.Residue],
         pbc: bool = False,
         thetaReference: mmunit.ScalarQuantity = mmunit.Quantity(88, mmunit.degrees),
         tolerance: mmunit.ScalarQuantity = mmunit.Quantity(15, mmunit.degrees),

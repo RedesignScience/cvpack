@@ -7,10 +7,10 @@
 
 """
 
+import collections
+import functools
 import inspect
-from collections import OrderedDict
-from functools import partial
-from typing import Any, Dict, Optional, Tuple
+import typing as t
 
 import numpy as np
 import openmm
@@ -22,7 +22,7 @@ from .unit import value_in_md_units
 
 
 class SerializableResidue(mmapp.topology.Residue):
-    """
+    r"""
     A class that extends OpenMM's Residue class with additional methods for
     serialization and deserialization.
     """
@@ -35,24 +35,24 @@ class SerializableResidue(mmapp.topology.Residue):
         ]
 
 
-class AbstractCollectiveVariable(openmm.Force):
-    """
+class BaseCollectiveVariable(openmm.Force):
+    r"""
     An abstract class with common attributes and method for all CVs.
     """
 
     _unit: mmunit.Unit = mmunit.dimensionless
     _mass_unit: mmunit.Unit = mmunit.dalton * mmunit.nanometers**2
-    _args: Dict[str, Any] = {}
+    _args: t.Dict[str, t.Any] = {}
 
-    def __getstate__(self) -> Dict[str, Any]:
+    def __getstate__(self) -> t.Dict[str, t.Any]:
         return self._args
 
-    def __setstate__(self, keywords: Dict[str, Any]) -> None:
+    def __setstate__(self, keywords: t.Dict[str, t.Any]) -> None:
         self.__init__(**keywords)
 
-    def _registerCV(self, unit: mmunit.Unit, *args: Any, **kwargs: Any) -> None:
+    def _registerCV(self, unit: mmunit.Unit, *args: t.Any, **kwargs: t.Any) -> None:
         """
-        Register the newly created AbstractCollectiveVariable subclass instance.
+        Register the newly created BaseCollectiveVariable subclass instance.
 
         This method must always be called from Subclass.__init__.
 
@@ -116,7 +116,7 @@ class AbstractCollectiveVariable(openmm.Force):
         context.reinitialize(preserveState=True)
         return state
 
-    def _precisionRound(self, number: float, digits: Optional[int] = None) -> float:
+    def _precisionRound(self, number: float, digits: t.Optional[int] = None) -> float:
         """
         Round a number to a specified number of precision digits (if specified).
 
@@ -157,7 +157,7 @@ class AbstractCollectiveVariable(openmm.Force):
             raise ValueError(f"Unit {unit} is not compatible with the MD unit system.")
 
     @classmethod
-    def getArguments(cls) -> Tuple[OrderedDict, OrderedDict]:
+    def getArguments(cls) -> t.Tuple[collections.OrderedDict, collections.OrderedDict]:
         """
         Inspect the arguments needed for constructing an instance of this collective
         variable.
@@ -180,8 +180,8 @@ class AbstractCollectiveVariable(openmm.Force):
             >>> print(*defaults.items())
             ('pbc', False) ('weighByMass', False)
         """
-        arguments = OrderedDict()
-        defaults = OrderedDict()
+        arguments = collections.OrderedDict()
+        defaults = collections.OrderedDict()
         for name, parameter in inspect.signature(cls).parameters.items():
             arguments[name] = parameter.annotation
             if parameter.default is not inspect.Parameter.empty:
@@ -243,7 +243,7 @@ class AbstractCollectiveVariable(openmm.Force):
         return new_group
 
     def getValue(
-        self, context: openmm.Context, digits: Optional[int] = None
+        self, context: openmm.Context, digits: t.Optional[int] = None
     ) -> mmunit.Quantity:
         """
         Evaluate this collective variable at a given :OpenMM:`Context`.
@@ -274,22 +274,22 @@ class AbstractCollectiveVariable(openmm.Force):
         return mmunit.Quantity(self._precisionRound(value, digits), self.getUnit())
 
     def getEffectiveMass(
-        self, context: openmm.Context, digits: Optional[int] = None
+        self, context: openmm.Context, digits: t.Optional[int] = None
     ) -> mmunit.Quantity:
-        """
+        r"""
         Compute the effective mass of this collective variable at a given
         :OpenMM:`Context`.
 
-        The effective mass of a collective variable :math:`q({\\bf r})` is defined as
+        The effective mass of a collective variable :math:`q({\bf r})` is defined as
         :cite:`Chipot_2007`:
 
         .. math::
 
-            m_\\mathrm{eff}({\\bf r}) = \\left(
-                \\sum_{i=1}^N \\frac{1}{m_i} \\left\\|
-                    \\frac{dq}{d{\\bf r}_i}
-                \\right\\|^2
-            \\right)^{-1}
+            m_\mathrm{eff}({\bf r}) = \left(
+                \sum_{i=1}^N \frac{1}{m_i} \left\|
+                    \frac{dq}{d{\bf r}_i}
+                \right\|^2
+            \right)^{-1}
 
         Optionally, effective mass of this collective variable can be rounded to a
         specified number of precision digits, which is the number of digits after the
@@ -340,7 +340,9 @@ class AbstractCollectiveVariable(openmm.Force):
         """
         state = self._getSingleForceState(context, getForces=True)
         # pylint: disable=protected-access,c-extension-no-member
-        get_mass = partial(openmm._openmm.System_getParticleMass, context.getSystem())
+        get_mass = functools.partial(
+            openmm._openmm.System_getParticleMass, context.getSystem()
+        )
         force_vectors = state.getForces(asNumpy=True)._value
         # pylint: enable=protected-access,c-extension-no-member
         squared_forces = np.sum(np.square(force_vectors), axis=1)

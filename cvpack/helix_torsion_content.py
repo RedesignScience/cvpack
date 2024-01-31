@@ -7,39 +7,39 @@
 
 """
 
-from typing import Sequence
+import typing as t
 
 import openmm
 from openmm import app as mmapp
 
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable, SerializableResidue
+from .cvpack import BaseCollectiveVariable, SerializableResidue
 
 
-class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable):
-    """
+class HelixTorsionContent(openmm.CustomTorsionForce, BaseCollectiveVariable):
+    r"""
     The alpha-helix Ramachandran content of a sequence of `n` residues:
 
     .. math::
 
-        \\alpha_{\\phi,\\psi}({\\bf r}) = \\frac{1}{2} \\sum_{i=2}^{n-1} \\left[
-            B_m\\left(
-                \\frac{\\phi_i({\\bf r}) - \\phi_{\\rm ref}}{\\theta_{\\rm tol}}
-            \\right) +
-            B_m\\left(
-                \\frac{\\psi_i({\\bf r}) - \\psi_{\\rm ref}}{\\theta_{\\rm tol}}
-            \\right)
-        \\right]
+        \alpha_{\phi,\psi}({\bf r}) = \frac{1}{2} \sum_{i=2}^{n-1} \left[
+            B_m\left(
+                \frac{\phi_i({\bf r}) - \phi_{\rm ref}}{\theta_{\rm tol}}
+            \right) +
+            B_m\left(
+                \frac{\psi_i({\bf r}) - \psi_{\rm ref}}{\theta_{\rm tol}}
+            \right)
+        \right]
 
-    where :math:`\\phi_i({\\bf r})` and :math:`\\psi_i({\\bf r})` are the Ramachandran
-    dihedral angles of residue :math:`i`, :math:`\\phi_{\\rm ref}` and
-    :math:`\\psi_{\\rm ref}` are their reference values in an alpha helix
-    :cite:`Hovmoller_2002`, and :math:`\\theta_{\\rm tol}` is the threshold tolerance
+    where :math:`\phi_i({\bf r})` and :math:`\psi_i({\bf r})` are the Ramachandran
+    dihedral angles of residue :math:`i`, :math:`\phi_{\rm ref}` and
+    :math:`\psi_{\rm ref}` are their reference values in an alpha helix
+    :cite:`Hovmoller_2002`, and :math:`\theta_{\rm tol}` is the threshold tolerance
     around these refenrences. :math:`B_m(x)` is a smooth boxcar function given by
 
     .. math::
-        B_m(x) = \\frac{1}{1 + x^{2m}}
+        B_m(x) = \frac{1}{1 + x^{2m}}
 
     where :math:`m` is an integer parameter that controls its steepness. Note that
     :math:`x` needs to be elevated to an even power for :math:`B_m(x)` to be an even
@@ -49,7 +49,7 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
 
     .. note::
 
-        The :math:`\\phi` and :math:`\\psi` angles of the first and last residues are
+        The :math:`\phi` and :math:`\psi` angles of the first and last residues are
         not considered. They are used to compute the dihedral angles of the second and
         penultimate residues, respectively.
 
@@ -77,7 +77,7 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
     Raises
     ------
         ValueError
-            If some residue does not contain a :math:`\\phi` or :math:`\\psi` angle
+            If some residue does not contain a :math:`\phi` or :math:`\psi` angle
 
     Example
     -------
@@ -109,7 +109,7 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
     @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        residues: Sequence[mmapp.topology.Residue],
+        residues: t.Sequence[mmapp.topology.Residue],
         pbc: bool = False,
         phiReference: mmunit.ScalarQuantity = mmunit.Quantity(-63.8, mmunit.degrees),
         psiReference: mmunit.ScalarQuantity = mmunit.Quantity(-41.1, mmunit.degrees),

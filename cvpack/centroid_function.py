@@ -16,24 +16,24 @@ from numpy.typing import ArrayLike
 from cvpack import unit as mmunit
 
 from .atomic_function import _add_parameters
-from .cvpack import AbstractCollectiveVariable
+from .cvpack import BaseCollectiveVariable
 
 
-class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):
-    """
-    A generic function of the centroids of :math:`m \\times n` atoms groups split
+class CentroidFunction(openmm.CustomCentroidBondForce, BaseCollectiveVariable):
+    r"""
+    A generic function of the centroids of :math:`m \times n` atoms groups split
     into `m` collections of `n` groups each:
 
     .. math::
 
-        f({\\bf r}) = \\sum_{i=1}^m F\\Big(
-            {\\bf g}^i_1({\\bf r}),
-            {\\bf g}^i_2({\\bf r}),
-            \\dots,
-            {\\bf g}^i_n({\\bf r})
-        \\Big)
+        f({\bf r}) = \sum_{i=1}^m F\Big(
+            {\bf g}^i_1({\bf r}),
+            {\bf g}^i_2({\bf r}),
+            \dots,
+            {\bf g}^i_n({\bf r})
+        \Big)
 
-    where :math:`F` is a user-defined function and :math:`{\\bf g}^i_1({\\bf r})` is the
+    where :math:`F` is a user-defined function and :math:`{\bf g}^i_1({\bf r})` is the
     centroid of the :math:`j`-th group of atoms of the :math:`i`-th collection of
     groups.
 
@@ -47,16 +47,16 @@ class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariabl
 
     .. math::
 
-        {\\bf g}_j({\\bf r}) = \\frac{1}{N_j} \\sum_{k=1}^{N_j} {\\bf r}_{k,j}
+        {\bf g}_j({\bf r}) = \frac{1}{N_j} \sum_{k=1}^{N_j} {\bf r}_{k,j}
 
     where :math:`N_j` is the number of atoms in group :math:`j` and
-    :math:`{\\bf r}_{k,j}` is the coordinate of the :math:`k`-th atom of group
+    :math:`{\bf r}_{k,j}` is the coordinate of the :math:`k`-th atom of group
     :math:`j`. Optionally, the centroid can be weighted by the mass of each atom
     in the group. In this case, it is redefined as:
 
     .. math::
 
-        {\\bf g}_j({\\bf r}) = \\frac{1}{M_j} \\sum_{k=1}^{N_j} m_{k,j} {\\bf r}_{k,j}
+        {\bf g}_j({\bf r}) = \frac{1}{M_j} \sum_{k=1}^{N_j} m_{k,j} {\bf r}_{k,j}
 
     where :math:`M_j` is the total mass of atom group :math:`j` and :math:`m_{k,j}` is
     the mass of the :math:`k`-th atom in group :math:`j`.
