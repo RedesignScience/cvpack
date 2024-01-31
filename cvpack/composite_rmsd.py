@@ -63,63 +63,66 @@ class CompositeRMSD(CompositeRMSDForce, BaseCollectiveVariable):
 
         To use this class, you must install the `openmm-cpp-forces`_ conda package.
 
-    .. _openmm-cpp-forces: https://anaconda.org/mdtools/openmm-cpp-forces
+    .. _openmm-cpp-forces:
+
+        https://anaconda.org/mdtools/openmm-cpp-forces
 
     Parameters
     ----------
-        referencePositions
-            The reference coordinates. It can be either a matrix or a dictionary whose
-            keys and values are atom indices and position vectors, respectively.
-        groups
-            A sequence of disjoint atom groups. Each group is a sequence of atom
-            indices.
-        numAtoms
-            The total number of atoms in the system, including those that are not in any
-            group. This argument is necessary only if ``referencePositions`` does not
-            contain all atoms in the system.
+    referencePositions
+        The reference coordinates, which can be either a coordinate matrix or a mapping
+        from atom indices to coordinate vectors. It must contain all atoms in
+        ``groups``, and does not need to contain all atoms in the system. See
+        ``numAtoms`` below.
+    groups
+        A sequence of disjoint atom groups. Each group is a sequence of atom indices.
+    numAtoms
+        The total number of atoms in the system, including those that are not in
+        ``groups``. This argument is necessary only if ``referencePositions`` does not
+        contain all atoms in the system.
 
     Raises
     ------
-        ImportError
-            If the `openmm-cpp-forces`_ conda package is not installed.
-        ValueError
-            If ``groups`` is not a sequence of disjoint atom groups.
+    ImportError
+        If the `openmm-cpp-forces`_ conda package is not installed.
+    ValueError
+        If ``groups`` is not a sequence of disjoint atom groups.
 
     Example
     -------
-        >>> import cvpack
-        >>> import openmm as mm
-        >>> import pytest
-        >>> from openmmtools import testsystems
-        >>> from cvpack import unit
-        >>> model = testsystems.HostGuestVacuum()
-        >>> host_atoms, guest_atoms = (
-        ...     [a.index for a in r.atoms()]
-        ...     for r in model.topology.residues()
-        ... )
-        >>> try:
-        ...     composite_rmsd = cvpack.CompositeRMSD(
-        ...         model.positions,
-        ...         [host_atoms, guest_atoms],
-        ...     )
-        ... except ImportError:
-        ...     pytest.skip("openmm-cpp-forces is not installed")
-        >>> composite_rmsd.setUnusedForceGroup(0, model.system)
-        1
-        >>> model.system.addForce(composite_rmsd)
-        5
-        >>> context = mm.Context(
-        ...     model.system,
-        ...     mm.VerletIntegrator(1.0 * unit.femtoseconds),
-        ...     mm.Platform.getPlatformByName('Reference'),
-        ... )
-        >>> context.setPositions(model.positions)
-        >>> print(composite_rmsd.getValue(context))
-        0.0 nm
-        >>> model.positions[guest_atoms] += 1.0 * unit.nanometers
-        >>> context.setPositions(model.positions)
-        >>> print(composite_rmsd.getValue(context))
-        0.0 nm
+    >>> import cvpack
+    >>> import openmm as mm
+    >>> import pytest
+    >>> from openmmtools import testsystems
+    >>> from cvpack import unit
+    >>> model = testsystems.HostGuestVacuum()
+    >>> host_atoms, guest_atoms = (
+    ...     [a.index for a in r.atoms()]
+    ...     for r in model.topology.residues()
+    ... )
+    >>> try:
+    ...     composite_rmsd = cvpack.CompositeRMSD(
+    ...         model.positions,
+    ...         [host_atoms, guest_atoms],
+    ...     )
+    ... except ImportError:
+    ...     pytest.skip("openmm-cpp-forces is not installed")
+    >>> composite_rmsd.setUnusedForceGroup(0, model.system)
+    1
+    >>> model.system.addForce(composite_rmsd)
+    5
+    >>> context = mm.Context(
+    ...     model.system,
+    ...     mm.VerletIntegrator(1.0 * unit.femtoseconds),
+    ...     mm.Platform.getPlatformByName('Reference'),
+    ... )
+    >>> context.setPositions(model.positions)
+    >>> print(composite_rmsd.getValue(context))
+    0.0 nm
+    >>> model.positions[guest_atoms] += 1.0 * unit.nanometers
+    >>> context.setPositions(model.positions)
+    >>> print(composite_rmsd.getValue(context))
+    0.0 nm
     """
 
     @mmunit.convert_quantities
@@ -138,7 +141,6 @@ class CompositeRMSD(CompositeRMSDForce, BaseCollectiveVariable):
         defined_coords = {atom: referencePositions[atom] for atom in all_atoms}
         all_coords = np.zeros((num_atoms, 3))
         for atom, coords in defined_coords.items():
-            # print(coords)
             all_coords[atom, :] = coords
         super().__init__(all_coords)
         for group in groups:
