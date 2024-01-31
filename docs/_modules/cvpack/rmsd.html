@@ -43,7 +43,6 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">t</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -64,42 +63,39 @@
 <span class="sd">    .. math::</span>
 
 <span class="sd">        d_{\rm rms}({\bf r}) = \sqrt{</span>
-<span class="sd">            \frac{1}{n} \sum_{i=1}^n \left\|</span>
-<span class="sd">                \hat{\bf r}_i - {\bf A}({\bf r}) \hat{\bf r}_i^{\rm ref}</span>
+<span class="sd">            \frac{1}{n} \min_{</span>
+<span class="sd">                \bf q \in \mathbb{R}^4 \atop \|{\bf q}\| = 1</span>
+<span class="sd">            } \sum_{i=1}^n \left\|</span>
+<span class="sd">                {\bf A}({\bf q}) \hat{\bf r}_i - \hat{\bf r}_i^{\rm ref}</span>
 <span class="sd">            \right\|^2</span>
 <span class="sd">        }</span>
 
 <span class="sd">    where :math:`\hat{\bf r}_i` is the position of the :math:`i`-th atom in the group</span>
-<span class="sd">    relative to the group&#39;s center of geometry (centroid),</span>
-<span class="sd">    :math:`\hat{\bf r}_i^{\rm ref}` is the centroid-centered position of the same</span>
-<span class="sd">    atom in a reference configuration, and :math:`{\bf A}({\bf r})` is the rotation</span>
-<span class="sd">    matrix that minimizes the RMSD between the group and the reference structure.</span>
+<span class="sd">    relative to the group&#39;s center of geometry (centroid), the superscript</span>
+<span class="sd">    :math:`\rm ref` denotes the reference structure, :math:`{\bf q}` is a unit</span>
+<span class="sd">    quaternion, and :math:`{\bf A}({\bf q})` is the rotation matrix corresponding to</span>
+<span class="sd">    :math:`{\bf q}`.</span>
 
 <span class="sd">    .. warning::</span>
 
 <span class="sd">        Periodic boundary conditions are `not supported</span>
-<span class="sd">        &lt;https://github.com/openmm/openmm/issues/2913&gt;`_. It atoms in the group belong</span>
-<span class="sd">        to distinct molecules, calling :func:`getNullBondForce` and adding the resulting</span>
-<span class="sd">        force to the system might circumvent any potential issues.</span>
+<span class="sd">        &lt;https://github.com/openmm/openmm/issues/2913&gt;`_. This is not a problem if all</span>
+<span class="sd">        atoms in the group belong to the same molecule. If they belong to distinct</span>
+<span class="sd">        molecules, it is possible to circumvent the issue by calling the method</span>
+<span class="sd">        :func:`getNullBondForce` and adding the resulting force to the system.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">        referencePositions</span>
-<span class="sd">            The reference coordinates. If there are ``n`` coordinates,  with</span>
-<span class="sd">            ``n=len(group)``, they must refer to the group atoms in the same order as</span>
-<span class="sd">            they appear in ``group``. Otherwise, if there are ``numAtoms`` coordinates</span>
-<span class="sd">            (see below), they must refer to the the system atoms and be sorted</span>
-<span class="sd">            accordingly. The first criterion has precedence over the second when</span>
-<span class="sd">            ``n == numAtoms``.</span>
-<span class="sd">        group</span>
-<span class="sd">            The index of the atoms in the group</span>
-<span class="sd">        numAtoms</span>
-<span class="sd">            The total number of atoms in the system (required by OpenMM)</span>
-
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">        ValueError</span>
-<span class="sd">            If ``len(referencePositions)`` is neither ``numAtoms`` nor ``len(group)``</span>
+<span class="sd">    referencePositions</span>
+<span class="sd">        The reference coordinates, which can be either a coordinate matrix or a mapping</span>
+<span class="sd">        from atom indices to coordinate vectors. It must contain all atoms in ``group``,</span>
+<span class="sd">        and does not need to contain all atoms in the system. See ``numAtoms`` below.</span>
+<span class="sd">    groups</span>
+<span class="sd">        A sequence of atom indices.</span>
+<span class="sd">    numAtoms</span>
+<span class="sd">        The total number of atoms in the system, including those that are not in</span>
+<span class="sd">        ``group``. This argument is necessary only if ``referencePositions`` does not</span>
+<span class="sd">        contain all atoms in the system.</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
@@ -129,23 +125,19 @@
     <span class="nd">@mmunit</span><span class="o">.</span><span class="n">convert_quantities</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">referencePositions</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">MatrixQuantity</span><span class="p">,</span>
+        <span class="n">referencePositions</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+            <span class="n">mmunit</span><span class="o">.</span><span class="n">MatrixQuantity</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">VectorQuantity</span><span class="p">]</span>
+        <span class="p">],</span>
         <span class="n">group</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
-        <span class="n">numAtoms</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">numAtoms</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">coords</span> <span class="o">=</span> <span class="n">referencePositions</span>
-        <span class="n">num_coords</span> <span class="o">=</span> <span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">num_coords</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">group</span><span class="p">):</span>
-            <span class="n">positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">numAtoms</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">group</span><span class="p">):</span>
-                <span class="n">positions</span><span class="p">[</span><span class="n">atom</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)])</span>
-        <span class="k">elif</span> <span class="n">num_coords</span> <span class="o">==</span> <span class="n">numAtoms</span><span class="p">:</span>
-            <span class="n">positions</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
-            <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">positions</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">group</span><span class="p">])</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid number of coordinates&quot;</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span><span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">numAtoms</span><span class="p">)</span>
+        <span class="n">num_atoms</span> <span class="o">=</span> <span class="n">numAtoms</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">referencePositions</span><span class="p">)</span>
+        <span class="n">defined_coords</span> <span class="o">=</span> <span class="p">{</span><span class="n">atom</span><span class="p">:</span> <span class="n">referencePositions</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">group</span><span class="p">}</span>
+        <span class="n">all_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_atoms</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">atom</span><span class="p">,</span> <span class="n">coords</span> <span class="ow">in</span> <span class="n">defined_coords</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">all_coords</span><span class="p">[</span><span class="n">atom</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">coords</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">all_coords</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span><span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span><span class="p">,</span> <span class="n">defined_coords</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">num_atoms</span><span class="p">)</span>
 
 <div class="viewcode-block" id="RMSD.getNullBondForce">
 <a class="viewcode-back" href="../../api/RMSD.html#cvpack.RMSD.getNullBondForce">[docs]</a>
@@ -189,8 +181,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">force</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">HarmonicBondForce</span><span class="p">()</span>
         <span class="n">group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_args</span><span class="p">[</span><span class="s2">&quot;group&quot;</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">group</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="n">force</span><span class="o">.</span><span class="n">addBond</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">group</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">group</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">group</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="n">force</span><span class="o">.</span><span class="n">addBond</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">force</span></div>
 </div>
 

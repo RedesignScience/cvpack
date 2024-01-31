@@ -65,23 +65,27 @@ positions of atom <span class="math notranslate nohighlight">\(i\)</span> in the
 group <span class="math notranslate nohighlight">\(j\)</span>, defined analogously to <span class="math notranslate nohighlight">\({\bf c}_j\)</span>.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>To use this class, you must install the <a class="reference external" href="https://anaconda.org/mdtools/openmm-cpp-forces">openmm-cpp-forces</a> conda package.</p>
+<p>To use this class, you must install the <a class="reference internal" href="#openmm-cpp-forces">openmm-cpp-forces</a> conda package.</p>
 </div>
+<blockquote id="openmm-cpp-forces">
+<div><p><a class="reference external" href="https://anaconda.org/mdtools/openmm-cpp-forces">https://anaconda.org/mdtools/openmm-cpp-forces</a></p>
+</div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>referencePositions</strong> (<em>Quantity</em><em> | </em><em>ndarray</em><em> | </em><em>Sequence</em><em>[</em><em>Vec3</em><em>] </em><em>| </em><em>Sequence</em><em>[</em><em>ndarray</em><em>] </em><em>| </em><em>Dict</em><em>[</em><em>int</em><em>, </em><em>Quantity</em><em> | </em><em>ndarray</em><em> | </em><em>Vec3</em><em>]</em>) – The reference coordinates. It can be either a matrix or a dictionary whose
-keys and values are atom indices and position vectors, respectively.</p></li>
-<li><p><strong>groups</strong> (<em>Sequence</em><em>[</em><em>Sequence</em><em>[</em><em>int</em><em>]</em><em>]</em>) – A sequence of disjoint atom groups. Each group is a sequence of atom
-indices.</p></li>
-<li><p><strong>numAtoms</strong> (<em>int</em><em> | </em><em>None</em>) – The total number of atoms in the system, including those that are not in any
-group. This argument is necessary only if <code class="docutils literal notranslate"><span class="pre">referencePositions</span></code> does not
+<li><p><strong>referencePositions</strong> (<em>Quantity</em><em> | </em><em>ndarray</em><em> | </em><em>Sequence</em><em>[</em><em>Vec3</em><em>] </em><em>| </em><em>Sequence</em><em>[</em><em>ndarray</em><em>] </em><em>| </em><em>Dict</em><em>[</em><em>int</em><em>, </em><em>Quantity</em><em> | </em><em>ndarray</em><em> | </em><em>Vec3</em><em>]</em>) – The reference coordinates, which can be either a coordinate matrix or a mapping
+from atom indices to coordinate vectors. It must contain all atoms in
+<code class="docutils literal notranslate"><span class="pre">groups</span></code>, and does not need to contain all atoms in the system. See
+<code class="docutils literal notranslate"><span class="pre">numAtoms</span></code> below.</p></li>
+<li><p><strong>groups</strong> (<em>Sequence</em><em>[</em><em>Sequence</em><em>[</em><em>int</em><em>]</em><em>]</em>) – A sequence of disjoint atom groups. Each group is a sequence of atom indices.</p></li>
+<li><p><strong>numAtoms</strong> (<em>int</em><em> | </em><em>None</em>) – The total number of atoms in the system, including those that are not in
+<code class="docutils literal notranslate"><span class="pre">groups</span></code>. This argument is necessary only if <code class="docutils literal notranslate"><span class="pre">referencePositions</span></code> does not
 contain all atoms in the system.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>ImportError</strong> – If the <a class="reference external" href="https://anaconda.org/mdtools/openmm-cpp-forces">openmm-cpp-forces</a> conda package is not installed.</p></li>
+<li><p><strong>ImportError</strong> – If the <a class="reference internal" href="#openmm-cpp-forces">openmm-cpp-forces</a> conda package is not installed.</p></li>
 <li><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">groups</span></code> is not a sequence of disjoint atom groups.</p></li>
 </ul>
 </dd>

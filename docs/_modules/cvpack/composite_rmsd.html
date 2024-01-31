@@ -101,63 +101,66 @@
 
 <span class="sd">        To use this class, you must install the `openmm-cpp-forces`_ conda package.</span>
 
-<span class="sd">    .. _openmm-cpp-forces: https://anaconda.org/mdtools/openmm-cpp-forces</span>
+<span class="sd">    .. _openmm-cpp-forces:</span>
+
+<span class="sd">        https://anaconda.org/mdtools/openmm-cpp-forces</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">        referencePositions</span>
-<span class="sd">            The reference coordinates. It can be either a matrix or a dictionary whose</span>
-<span class="sd">            keys and values are atom indices and position vectors, respectively.</span>
-<span class="sd">        groups</span>
-<span class="sd">            A sequence of disjoint atom groups. Each group is a sequence of atom</span>
-<span class="sd">            indices.</span>
-<span class="sd">        numAtoms</span>
-<span class="sd">            The total number of atoms in the system, including those that are not in any</span>
-<span class="sd">            group. This argument is necessary only if ``referencePositions`` does not</span>
-<span class="sd">            contain all atoms in the system.</span>
+<span class="sd">    referencePositions</span>
+<span class="sd">        The reference coordinates, which can be either a coordinate matrix or a mapping</span>
+<span class="sd">        from atom indices to coordinate vectors. It must contain all atoms in</span>
+<span class="sd">        ``groups``, and does not need to contain all atoms in the system. See</span>
+<span class="sd">        ``numAtoms`` below.</span>
+<span class="sd">    groups</span>
+<span class="sd">        A sequence of disjoint atom groups. Each group is a sequence of atom indices.</span>
+<span class="sd">    numAtoms</span>
+<span class="sd">        The total number of atoms in the system, including those that are not in</span>
+<span class="sd">        ``groups``. This argument is necessary only if ``referencePositions`` does not</span>
+<span class="sd">        contain all atoms in the system.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
-<span class="sd">        ImportError</span>
-<span class="sd">            If the `openmm-cpp-forces`_ conda package is not installed.</span>
-<span class="sd">        ValueError</span>
-<span class="sd">            If ``groups`` is not a sequence of disjoint atom groups.</span>
+<span class="sd">    ImportError</span>
+<span class="sd">        If the `openmm-cpp-forces`_ conda package is not installed.</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If ``groups`` is not a sequence of disjoint atom groups.</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
-<span class="sd">        &gt;&gt;&gt; import cvpack</span>
-<span class="sd">        &gt;&gt;&gt; import openmm as mm</span>
-<span class="sd">        &gt;&gt;&gt; import pytest</span>
-<span class="sd">        &gt;&gt;&gt; from openmmtools import testsystems</span>
-<span class="sd">        &gt;&gt;&gt; from cvpack import unit</span>
-<span class="sd">        &gt;&gt;&gt; model = testsystems.HostGuestVacuum()</span>
-<span class="sd">        &gt;&gt;&gt; host_atoms, guest_atoms = (</span>
-<span class="sd">        ...     [a.index for a in r.atoms()]</span>
-<span class="sd">        ...     for r in model.topology.residues()</span>
-<span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; try:</span>
-<span class="sd">        ...     composite_rmsd = cvpack.CompositeRMSD(</span>
-<span class="sd">        ...         model.positions,</span>
-<span class="sd">        ...         [host_atoms, guest_atoms],</span>
-<span class="sd">        ...     )</span>
-<span class="sd">        ... except ImportError:</span>
-<span class="sd">        ...     pytest.skip(&quot;openmm-cpp-forces is not installed&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; composite_rmsd.setUnusedForceGroup(0, model.system)</span>
-<span class="sd">        1</span>
-<span class="sd">        &gt;&gt;&gt; model.system.addForce(composite_rmsd)</span>
-<span class="sd">        5</span>
-<span class="sd">        &gt;&gt;&gt; context = mm.Context(</span>
-<span class="sd">        ...     model.system,</span>
-<span class="sd">        ...     mm.VerletIntegrator(1.0 * unit.femtoseconds),</span>
-<span class="sd">        ...     mm.Platform.getPlatformByName(&#39;Reference&#39;),</span>
-<span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">        &gt;&gt;&gt; print(composite_rmsd.getValue(context))</span>
-<span class="sd">        0.0 nm</span>
-<span class="sd">        &gt;&gt;&gt; model.positions[guest_atoms] += 1.0 * unit.nanometers</span>
-<span class="sd">        &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">        &gt;&gt;&gt; print(composite_rmsd.getValue(context))</span>
-<span class="sd">        0.0 nm</span>
+<span class="sd">    &gt;&gt;&gt; import cvpack</span>
+<span class="sd">    &gt;&gt;&gt; import openmm as mm</span>
+<span class="sd">    &gt;&gt;&gt; import pytest</span>
+<span class="sd">    &gt;&gt;&gt; from openmmtools import testsystems</span>
+<span class="sd">    &gt;&gt;&gt; from cvpack import unit</span>
+<span class="sd">    &gt;&gt;&gt; model = testsystems.HostGuestVacuum()</span>
+<span class="sd">    &gt;&gt;&gt; host_atoms, guest_atoms = (</span>
+<span class="sd">    ...     [a.index for a in r.atoms()]</span>
+<span class="sd">    ...     for r in model.topology.residues()</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; try:</span>
+<span class="sd">    ...     composite_rmsd = cvpack.CompositeRMSD(</span>
+<span class="sd">    ...         model.positions,</span>
+<span class="sd">    ...         [host_atoms, guest_atoms],</span>
+<span class="sd">    ...     )</span>
+<span class="sd">    ... except ImportError:</span>
+<span class="sd">    ...     pytest.skip(&quot;openmm-cpp-forces is not installed&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; composite_rmsd.setUnusedForceGroup(0, model.system)</span>
+<span class="sd">    1</span>
+<span class="sd">    &gt;&gt;&gt; model.system.addForce(composite_rmsd)</span>
+<span class="sd">    5</span>
+<span class="sd">    &gt;&gt;&gt; context = mm.Context(</span>
+<span class="sd">    ...     model.system,</span>
+<span class="sd">    ...     mm.VerletIntegrator(1.0 * unit.femtoseconds),</span>
+<span class="sd">    ...     mm.Platform.getPlatformByName(&#39;Reference&#39;),</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; context.setPositions(model.positions)</span>
+<span class="sd">    &gt;&gt;&gt; print(composite_rmsd.getValue(context))</span>
+<span class="sd">    0.0 nm</span>
+<span class="sd">    &gt;&gt;&gt; model.positions[guest_atoms] += 1.0 * unit.nanometers</span>
+<span class="sd">    &gt;&gt;&gt; context.setPositions(model.positions)</span>
+<span class="sd">    &gt;&gt;&gt; print(composite_rmsd.getValue(context))</span>
+<span class="sd">    0.0 nm</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@mmunit</span><span class="o">.</span><span class="n">convert_quantities</span>
@@ -176,7 +179,6 @@
         <span class="n">defined_coords</span> <span class="o">=</span> <span class="p">{</span><span class="n">atom</span><span class="p">:</span> <span class="n">referencePositions</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">all_atoms</span><span class="p">}</span>
         <span class="n">all_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_atoms</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">atom</span><span class="p">,</span> <span class="n">coords</span> <span class="ow">in</span> <span class="n">defined_coords</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="c1"># print(coords)</span>
             <span class="n">all_coords</span><span class="p">[</span><span class="n">atom</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">coords</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">all_coords</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">:</span>
