@@ -339,10 +339,10 @@ class AbstractCollectiveVariable(openmm.Force):
             30.94693 Da
         """
         state = self._getSingleForceState(context, getForces=True)
-        # pylint: disable=protected-access
+        # pylint: disable=protected-access,c-extension-no-member
         get_mass = partial(openmm._openmm.System_getParticleMass, context.getSystem())
         force_vectors = state.getForces(asNumpy=True)._value
-        # pylint: enable=protected-access
+        # pylint: enable=protected-access,c-extension-no-member
         squared_forces = np.sum(np.square(force_vectors), axis=1)
         nonzeros = np.nonzero(squared_forces)[0]
         if nonzeros.size == 0:
