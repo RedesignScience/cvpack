@@ -7,12 +7,12 @@
 
 """
 
-from typing import IO, Any
+import typing as t
 
 import yaml
 
 
-def serialize(obj: Any, iostream: IO) -> None:
+def serialize(obj: t.Any, iostream: t.IO) -> None:
     """
     Serializes a cvpack object.
 
@@ -45,7 +45,7 @@ def serialize(obj: Any, iostream: IO) -> None:
     iostream.write(yaml.dump(obj, Dumper=yaml.CDumper))
 
 
-def deserialize(iostream: IO) -> Any:
+def deserialize(iostream: t.IO) -> t.Any:
     """
     Deserializes a cvpack object.
 

@@ -8,7 +8,7 @@
 """
 
 import copy
-from typing import Sequence
+import typing as t
 
 import numpy as np
 import openmm
@@ -92,7 +92,7 @@ class RMSD(openmm.RMSDForce, AbstractCollectiveVariable):
     def __init__(
         self,
         referencePositions: mmunit.MatrixQuantity,
-        group: Sequence[int],
+        group: t.Sequence[int],
         numAtoms: int,
     ) -> None:
         coords = referencePositions

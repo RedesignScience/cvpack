@@ -7,7 +7,7 @@
 
 """
 
-from typing import Sequence
+import typing as t
 
 import openmm
 from openmm import app as mmapp
@@ -109,7 +109,7 @@ class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable)
     @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        residues: Sequence[mmapp.topology.Residue],
+        residues: t.Sequence[mmapp.topology.Residue],
         pbc: bool = False,
         phiReference: mmunit.ScalarQuantity = mmunit.Quantity(-63.8, mmunit.degrees),
         psiReference: mmunit.ScalarQuantity = mmunit.Quantity(-41.1, mmunit.degrees),

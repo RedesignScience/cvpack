@@ -7,7 +7,7 @@
 
 """
 
-from typing import Sequence
+import typing as t
 
 import openmm
 
@@ -21,7 +21,7 @@ class _RadiusOfGyrationBase(openmm.CustomCentroidBondForce, AbstractCollectiveVa
         self,
         num_groups: int,
         expression: str,
-        group: Sequence[int],
+        group: t.Sequence[int],
         pbc: bool = False,
         weighByMass: bool = False,
     ) -> None:
@@ -97,7 +97,7 @@ class RadiusOfGyration(_RadiusOfGyrationBase):
     """
 
     def __init__(
-        self, group: Sequence[int], pbc: bool = False, weighByMass: bool = False
+        self, group: t.Sequence[int], pbc: bool = False, weighByMass: bool = False
     ) -> None:
         num_atoms = len(group)
         num_groups = num_atoms + 1

@@ -8,7 +8,7 @@
 
 """
 
-from typing import Sequence
+import typing as t
 
 from cvpack import unit as mmunit
 
@@ -78,7 +78,7 @@ class RadiusOfGyrationSq(_RadiusOfGyrationBase):
     """
 
     def __init__(
-        self, group: Sequence[int], pbc: bool = False, weighByMass: bool = False
+        self, group: t.Sequence[int], pbc: bool = False, weighByMass: bool = False
     ) -> None:
         num_atoms = len(group)
         super().__init__(2, f"distance(g1, g2)^2/{num_atoms}", group, pbc, weighByMass)

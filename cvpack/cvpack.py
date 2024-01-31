@@ -8,9 +8,9 @@
 """
 
 import inspect
+import typing as t
 from collections import OrderedDict
 from functools import partial
-from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 import openmm
@@ -42,15 +42,15 @@ class AbstractCollectiveVariable(openmm.Force):
 
     _unit: mmunit.Unit = mmunit.dimensionless
     _mass_unit: mmunit.Unit = mmunit.dalton * mmunit.nanometers**2
-    _args: Dict[str, Any] = {}
+    _args: t.Dict[str, t.Any] = {}
 
-    def __getstate__(self) -> Dict[str, Any]:
+    def __getstate__(self) -> t.Dict[str, t.Any]:
         return self._args
 
-    def __setstate__(self, keywords: Dict[str, Any]) -> None:
+    def __setstate__(self, keywords: t.Dict[str, t.Any]) -> None:
         self.__init__(**keywords)
 
-    def _registerCV(self, unit: mmunit.Unit, *args: Any, **kwargs: Any) -> None:
+    def _registerCV(self, unit: mmunit.Unit, *args: t.Any, **kwargs: t.Any) -> None:
         """
         Register the newly created AbstractCollectiveVariable subclass instance.
 
@@ -116,7 +116,7 @@ class AbstractCollectiveVariable(openmm.Force):
         context.reinitialize(preserveState=True)
         return state
 
-    def _precisionRound(self, number: float, digits: Optional[int] = None) -> float:
+    def _precisionRound(self, number: float, digits: t.Optional[int] = None) -> float:
         """
         Round a number to a specified number of precision digits (if specified).
 
@@ -157,7 +157,7 @@ class AbstractCollectiveVariable(openmm.Force):
             raise ValueError(f"Unit {unit} is not compatible with the MD unit system.")
 
     @classmethod
-    def getArguments(cls) -> Tuple[OrderedDict, OrderedDict]:
+    def getArguments(cls) -> t.Tuple[OrderedDict, OrderedDict]:
         """
         Inspect the arguments needed for constructing an instance of this collective
         variable.
@@ -243,7 +243,7 @@ class AbstractCollectiveVariable(openmm.Force):
         return new_group
 
     def getValue(
-        self, context: openmm.Context, digits: Optional[int] = None
+        self, context: openmm.Context, digits: t.Optional[int] = None
     ) -> mmunit.Quantity:
         """
         Evaluate this collective variable at a given :OpenMM:`Context`.
@@ -274,7 +274,7 @@ class AbstractCollectiveVariable(openmm.Force):
         return mmunit.Quantity(self._precisionRound(value, digits), self.getUnit())
 
     def getEffectiveMass(
-        self, context: openmm.Context, digits: Optional[int] = None
+        self, context: openmm.Context, digits: t.Optional[int] = None
     ) -> mmunit.Quantity:
         """
         Compute the effective mass of this collective variable at a given

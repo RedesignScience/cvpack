@@ -12,18 +12,18 @@ from __future__ import annotations
 
 import ast
 import inspect
+import typing as t
 from functools import wraps
 from numbers import Real
-from typing import List, Sequence, Union
 
 import numpy as np
 import openmm
 from openmm import unit as _mmunit
 
-ScalarQuantity = Union[_mmunit.Quantity, Real]
-VectorQuantity = Union[_mmunit.Quantity, np.ndarray, openmm.Vec3]
-MatrixQuantity = Union[
-    _mmunit.Quantity, np.ndarray, Sequence[openmm.Vec3], Sequence[np.ndarray]
+ScalarQuantity = t.Union[_mmunit.Quantity, Real]
+VectorQuantity = t.Union[_mmunit.Quantity, np.ndarray, openmm.Vec3]
+MatrixQuantity = t.Union[
+    _mmunit.Quantity, np.ndarray, t.Sequence[openmm.Vec3], t.Sequence[np.ndarray]
 ]
 
 
@@ -148,8 +148,8 @@ class SerializableQuantity(_mmunit.Quantity):
 
 
 def value_in_md_units(  # pylint: disable=redefined-outer-name
-    quantity: Union[ScalarQuantity, VectorQuantity, MatrixQuantity]
-) -> Union[float, np.ndarray, openmm.Vec3, List[openmm.Vec3], List[np.ndarray]]:
+    quantity: t.Union[ScalarQuantity, VectorQuantity, MatrixQuantity]
+) -> t.Union[float, np.ndarray, openmm.Vec3, t.List[openmm.Vec3], t.List[np.ndarray]]:
     """
     Return the numerical value of a quantity in the MD unit system (e.g. mass in Da,
     distance in nm, time in ps, temperature in K, energy in kJ/mol, angle in rad).
@@ -196,7 +196,7 @@ def value_in_md_units(  # pylint: disable=redefined-outer-name
         value = quantity
     if isinstance(value, Real):
         return float(value)
-    if isinstance(value, Sequence):
+    if isinstance(value, t.Sequence):
         if isinstance(value[0], openmm.Vec3):
             return [openmm.Vec3(*vec) for vec in value]
         if isinstance(value[0], np.ndarray):

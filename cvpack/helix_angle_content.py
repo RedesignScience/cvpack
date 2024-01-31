@@ -7,7 +7,7 @@
 
 """
 
-from typing import Sequence
+import typing as t
 
 import openmm
 from openmm import app as mmapp
@@ -99,7 +99,7 @@ class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
     @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        residues: Sequence[mmapp.topology.Residue],
+        residues: t.Sequence[mmapp.topology.Residue],
         pbc: bool = False,
         thetaReference: mmunit.ScalarQuantity = mmunit.Quantity(88, mmunit.degrees),
         tolerance: mmunit.ScalarQuantity = mmunit.Quantity(15, mmunit.degrees),
