@@ -7,7 +7,7 @@ Collective Variable Package
 [![GitHub Actions Build Status](https://github.com/RedesignScience/cvpack/workflows/Windows/badge.svg)](https://github.com/RedesignScience/cvpack/actions?query=workflow%3AWindows)
 [![GitHub Actions Build Status](https://github.com/RedesignScience/cvpack/workflows/Linter/badge.svg)](https://github.com/RedesignScience/cvpack/actions?query=workflow%3ALinter)
 [![Documentation Status](https://github.com/RedesignScience/cvpack/workflows/Docs/badge.svg)](https://github.com/RedesignScience/cvpack/actions?query=workflow%3ADocs)
-[![Coverage Report](https://redesignscience.github.io/cvpack/coverage/coverage.svg)](https://redesignscience.github.io/cvpack/coverage)
+[![Coverage Report](https://redesignscience.github.io/cvpack/development/coverage/coverage.svg)](https://redesignscience.github.io/cvpack/development/coverage)
 
 [![Conda cvpack version](https://img.shields.io/conda/v/mdtools/cvpack.svg)](https://anaconda.org/mdtools/cvpack)
 [![Conda cvpack platforms](https://img.shields.io/conda/pn/mdtools/cvpack.svg)](https://anaconda.org/mdtools/cvpack)
@@ -77,7 +77,7 @@ To use CVPack in your own Python script or Jupyter notebook, simply import it as
 
 ### Documentation
 
-The documentation for CVPack is available at [Github Pages](https://redesignscience.github.io/cvpack).
+Documentation for the latest CVPack version is available at [Github Pages](https://redesignscience.github.io/cvpack/latest).
 
 ### Copyright
 
