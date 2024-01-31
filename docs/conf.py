@@ -56,10 +56,10 @@ with open("api/index.rst", "w") as f:
 
 # -- Project information -----------------------------------------------------
 
-project = "CVPack"
-copyright = "2023, Redesign Science | CMS Cookiecutter v1.1"
+version = os.getenv("CVPACK_VERSION", cvpack.__version__)
+project = f"CVPack {version}"
+copyright = r"2024 C. Abreu & Redesign Science"
 author = "Charlles Abreu"
-version = ""
 release = ""
 
 # -- General configuration ---------------------------------------------------
@@ -137,7 +137,7 @@ html_sidebars = {
 html_use_smartypants = True
 html_last_updated_fmt = "%b %d, %Y"
 html_split_index = False
-html_short_title = "%s-%s" % (project, version)
+# html_short_title = "%s-%s" % (project, version)
 
 
 def setup(app):

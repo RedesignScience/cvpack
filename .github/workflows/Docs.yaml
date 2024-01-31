@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - "main"
+    tags:
+      - v*
   pull_request:
     branches:
       - "main"
@@ -41,6 +43,11 @@ jobs:
       - name: Build Documentation
         shell: bash -l {0}
         run: |
+          if [ "$GITHUB_EVENT_NAME" == "push" ] && [ "$GITHUB_REF_TYPE" == "tag" ]; then
+            export CVPACK_VERSION=${{ github.ref_name }}
+          else
+            export CVPACK_VERSION=dev
+          fi
           sphinx-build ./docs ./html
 
       - name: Run tests
@@ -75,21 +82,26 @@ jobs:
         run: |
           if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
             echo "Deployment is deactivated on pull requests"
+            exit 0
+          elif [ "$GITHUB_REF_TYPE" == "tag" ]; then
+            subdirs=($CVPACK_VERSION latest)
           else
-            git reset --hard HEAD
-            set -x
-            echo "::group::Push page to gh-pages branch"
-            git config user.name "$(git show --format=%an -s)"
-            git config user.email "$(git show --format=%ae -s)"
-            git fetch origin
-            git switch gh-pages
-            rsync -va --delete-excluded html/ docs/
-            rsync -va --delete-excluded htmlcov/ docs/coverage/
-            touch docs/.nojekyll
-            git add -f docs/*
-            git add -f docs/.nojekyll
-            git add -f docs/coverage/*
-            git commit -m "Docs from $GITHUB_REF $GITHUB_SHA" || echo "Branch is up to date"
-            git push -f origin gh-pages
-            echo "::endgroup::"
+            subdirs=(development)
           fi
+          git reset --hard HEAD
+          set -x
+          echo "::group::Push page to gh-pages branch"
+          git config user.name "$(git show --format=%an -s)"
+          git config user.email "$(git show --format=%ae -s)"
+          git fetch origin
+          git switch gh-pages
+          for subdir in ${subdirs[@]}; do
+            dir=docs/$subdir
+            rsync -va --delete-excluded html/ $dir/
+            rsync -va --delete-excluded htmlcov/ $dir/coverage/
+            git add -f $dir/*
+          done
+          touch docs/.nojekyll
+          git commit -m "Docs from $GITHUB_REF $GITHUB_SHA" || echo "Branch is up to date"
+          git push -f origin gh-pages
+          echo "::endgroup::"
