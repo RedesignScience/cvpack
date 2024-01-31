@@ -47,18 +47,18 @@
 
 <span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
-<span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">AbstractCollectiveVariable</span>
+<span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">BaseCollectiveVariable</span>
 
 
 <div class="viewcode-block" id="Distance">
 <a class="viewcode-back" href="../../api/Distance.html#cvpack.Distance">[docs]</a>
-<span class="k">class</span> <span class="nc">Distance</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomBondForce</span><span class="p">,</span> <span class="n">AbstractCollectiveVariable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span> <span class="nc">Distance</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomBondForce</span><span class="p">,</span> <span class="n">BaseCollectiveVariable</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The distance between two atoms:</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        d({\\bf r}) = \\| {\\bf r}_2 - {\\bf r}_1 \\|.</span>
+<span class="sd">        d({\bf r}) = \| {\bf r}_2 - {\bf r}_1 \|.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>

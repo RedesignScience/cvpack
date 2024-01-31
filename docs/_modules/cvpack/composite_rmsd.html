@@ -49,7 +49,7 @@
 
 <span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
-<span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">AbstractCollectiveVariable</span>
+<span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">BaseCollectiveVariable</span>
 
 
 <span class="k">class</span> <span class="nc">_Stub</span><span class="p">:</span>  <span class="c1"># pylint: disable=too-few-public-methods</span>
@@ -67,7 +67,7 @@
 
 <div class="viewcode-block" id="CompositeRMSD">
 <a class="viewcode-back" href="../../api/CompositeRMSD.html#cvpack.CompositeRMSD">[docs]</a>
-<span class="k">class</span> <span class="nc">CompositeRMSD</span><span class="p">(</span><span class="n">CompositeRMSDForce</span><span class="p">,</span> <span class="n">AbstractCollectiveVariable</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">CompositeRMSD</span><span class="p">(</span><span class="n">CompositeRMSDForce</span><span class="p">,</span> <span class="n">BaseCollectiveVariable</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The composite root-mean-square deviation (RMSD) between the current and reference</span>
 <span class="sd">    coordinates of :math:`m` groups of atoms:</span>
@@ -101,9 +101,7 @@
 
 <span class="sd">        To use this class, you must install the `openmm-cpp-forces`_ conda package.</span>
 
-<span class="sd">    .. _openmm-cpp-forces:</span>
-
-<span class="sd">        https://anaconda.org/mdtools/openmm-cpp-forces</span>
+<span class="sd">    .. _openmm-cpp-forces: https://anaconda.org/mdtools/openmm-cpp-forces</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>

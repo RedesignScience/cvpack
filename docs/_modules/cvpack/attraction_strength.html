@@ -49,7 +49,7 @@
 
 <span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
-<span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">AbstractCollectiveVariable</span>
+<span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">BaseCollectiveVariable</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">NonbondedForceSurrogate</span><span class="p">,</span> <span class="n">evaluate_in_context</span>
 
 <span class="n">ONE_4PI_EPS0</span> <span class="o">=</span> <span class="mf">138.93545764438198</span>
@@ -57,47 +57,47 @@
 
 <div class="viewcode-block" id="AttractionStrength">
 <a class="viewcode-back" href="../../api/AttractionStrength.html#cvpack.AttractionStrength">[docs]</a>
-<span class="k">class</span> <span class="nc">AttractionStrength</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomNonbondedForce</span><span class="p">,</span> <span class="n">AbstractCollectiveVariable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span> <span class="nc">AttractionStrength</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomNonbondedForce</span><span class="p">,</span> <span class="n">BaseCollectiveVariable</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The strength of the attraction between two atom groups:</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        S_{\\rm attr}({\\bf r}) = &amp;-\\frac{1}{E_{\\rm ref}} \\Bigg[</span>
-<span class="sd">            \\sum_{i \\in {\\bf g}_1}</span>
-<span class="sd">                \\sum_{\\substack{j \\in {\\bf g}_2 \\\\ j \\neq i}}</span>
-<span class="sd">                    \\epsilon_{ij} u_{\\rm disp}\\left(</span>
-<span class="sd">                        \\frac{\\|{\\bf r}_i - {\\bf r}_j\\|}{\\sigma_{ij}}</span>
-<span class="sd">                    \\right) \\\\</span>
-<span class="sd">            &amp;+\\sum_{i \\in {\\bf g}_1}</span>
-<span class="sd">            \\sum_{\\substack{j \\in {\\bf g}_2 \\\\ q_jq_i &lt; 0}}</span>
-<span class="sd">                \\frac{q_i q_j}{4 \\pi \\varepsilon_0 r_{\\rm c}} u_{\\rm elec}\\left(</span>
-<span class="sd">                    \\frac{\\|{\\bf r}_i - {\\bf r}_j\\|}{r_{\\rm c}}</span>
-<span class="sd">                \\right) \\Bigg]</span>
+<span class="sd">        S_{\rm attr}({\bf r}) = &amp;-\frac{1}{E_{\rm ref}} \Bigg[</span>
+<span class="sd">            \sum_{i \in {\bf g}_1}</span>
+<span class="sd">                \sum_{\substack{j \in {\bf g}_2 \\ j \neq i}}</span>
+<span class="sd">                    \epsilon_{ij} u_{\rm disp}\left(</span>
+<span class="sd">                        \frac{\|{\bf r}_i - {\bf r}_j\|}{\sigma_{ij}}</span>
+<span class="sd">                    \right) \\</span>
+<span class="sd">            &amp;+\sum_{i \in {\bf g}_1}</span>
+<span class="sd">            \sum_{\substack{j \in {\bf g}_2 \\ q_jq_i &lt; 0}}</span>
+<span class="sd">                \frac{q_i q_j}{4 \pi \varepsilon_0 r_{\rm c}} u_{\rm elec}\left(</span>
+<span class="sd">                    \frac{\|{\bf r}_i - {\bf r}_j\|}{r_{\rm c}}</span>
+<span class="sd">                \right) \Bigg]</span>
 
-<span class="sd">    where :math:`{\\bf g}_1` and :math:`{\\bf g}_2` are the two atom groups,</span>
-<span class="sd">    :math:`r_{\\rm c}` is the cutoff distance, :math:`\\varepsilon_0` is the</span>
+<span class="sd">    where :math:`{\bf g}_1` and :math:`{\bf g}_2` are the two atom groups,</span>
+<span class="sd">    :math:`r_{\rm c}` is the cutoff distance, :math:`\varepsilon_0` is the</span>
 <span class="sd">    permittivity of empty space, :math:`q_i` is the charge of atom :math:`i`, and</span>
-<span class="sd">    :math:`E_{\\rm ref}` is a reference value (in energy units per mole).</span>
+<span class="sd">    :math:`E_{\rm ref}` is a reference value (in energy units per mole).</span>
 <span class="sd">    The Lennard-Jones parameters are given by the Lorentz-Berthelot mixing rule, i.e.</span>
-<span class="sd">    :math:`\\epsilon_{ij} = \\sqrt{\\epsilon_i \\epsilon_j}`, and</span>
-<span class="sd">    :math:`\\sigma_{ij} = (\\sigma_i + \\sigma_j)/2`.</span>
+<span class="sd">    :math:`\epsilon_{ij} = \sqrt{\epsilon_i \epsilon_j}`, and</span>
+<span class="sd">    :math:`\sigma_{ij} = (\sigma_i + \sigma_j)/2`.</span>
 
-<span class="sd">    The function :math:`u_{\\rm disp}(x)` is a Lennard-Jones-like reduced potential with</span>
+<span class="sd">    The function :math:`u_{\rm disp}(x)` is a Lennard-Jones-like reduced potential with</span>
 <span class="sd">    a highly softened repulsion part, defined as</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        u_{\\rm disp}(x) = 4\\left(\\frac{1}{y^2} - \\frac{1}{y}\\right),</span>
-<span class="sd">        \\quad \\text{where} \\quad</span>
+<span class="sd">        u_{\rm disp}(x) = 4\left(\frac{1}{y^2} - \frac{1}{y}\right),</span>
+<span class="sd">        \quad \text{where} \quad</span>
 <span class="sd">        y = |x^6 - 2| + 2</span>
 
-<span class="sd">    The function :math:`u_{\\rm elec}(x)` provides a Coulomb-like decay with</span>
+<span class="sd">    The function :math:`u_{\rm elec}(x)` provides a Coulomb-like decay with</span>
 <span class="sd">    reaction-field screening, defined as</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        u_{\\rm elec}(x) = \\frac{1}{x} + \\frac{x^2 - 3}{2}</span>
+<span class="sd">        u_{\rm elec}(x) = \frac{1}{x} + \frac{x^2 - 3}{2}</span>
 
 <span class="sd">    The screening considers a perfect conductor as the surrounding medium</span>
 <span class="sd">    :cite:`Correa_2022`.</span>
@@ -105,7 +105,7 @@
 <span class="sd">    .. note::</span>
 
 <span class="sd">        Only attractive electrostatic interactions are considered (:math:`q_i q_i &lt; 0`),</span>
-<span class="sd">        which gives :math:`S_{\\rm attr}({\\bf r})` a lower bound of zero. The upper</span>
+<span class="sd">        which gives :math:`S_{\rm attr}({\bf r})` a lower bound of zero. The upper</span>
 <span class="sd">        bound will depends on the system details, the chosen groups of atoms, and the</span>
 <span class="sd">        adopted reference value.</span>
 
@@ -114,8 +114,8 @@
 <span class="sd">    distance, are taken from :openmm:`NonbondedForce` object.</span>
 
 <span class="sd">    .. note::</span>
-<span class="sd">        Any non-exclusion exceptions involving atoms in :math:`{\\bf g}_1` and</span>
-<span class="sd">        :math:`{\\bf g}_2` in the provided :class:`openmm.NonbondedForce` are turned</span>
+<span class="sd">        Any non-exclusion exceptions involving atoms in :math:`{\bf g}_1` and</span>
+<span class="sd">        :math:`{\bf g}_2` in the provided :class:`openmm.NonbondedForce` are turned</span>
 <span class="sd">        into exclusions in this collective variable.</span>
 
 <span class="sd">    Parameters</span>

@@ -43,41 +43,41 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">t</span>
 
 <span class="kn">import</span> <span class="nn">openmm</span>
 <span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">app</span> <span class="k">as</span> <span class="n">mmapp</span>
 
 <span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
-<span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">AbstractCollectiveVariable</span><span class="p">,</span> <span class="n">SerializableResidue</span>
+<span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">BaseCollectiveVariable</span><span class="p">,</span> <span class="n">SerializableResidue</span>
 
 
 <div class="viewcode-block" id="HelixTorsionContent">
 <a class="viewcode-back" href="../../api/HelixTorsionContent.html#cvpack.HelixTorsionContent">[docs]</a>
-<span class="k">class</span> <span class="nc">HelixTorsionContent</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomTorsionForce</span><span class="p">,</span> <span class="n">AbstractCollectiveVariable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span> <span class="nc">HelixTorsionContent</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomTorsionForce</span><span class="p">,</span> <span class="n">BaseCollectiveVariable</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The alpha-helix Ramachandran content of a sequence of `n` residues:</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        \\alpha_{\\phi,\\psi}({\\bf r}) = \\frac{1}{2} \\sum_{i=2}^{n-1} \\left[</span>
-<span class="sd">            B_m\\left(</span>
-<span class="sd">                \\frac{\\phi_i({\\bf r}) - \\phi_{\\rm ref}}{\\theta_{\\rm tol}}</span>
-<span class="sd">            \\right) +</span>
-<span class="sd">            B_m\\left(</span>
-<span class="sd">                \\frac{\\psi_i({\\bf r}) - \\psi_{\\rm ref}}{\\theta_{\\rm tol}}</span>
-<span class="sd">            \\right)</span>
-<span class="sd">        \\right]</span>
+<span class="sd">        \alpha_{\phi,\psi}({\bf r}) = \frac{1}{2} \sum_{i=2}^{n-1} \left[</span>
+<span class="sd">            B_m\left(</span>
+<span class="sd">                \frac{\phi_i({\bf r}) - \phi_{\rm ref}}{\theta_{\rm tol}}</span>
+<span class="sd">            \right) +</span>
+<span class="sd">            B_m\left(</span>
+<span class="sd">                \frac{\psi_i({\bf r}) - \psi_{\rm ref}}{\theta_{\rm tol}}</span>
+<span class="sd">            \right)</span>
+<span class="sd">        \right]</span>
 
-<span class="sd">    where :math:`\\phi_i({\\bf r})` and :math:`\\psi_i({\\bf r})` are the Ramachandran</span>
-<span class="sd">    dihedral angles of residue :math:`i`, :math:`\\phi_{\\rm ref}` and</span>
-<span class="sd">    :math:`\\psi_{\\rm ref}` are their reference values in an alpha helix</span>
-<span class="sd">    :cite:`Hovmoller_2002`, and :math:`\\theta_{\\rm tol}` is the threshold tolerance</span>
+<span class="sd">    where :math:`\phi_i({\bf r})` and :math:`\psi_i({\bf r})` are the Ramachandran</span>
+<span class="sd">    dihedral angles of residue :math:`i`, :math:`\phi_{\rm ref}` and</span>
+<span class="sd">    :math:`\psi_{\rm ref}` are their reference values in an alpha helix</span>
+<span class="sd">    :cite:`Hovmoller_2002`, and :math:`\theta_{\rm tol}` is the threshold tolerance</span>
 <span class="sd">    around these refenrences. :math:`B_m(x)` is a smooth boxcar function given by</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        B_m(x) = \\frac{1}{1 + x^{2m}}</span>
+<span class="sd">        B_m(x) = \frac{1}{1 + x^{2m}}</span>
 
 <span class="sd">    where :math:`m` is an integer parameter that controls its steepness. Note that</span>
 <span class="sd">    :math:`x` needs to be elevated to an even power for :math:`B_m(x)` to be an even</span>
@@ -87,7 +87,7 @@
 
 <span class="sd">    .. note::</span>
 
-<span class="sd">        The :math:`\\phi` and :math:`\\psi` angles of the first and last residues are</span>
+<span class="sd">        The :math:`\phi` and :math:`\psi` angles of the first and last residues are</span>
 <span class="sd">        not considered. They are used to compute the dihedral angles of the second and</span>
 <span class="sd">        penultimate residues, respectively.</span>
 
@@ -115,7 +115,7 @@
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">        ValueError</span>
-<span class="sd">            If some residue does not contain a :math:`\\phi` or :math:`\\psi` angle</span>
+<span class="sd">            If some residue does not contain a :math:`\phi` or :math:`\psi` angle</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
@@ -147,7 +147,7 @@
     <span class="nd">@mmunit</span><span class="o">.</span><span class="n">convert_quantities</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">residues</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">mmapp</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">Residue</span><span class="p">],</span>
+        <span class="n">residues</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">mmapp</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">Residue</span><span class="p">],</span>
         <span class="n">pbc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">phiReference</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="o">-</span><span class="mf">63.8</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">degrees</span><span class="p">),</span>
         <span class="n">psiReference</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="o">-</span><span class="mf">41.1</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">degrees</span><span class="p">),</span>

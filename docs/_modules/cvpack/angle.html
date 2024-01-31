@@ -47,24 +47,24 @@
 
 <span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
-<span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">AbstractCollectiveVariable</span>
+<span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">BaseCollectiveVariable</span>
 
 
 <div class="viewcode-block" id="Angle">
 <a class="viewcode-back" href="../../api/Angle.html#cvpack.Angle">[docs]</a>
-<span class="k">class</span> <span class="nc">Angle</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomAngleForce</span><span class="p">,</span> <span class="n">AbstractCollectiveVariable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span> <span class="nc">Angle</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomAngleForce</span><span class="p">,</span> <span class="n">BaseCollectiveVariable</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The angle formed by three atoms:</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        \\theta({\\bf r}) =</span>
-<span class="sd">            \\mathrm{acos}\\left(</span>
-<span class="sd">                \\frac{{\\bf r}_{2,1} \\cdot {\\bf r}_{2,3} }</span>
-<span class="sd">                       {\\| {\\bf r}_{2,1} \\| \\| {\\bf r}_{2,3} \\|}</span>
-<span class="sd">            \\right),</span>
+<span class="sd">        \theta({\bf r}) =</span>
+<span class="sd">            \mathrm{acos}\left(</span>
+<span class="sd">                \frac{{\bf r}_{2,1} \cdot {\bf r}_{2,3} }</span>
+<span class="sd">                       {\| {\bf r}_{2,1} \| \| {\bf r}_{2,3} \|}</span>
+<span class="sd">            \right),</span>
 
-<span class="sd">    where :math:`{\\bf r}_{i,j} = {\\bf r}_j - {\\bf r}_i`.</span>
+<span class="sd">    where :math:`{\bf r}_{i,j} = {\bf r}_j - {\bf r}_i`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>

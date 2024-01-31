@@ -50,96 +50,96 @@
 
 <span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
+<span class="kn">from</span> <span class="nn">.base_rmsd_content</span> <span class="kn">import</span> <span class="n">BaseRMSDContent</span>
 <span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">SerializableResidue</span>
-<span class="kn">from</span> <span class="nn">.rmsd_content</span> <span class="kn">import</span> <span class="n">RMSDContent</span>
 
 <span class="c1"># pylint: disable=protected-access</span>
-<span class="n">PARABETA_POSITIONS</span> <span class="o">=</span> <span class="n">RMSDContent</span><span class="o">.</span><span class="n">_loadPositions</span><span class="p">(</span><span class="s2">&quot;ideal_parallel_beta_sheet.csv&quot;</span><span class="p">)</span>
-<span class="n">ANTIBETA_POSITIONS</span> <span class="o">=</span> <span class="n">RMSDContent</span><span class="o">.</span><span class="n">_loadPositions</span><span class="p">(</span><span class="s2">&quot;ideal_antiparallel_beta_sheet.csv&quot;</span><span class="p">)</span>
+<span class="n">PARABETA_POSITIONS</span> <span class="o">=</span> <span class="n">BaseRMSDContent</span><span class="o">.</span><span class="n">_loadPositions</span><span class="p">(</span><span class="s2">&quot;ideal_parallel_beta_sheet.csv&quot;</span><span class="p">)</span>
+<span class="n">ANTIBETA_POSITIONS</span> <span class="o">=</span> <span class="n">BaseRMSDContent</span><span class="o">.</span><span class="n">_loadPositions</span><span class="p">(</span><span class="s2">&quot;ideal_antiparallel_beta_sheet.csv&quot;</span><span class="p">)</span>
 <span class="c1"># pylint: enable=protected-access</span>
 
 
 <div class="viewcode-block" id="SheetRMSDContent">
 <a class="viewcode-back" href="../../api/SheetRMSDContent.html#cvpack.SheetRMSDContent">[docs]</a>
-<span class="k">class</span> <span class="nc">SheetRMSDContent</span><span class="p">(</span><span class="n">RMSDContent</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span> <span class="nc">SheetRMSDContent</span><span class="p">(</span><span class="n">BaseRMSDContent</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The beta-sheet RMSD content of `n` residues :cite:`Pietrucci_2009`:</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        \\beta_{\\rm rmsd}({\\bf r}) = \\sum_{i=1}^{n-2-d_{\\rm min}}</span>
-<span class="sd">            \\sum_{j=i+d_{\\rm min}}^{n-2} S\\left(</span>
-<span class="sd">                \\frac{r_{\\rm rmsd}({\\bf g}_{i,j}, {\\bf g}_{\\rm ref})}{r_0}</span>
-<span class="sd">            \\right)</span>
+<span class="sd">        \beta_{\rm rmsd}({\bf r}) = \sum_{i=1}^{n-2-d_{\rm min}}</span>
+<span class="sd">            \sum_{j=i+d_{\rm min}}^{n-2} S\left(</span>
+<span class="sd">                \frac{r_{\rm rmsd}({\bf g}_{i,j}, {\bf g}_{\rm ref})}{r_0}</span>
+<span class="sd">            \right)</span>
 
-<span class="sd">    where :math:`{\\bf g}_{i,j}` represents the coordinates of a group of atoms</span>
+<span class="sd">    where :math:`{\bf g}_{i,j}` represents the coordinates of a group of atoms</span>
 <span class="sd">    selected from residues i to i+2 and residues j to j+2 of the sequence,</span>
-<span class="sd">    :math:`d_{\\rm min}` is the minimum distance between integers i and j,</span>
-<span class="sd">    :math:`{\\bf g}_{\\rm ref}` represents the coordinates of the same atoms in an</span>
-<span class="sd">    ideal beta-sheet configuration, :math:`r_{\\rm rmsd}({\\bf g}, {\\bf g}_{\\rm ref})`</span>
-<span class="sd">    is the root-mean-square distance (RMSD) between groups :math:`{\\bf g}` and</span>
-<span class="sd">    :math:`{\\bf g}_{\\rm ref}`, :math:`r_0` is a threshold RMSD value, and</span>
+<span class="sd">    :math:`d_{\rm min}` is the minimum distance between integers i and j,</span>
+<span class="sd">    :math:`{\bf g}_{\rm ref}` represents the coordinates of the same atoms in an</span>
+<span class="sd">    ideal beta-sheet configuration, :math:`r_{\rm rmsd}({\bf g}, {\bf g}_{\rm ref})`</span>
+<span class="sd">    is the root-mean-square distance (RMSD) between groups :math:`{\bf g}` and</span>
+<span class="sd">    :math:`{\bf g}_{\rm ref}`, :math:`r_0` is a threshold RMSD value, and</span>
 <span class="sd">    :math:`S(x)` is a smooth step function whose default form is</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        S(x) = \\frac{1 + x^4}{1 + x^4 + x^8}</span>
+<span class="sd">        S(x) = \frac{1 + x^4}{1 + x^4 + x^8}</span>
 
 <span class="sd">    The sequence of residues must be a contiguous subset of a protein chain, ordered</span>
 <span class="sd">    from the N-terminus to the C-terminus. The beta-sheet RMSD content is defined for</span>
 <span class="sd">    both antiparallel and parallel beta sheets, with different ideal configurations</span>
-<span class="sd">    :math:`{\\bf g}_{\\rm ref}` and minimim distances :math:`d_{\\rm min}` in each case.</span>
+<span class="sd">    :math:`{\bf g}_{\rm ref}` and minimim distances :math:`d_{\rm min}` in each case.</span>
 
-<span class="sd">    Every group :math:`{\\bf g}_{i,j}` is formed by the N, :math:`{\\rm C}_\\alpha`,</span>
-<span class="sd">    :math:`{\\rm C}_\\beta`, C, and O atoms of the six residues involvend, thus</span>
+<span class="sd">    Every group :math:`{\bf g}_{i,j}` is formed by the N, :math:`{\rm C}_\alpha`,</span>
+<span class="sd">    :math:`{\rm C}_\beta`, C, and O atoms of the six residues involvend, thus</span>
 <span class="sd">    comprising 30 atoms in total. In the case of glycine, the missing</span>
-<span class="sd">    :math:`{\\rm C}_\\beta` atom is replaced by the corresponding H atom. The RMSD is</span>
+<span class="sd">    :math:`{\rm C}_\beta` atom is replaced by the corresponding H atom. The RMSD is</span>
 <span class="sd">    then defined as</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        r_{\\rm rmsd}({\\bf g}, {\\bf g}_{\\rm ref}) =</span>
-<span class="sd">            \\sqrt{\\frac{1}{30} \\sum_{k=1}^{30} \\left\\|</span>
-<span class="sd">                \\hat{\\bf r}_k({\\bf g}) -</span>
-<span class="sd">                {\\bf A}({\\bf g})\\hat{\\bf r}_k({\\bf g}_{\\rm ref})</span>
-<span class="sd">            \\right\\|^2}</span>
+<span class="sd">        r_{\rm rmsd}({\bf g}, {\bf g}_{\rm ref}) =</span>
+<span class="sd">            \sqrt{\frac{1}{30} \sum_{k=1}^{30} \left\|</span>
+<span class="sd">                \hat{\bf r}_k({\bf g}) -</span>
+<span class="sd">                {\bf A}({\bf g})\hat{\bf r}_k({\bf g}_{\rm ref})</span>
+<span class="sd">            \right\|^2}</span>
 
-<span class="sd">    where :math:`\\hat{\\bf r}_k({\\bf g})` is the position of the :math:`k`-th atom in</span>
-<span class="sd">    a group :math:`{\\bf g}` relative to the group&#39;s center of geometry and</span>
-<span class="sd">    :math:`{\\bf A}({\\bf g})` is the rotation matrix that minimizes the RMSD between</span>
-<span class="sd">    :math:`{\\bf g}` and :math:`{\\bf g}_{\\rm ref}`.</span>
+<span class="sd">    where :math:`\hat{\bf r}_k({\bf g})` is the position of the :math:`k`-th atom in</span>
+<span class="sd">    a group :math:`{\bf g}` relative to the group&#39;s center of geometry and</span>
+<span class="sd">    :math:`{\bf A}({\bf g})` is the rotation matrix that minimizes the RMSD between</span>
+<span class="sd">    :math:`{\bf g}` and :math:`{\bf g}_{\rm ref}`.</span>
 
 <span class="sd">    In addition, one can choose to partition the sequence of residues into :math:`m`</span>
-<span class="sd">    blocks with :math:`n_1, n_2, \\ldots, n_m` residues. In this case, only groups</span>
-<span class="sd">    :math:`{\\bf g}_{i,j}` composed of three consecutive residues from a block and</span>
+<span class="sd">    blocks with :math:`n_1, n_2, \ldots, n_m` residues. In this case, only groups</span>
+<span class="sd">    :math:`{\bf g}_{i,j}` composed of three consecutive residues from a block and</span>
 <span class="sd">    three consecutive residues from the next block will be considered. The definition</span>
 <span class="sd">    of the RMSD content is then modified to</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        \\beta_{\\rm rmsd}({\\bf r}) = \\sum_{k=1}^{m-1} \\sum_{i=l_{k-1}+1}^{l_{k}-2}</span>
-<span class="sd">            \\sum_{j=l_k+1}^{l_{k+1}-2} S\\left(</span>
-<span class="sd">                \\frac{r_{\\rm rmsd}({\\bf g}_{i,j}, {\\bf g}_{\\rm ref})}{r_0}</span>
-<span class="sd">            \\right)</span>
+<span class="sd">        \beta_{\rm rmsd}({\bf r}) = \sum_{k=1}^{m-1} \sum_{i=l_{k-1}+1}^{l_{k}-2}</span>
+<span class="sd">            \sum_{j=l_k+1}^{l_{k+1}-2} S\left(</span>
+<span class="sd">                \frac{r_{\rm rmsd}({\bf g}_{i,j}, {\bf g}_{\rm ref})}{r_0}</span>
+<span class="sd">            \right)</span>
 
-<span class="sd">    where :math:`l_k = \\sum_{i=1}^k n_i` is the index of the last residue in block</span>
+<span class="sd">    where :math:`l_k = \sum_{i=1}^k n_i` is the index of the last residue in block</span>
 <span class="sd">    :math:`k`. All blocks must be contiguous subsets of the same protein chain, ordered</span>
 <span class="sd">    from the N-terminus to the C-terminus. However, each block can be separated from the</span>
 <span class="sd">    next one by any number of residues.</span>
 
 <span class="sd">    Optionally, the beta-sheet RMSD content can be normalized to the range</span>
 <span class="sd">    :math:`[0, 1]`. This is done by dividing its value by the number of</span>
-<span class="sd">    :math:`{\\bf g}_{i,j}` groups. For a single, contiguous sequence of residues, this</span>
+<span class="sd">    :math:`{\bf g}_{i,j}` groups. For a single, contiguous sequence of residues, this</span>
 <span class="sd">    number is</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        N_{\\rm groups} = \\frac{(n - 2 - d_{\\rm min})(n - 1 - d_{\\rm min})}{2}</span>
+<span class="sd">        N_{\rm groups} = \frac{(n - 2 - d_{\rm min})(n - 1 - d_{\rm min})}{2}</span>
 
 <span class="sd">    In the case of a partitioned sequence, the number of groups is given by</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        N_{\\rm groups} = \\sum_{k=1}^{m-1} (n_k - 2)(n_{k+1} - 2)</span>
+<span class="sd">        N_{\rm groups} = \sum_{k=1}^{m-1} (n_k - 2)(n_{k+1} - 2)</span>
 
 <span class="sd">    This collective variable was introduced in Ref. :cite:`Pietrucci_2009`. The default</span>
 <span class="sd">    step function shown above is identical to the one in the original paper, but written</span>
@@ -155,7 +155,7 @@
 
 <span class="sd">    .. note::</span>
 
-<span class="sd">        The present implementation is limited to :math:`1 \\leq N_{\\rm groups} \\leq</span>
+<span class="sd">        The present implementation is limited to :math:`1 \leq N_{\rm groups} \leq</span>
 <span class="sd">        1024`.</span>
 
 <span class="sd">    Parameters</span>

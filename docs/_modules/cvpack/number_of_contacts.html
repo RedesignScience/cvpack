@@ -49,19 +49,19 @@
 
 <span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
-<span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">AbstractCollectiveVariable</span>
+<span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">BaseCollectiveVariable</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">NonbondedForceSurrogate</span><span class="p">,</span> <span class="n">evaluate_in_context</span>
 
 
 <div class="viewcode-block" id="NumberOfContacts">
 <a class="viewcode-back" href="../../api/NumberOfContacts.html#cvpack.NumberOfContacts">[docs]</a>
-<span class="k">class</span> <span class="nc">NumberOfContacts</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomNonbondedForce</span><span class="p">,</span> <span class="n">AbstractCollectiveVariable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span> <span class="nc">NumberOfContacts</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomNonbondedForce</span><span class="p">,</span> <span class="n">BaseCollectiveVariable</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The number of contacts between two atom groups:</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        N({\\bf r}) = \\sum_{i \\in {\\bf g}_1} \\sum_{j \\in {\\bf g}_2}</span>
-<span class="sd">                        S\\left(\\frac{\\|{\\bf r}_j - {\\bf r}_i\\|}{r_0}\\right)</span>
+<span class="sd">        N({\bf r}) = \sum_{i \in {\bf g}_1} \sum_{j \in {\bf g}_2}</span>
+<span class="sd">                        S\left(\frac{\|{\bf r}_j - {\bf r}_i\|}{r_0}\right)</span>
 
 <span class="sd">    where :math:`r_0` is the threshold distance for defining a contact and :math:`S(x)`</span>
 <span class="sd">    is a step function equal to :math:`1` if a contact is made or equal to :math:`0`</span>
@@ -69,14 +69,14 @@
 <span class="sd">    `H` is the `Heaviside step function</span>
 <span class="sd">    &lt;https://en.wikipedia.org/wiki/Heaviside_step_function&gt;`_. For molecular dynamics,</span>
 <span class="sd">    however, :math:`S(x)` should be a continuous approximation of :math:`H(1-x)` for</span>
-<span class="sd">    :math:`x \\geq 0`. By default :cite:`Iannuzzi_2003`, the following function is used:</span>
+<span class="sd">    :math:`x \geq 0`. By default :cite:`Iannuzzi_2003`, the following function is used:</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        S(x) = \\frac{1-x^6}{1-x^{12}} = \\frac{1}{1+x^6}</span>
+<span class="sd">        S(x) = \frac{1-x^6}{1-x^{12}} = \frac{1}{1+x^6}</span>
 
 <span class="sd">    In fact, a cutoff distance :math:`r_c = x_c r_0` (typically, :math:`x_c = 2`) is</span>
-<span class="sd">    applied so that :math:`S(x) = 0` for :math:`x \\geq x_c`. To avoid discontinuities,</span>
+<span class="sd">    applied so that :math:`S(x) = 0` for :math:`x \geq x_c`. To avoid discontinuities,</span>
 <span class="sd">    there is also the option to smoothly switch off :math:`S(x)` starting from</span>
 <span class="sd">    :math:`r_s = x_s r_0` (typically, :math:`x_s = 1.5`) instead of doing it abruptly at</span>
 <span class="sd">    :math:`r_c`.</span>
@@ -84,12 +84,12 @@
 <span class="sd">    .. note::</span>
 
 <span class="sd">        Atoms are allowed to be in both groups. In this case, self-contacts</span>
-<span class="sd">        (:math:`i = j`) are ignored and each pair of distinct atoms (:math:`i \\neq j`)</span>
+<span class="sd">        (:math:`i = j`) are ignored and each pair of distinct atoms (:math:`i \neq j`)</span>
 <span class="sd">        is counted only once.</span>
 
 <span class="sd">    .. note::</span>
-<span class="sd">        Any non-exclusion exceptions involving atoms in :math:`{\\bf g}_1` and</span>
-<span class="sd">        :math:`{\\bf g}_2` in the provided :class:`openmm.NonbondedForce` are turned</span>
+<span class="sd">        Any non-exclusion exceptions involving atoms in :math:`{\bf g}_1` and</span>
+<span class="sd">        :math:`{\bf g}_2` in the provided :class:`openmm.NonbondedForce` are turned</span>
 <span class="sd">        into exclusions in this collective variable.</span>
 
 <span class="sd">    Parameters</span>

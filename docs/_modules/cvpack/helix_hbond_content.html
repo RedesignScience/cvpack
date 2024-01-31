@@ -44,35 +44,35 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">re</span> <span class="k">as</span> <span class="nn">regex</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Pattern</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">t</span>
 
 <span class="kn">import</span> <span class="nn">openmm</span>
 <span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">app</span> <span class="k">as</span> <span class="n">mmapp</span>
 
 <span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
-<span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">AbstractCollectiveVariable</span><span class="p">,</span> <span class="n">SerializableResidue</span>
+<span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">BaseCollectiveVariable</span><span class="p">,</span> <span class="n">SerializableResidue</span>
 
 
 <div class="viewcode-block" id="HelixHBondContent">
 <a class="viewcode-back" href="../../api/HelixHBondContent.html#cvpack.HelixHBondContent">[docs]</a>
-<span class="k">class</span> <span class="nc">HelixHBondContent</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomBondForce</span><span class="p">,</span> <span class="n">AbstractCollectiveVariable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span> <span class="nc">HelixHBondContent</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomBondForce</span><span class="p">,</span> <span class="n">BaseCollectiveVariable</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The alpha-helix hydrogen-bond content of a sequence of `n` residues:</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        \\alpha_{\\rm HB}({\\bf r}) = \\sum_{i=5}^n B_m\\left(</span>
-<span class="sd">            \\frac{\\| {\\bf r}^{\\rm H}_i - {\\bf r}^{\\rm O}_{i-4} \\|}{d_{\\rm HB}}</span>
-<span class="sd">        \\right)</span>
+<span class="sd">        \alpha_{\rm HB}({\bf r}) = \sum_{i=5}^n B_m\left(</span>
+<span class="sd">            \frac{\| {\bf r}^{\rm H}_i - {\bf r}^{\rm O}_{i-4} \|}{d_{\rm HB}}</span>
+<span class="sd">        \right)</span>
 
-<span class="sd">    where :math:`{\\bf r}^{\\rm H}_k` and :math:`{\\bf r}^{\\rm O}_k` are the positions</span>
+<span class="sd">    where :math:`{\bf r}^{\rm H}_k` and :math:`{\bf r}^{\rm O}_k` are the positions</span>
 <span class="sd">    of the hydrogen and oxygen atoms bonded, respectively, to the backbone nitrogen and</span>
-<span class="sd">    carbon atoms of residue :math:`k`. In addition, :math:`d_{\\rm HB}` is the threshold</span>
+<span class="sd">    carbon atoms of residue :math:`k`. In addition, :math:`d_{\rm HB}` is the threshold</span>
 <span class="sd">    distance for a hydrogen bond and :math:`B_m(x)` is a smooth step function given by</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        B_m(x) = \\frac{1}{1 + x^{2m}}</span>
+<span class="sd">        B_m(x) = \frac{1}{1 + x^{2m}}</span>
 
 <span class="sd">    where :math:`m` is an integer parameter that controls its steepness.</span>
 
@@ -125,7 +125,7 @@
     <span class="nd">@mmunit</span><span class="o">.</span><span class="n">convert_quantities</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">residues</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">mmapp</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">Residue</span><span class="p">],</span>
+        <span class="n">residues</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">mmapp</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">Residue</span><span class="p">],</span>
         <span class="n">pbc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">thresholdDistance</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span>
             <span class="mf">0.33</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span>
@@ -133,7 +133,7 @@
         <span class="n">halfExponent</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
         <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">def</span> <span class="nf">find_atom</span><span class="p">(</span><span class="n">residue</span><span class="p">:</span> <span class="n">mmapp</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">Residue</span><span class="p">,</span> <span class="n">pattern</span><span class="p">:</span> <span class="n">Pattern</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">find_atom</span><span class="p">(</span><span class="n">residue</span><span class="p">:</span> <span class="n">mmapp</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">Residue</span><span class="p">,</span> <span class="n">pattern</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Pattern</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
                     <span class="k">return</span> <span class="n">atom</span><span class="o">.</span><span class="n">index</span>
@@ -145,8 +145,8 @@
 
         <span class="n">numerator</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">residues</span><span class="p">)</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span> <span class="k">if</span> <span class="n">normalize</span> <span class="k">else</span> <span class="mi">1</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">numerator</span><span class="si">}</span><span class="s2">/(1+x^</span><span class="si">{</span><span class="mi">2</span><span class="o">*</span><span class="n">halfExponent</span><span class="si">}</span><span class="s2">); x=r/</span><span class="si">{</span><span class="n">thresholdDistance</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">hydrogen_pattern</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">b(H|1H|HN1|HT1|H1|HN)</span><span class="se">\\</span><span class="s2">b&quot;</span><span class="p">)</span>
-        <span class="n">oxygen_pattern</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">b(O|OCT1|OC1|OT1|O1)</span><span class="se">\\</span><span class="s2">b&quot;</span><span class="p">)</span>
+        <span class="n">hydrogen_pattern</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b(H|1H|HN1|HT1|H1|HN)\b&quot;</span><span class="p">)</span>
+        <span class="n">oxygen_pattern</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b(O|OCT1|OC1|OT1|O1)\b&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">residues</span><span class="p">)):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">addBond</span><span class="p">(</span>
                 <span class="n">find_atom</span><span class="p">(</span><span class="n">residues</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">4</span><span class="p">],</span> <span class="n">oxygen_pattern</span><span class="p">),</span>

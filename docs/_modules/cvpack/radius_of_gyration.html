@@ -43,60 +43,39 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Sequence</span>
-
-<span class="kn">import</span> <span class="nn">openmm</span>
+<span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">t</span>
 
 <span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
-<span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">AbstractCollectiveVariable</span>
-
-
-<span class="k">class</span> <span class="nc">_RadiusOfGyrationBase</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomCentroidBondForce</span><span class="p">,</span> <span class="n">AbstractCollectiveVariable</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">num_groups</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">expression</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">group</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
-        <span class="n">pbc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">weighByMass</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">num_groups</span><span class="p">,</span> <span class="n">expression</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">group</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">addGroup</span><span class="p">([</span><span class="n">atom</span><span class="p">])</span>
-        <span class="k">if</span> <span class="n">weighByMass</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">addGroup</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">addGroup</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">group</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">setUsesPeriodicBoundaryConditions</span><span class="p">(</span><span class="n">pbc</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.base_radius_of_gyration</span> <span class="kn">import</span> <span class="n">BaseRadiusOfGyration</span>
 
 
 <div class="viewcode-block" id="RadiusOfGyration">
 <a class="viewcode-back" href="../../api/RadiusOfGyration.html#cvpack.RadiusOfGyration">[docs]</a>
-<span class="k">class</span> <span class="nc">RadiusOfGyration</span><span class="p">(</span><span class="n">_RadiusOfGyrationBase</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span> <span class="nc">RadiusOfGyration</span><span class="p">(</span><span class="n">BaseRadiusOfGyration</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The radius of gyration of a group of :math:`n` atoms:</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        r_g({\\bf r}) = \\sqrt{ \\frac{1}{n} \\sum_{i=1}^n \\left\\|</span>
-<span class="sd">            {\\bf r}_i - {\\bf r}_c({\\bf r})</span>
-<span class="sd">        \\right\\|^2 }.</span>
+<span class="sd">        r_g({\bf r}) = \sqrt{ \frac{1}{n} \sum_{i=1}^n \left\|</span>
+<span class="sd">            {\bf r}_i - {\bf r}_c({\bf r})</span>
+<span class="sd">        \right\|^2 }.</span>
 
-<span class="sd">    where :math:`{\\bf r}_c({\\bf r})` is the geometric center of the group:</span>
+<span class="sd">    where :math:`{\bf r}_c({\bf r})` is the geometric center of the group:</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        {\\bf r}_c({\\bf r}) = \\frac{1}{n} \\sum_{i=j}^n {\\bf r}_j</span>
+<span class="sd">        {\bf r}_c({\bf r}) = \frac{1}{n} \sum_{i=j}^n {\bf r}_j</span>
 
 <span class="sd">    Optionally, the radius of gyration can be computed with respect to the center of</span>
 <span class="sd">    mass of the group. In this case, the geometric center is replaced by:</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        {\\bf r}_m({\\bf r}) = \\frac{1}{M} \\sum_{i=1}^n m_i {\\bf r}_i</span>
+<span class="sd">        {\bf r}_m({\bf r}) = \frac{1}{M} \sum_{i=1}^n m_i {\bf r}_i</span>
 
-<span class="sd">    where :math:`M = \\sum_{i=1}^n m_i` is the total mass of the group.</span>
+<span class="sd">    where :math:`M = \sum_{i=1}^n m_i` is the total mass of the group.</span>
 
 <span class="sd">    .. note::</span>
 
@@ -135,7 +114,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">pbc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">weighByMass</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">pbc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">weighByMass</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">num_atoms</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
         <span class="n">num_groups</span> <span class="o">=</span> <span class="n">num_atoms</span> <span class="o">+</span> <span class="mi">1</span>

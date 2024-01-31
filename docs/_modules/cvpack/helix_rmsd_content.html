@@ -49,61 +49,61 @@
 
 <span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
+<span class="kn">from</span> <span class="nn">.base_rmsd_content</span> <span class="kn">import</span> <span class="n">BaseRMSDContent</span>
 <span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">SerializableResidue</span>
-<span class="kn">from</span> <span class="nn">.rmsd_content</span> <span class="kn">import</span> <span class="n">RMSDContent</span>
 
 <span class="c1"># pylint: disable=protected-access</span>
-<span class="n">ALPHA_POSITIONS</span> <span class="o">=</span> <span class="n">RMSDContent</span><span class="o">.</span><span class="n">_loadPositions</span><span class="p">(</span><span class="s2">&quot;ideal_alpha_helix.csv&quot;</span><span class="p">)</span>
+<span class="n">ALPHA_POSITIONS</span> <span class="o">=</span> <span class="n">BaseRMSDContent</span><span class="o">.</span><span class="n">_loadPositions</span><span class="p">(</span><span class="s2">&quot;ideal_alpha_helix.csv&quot;</span><span class="p">)</span>
 <span class="c1"># pylint: enable=protected-access</span>
 
 
 <div class="viewcode-block" id="HelixRMSDContent">
 <a class="viewcode-back" href="../../api/HelixRMSDContent.html#cvpack.HelixRMSDContent">[docs]</a>
-<span class="k">class</span> <span class="nc">HelixRMSDContent</span><span class="p">(</span><span class="n">RMSDContent</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span> <span class="nc">HelixRMSDContent</span><span class="p">(</span><span class="n">BaseRMSDContent</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The alpha-helix RMSD content of a sequence of `n` residues :cite:`Pietrucci_2009`:</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        \\alpha_{\\rm rmsd}({\\bf r}) = \\sum_{i=1}^{n-5} S\\left(</span>
-<span class="sd">            \\frac{r_{\\rm rmsd}({\\bf g}_i, {\\bf g}_{\\rm ref})}{r_0}</span>
-<span class="sd">        \\right)</span>
+<span class="sd">        \alpha_{\rm rmsd}({\bf r}) = \sum_{i=1}^{n-5} S\left(</span>
+<span class="sd">            \frac{r_{\rm rmsd}({\bf g}_i, {\bf g}_{\rm ref})}{r_0}</span>
+<span class="sd">        \right)</span>
 
-<span class="sd">    where :math:`{\\bf g}_i` represents a group of atoms selected from residues</span>
-<span class="sd">    :math:`i` to :math:`i+5` of the sequence, :math:`{\\bf g}_{\\rm ref}` represents</span>
+<span class="sd">    where :math:`{\bf g}_i` represents a group of atoms selected from residues</span>
+<span class="sd">    :math:`i` to :math:`i+5` of the sequence, :math:`{\bf g}_{\rm ref}` represents</span>
 <span class="sd">    the same atoms in an ideal alpha-helix configuration,</span>
-<span class="sd">    :math:`r_{\\rm rmsd}({\\bf g}, {\\bf g}_{\\rm ref})` is the root-mean-square</span>
-<span class="sd">    distance (RMSD) between groups :math:`{\\bf g}` and :math:`{\\bf g}_{\\rm ref}`,</span>
+<span class="sd">    :math:`r_{\rm rmsd}({\bf g}, {\bf g}_{\rm ref})` is the root-mean-square</span>
+<span class="sd">    distance (RMSD) between groups :math:`{\bf g}` and :math:`{\bf g}_{\rm ref}`,</span>
 <span class="sd">    :math:`r_0` is a threshold RMSD value, and :math:`S(x)` is a smooth step function</span>
 <span class="sd">    whose default form is</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        S(x) = \\frac{1 + x^4}{1 + x^4 + x^8}</span>
+<span class="sd">        S(x) = \frac{1 + x^4}{1 + x^4 + x^8}</span>
 
 <span class="sd">    The residues must be a contiguous sequence from a single chain, ordered from</span>
 <span class="sd">    the N-terminus to the C-terminus.</span>
 
-<span class="sd">    Every group :math:`{\\bf g}_{i,j}` is formed by the N, :math:`{\\rm C}_\\alpha`,</span>
-<span class="sd">    :math:`{\\rm C}_\\beta`, C, and O atoms of the six residues involvend, thus</span>
+<span class="sd">    Every group :math:`{\bf g}_{i,j}` is formed by the N, :math:`{\rm C}_\alpha`,</span>
+<span class="sd">    :math:`{\rm C}_\beta`, C, and O atoms of the six residues involvend, thus</span>
 <span class="sd">    comprising 30 atoms in total. In the case of glycine, the missing</span>
-<span class="sd">    :math:`{\\rm C}_\\beta` atom is replaced by the corresponding H atom. The RMSD is</span>
+<span class="sd">    :math:`{\rm C}_\beta` atom is replaced by the corresponding H atom. The RMSD is</span>
 <span class="sd">    then defined as</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        r_{\\rm rmsd}({\\bf g}, {\\bf g}_{\\rm ref}) =</span>
-<span class="sd">            \\sqrt{\\frac{1}{30} \\sum_{j=1}^{30} \\left\\|</span>
-<span class="sd">                \\hat{\\bf r}_j({\\bf g}) -</span>
-<span class="sd">                {\\bf A}({\\bf g})\\hat{\\bf r}_j({\\bf g}_{\\rm ref})</span>
-<span class="sd">            \\right\\|^2}</span>
+<span class="sd">        r_{\rm rmsd}({\bf g}, {\bf g}_{\rm ref}) =</span>
+<span class="sd">            \sqrt{\frac{1}{30} \sum_{j=1}^{30} \left\|</span>
+<span class="sd">                \hat{\bf r}_j({\bf g}) -</span>
+<span class="sd">                {\bf A}({\bf g})\hat{\bf r}_j({\bf g}_{\rm ref})</span>
+<span class="sd">            \right\|^2}</span>
 
-<span class="sd">    where :math:`\\hat{\\bf r}_k({\\bf g})` is the position of the :math:`k`-th atom in</span>
-<span class="sd">    a group :math:`{\\bf g}` relative to the group&#39;s center of geometry and</span>
-<span class="sd">    :math:`{\\bf A}({\\bf g})` is the rotation matrix that minimizes the RMSD between</span>
-<span class="sd">    :math:`{\\bf g}` and :math:`{\\bf g}_{\\rm ref}`.</span>
+<span class="sd">    where :math:`\hat{\bf r}_k({\bf g})` is the position of the :math:`k`-th atom in</span>
+<span class="sd">    a group :math:`{\bf g}` relative to the group&#39;s center of geometry and</span>
+<span class="sd">    :math:`{\bf A}({\bf g})` is the rotation matrix that minimizes the RMSD between</span>
+<span class="sd">    :math:`{\bf g}` and :math:`{\bf g}_{\rm ref}`.</span>
 
 <span class="sd">    Optionally, the alpha-helix RMSD content can be normalized to the range</span>
-<span class="sd">    :math:`[0, 1]`. This is done by dividing its value by :math:`N_{\\rm groups} =</span>
+<span class="sd">    :math:`[0, 1]`. This is done by dividing its value by :math:`N_{\rm groups} =</span>
 <span class="sd">    n - 5`.</span>
 
 <span class="sd">    This collective variable was introduced in Ref. :cite:`Pietrucci_2009`. The default</span>
@@ -114,7 +114,7 @@
 
 <span class="sd">    .. note::</span>
 
-<span class="sd">        The present implementation is limited to :math:`1 \\leq N_{\\rm groups} \\leq</span>
+<span class="sd">        The present implementation is limited to :math:`1 \leq N_{\rm groups} \leq</span>
 <span class="sd">        1024`.</span>
 
 <span class="sd">    .. _ALPHARMSD: https://www.plumed.org/doc-v2.8/user-doc/html/_a_l_p_h_a_r_m_s_d.html</span>

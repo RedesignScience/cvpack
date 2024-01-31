@@ -52,26 +52,26 @@
 <span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
 <span class="kn">from</span> <span class="nn">.atomic_function</span> <span class="kn">import</span> <span class="n">_add_parameters</span>
-<span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">AbstractCollectiveVariable</span>
+<span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">BaseCollectiveVariable</span>
 
 
 <div class="viewcode-block" id="CentroidFunction">
 <a class="viewcode-back" href="../../api/CentroidFunction.html#cvpack.CentroidFunction">[docs]</a>
-<span class="k">class</span> <span class="nc">CentroidFunction</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomCentroidBondForce</span><span class="p">,</span> <span class="n">AbstractCollectiveVariable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A generic function of the centroids of :math:`m \\times n` atoms groups split</span>
+<span class="k">class</span> <span class="nc">CentroidFunction</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomCentroidBondForce</span><span class="p">,</span> <span class="n">BaseCollectiveVariable</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A generic function of the centroids of :math:`m \times n` atoms groups split</span>
 <span class="sd">    into `m` collections of `n` groups each:</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        f({\\bf r}) = \\sum_{i=1}^m F\\Big(</span>
-<span class="sd">            {\\bf g}^i_1({\\bf r}),</span>
-<span class="sd">            {\\bf g}^i_2({\\bf r}),</span>
-<span class="sd">            \\dots,</span>
-<span class="sd">            {\\bf g}^i_n({\\bf r})</span>
-<span class="sd">        \\Big)</span>
+<span class="sd">        f({\bf r}) = \sum_{i=1}^m F\Big(</span>
+<span class="sd">            {\bf g}^i_1({\bf r}),</span>
+<span class="sd">            {\bf g}^i_2({\bf r}),</span>
+<span class="sd">            \dots,</span>
+<span class="sd">            {\bf g}^i_n({\bf r})</span>
+<span class="sd">        \Big)</span>
 
-<span class="sd">    where :math:`F` is a user-defined function and :math:`{\\bf g}^i_1({\\bf r})` is the</span>
+<span class="sd">    where :math:`F` is a user-defined function and :math:`{\bf g}^i_1({\bf r})` is the</span>
 <span class="sd">    centroid of the :math:`j`-th group of atoms of the :math:`i`-th collection of</span>
 <span class="sd">    groups.</span>
 
@@ -85,16 +85,16 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        {\\bf g}_j({\\bf r}) = \\frac{1}{N_j} \\sum_{k=1}^{N_j} {\\bf r}_{k,j}</span>
+<span class="sd">        {\bf g}_j({\bf r}) = \frac{1}{N_j} \sum_{k=1}^{N_j} {\bf r}_{k,j}</span>
 
 <span class="sd">    where :math:`N_j` is the number of atoms in group :math:`j` and</span>
-<span class="sd">    :math:`{\\bf r}_{k,j}` is the coordinate of the :math:`k`-th atom of group</span>
+<span class="sd">    :math:`{\bf r}_{k,j}` is the coordinate of the :math:`k`-th atom of group</span>
 <span class="sd">    :math:`j`. Optionally, the centroid can be weighted by the mass of each atom</span>
 <span class="sd">    in the group. In this case, it is redefined as:</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        {\\bf g}_j({\\bf r}) = \\frac{1}{M_j} \\sum_{k=1}^{N_j} m_{k,j} {\\bf r}_{k,j}</span>
+<span class="sd">        {\bf g}_j({\bf r}) = \frac{1}{M_j} \sum_{k=1}^{N_j} m_{k,j} {\bf r}_{k,j}</span>
 
 <span class="sd">    where :math:`M_j` is the total mass of atom group :math:`j` and :math:`m_{k,j}` is</span>
 <span class="sd">    the mass of the :math:`k`-th atom in group :math:`j`.</span>
