@@ -18,12 +18,12 @@ from .utils import NonbondedForceSurrogate, evaluate_in_context
 
 
 class NumberOfContacts(openmm.CustomNonbondedForce, BaseCollectiveVariable):
-    """
+    r"""
     The number of contacts between two atom groups:
 
     .. math::
-        N({\\bf r}) = \\sum_{i \\in {\\bf g}_1} \\sum_{j \\in {\\bf g}_2}
-                        S\\left(\\frac{\\|{\\bf r}_j - {\\bf r}_i\\|}{r_0}\\right)
+        N({\bf r}) = \sum_{i \in {\bf g}_1} \sum_{j \in {\bf g}_2}
+                        S\left(\frac{\|{\bf r}_j - {\bf r}_i\|}{r_0}\right)
 
     where :math:`r_0` is the threshold distance for defining a contact and :math:`S(x)`
     is a step function equal to :math:`1` if a contact is made or equal to :math:`0`
@@ -31,14 +31,14 @@ class NumberOfContacts(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     `H` is the `Heaviside step function
     <https://en.wikipedia.org/wiki/Heaviside_step_function>`_. For molecular dynamics,
     however, :math:`S(x)` should be a continuous approximation of :math:`H(1-x)` for
-    :math:`x \\geq 0`. By default :cite:`Iannuzzi_2003`, the following function is used:
+    :math:`x \geq 0`. By default :cite:`Iannuzzi_2003`, the following function is used:
 
     .. math::
 
-        S(x) = \\frac{1-x^6}{1-x^{12}} = \\frac{1}{1+x^6}
+        S(x) = \frac{1-x^6}{1-x^{12}} = \frac{1}{1+x^6}
 
     In fact, a cutoff distance :math:`r_c = x_c r_0` (typically, :math:`x_c = 2`) is
-    applied so that :math:`S(x) = 0` for :math:`x \\geq x_c`. To avoid discontinuities,
+    applied so that :math:`S(x) = 0` for :math:`x \geq x_c`. To avoid discontinuities,
     there is also the option to smoothly switch off :math:`S(x)` starting from
     :math:`r_s = x_s r_0` (typically, :math:`x_s = 1.5`) instead of doing it abruptly at
     :math:`r_c`.
@@ -46,12 +46,12 @@ class NumberOfContacts(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     .. note::
 
         Atoms are allowed to be in both groups. In this case, self-contacts
-        (:math:`i = j`) are ignored and each pair of distinct atoms (:math:`i \\neq j`)
+        (:math:`i = j`) are ignored and each pair of distinct atoms (:math:`i \neq j`)
         is counted only once.
 
     .. note::
-        Any non-exclusion exceptions involving atoms in :math:`{\\bf g}_1` and
-        :math:`{\\bf g}_2` in the provided :class:`openmm.NonbondedForce` are turned
+        Any non-exclusion exceptions involving atoms in :math:`{\bf g}_1` and
+        :math:`{\bf g}_2` in the provided :class:`openmm.NonbondedForce` are turned
         into exclusions in this collective variable.
 
     Parameters

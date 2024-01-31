@@ -22,7 +22,7 @@ from .unit import value_in_md_units
 
 
 class SerializableResidue(mmapp.topology.Residue):
-    """
+    r"""
     A class that extends OpenMM's Residue class with additional methods for
     serialization and deserialization.
     """
@@ -36,7 +36,7 @@ class SerializableResidue(mmapp.topology.Residue):
 
 
 class BaseCollectiveVariable(openmm.Force):
-    """
+    r"""
     An abstract class with common attributes and method for all CVs.
     """
 
@@ -276,20 +276,20 @@ class BaseCollectiveVariable(openmm.Force):
     def getEffectiveMass(
         self, context: openmm.Context, digits: t.Optional[int] = None
     ) -> mmunit.Quantity:
-        """
+        r"""
         Compute the effective mass of this collective variable at a given
         :OpenMM:`Context`.
 
-        The effective mass of a collective variable :math:`q({\\bf r})` is defined as
+        The effective mass of a collective variable :math:`q({\bf r})` is defined as
         :cite:`Chipot_2007`:
 
         .. math::
 
-            m_\\mathrm{eff}({\\bf r}) = \\left(
-                \\sum_{i=1}^N \\frac{1}{m_i} \\left\\|
-                    \\frac{dq}{d{\\bf r}_i}
-                \\right\\|^2
-            \\right)^{-1}
+            m_\mathrm{eff}({\bf r}) = \left(
+                \sum_{i=1}^N \frac{1}{m_i} \left\|
+                    \frac{dq}{d{\bf r}_i}
+                \right\|^2
+            \right)^{-1}
 
         Optionally, effective mass of this collective variable can be rounded to a
         specified number of precision digits, which is the number of digits after the

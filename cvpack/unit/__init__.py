@@ -28,7 +28,7 @@ MatrixQuantity = t.Union[
 
 
 class _NodeTransformer(ast.NodeTransformer):
-    """
+    r"""
     A child class of ast.NodeTransformer that replaces all instances of ast.Name with
     an ast.Attribute with the value "unit" and the attribute name equal to the original
     id of the ast.Name.
@@ -46,7 +46,7 @@ class _NodeTransformer(ast.NodeTransformer):
 
 
 class SerializableUnit(_mmunit.Unit):
-    """
+    r"""
     A child class of openmm.unit.Unit that allows for serialization/deserialization.
 
     Parameters
@@ -94,7 +94,7 @@ class SerializableUnit(_mmunit.Unit):
 
 
 class SerializableQuantity(_mmunit.Quantity):
-    """
+    r"""
     A child class of openmm.unit.Quantity that allows for serialization/deserialization.
 
     Parameters

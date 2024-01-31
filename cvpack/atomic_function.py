@@ -49,17 +49,17 @@ def _add_parameters(
 
 
 class AtomicFunction(openmm.CustomCompoundBondForce, BaseCollectiveVariable):
-    """
+    r"""
     A generic function of the coordinates of atoms split into `m` groups of `n`
     atoms each:
 
     .. math::
 
-        f({\\bf r}) = \\sum_{i=1}^m F\\left(
-            {\\bf r}_{i,1}, {\\bf r}_{i,2}, \\dots, {\\bf r}_{i,n}
-        \\right)
+        f({\bf r}) = \sum_{i=1}^m F\left(
+            {\bf r}_{i,1}, {\bf r}_{i,2}, \dots, {\bf r}_{i,n}
+        \right)
 
-    where :math:`F` is a user-defined function and :math:`{\\bf r}_{i,j}` is the
+    where :math:`F` is a user-defined function and :math:`{\bf r}_{i,j}` is the
     coordinate of the :math:`j`-th atom of the :math:`i`-th group.
 
     The function :math:`F` is defined as a string and can be any expression supported by

@@ -18,16 +18,16 @@ from .cvpack import BaseCollectiveVariable
 
 
 class TorsionSimilarity(openmm.CustomCompoundBondForce, BaseCollectiveVariable):
-    """
+    r"""
     The degree of similarity between `n` pairs of torsion angles:
 
     .. math::
 
-        s({\\bf r}) = \\frac{n}{2} + \\frac{1}{2} \\sum_{i=1}^n \\cos\\Big(
-            \\phi^{\\rm 1st}_i({\\bf r}) - \\phi^{\\rm 2nd}_i({\\bf r})
-        \\Big)
+        s({\bf r}) = \frac{n}{2} + \frac{1}{2} \sum_{i=1}^n \cos\Big(
+            \phi^{\rm 1st}_i({\bf r}) - \phi^{\rm 2nd}_i({\bf r})
+        \Big)
 
-    where :math:`\\phi^{\\rm kth}_i` is the torsion angle at position :math:`i` in the
+    where :math:`\phi^{\rm kth}_i` is the torsion angle at position :math:`i` in the
     :math:`k`-th list.
 
     .. note::

@@ -19,22 +19,22 @@ from .cvpack import BaseCollectiveVariable, SerializableResidue
 
 
 class HelixHBondContent(openmm.CustomBondForce, BaseCollectiveVariable):
-    """
+    r"""
     The alpha-helix hydrogen-bond content of a sequence of `n` residues:
 
     .. math::
 
-        \\alpha_{\\rm HB}({\\bf r}) = \\sum_{i=5}^n B_m\\left(
-            \\frac{\\| {\\bf r}^{\\rm H}_i - {\\bf r}^{\\rm O}_{i-4} \\|}{d_{\\rm HB}}
-        \\right)
+        \alpha_{\rm HB}({\bf r}) = \sum_{i=5}^n B_m\left(
+            \frac{\| {\bf r}^{\rm H}_i - {\bf r}^{\rm O}_{i-4} \|}{d_{\rm HB}}
+        \right)
 
-    where :math:`{\\bf r}^{\\rm H}_k` and :math:`{\\bf r}^{\\rm O}_k` are the positions
+    where :math:`{\bf r}^{\rm H}_k` and :math:`{\bf r}^{\rm O}_k` are the positions
     of the hydrogen and oxygen atoms bonded, respectively, to the backbone nitrogen and
-    carbon atoms of residue :math:`k`. In addition, :math:`d_{\\rm HB}` is the threshold
+    carbon atoms of residue :math:`k`. In addition, :math:`d_{\rm HB}` is the threshold
     distance for a hydrogen bond and :math:`B_m(x)` is a smooth step function given by
 
     .. math::
-        B_m(x) = \\frac{1}{1 + x^{2m}}
+        B_m(x) = \frac{1}{1 + x^{2m}}
 
     where :math:`m` is an integer parameter that controls its steepness.
 
@@ -107,8 +107,8 @@ class HelixHBondContent(openmm.CustomBondForce, BaseCollectiveVariable):
 
         numerator = 1 / (len(residues) - 4) if normalize else 1
         super().__init__(f"{numerator}/(1+x^{2*halfExponent}); x=r/{thresholdDistance}")
-        hydrogen_pattern = regex.compile("\\b(H|1H|HN1|HT1|H1|HN)\\b")
-        oxygen_pattern = regex.compile("\\b(O|OCT1|OC1|OT1|O1)\\b")
+        hydrogen_pattern = regex.compile(r"\b(H|1H|HN1|HT1|H1|HN)\b")
+        oxygen_pattern = regex.compile(r"\b(O|OCT1|OC1|OT1|O1)\b")
         for i in range(4, len(residues)):
             self.addBond(
                 find_atom(residues[i - 4], oxygen_pattern),

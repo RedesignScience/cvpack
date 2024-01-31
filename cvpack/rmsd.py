@@ -19,22 +19,22 @@ from .cvpack import BaseCollectiveVariable
 
 
 class RMSD(openmm.RMSDForce, BaseCollectiveVariable):
-    """
+    r"""
     The minimum root-mean-square deviation (RMSD) between the current and reference
     coordinates of a group of `n` atoms:
 
     .. math::
 
-        d_{\\rm rms}({\\bf r}) = \\sqrt{
-            \\frac{1}{n} \\sum_{i=1}^n \\left\\|
-                \\hat{\\bf r}_i - {\\bf A}({\\bf r}) \\hat{\\bf r}_i^{\\rm ref}
-            \\right\\|^2
+        d_{\rm rms}({\bf r}) = \sqrt{
+            \frac{1}{n} \sum_{i=1}^n \left\|
+                \hat{\bf r}_i - {\bf A}({\bf r}) \hat{\bf r}_i^{\rm ref}
+            \right\|^2
         }
 
-    where :math:`\\hat{\\bf r}_i` is the position of the :math:`i`-th atom in the group
+    where :math:`\hat{\bf r}_i` is the position of the :math:`i`-th atom in the group
     relative to the group's center of geometry (centroid),
-    :math:`\\hat{\\bf r}_i^{\\rm ref}` is the centroid-centered position of the same
-    atom in a reference configuration, and :math:`{\\bf A}({\\bf r})` is the rotation
+    :math:`\hat{\bf r}_i^{\rm ref}` is the centroid-centered position of the same
+    atom in a reference configuration, and :math:`{\bf A}({\bf r})` is the rotation
     matrix that minimizes the RMSD between the group and the reference structure.
 
     .. warning::

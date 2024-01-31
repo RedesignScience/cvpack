@@ -15,21 +15,21 @@ from .cvpack import BaseCollectiveVariable
 
 
 class Torsion(openmm.CustomTorsionForce, BaseCollectiveVariable):
-    """
+    r"""
     The torsion angle formed by four atoms:
 
     .. math::
 
-        \\varphi({\\bf r}) = {\\rm atan2}\\left(\\frac{
-            ({\\bf r}_{2,1} \\times {\\bf r}_{3,4}) \\cdot {\\bf u}_{2,3}
+        \varphi({\bf r}) = {\rm atan2}\left(\frac{
+            ({\bf r}_{2,1} \times {\bf r}_{3,4}) \cdot {\bf u}_{2,3}
         }{
-            {\\bf r}_{2,1} \\cdot {\\bf r}_{3,4} -
-            ({\\bf r}_{2,1} \\cdot {\\bf u}_{2,3})
-            ({\\bf r}_{3,4} \\cdot {\\bf u}_{2,3})
-        }\\right),
+            {\bf r}_{2,1} \cdot {\bf r}_{3,4} -
+            ({\bf r}_{2,1} \cdot {\bf u}_{2,3})
+            ({\bf r}_{3,4} \cdot {\bf u}_{2,3})
+        }\right),
 
-    where :math:`{\\bf r}_{i,j} = {\\bf r}_j - {\\bf r}_i`,
-    :math:`{\\bf u}_{2,3} = {\\bf r}_{2,3}/\\|{\\bf r}_{2,3}\\|`,
+    where :math:`{\bf r}_{i,j} = {\bf r}_j - {\bf r}_i`,
+    :math:`{\bf u}_{2,3} = {\bf r}_{2,3}/\|{\bf r}_{2,3}\|`,
     and `atan2 <https://en.wikipedia.org/wiki/Atan2>`_ is the arctangent function that
     receives the numerator and denominator above as separate arguments.
 
