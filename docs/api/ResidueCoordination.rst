@@ -1,0 +1,17 @@
+ResidueCoordination
+===================
+
+.. currentmodule:: cvpack
+.. autoclass:: ResidueCoordination
+    :member-order: alphabetical
+
+    .. rubric:: Methods
+
+    .. automethod:: getArguments
+    .. automethod:: getEffectiveMass
+    .. automethod:: getReferenceValue
+    .. automethod:: getUnit
+    .. automethod:: getValue
+    .. automethod:: setReferenceValue
+    .. automethod:: setUnit
+    .. automethod:: setUnusedForceGroup
