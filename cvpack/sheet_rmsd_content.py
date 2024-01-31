@@ -14,16 +14,16 @@ from openmm import app as mmapp
 
 from cvpack import unit as mmunit
 
+from .base_rmsd_content import BaseRMSDContent
 from .cvpack import SerializableResidue
-from .rmsd_content import RMSDContent
 
 # pylint: disable=protected-access
-PARABETA_POSITIONS = RMSDContent._loadPositions("ideal_parallel_beta_sheet.csv")
-ANTIBETA_POSITIONS = RMSDContent._loadPositions("ideal_antiparallel_beta_sheet.csv")
+PARABETA_POSITIONS = BaseRMSDContent._loadPositions("ideal_parallel_beta_sheet.csv")
+ANTIBETA_POSITIONS = BaseRMSDContent._loadPositions("ideal_antiparallel_beta_sheet.csv")
 # pylint: enable=protected-access
 
 
-class SheetRMSDContent(RMSDContent):
+class SheetRMSDContent(BaseRMSDContent):
     r"""
     The beta-sheet RMSD content of `n` residues :cite:`Pietrucci_2009`:
 

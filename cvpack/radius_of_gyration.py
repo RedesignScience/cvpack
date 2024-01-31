@@ -9,33 +9,12 @@
 
 import typing as t
 
-import openmm
-
 from cvpack import unit as mmunit
 
-from .cvpack import BaseCollectiveVariable
+from .base_radius_of_gyration import BaseRadiusOfGyration
 
 
-class _RadiusOfGyrationBase(openmm.CustomCentroidBondForce, BaseCollectiveVariable):
-    def __init__(  # pylint: disable=too-many-arguments
-        self,
-        num_groups: int,
-        expression: str,
-        group: t.Sequence[int],
-        pbc: bool = False,
-        weighByMass: bool = False,
-    ) -> None:
-        super().__init__(num_groups, expression)
-        for atom in group:
-            self.addGroup([atom])
-        if weighByMass:
-            self.addGroup(group)
-        else:
-            self.addGroup(group, [1] * len(group))
-        self.setUsesPeriodicBoundaryConditions(pbc)
-
-
-class RadiusOfGyration(_RadiusOfGyrationBase):
+class RadiusOfGyration(BaseRadiusOfGyration):
     r"""
     The radius of gyration of a group of :math:`n` atoms:
 

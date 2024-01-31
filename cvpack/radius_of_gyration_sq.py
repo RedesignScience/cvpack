@@ -12,10 +12,10 @@ import typing as t
 
 from cvpack import unit as mmunit
 
-from .radius_of_gyration import _RadiusOfGyrationBase
+from .base_radius_of_gyration import BaseRadiusOfGyration
 
 
-class RadiusOfGyrationSq(_RadiusOfGyrationBase):
+class RadiusOfGyrationSq(BaseRadiusOfGyration):
     r"""
     The square of the radius of gyration of a group of :math:`n` atoms:
 

@@ -13,15 +13,15 @@ from openmm import app as mmapp
 
 from cvpack import unit as mmunit
 
+from .base_rmsd_content import BaseRMSDContent
 from .cvpack import SerializableResidue
-from .rmsd_content import RMSDContent
 
 # pylint: disable=protected-access
-ALPHA_POSITIONS = RMSDContent._loadPositions("ideal_alpha_helix.csv")
+ALPHA_POSITIONS = BaseRMSDContent._loadPositions("ideal_alpha_helix.csv")
 # pylint: enable=protected-access
 
 
-class HelixRMSDContent(RMSDContent):
+class HelixRMSDContent(BaseRMSDContent):
     r"""
     The alpha-helix RMSD content of a sequence of `n` residues :cite:`Pietrucci_2009`:
 
