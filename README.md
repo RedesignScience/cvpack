@@ -39,7 +39,7 @@ The CVs implemented in CVPack are listed in the table below.
 | [Atomic Function]       | a user-defined function of the coordinates of a group of atoms   |
 | [Attraction Strength]   | strength of the attraction between two groups of atoms           |
 | [Centroid Function]     | a user-defined function of the centroids of groups of atoms      |
-| [CompositeRMSD]         | multibody RMSD with concerted-rotation alignment                 |
+| [Composite RMSD]        | multibody RMSD with concerted-rotation alignment                 |
 | [Distance]              | distance between two atoms                                       |
 | [Helix angle content]   | alpha-helix angle content of a sequence of residues              |
 | [Helix H-bond content]  | alpha-helix hydrogen-bond content of a sequence of residues      |
@@ -47,7 +47,7 @@ The CVs implemented in CVPack are listed in the table below.
 | [Helix torsion content] | alpha-helix Ramachandran content of a sequence of residues       |
 | [Number of contacts]    | number of contacts between two groups of atoms                   |
 | [Radius of gyration]    | radius of gyration of a group of atoms                           |
-| [Radius of gyration Sq.]| square of the radius of gyration of a group of atoms             |
+| [(Radius of gyration)^2]| square of the radius of gyration of a group of atoms             |
 | [Residue coordination]  | number of contacts between two disjoint groups of residues       |
 | [RMSD]                  | root-mean-square deviation with respect to a reference structure |
 | [Sheet RMSD content]    | beta-sheet RMSD content of a sequence of residues                |
@@ -101,7 +101,7 @@ Initial project based on the [CMS Cookiecutter] version 1.1.
 [Atomic Function]:        https://redesignscience.github.io/cvpack/api/AtomicFunction.html
 [Attraction Strength]:    https://redesignscience.github.io/cvpack/api/AttractionStrength.html
 [Centroid Function]:      https://redesignscience.github.io/cvpack/api/CentroidFunction.html
-[CompositeRMSD]:          https://redesignscience.github.io/cvpack/api/CompositeRMSD.html
+[Composite RMSD]:         https://redesignscience.github.io/cvpack/api/CompositeRMSD.html
 [Distance]:               https://redesignscience.github.io/cvpack/api/Distance.html
 [Helix angle content]:    https://redesignscience.github.io/cvpack/api/HelixAngleContent.html
 [Helix H-bond content]:   https://redesignscience.github.io/cvpack/api/HelixHBondContent.html
@@ -109,7 +109,7 @@ Initial project based on the [CMS Cookiecutter] version 1.1.
 [Helix torsion content]:  https://redesignscience.github.io/cvpack/api/HelixTorsionContent.html
 [Number of contacts]:     https://redesignscience.github.io/cvpack/api/NumberOfContacts.html
 [Radius of gyration]:     https://redesignscience.github.io/cvpack/api/RadiusOfGyration.html
-[Radius of gyration Sq.]: https://redesignscience.github.io/cvpack/api/RadiusOfGyrationSq.html
+[(Radius of gyration)^2]: https://redesignscience.github.io/cvpack/api/RadiusOfGyrationSq.html
 [Residue coordination]:   https://redesignscience.github.io/cvpack/api/ResidueCoordination.html
 [RMSD]:                   https://redesignscience.github.io/cvpack/api/RMSD.html
 [Sheet RMSD content]:     https://redesignscience.github.io/cvpack/api/SheetRMSDContent.html
