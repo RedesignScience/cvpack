@@ -14,7 +14,7 @@ Collective Variable Package
 [![Conda cvpack downloads](https://img.shields.io/conda/dn/mdtools/cvpack.svg)](https://anaconda.org/mdtools/cvpack)
 
 [![License](https://img.shields.io/badge/License-MIT-yellowgreen.svg?style=flat)](https://github.com/RedesignScience/cvpack/blob/main/LICENSE.md)
-[![Twitter](https://badgen.net/badge/follow%20us/@RedesignScience?icon=twitter)](https://twitter.com/RedesignScience)
+[![Twitter](https://badgen.net/badge/About/RedesignScience)](https://www.redesignscience.com)
 
 ### Overview
 
@@ -39,6 +39,7 @@ The CVs implemented in CVPack are listed in the table below.
 | [Atomic Function]       | a user-defined function of the coordinates of a group of atoms   |
 | [Attraction Strength]   | strength of the attraction between two groups of atoms           |
 | [Centroid Function]     | a user-defined function of the centroids of groups of atoms      |
+| [CompositeRMSD]         | multibody RMSD with concerted-rotation alignment                 |
 | [Distance]              | distance between two atoms                                       |
 | [Helix angle content]   | alpha-helix angle content of a sequence of residues              |
 | [Helix H-bond content]  | alpha-helix hydrogen-bond content of a sequence of residues      |
@@ -80,7 +81,7 @@ The documentation for CVPack is available at [Read the Docs](https://cvpack.read
 
 ### Copyright
 
-Copyright (c) 2023, [Redesign Science](https://www.redesignscience.com)
+Copyright (c) 2023-2024 [C. Abreu](https://github.com/craabreu) & [Redesign Science](https://www.redesignscience.com)
 
 
 #### Acknowledgements
@@ -100,6 +101,7 @@ Project based on the [CMS Cookiecutter] version 1.1.
 [Atomic Function]:        https://redesignscience.github.io/cvpack/api/AtomicFunction.html
 [Attraction Strength]:    https://redesignscience.github.io/cvpack/api/AttractionStrength.html
 [Centroid Function]:      https://redesignscience.github.io/cvpack/api/CentroidFunction.html
+[CompositeRMSD]:          https://redesignscience.github.io/cvpack/api/CompositeRMSD.html
 [Distance]:               https://redesignscience.github.io/cvpack/api/Distance.html
 [Helix angle content]:    https://redesignscience.github.io/cvpack/api/HelixAngleContent.html
 [Helix H-bond content]:   https://redesignscience.github.io/cvpack/api/HelixHBondContent.html
