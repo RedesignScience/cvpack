@@ -14,10 +14,10 @@ from openmm import app as mmapp
 
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable, SerializableResidue
+from .cvpack import BaseCollectiveVariable, SerializableResidue
 
 
-class HelixTorsionContent(openmm.CustomTorsionForce, AbstractCollectiveVariable):
+class HelixTorsionContent(openmm.CustomTorsionForce, BaseCollectiveVariable):
     """
     The alpha-helix Ramachandran content of a sequence of `n` residues:
 

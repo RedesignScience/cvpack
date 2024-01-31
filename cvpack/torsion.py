@@ -11,10 +11,10 @@ import openmm
 
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable
+from .cvpack import BaseCollectiveVariable
 
 
-class Torsion(openmm.CustomTorsionForce, AbstractCollectiveVariable):
+class Torsion(openmm.CustomTorsionForce, BaseCollectiveVariable):
     """
     The torsion angle formed by four atoms:
 

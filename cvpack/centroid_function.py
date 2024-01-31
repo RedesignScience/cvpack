@@ -16,10 +16,10 @@ from numpy.typing import ArrayLike
 from cvpack import unit as mmunit
 
 from .atomic_function import _add_parameters
-from .cvpack import AbstractCollectiveVariable
+from .cvpack import BaseCollectiveVariable
 
 
-class CentroidFunction(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):
+class CentroidFunction(openmm.CustomCentroidBondForce, BaseCollectiveVariable):
     """
     A generic function of the centroids of :math:`m \\times n` atoms groups split
     into `m` collections of `n` groups each:

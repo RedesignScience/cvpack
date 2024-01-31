@@ -14,10 +14,10 @@ import openmm
 
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable
+from .cvpack import BaseCollectiveVariable
 
 
-class TorsionSimilarity(openmm.CustomCompoundBondForce, AbstractCollectiveVariable):
+class TorsionSimilarity(openmm.CustomCompoundBondForce, BaseCollectiveVariable):
     """
     The degree of similarity between `n` pairs of torsion angles:
 

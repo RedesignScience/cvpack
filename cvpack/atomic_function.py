@@ -24,7 +24,7 @@ from openmm import (
 
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable
+from .cvpack import BaseCollectiveVariable
 
 
 def _add_parameters(
@@ -48,7 +48,7 @@ def _add_parameters(
     return perbond_parameters
 
 
-class AtomicFunction(openmm.CustomCompoundBondForce, AbstractCollectiveVariable):
+class AtomicFunction(openmm.CustomCompoundBondForce, BaseCollectiveVariable):
     """
     A generic function of the coordinates of atoms split into `m` groups of `n`
     atoms each:

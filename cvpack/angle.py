@@ -11,10 +11,10 @@ import openmm
 
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable
+from .cvpack import BaseCollectiveVariable
 
 
-class Angle(openmm.CustomAngleForce, AbstractCollectiveVariable):
+class Angle(openmm.CustomAngleForce, BaseCollectiveVariable):
     """
     The angle formed by three atoms:
 

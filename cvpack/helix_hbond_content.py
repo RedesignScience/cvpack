@@ -15,10 +15,10 @@ from openmm import app as mmapp
 
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable, SerializableResidue
+from .cvpack import BaseCollectiveVariable, SerializableResidue
 
 
-class HelixHBondContent(openmm.CustomBondForce, AbstractCollectiveVariable):
+class HelixHBondContent(openmm.CustomBondForce, BaseCollectiveVariable):
     """
     The alpha-helix hydrogen-bond content of a sequence of `n` residues:
 

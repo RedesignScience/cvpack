@@ -15,10 +15,10 @@ import openmm
 
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable
+from .cvpack import BaseCollectiveVariable
 
 
-class RMSD(openmm.RMSDForce, AbstractCollectiveVariable):
+class RMSD(openmm.RMSDForce, BaseCollectiveVariable):
     """
     The minimum root-mean-square deviation (RMSD) between the current and reference
     coordinates of a group of `n` atoms:

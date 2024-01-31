@@ -35,7 +35,7 @@ class SerializableResidue(mmapp.topology.Residue):
         ]
 
 
-class AbstractCollectiveVariable(openmm.Force):
+class BaseCollectiveVariable(openmm.Force):
     """
     An abstract class with common attributes and method for all CVs.
     """
@@ -52,7 +52,7 @@ class AbstractCollectiveVariable(openmm.Force):
 
     def _registerCV(self, unit: mmunit.Unit, *args: t.Any, **kwargs: t.Any) -> None:
         """
-        Register the newly created AbstractCollectiveVariable subclass instance.
+        Register the newly created BaseCollectiveVariable subclass instance.
 
         This method must always be called from Subclass.__init__.
 

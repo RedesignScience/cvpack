@@ -11,10 +11,10 @@ import openmm
 
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable
+from .cvpack import BaseCollectiveVariable
 
 
-class Distance(openmm.CustomBondForce, AbstractCollectiveVariable):
+class Distance(openmm.CustomBondForce, BaseCollectiveVariable):
     """
     The distance between two atoms:
 

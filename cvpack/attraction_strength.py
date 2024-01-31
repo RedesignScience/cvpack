@@ -13,13 +13,13 @@ import openmm
 
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable
+from .cvpack import BaseCollectiveVariable
 from .utils import NonbondedForceSurrogate, evaluate_in_context
 
 ONE_4PI_EPS0 = 138.93545764438198
 
 
-class AttractionStrength(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
+class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     """
     The strength of the attraction between two atom groups:
 

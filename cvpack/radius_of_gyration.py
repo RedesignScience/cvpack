@@ -13,10 +13,10 @@ import openmm
 
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable
+from .cvpack import BaseCollectiveVariable
 
 
-class _RadiusOfGyrationBase(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):
+class _RadiusOfGyrationBase(openmm.CustomCentroidBondForce, BaseCollectiveVariable):
     def __init__(  # pylint: disable=too-many-arguments
         self,
         num_groups: int,

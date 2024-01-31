@@ -14,10 +14,10 @@ from openmm import app as mmapp
 
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable, SerializableResidue
+from .cvpack import BaseCollectiveVariable, SerializableResidue
 
 
-class HelixAngleContent(openmm.CustomAngleForce, AbstractCollectiveVariable):
+class HelixAngleContent(openmm.CustomAngleForce, BaseCollectiveVariable):
     """
     The alpha-helix angle content of a sequence of `n` residues:
 

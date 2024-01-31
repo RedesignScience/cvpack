@@ -13,11 +13,11 @@ import openmm
 
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable
+from .cvpack import BaseCollectiveVariable
 from .utils import NonbondedForceSurrogate, evaluate_in_context
 
 
-class NumberOfContacts(openmm.CustomNonbondedForce, AbstractCollectiveVariable):
+class NumberOfContacts(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     """
     The number of contacts between two atom groups:
 

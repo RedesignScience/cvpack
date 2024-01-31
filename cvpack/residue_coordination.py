@@ -14,10 +14,10 @@ from openmm.app.topology import Residue
 
 from cvpack import unit as mmunit
 
-from .cvpack import AbstractCollectiveVariable, SerializableResidue
+from .cvpack import BaseCollectiveVariable, SerializableResidue
 
 
-class ResidueCoordination(openmm.CustomCentroidBondForce, AbstractCollectiveVariable):
+class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable):
     """
     The number of contacts between two disjoint groups of residues:
 
