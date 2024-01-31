@@ -90,7 +90,7 @@ jobs:
           git config user.email "$(git show --format=%ae -s)"
           git fetch origin
           git switch gh-pages
-          for subdir in ${dirs[@]}; do
+          for subdir in ${subdirs[@]}; do
             dir=docs/$subdir
             rsync -va --delete-excluded html/ $dir/
             rsync -va --delete-excluded htmlcov/ $dir/coverage/
