@@ -1,0 +1,15 @@
+Distance
+========
+
+.. currentmodule:: cvpack
+.. autoclass:: Distance
+    :member-order: alphabetical
+
+    .. rubric:: Methods
+
+    .. automethod:: getArguments
+    .. automethod:: getEffectiveMass
+    .. automethod:: getUnit
+    .. automethod:: getValue
+    .. automethod:: setUnit
+    .. automethod:: setUnusedForceGroup

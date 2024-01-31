@@ -1,0 +1,16 @@
+RMSD
+====
+
+.. currentmodule:: cvpack
+.. autoclass:: RMSD
+    :member-order: alphabetical
+
+    .. rubric:: Methods
+
+    .. automethod:: getArguments
+    .. automethod:: getEffectiveMass
+    .. automethod:: getNullBondForce
+    .. automethod:: getUnit
+    .. automethod:: getValue
+    .. automethod:: setUnit
+    .. automethod:: setUnusedForceGroup
