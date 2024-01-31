@@ -21,9 +21,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macOS-latest]
-        python-version: [3.11]
-        openmm-version: ["8.1"]
+        include:
+          - os: macos-latest
+            python-version: "3.11"
+            openmm-version: "8.1"
 
     steps:
       - uses: actions/checkout@v3
