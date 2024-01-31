@@ -60,12 +60,12 @@
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
-            <a id="prevFileLink" class="nav" href="d_1162223856cd18a9_centroid_function_py.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a id="prevFileLink" class="nav" href="d_1162223856cd18a9_composite_rmsd_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_1162223856cd18a9_distance_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-01-31 13:35 +0000
+            created at 2024-01-31 13:39 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -421,10 +421,10 @@
     <p class="pln"><span class="n"><a id="t339" href="#t339">339</a></span><span class="t"><span class="str">            30.94693 Da</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t340" href="#t340">340</a></span><span class="t"><span class="str">        """</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t341" href="#t341">341</a></span><span class="t">        <span class="nam">state</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">_getSingleForceState</span><span class="op">(</span><span class="nam">context</span><span class="op">,</span> <span class="nam">getForces</span><span class="op">=</span><span class="key">True</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t342" href="#t342">342</a></span><span class="t">        <span class="com"># pylint: disable=protected-access</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t342" href="#t342">342</a></span><span class="t">        <span class="com"># pylint: disable=protected-access,c-extension-no-member</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t343" href="#t343">343</a></span><span class="t">        <span class="nam">get_mass</span> <span class="op">=</span> <span class="nam">partial</span><span class="op">(</span><span class="nam">openmm</span><span class="op">.</span><span class="nam">_openmm</span><span class="op">.</span><span class="nam">System_getParticleMass</span><span class="op">,</span> <span class="nam">context</span><span class="op">.</span><span class="nam">getSystem</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t344" href="#t344">344</a></span><span class="t">        <span class="nam">force_vectors</span> <span class="op">=</span> <span class="nam">state</span><span class="op">.</span><span class="nam">getForces</span><span class="op">(</span><span class="nam">asNumpy</span><span class="op">=</span><span class="key">True</span><span class="op">)</span><span class="op">.</span><span class="nam">_value</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t345" href="#t345">345</a></span><span class="t">        <span class="com"># pylint: enable=protected-access</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t345" href="#t345">345</a></span><span class="t">        <span class="com"># pylint: enable=protected-access,c-extension-no-member</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t346" href="#t346">346</a></span><span class="t">        <span class="nam">squared_forces</span> <span class="op">=</span> <span class="nam">np</span><span class="op">.</span><span class="nam">sum</span><span class="op">(</span><span class="nam">np</span><span class="op">.</span><span class="nam">square</span><span class="op">(</span><span class="nam">force_vectors</span><span class="op">)</span><span class="op">,</span> <span class="nam">axis</span><span class="op">=</span><span class="num">1</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t347" href="#t347">347</a></span><span class="t">        <span class="nam">nonzeros</span> <span class="op">=</span> <span class="nam">np</span><span class="op">.</span><span class="nam">nonzero</span><span class="op">(</span><span class="nam">squared_forces</span><span class="op">)</span><span class="op">[</span><span class="num">0</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t348" href="#t348">348</a></span><span class="t">        <span class="key">if</span> <span class="nam">nonzeros</span><span class="op">.</span><span class="nam">size</span> <span class="op">==</span> <span class="num">0</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -438,12 +438,12 @@
 <footer>
     <div class="content">
         <p>
-            <a id="prevFileLink" class="nav" href="d_1162223856cd18a9_centroid_function_py.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a id="prevFileLink" class="nav" href="d_1162223856cd18a9_composite_rmsd_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_1162223856cd18a9_distance_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-01-31 13:35 +0000
+            created at 2024-01-31 13:39 +0000
         </p>
     </div>
 </footer>

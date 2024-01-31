@@ -8,6 +8,7 @@ Python API
     AtomicFunction
     AttractionStrength
     CentroidFunction
+    CompositeRMSD
     Distance
     HelixAngleContent
     HelixHBondContent
