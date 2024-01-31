@@ -77,7 +77,7 @@ To use CVPack in your own Python script or Jupyter notebook, simply import it as
 
 ### Documentation
 
-The documentation for CVPack is available at [Read the Docs](https://cvpack.readthedocs.io/en/stable).
+The documentation for CVPack is available at [Github Pages](https://redesignscience.github.io/cvpack).
 
 ### Copyright
 
@@ -86,7 +86,7 @@ Copyright (c) 2023-2024 [C. Abreu](https://github.com/craabreu) & [Redesign Scie
 
 #### Acknowledgements
 
-Project based on the [CMS Cookiecutter] version 1.1.
+Initial project based on the [CMS Cookiecutter] version 1.1.
 
 [BiasVariable]:       https://docs.openmm.org/latest/api-python/generated/openmm.app.metadynamics.BiasVariable.html
 [CMS Cookiecutter]:   https://github.com/molssi/cookiecutter-cms
