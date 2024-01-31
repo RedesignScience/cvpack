@@ -363,6 +363,39 @@ def test_rmsd():
     perform_common_tests(rmsd, context)
 
 
+def test_composite_rmsd():
+    """
+    Test whether a CompositeRMSD is computed correctly.
+
+    """
+    model = testsystems.HostGuestExplicit()
+    host_atoms, guest_atoms = (
+        [a.index for a in r.atoms()] for r in it.islice(model.topology.residues(), 0, 2)
+    )
+    try:
+        crmsd1 = cvpack.CompositeRMSD(model.positions, [host_atoms, guest_atoms])
+        atoms = host_atoms + guest_atoms
+        crmsd2 = cvpack.CompositeRMSD(
+            dict(zip(atoms, model.positions[atoms])),
+            [host_atoms, guest_atoms],
+            numAtoms=model.system.getNumParticles(),
+        )
+    except ImportError:
+        pytest.skip("openmm-cpp-forces is not installed")
+    crmsd1.setUnusedForceGroup(0, model.system)
+    crmsd2.setUnusedForceGroup(1, model.system)
+    model.system.addForce(crmsd1)
+    model.system.addForce(crmsd2)
+    context = openmm.Context(
+        model.system,
+        openmm.VerletIntegrator(0),
+        openmm.Platform.getPlatformByName("Reference"),
+    )
+    context.setPositions(model.positions)
+    perform_common_tests(crmsd1, context)
+    perform_common_tests(crmsd2, context)
+
+
 def test_helix_torsion_content():
     """
     Test whether a helix ramachandran content is computed correctly.
@@ -697,9 +730,7 @@ def test_attraction_strength():
             rij = np.linalg.norm(positions[i] - positions[j])
             if rij <= cutoff:
                 x = np.abs((2 * rij / (sigmas[i] + sigmas[j])) ** 6 - 2.0) + 2.0
-                strength -= (
-                    4 * np.sqrt(epsilons[i] * epsilons[j]) * (1 / x**2 - 1 / x)
-                )
+                strength -= 4 * np.sqrt(epsilons[i] * epsilons[j]) * (1 / x**2 - 1 / x)
                 if charges[i] * charges[j] < 0.0:
                     x = rij / cutoff
                     strength -= (

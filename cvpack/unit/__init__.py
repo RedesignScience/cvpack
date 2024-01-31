@@ -235,25 +235,23 @@ def convert_quantities(func):
     """
     sig = inspect.signature(func)
 
+    def remove_unit(value):
+        if isinstance(value, _mmunit.Quantity):
+            return value.value_in_unit_system(_mmunit.md_unit_system)
+        if isinstance(value, (np.ndarray, openmm.Vec3)):
+            return value
+        if isinstance(value, (list, tuple)):
+            return type(value)(map(remove_unit, value))
+        if isinstance(value, dict):
+            return {key: remove_unit(val) for key, val in value.items()}
+        return value
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         bound = sig.bind(*args, **kwargs)
         bound.apply_defaults()
         for name, value in bound.arguments.items():
-            if isinstance(value, _mmunit.Quantity):
-                bound.arguments[name] = value.value_in_unit_system(
-                    _mmunit.md_unit_system
-                )
-            elif isinstance(value, (list, tuple)):
-                bound.arguments[name] = type(value)(
-                    (
-                        item.value_in_unit_system(_mmunit.md_unit_system)
-                        if isinstance(item, _mmunit.Quantity)
-                        else item
-                    )
-                    for item in value
-                )
-
+            bound.arguments[name] = remove_unit(value)
         return func(*bound.args, **bound.kwargs)
 
     return wrapper
