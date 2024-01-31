@@ -14,13 +14,6 @@ import typing as t
 import numpy as np
 import openmm
 from numpy.typing import ArrayLike
-from openmm import (
-    CustomAngleForce,
-    CustomBondForce,
-    CustomCompoundBondForce,
-    CustomExternalForce,
-    CustomTorsionForce,
-)
 
 from cvpack import unit as mmunit
 
@@ -158,11 +151,11 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCollectiveVariable):
     def _fromCustomForce(
         cls,
         force: t.Union[
-            CustomAngleForce,
-            CustomBondForce,
-            CustomCompoundBondForce,
-            CustomExternalForce,
-            CustomTorsionForce,
+            openmm.CustomAngleForce,
+            openmm.CustomBondForce,
+            openmm.CustomCompoundBondForce,
+            openmm.CustomExternalForce,
+            openmm.CustomTorsionForce,
         ],
         unit: mmunit.Unit,
         pbc: bool = False,
@@ -359,11 +352,11 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCollectiveVariable):
         if isinstance(
             force,
             (
-                CustomAngleForce,
-                CustomBondForce,
-                CustomCompoundBondForce,
-                CustomExternalForce,
-                CustomTorsionForce,
+                openmm.CustomAngleForce,
+                openmm.CustomBondForce,
+                openmm.CustomCompoundBondForce,
+                openmm.CustomExternalForce,
+                openmm.CustomTorsionForce,
             ),
         ):
             return cls._fromCustomForce(force, unit, pbc)

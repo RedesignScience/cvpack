@@ -7,10 +7,10 @@
 
 """
 
+import collections
+import functools
 import inspect
 import typing as t
-from collections import OrderedDict
-from functools import partial
 
 import numpy as np
 import openmm
@@ -157,7 +157,7 @@ class BaseCollectiveVariable(openmm.Force):
             raise ValueError(f"Unit {unit} is not compatible with the MD unit system.")
 
     @classmethod
-    def getArguments(cls) -> t.Tuple[OrderedDict, OrderedDict]:
+    def getArguments(cls) -> t.Tuple[collections.OrderedDict, collections.OrderedDict]:
         """
         Inspect the arguments needed for constructing an instance of this collective
         variable.
@@ -180,8 +180,8 @@ class BaseCollectiveVariable(openmm.Force):
             >>> print(*defaults.items())
             ('pbc', False) ('weighByMass', False)
         """
-        arguments = OrderedDict()
-        defaults = OrderedDict()
+        arguments = collections.OrderedDict()
+        defaults = collections.OrderedDict()
         for name, parameter in inspect.signature(cls).parameters.items():
             arguments[name] = parameter.annotation
             if parameter.default is not inspect.Parameter.empty:
@@ -340,7 +340,9 @@ class BaseCollectiveVariable(openmm.Force):
         """
         state = self._getSingleForceState(context, getForces=True)
         # pylint: disable=protected-access,c-extension-no-member
-        get_mass = partial(openmm._openmm.System_getParticleMass, context.getSystem())
+        get_mass = functools.partial(
+            openmm._openmm.System_getParticleMass, context.getSystem()
+        )
         force_vectors = state.getForces(asNumpy=True)._value
         # pylint: enable=protected-access,c-extension-no-member
         squared_forces = np.sum(np.square(force_vectors), axis=1)
