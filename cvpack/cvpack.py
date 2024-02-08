@@ -21,18 +21,35 @@ from cvpack import unit as mmunit
 from .unit import value_in_md_units
 
 
+class SerializableAtom(mmapp.topology.Atom):
+    r"""
+    A serializable version of OpenMM's Atom class.
+    """
+
+    def __init__(self, atom: mmapp.topology.Atom) -> None:
+        super().__init__(
+            atom.name,
+            atom.element,
+            atom.index,
+            atom.residue if isinstance(atom.residue, int) else atom.residue.index,
+            atom.id,
+        )
+
+
 class SerializableResidue(mmapp.topology.Residue):
     r"""
-    A class that extends OpenMM's Residue class with additional methods for
-    serialization and deserialization.
+    A serializable version of OpenMM's Residue class.
     """
 
     def __init__(self, residue: mmapp.topology.Residue) -> None:
-        super().__init__(residue.name, residue.index, None, residue.id, None)
-        self._atoms = [
-            mmapp.topology.Atom(atom.name, atom.element, atom.index, None, atom.id)
-            for atom in residue.atoms()
-        ]
+        super().__init__(
+            residue.name,
+            residue.index,
+            residue.chain if isinstance(residue.chain, int) else residue.chain.index,
+            residue.id,
+            residue.insertionCode,
+        )
+        self._atoms = list(map(SerializableAtom, residue.atoms()))
 
 
 class BaseCollectiveVariable(openmm.Force):
