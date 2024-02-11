@@ -77,9 +77,12 @@ class RadiusOfGyrationSq(BaseRadiusOfGyration):
 
     """
 
+    yaml_tag = "!cvpack.RadiusOfGyrationSq"
+
     def __init__(
-        self, group: t.Sequence[int], pbc: bool = False, weighByMass: bool = False
+        self, group: t.Iterable[int], pbc: bool = False, weighByMass: bool = False
     ) -> None:
+        group = list(group)
         num_atoms = len(group)
         super().__init__(2, f"distance(g1, g2)^2/{num_atoms}", group, pbc, weighByMass)
         for atom in group:

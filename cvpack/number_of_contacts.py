@@ -126,6 +126,8 @@ class NumberOfContacts(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     1.0 dimensionless
     """
 
+    yaml_tag = "!cvpack.NumberOfContacts"
+
     @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,

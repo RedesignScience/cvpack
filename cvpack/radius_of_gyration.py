@@ -75,9 +75,12 @@ class RadiusOfGyration(BaseRadiusOfGyration):
 
     """
 
+    yaml_tag = "!cvpack.RadiusOfGyration"
+
     def __init__(
-        self, group: t.Sequence[int], pbc: bool = False, weighByMass: bool = False
+        self, group: t.Iterable[int], pbc: bool = False, weighByMass: bool = False
     ) -> None:
+        group = list(group)
         num_atoms = len(group)
         num_groups = num_atoms + 1
         sum_dist_sq = "+".join(

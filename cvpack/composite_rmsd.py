@@ -125,20 +125,25 @@ class CompositeRMSD(CompositeRMSDForce, BaseCollectiveVariable):
     0.0 nm
     """
 
+    yaml_tag = "!cvpack.CompositeRMSD"
+
     @mmunit.convert_quantities
     def __init__(
         self,
         referencePositions: t.Union[
             mmunit.MatrixQuantity, t.Dict[int, mmunit.VectorQuantity]
         ],
-        groups: t.Sequence[t.Sequence[int]],
+        groups: t.Iterable[t.Iterable[int]],
         numAtoms: t.Optional[int] = None,
     ) -> None:
         num_atoms = numAtoms or len(referencePositions)
+        groups = [list(map(int, group)) for group in groups]
         all_atoms = sum(groups, [])
         if len(set(all_atoms)) != len(all_atoms):
             raise ValueError("Atom groups must be disjoint")
-        defined_coords = {atom: referencePositions[atom] for atom in all_atoms}
+        defined_coords = {
+            atom: list(map(float, referencePositions[atom])) for atom in all_atoms
+        }
         all_coords = np.zeros((num_atoms, 3))
         for atom, coords in defined_coords.items():
             all_coords[atom, :] = coords

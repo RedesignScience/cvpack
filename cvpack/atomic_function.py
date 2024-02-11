@@ -17,31 +17,10 @@ from numpy.typing import ArrayLike
 
 from cvpack import unit as mmunit
 
-from .cvpack import BaseCollectiveVariable
+from .base_custom_function import BaseCustomFunction
 
 
-def _add_parameters(
-    force: openmm.Force,
-    size: int,
-    **parameters: t.Union[mmunit.ScalarQuantity, t.Sequence[mmunit.ScalarQuantity]],
-) -> t.List[t.Union[float, t.Sequence[mmunit.ScalarQuantity]]]:
-    perbond_parameters = []
-    for name, data in parameters.items():
-        if isinstance(data, mmunit.Quantity):
-            data = data.value_in_unit_system(mmunit.md_unit_system)
-        if isinstance(data, t.Sequence):
-            if len(data) != size:
-                raise ValueError(
-                    f"The length of parameter {name} is {len(data)}. Should be {size}."
-                )
-            force.addPerBondParameter(name)
-            perbond_parameters.append(data)
-        else:
-            force.addGlobalParameter(name, data)
-    return perbond_parameters
-
-
-class AtomicFunction(openmm.CustomCompoundBondForce, BaseCollectiveVariable):
+class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
     r"""
     A generic function of the coordinates of atoms split into `m` groups of `n`
     atoms each:
@@ -126,26 +105,27 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCollectiveVariable):
         429.479 kJ/mol
     """
 
+    yaml_tag = "!cvpack.AtomicFunction"
+
+    @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
         function: str,
         unit: mmunit.Unit,
         groups: ArrayLike,
         pbc: bool = True,
-        **parameters: t.Union[mmunit.ScalarQuantity, t.Sequence[mmunit.ScalarQuantity]],
+        **parameters: t.Union[mmunit.ScalarQuantity, mmunit.VectorQuantity],
     ) -> None:
         groups = np.atleast_2d(groups)
-        num_groups, atoms_per_group, *others = groups.shape
-        if others:
+        num_groups, atoms_per_group, *other_dimensions = groups.shape
+        if other_dimensions:
             raise ValueError("Array `groups` cannot have more than 2 dimensions")
         super().__init__(atoms_per_group, function)
-        perbond_parameters = _add_parameters(self, num_groups, **parameters)
-        for group, *values in zip(groups, *perbond_parameters):
-            self.addBond(group, values)
-        self.setUsesPeriodicBoundaryConditions(pbc)
-        self._checkUnitCompatibility(unit)
+        overalls, perbonds = self._extractParameters(num_groups, **parameters)
+        self._addParameters(overalls, perbonds, groups, pbc, unit)
         unit = mmunit.SerializableUnit(unit)
-        self._registerCV(unit, function, unit, groups, pbc, **parameters)
+        groups = [list(map(int, group)) for group in groups]
+        self._registerCV(unit, function, unit, groups, pbc, **overalls, **perbonds)
 
     @classmethod
     def _fromCustomForce(
