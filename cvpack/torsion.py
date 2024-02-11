@@ -65,6 +65,8 @@ class Torsion(openmm.CustomTorsionForce, BaseCollectiveVariable):
 
     """
 
+    yaml_tag = "!cvpack.Torsion"
+
     def __init__(  # pylint: disable=too-many-arguments
         self, atom1: int, atom2: int, atom3: int, atom4: int, pbc: bool = False
     ) -> None:

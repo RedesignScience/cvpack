@@ -79,12 +79,16 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, BaseCollectiveVariable):
         18.65992 dimensionless
     """
 
+    yaml_tag = "!cvpack.TorsionSimilarity"
+
     def __init__(
         self,
-        firstList: t.Sequence[t.Sequence[int]],
-        secondList: t.Sequence[t.Sequence[int]],
+        firstList: t.Iterable[t.Tuple[int, int, int, int]],
+        secondList: t.Iterable[t.Tuple[int, int, int, int]],
         pbc: bool = False,
     ) -> None:
+        firstList = [list(map(int, first)) for first in firstList]
+        secondList = [list(map(int, second)) for second in secondList]
         function = f"0.5*(1 + cos(min(delta, {2*np.pi} - delta)))"
         definition = "delta = dihedral(p1, p2, p3, p4) - dihedral(p5, p6, p7, p8)"
         super().__init__(8, f"{function}; {definition}")

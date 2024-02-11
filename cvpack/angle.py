@@ -58,6 +58,8 @@ class Angle(openmm.CustomAngleForce, BaseCollectiveVariable):
 
     """
 
+    yaml_tag = "!cvpack.Angle"
+
     def __init__(self, atom1: int, atom2: int, atom3: int, pbc: bool = False) -> None:
         super().__init__("theta")
         self.addAngle(atom1, atom2, atom3, [])

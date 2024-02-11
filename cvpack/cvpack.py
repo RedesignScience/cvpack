@@ -14,6 +14,7 @@ import typing as t
 
 import numpy as np
 import openmm
+import yaml
 from openmm import app as mmapp
 
 from cvpack import unit as mmunit
@@ -21,21 +22,77 @@ from cvpack import unit as mmunit
 from .unit import value_in_md_units
 
 
-class SerializableResidue(mmapp.topology.Residue):
+class SerializableAtom(yaml.YAMLObject):
     r"""
-    A class that extends OpenMM's Residue class with additional methods for
-    serialization and deserialization.
+    A serializable version of OpenMM's Atom class.
     """
 
-    def __init__(self, residue: mmapp.topology.Residue) -> None:
-        super().__init__(residue.name, residue.index, None, residue.id, None)
-        self._atoms = [
-            mmapp.topology.Atom(atom.name, atom.element, atom.index, None, atom.id)
-            for atom in residue.atoms()
-        ]
+    yaml_tag = "!cvpack.Atom"
+
+    def __init__(  # pylint: disable=super-init-not-called
+        self, atom: t.Union[mmapp.topology.Atom, "SerializableAtom"]
+    ) -> None:
+        self.name = atom.name
+        self.index = atom.index
+        if isinstance(atom, mmapp.topology.Atom):
+            self.element = atom.element.symbol
+            self.residue = atom.residue.index
+        else:
+            self.element = atom.element
+            self.residue = atom.residue
+        self.id = atom.id
+
+    def __getstate__(self) -> t.Dict[str, t.Any]:
+        return self.__dict__
+
+    def __setstate__(self, keywords: t.Dict[str, t.Any]) -> None:
+        self.__dict__.update(keywords)
 
 
-class BaseCollectiveVariable(openmm.Force):
+yaml.SafeLoader.add_constructor(SerializableAtom.yaml_tag, SerializableAtom.from_yaml)
+yaml.SafeDumper.add_representer(SerializableAtom, SerializableAtom.to_yaml)
+
+
+class SerializableResidue(yaml.YAMLObject):
+    r"""
+    A serializable version of OpenMM's Residue class.
+    """
+
+    yaml_tag = "!cvpack.Residue"
+
+    def __init__(  # pylint: disable=super-init-not-called
+        self, residue: t.Union[mmapp.topology.Residue, "SerializableResidue"]
+    ) -> None:
+        self.name = residue.name
+        self.index = residue.index
+        if isinstance(residue, mmapp.topology.Residue):
+            self.chain = residue.chain.index
+        else:
+            self.chain = residue.chain
+        self.id = residue.id
+        self._atoms = list(map(SerializableAtom, residue.atoms()))
+
+    def __getstate__(self) -> t.Dict[str, t.Any]:
+        return self.__dict__
+
+    def __setstate__(self, keywords: t.Dict[str, t.Any]) -> None:
+        self.__dict__.update(keywords)
+
+    def __len__(self) -> int:
+        return len(self._atoms)
+
+    def atoms(self):
+        """Iterate over all Atoms in the Residue."""
+        return iter(self._atoms)
+
+
+yaml.SafeLoader.add_constructor(
+    SerializableResidue.yaml_tag, SerializableResidue.from_yaml
+)
+yaml.SafeDumper.add_representer(SerializableResidue, SerializableResidue.to_yaml)
+
+
+class BaseCollectiveVariable(openmm.Force, yaml.YAMLObject):
     r"""
     An abstract class with common attributes and method for all CVs.
     """
@@ -67,12 +124,15 @@ class BaseCollectiveVariable(openmm.Force):
             kwargs
                 The keyword arguments needed to construct this collective variable
         """
-        self.setName(self.__class__.__name__)
+        cls = self.__class__
+        self.setName(cls.__name__)
         self.setUnit(unit)
         self._mass_unit = mmunit.dalton * (mmunit.nanometers / self.getUnit()) ** 2
         arguments, _ = self.getArguments()
         self._args = dict(zip(arguments, args))
         self._args.update(kwargs)
+        yaml.SafeLoader.add_constructor(cls.yaml_tag, cls.from_yaml)
+        yaml.SafeDumper.add_representer(cls, cls.to_yaml)
 
     def _getSingleForceState(
         self, context: openmm.Context, getEnergy: bool = False, getForces: bool = False
@@ -140,22 +200,6 @@ class BaseCollectiveVariable(openmm.Force):
         power = f"{number:e}".split("e")[1]
         return round(number, -(int(power) - digits))
 
-    @staticmethod
-    def _checkUnitCompatibility(unit: mmunit.Unit) -> None:
-        """
-        Check if the given unit is compatible with the MD unit system.
-
-        Parameters
-        ----------
-            unit
-                The unit to check
-        """
-        if not np.isclose(
-            mmunit.Quantity(1.0, unit).value_in_unit_system(mmunit.md_unit_system),
-            1.0,
-        ):
-            raise ValueError(f"Unit {unit} is not compatible with the MD unit system.")
-
     @classmethod
     def getArguments(cls) -> t.Tuple[collections.OrderedDict, collections.OrderedDict]:
         """
@@ -174,7 +218,7 @@ class BaseCollectiveVariable(openmm.Force):
             >>> args, defaults = cvpack.RadiusOfGyration.getArguments()
             >>> for name, annotation in args.items():
             ...     print(f"{name}: {annotation}")
-            group: typing.Sequence[int]
+            group: typing.Iterable[int]
             pbc: <class 'bool'>
             weighByMass: <class 'bool'>
             >>> print(*defaults.items())

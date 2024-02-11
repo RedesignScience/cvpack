@@ -15,11 +15,10 @@ from numpy.typing import ArrayLike
 
 from cvpack import unit as mmunit
 
-from .atomic_function import _add_parameters
-from .cvpack import BaseCollectiveVariable
+from .base_custom_function import BaseCustomFunction
 
 
-class CentroidFunction(openmm.CustomCentroidBondForce, BaseCollectiveVariable):
+class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
     r"""
     A generic function of the centroids of :math:`m \times n` atoms groups split
     into `m` collections of `n` groups each:
@@ -150,34 +149,43 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCollectiveVariable):
         33.0 dimensionless
     """
 
+    yaml_tag = "!cvpack.CentroidFunction"
+
+    @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
         function: str,
         unit: mmunit.Unit,
-        groups: t.Sequence[t.Sequence[int]],
+        groups: t.Iterable[t.Iterable[int]],
         collections: t.Optional[ArrayLike] = None,
         pbc: bool = True,
         weighByMass: bool = True,
-        **parameters: mmunit.ScalarQuantity,
+        **parameters: t.Union[mmunit.ScalarQuantity, mmunit.VectorQuantity],
     ) -> None:
+        groups = [list(map(int, group)) for group in groups]
+        num_groups = len(groups)
         collections = np.atleast_2d(
-            np.arange(len(groups)) if collections is None else collections
+            np.arange(num_groups) if collections is None else collections
         )
         num_collections, groups_per_collection, *others = collections.shape
         if others:
             raise ValueError("Array `collections` cannot have more than 2 dimensions")
-        num_groups = len(groups)
         if np.any(collections < 0) or np.any(collections >= num_groups):
             raise ValueError("Group index out of bounds")
         super().__init__(groups_per_collection, function)
         for group in groups:
             self.addGroup(group, *([] if weighByMass else [[1] * len(group)]))
-        perbond_parameters = _add_parameters(self, num_collections, **parameters)
-        for collection, *values in zip(collections, *perbond_parameters):
-            self.addBond(collection, values)
-        self.setUsesPeriodicBoundaryConditions(pbc)
-        self._checkUnitCompatibility(unit)
+        overalls, perbonds = self._extractParameters(num_collections, **parameters)
+        self._addParameters(overalls, perbonds, collections, pbc, unit)
         unit = mmunit.SerializableUnit(unit)
         self._registerCV(
-            unit, function, unit, groups, collections, pbc, weighByMass, **parameters
+            unit,
+            function,
+            unit,
+            groups,
+            [list(map(int, collection)) for collection in collections],
+            pbc,
+            weighByMass,
+            **overalls,
+            **perbonds,
         )

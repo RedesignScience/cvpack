@@ -19,7 +19,7 @@ from .cvpack import BaseCollectiveVariable
 
 class RMSD(openmm.RMSDForce, BaseCollectiveVariable):
     r"""
-    The minimum root-mean-square deviation (RMSD) between the current and reference
+    The root-mean-square deviation (RMSD) between the current and reference
     coordinates of a group of `n` atoms:
 
     .. math::
@@ -84,17 +84,22 @@ class RMSD(openmm.RMSDForce, BaseCollectiveVariable):
 
     """
 
+    yaml_tag = "!cvpack.RMSD"
+
     @mmunit.convert_quantities
     def __init__(
         self,
         referencePositions: t.Union[
             mmunit.MatrixQuantity, t.Dict[int, mmunit.VectorQuantity]
         ],
-        group: t.Sequence[int],
+        group: t.Iterable[int],
         numAtoms: t.Optional[int] = None,
     ) -> None:
+        group = list(map(int, group))
         num_atoms = numAtoms or len(referencePositions)
-        defined_coords = {atom: referencePositions[atom] for atom in group}
+        defined_coords = {
+            atom: list(map(float, referencePositions[atom])) for atom in group
+        }
         all_coords = np.zeros((num_atoms, 3))
         for atom, coords in defined_coords.items():
             all_coords[atom, :] = coords

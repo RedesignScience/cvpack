@@ -1,5 +1,7 @@
 """Useful Collective Variables for OpenMM"""
 
+import yaml
+
 # Add imports here
 from ._version import __version__  # noqa: F401
 from .angle import Angle  # noqa: F401
@@ -20,3 +22,26 @@ from .rmsd import RMSD  # noqa: F401
 from .sheet_rmsd_content import SheetRMSDContent  # noqa: F401
 from .torsion import Torsion  # noqa: F401
 from .torsion_similarity import TorsionSimilarity  # noqa: F401
+
+for cls in [
+    Angle,
+    AtomicFunction,
+    AttractionStrength,
+    CentroidFunction,
+    CompositeRMSD,
+    Distance,
+    HelixAngleContent,
+    HelixHBondContent,
+    HelixRMSDContent,
+    HelixTorsionContent,
+    NumberOfContacts,
+    RadiusOfGyration,
+    RadiusOfGyrationSq,
+    ResidueCoordination,
+    RMSD,
+    SheetRMSDContent,
+    Torsion,
+    TorsionSimilarity,
+]:
+    yaml.SafeLoader.add_constructor(cls.yaml_tag, cls.from_yaml)
+    yaml.SafeDumper.add_representer(cls, cls.to_yaml)

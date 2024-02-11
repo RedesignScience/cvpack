@@ -11,12 +11,17 @@ import typing as t
 from copy import deepcopy
 
 import openmm
+import yaml
 
 from cvpack import unit as mmunit
 
 
-class NonbondedForceSurrogate:  # pylint: disable=too-many-instance-attributes
+class NonbondedForceSurrogate(
+    yaml.YAMLObject
+):  # pylint: disable=too-many-instance-attributes
     """A surrogate class for the NonbondedForce class in OpenMM."""
+
+    yaml_tag = "!cvpack.NonbondedForce"
 
     def __init__(self, other: openmm.NonbondedForce) -> None:
         self._cutoff = other.getCutoffDistance()
@@ -92,6 +97,14 @@ class NonbondedForceSurrogate:  # pylint: disable=too-many-instance-attributes
     def getSwitchingDistance(self) -> float:
         """Get the switching distance."""
         return mmunit.value_in_md_units(self._switching_distance)
+
+
+yaml.SafeLoader.add_constructor(
+    NonbondedForceSurrogate.yaml_tag, NonbondedForceSurrogate.from_yaml
+)
+yaml.SafeDumper.add_representer(
+    NonbondedForceSurrogate, NonbondedForceSurrogate.to_yaml
+)
 
 
 def evaluate_in_context(force: openmm.Force, context: openmm.Context) -> float:

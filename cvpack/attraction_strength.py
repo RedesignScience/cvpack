@@ -144,16 +144,20 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     5.2222 nm**2 Da
     """
 
+    yaml_tag = "!cvpack.AttractionStrength"
+
     @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        group1: t.Sequence[int],
-        group2: t.Sequence[int],
+        group1: t.Iterable[int],
+        group2: t.Iterable[int],
         nonbondedForce: openmm.NonbondedForce,
         reference: t.Union[mmunit.ScalarQuantity, openmm.Context] = mmunit.Quantity(
             1.0, mmunit.kilojoule_per_mole
         ),
     ) -> None:
+        group1 = list(group1)
+        group2 = list(group2)
         nonbondedForce = NonbondedForceSurrogate(nonbondedForce)
         cutoff = nonbondedForce.getCutoffDistance()
         expression = (

@@ -181,6 +181,8 @@ class SheetRMSDContent(BaseRMSDContent):
         0.98594 dimensionless
     """
 
+    yaml_tag = "!cvpack.SheetRMSDContent"
+
     @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,

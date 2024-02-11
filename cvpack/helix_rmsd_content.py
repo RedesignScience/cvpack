@@ -123,6 +123,8 @@ class HelixRMSDContent(BaseRMSDContent):
         15.981 dimensionless
     """
 
+    yaml_tag = "!cvpack.HelixRMSDContent"
+
     @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,

@@ -18,6 +18,7 @@ from numbers import Real
 
 import numpy as np
 import openmm
+import yaml
 from openmm import unit as _mmunit
 
 ScalarQuantity = t.Union[_mmunit.Quantity, Real]
@@ -45,7 +46,7 @@ class _NodeTransformer(ast.NodeTransformer):
         return ast.Attribute(value=mod, attr=node.id, ctx=ast.Load())
 
 
-class SerializableUnit(_mmunit.Unit):
+class SerializableUnit(_mmunit.Unit, yaml.YAMLObject):
     r"""
     A child class of openmm.unit.Unit that allows for serialization/deserialization.
 
@@ -61,15 +62,17 @@ class SerializableUnit(_mmunit.Unit):
         >>> from openmm.unit import nanometer, picosecond
         >>> SerializableUnit(nanometer)  # doctest: +ELLIPSIS
         Unit(..., name="nanometer", symbol="nm"): 1.0})
-        >>> dump = yaml.dump(SerializableUnit(nanometer/picosecond))
+        >>> dump = yaml.safe_dump(SerializableUnit(nanometer/picosecond))
         >>> print(dump)
-        !!python/object:cvpack.unit.SerializableUnit
+        !cvpack.Unit
         description: nanometer/picosecond
         version: 1
         <BLANKLINE>
-        >>> 2*yaml.load(dump, Loader=yaml.CLoader)
+        >>> 2*yaml.safe_load(dump)
         Quantity(value=2, unit=nanometer/picosecond)
     """
+
+    yaml_tag = "!cvpack.Unit"
 
     def __init__(self, base_or_scaled_units):
         if isinstance(base_or_scaled_units, _mmunit.Unit):
@@ -93,7 +96,11 @@ class SerializableUnit(_mmunit.Unit):
         self.__init__(kwds["description"])
 
 
-class SerializableQuantity(_mmunit.Quantity):
+yaml.SafeLoader.add_constructor(SerializableUnit.yaml_tag, SerializableUnit.from_yaml)
+yaml.SafeDumper.add_representer(SerializableUnit, SerializableUnit.to_yaml)
+
+
+class SerializableQuantity(_mmunit.Quantity, yaml.YAMLObject):
     r"""
     A child class of openmm.unit.Quantity that allows for serialization/deserialization.
 
@@ -111,18 +118,20 @@ class SerializableQuantity(_mmunit.Quantity):
         >>> from openmm.unit import nanometer
         >>> SerializableQuantity(1.0, nanometer)
         Quantity(value=1.0, unit=nanometer)
-        >>> dump = yaml.dump(SerializableQuantity(1.0, nanometer))
+        >>> dump = yaml.safe_dump(SerializableQuantity(1.0, nanometer))
         >>> print(dump)
-        !!python/object:cvpack.unit.SerializableQuantity
-        unit: !!python/object:cvpack.unit.SerializableUnit
+        !cvpack.Quantity
+        unit: !cvpack.Unit
           description: nanometer
           version: 1
         value: 1.0
         version: 1
         <BLANKLINE>
-        >>> yaml.load(dump, Loader=yaml.CLoader)
+        >>> yaml.safe_load(dump)
         Quantity(value=1.0, unit=nanometer)
     """
+
+    yaml_tag = "!cvpack.Quantity"
 
     def __init__(self, value, unit=None):  # pylint: disable=redefined-outer-name
         if unit is None:
@@ -145,6 +154,12 @@ class SerializableQuantity(_mmunit.Quantity):
         rad).
         """
         return value_in_md_units(self)
+
+
+yaml.SafeLoader.add_constructor(
+    SerializableQuantity.yaml_tag, SerializableQuantity.from_yaml
+)
+yaml.SafeDumper.add_representer(SerializableQuantity, SerializableQuantity.to_yaml)
 
 
 def value_in_md_units(  # pylint: disable=redefined-outer-name
