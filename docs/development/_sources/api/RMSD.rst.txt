@@ -14,3 +14,4 @@ RMSD
     .. automethod:: getValue
     .. automethod:: setUnit
     .. automethod:: setUnusedForceGroup
+    .. automethod:: yaml_tag

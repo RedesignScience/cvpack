@@ -53,33 +53,12 @@
 
 <span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
-<span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">BaseCollectiveVariable</span>
-
-
-<span class="k">def</span> <span class="nf">_add_parameters</span><span class="p">(</span>
-    <span class="n">force</span><span class="p">:</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Force</span><span class="p">,</span>
-    <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">parameters</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">]],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">]]]:</span>
-    <span class="n">perbond_parameters</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">value_in_unit_system</span><span class="p">(</span><span class="n">mmunit</span><span class="o">.</span><span class="n">md_unit_system</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">):</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">!=</span> <span class="n">size</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;The length of parameter </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> is </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">. Should be </span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2">.&quot;</span>
-                <span class="p">)</span>
-            <span class="n">force</span><span class="o">.</span><span class="n">addPerBondParameter</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-            <span class="n">perbond_parameters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">force</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">perbond_parameters</span>
+<span class="kn">from</span> <span class="nn">.base_custom_function</span> <span class="kn">import</span> <span class="n">BaseCustomFunction</span>
 
 
 <div class="viewcode-block" id="AtomicFunction">
 <a class="viewcode-back" href="../../api/AtomicFunction.html#cvpack.AtomicFunction">[docs]</a>
-<span class="k">class</span> <span class="nc">AtomicFunction</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomCompoundBondForce</span><span class="p">,</span> <span class="n">BaseCollectiveVariable</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">AtomicFunction</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomCompoundBondForce</span><span class="p">,</span> <span class="n">BaseCustomFunction</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A generic function of the coordinates of atoms split into `m` groups of `n`</span>
 <span class="sd">    atoms each:</span>
@@ -164,26 +143,27 @@
 <span class="sd">        429.479 kJ/mol</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">yaml_tag</span> <span class="o">=</span> <span class="s2">&quot;!cvpack.AtomicFunction&quot;</span>
+
+    <span class="nd">@mmunit</span><span class="o">.</span><span class="n">convert_quantities</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">function</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">unit</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Unit</span><span class="p">,</span>
         <span class="n">groups</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
         <span class="n">pbc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">parameters</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">]],</span>
+        <span class="o">**</span><span class="n">parameters</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">VectorQuantity</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">groups</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
-        <span class="n">num_groups</span><span class="p">,</span> <span class="n">atoms_per_group</span><span class="p">,</span> <span class="o">*</span><span class="n">others</span> <span class="o">=</span> <span class="n">groups</span><span class="o">.</span><span class="n">shape</span>
-        <span class="k">if</span> <span class="n">others</span><span class="p">:</span>
+        <span class="n">num_groups</span><span class="p">,</span> <span class="n">atoms_per_group</span><span class="p">,</span> <span class="o">*</span><span class="n">other_dimensions</span> <span class="o">=</span> <span class="n">groups</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">if</span> <span class="n">other_dimensions</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Array `groups` cannot have more than 2 dimensions&quot;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">atoms_per_group</span><span class="p">,</span> <span class="n">function</span><span class="p">)</span>
-        <span class="n">perbond_parameters</span> <span class="o">=</span> <span class="n">_add_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_groups</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">group</span><span class="p">,</span> <span class="o">*</span><span class="n">values</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">groups</span><span class="p">,</span> <span class="o">*</span><span class="n">perbond_parameters</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">addBond</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">setUsesPeriodicBoundaryConditions</span><span class="p">(</span><span class="n">pbc</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_checkUnitCompatibility</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
+        <span class="n">overalls</span><span class="p">,</span> <span class="n">perbonds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extractParameters</span><span class="p">(</span><span class="n">num_groups</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_addParameters</span><span class="p">(</span><span class="n">overalls</span><span class="p">,</span> <span class="n">perbonds</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">pbc</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
         <span class="n">unit</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">SerializableUnit</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">pbc</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">)</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">group</span><span class="p">))</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">pbc</span><span class="p">,</span> <span class="o">**</span><span class="n">overalls</span><span class="p">,</span> <span class="o">**</span><span class="n">perbonds</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_fromCustomForce</span><span class="p">(</span>

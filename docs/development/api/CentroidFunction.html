@@ -75,7 +75,7 @@ the mass of the <span class="math notranslate nohighlight">\(k\)</span>-th atom 
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>function</strong> (<em>str</em>) – The function to be evaluated. It must be a valid
 <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.CustomCentroidBondForce.html">openmm.CustomCentroidBondForce</a> expression</p></li>
-<li><p><strong>groups</strong> (<em>Sequence</em><em>[</em><em>Sequence</em><em>[</em><em>int</em><em>]</em><em>]</em>) – The groups of atoms to be used in the function. Each group must be specified
+<li><p><strong>groups</strong> (<em>Iterable</em><em>[</em><em>Iterable</em><em>[</em><em>int</em><em>]</em><em>]</em>) – The groups of atoms to be used in the function. Each group must be specified
 as a list of atom indices with arbitrary length</p></li>
 <li><p><strong>collections</strong> (<em>_SupportsArray</em><em>[</em><em>dtype</em><em>[</em><em>Any</em><em>]</em><em>] </em><em>| </em><em>_NestedSequence</em><em>[</em><em>_SupportsArray</em><em>[</em><em>dtype</em><em>[</em><em>Any</em><em>]</em><em>]</em><em>] </em><em>| </em><em>bool</em><em> | </em><em>int</em><em> | </em><em>float</em><em> | </em><em>complex</em><em> | </em><em>str</em><em> | </em><em>bytes</em><em> | </em><em>_NestedSequence</em><em>[</em><em>bool</em><em> | </em><em>int</em><em> | </em><em>float</em><em> | </em><em>complex</em><em> | </em><em>str</em><em> | </em><em>bytes</em><em>] </em><em>| </em><em>None</em>) – The indices of the groups in each collection, passed as a 2D array-like object
 of shape <cite>(m, n)</cite>, where <cite>m</cite> is the number of collections and <cite>n</cite> is the number
@@ -174,7 +174,7 @@ variable.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">args</span><span class="p">,</span> <span class="n">defaults</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">RadiusOfGyration</span><span class="o">.</span><span class="n">getArguments</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">annotation</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
 <span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">annotation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="go">group: typing.Sequence[int]</span>
+<span class="go">group: typing.Iterable[int]</span>
 <span class="go">pbc: &lt;class &#39;bool&#39;&gt;</span>
 <span class="go">weighByMass: &lt;class &#39;bool&#39;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">defaults</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
@@ -320,6 +320,20 @@ force groups in the system</p></li>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="cvpack.CentroidFunction.yaml_tag">
+<span class="sig-name descname"><span class="pre">yaml_tag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.CentroidFunction.yaml_tag" title="Link to this definition">¶</a></dt>
+<dd><p>str(object=’’) -&gt; str
+str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</p>
+<p>Create a new string object from the given object. If encoding or
+errors is specified, then the object must expose a data buffer
+that will be decoded using the given encoding and error handler.
+Otherwise, returns the result of object.__str__() (if defined)
+or repr(object).
+encoding defaults to sys.getdefaultencoding().
+errors defaults to ‘strict’.</p>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -364,6 +378,7 @@ force groups in the system</p></li>
 <li class="toctree-l2"><a class="reference internal" href="RMSD.html">RMSD</a></li>
 <li class="toctree-l2"><a class="reference internal" href="SheetRMSDContent.html">SheetRMSDContent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Torsion.html">Torsion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="TorsionSimilarity.html">TorsionSimilarity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="TorsionSimilarity.html">TorsionSimilarity</a></li>
 </ul>
 </li>

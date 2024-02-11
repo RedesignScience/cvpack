@@ -22,6 +22,7 @@ Python API
     SheetRMSDContent
     Torsion
     TorsionSimilarity
+    TorsionSimilarity
 
 .. testsetup::
 

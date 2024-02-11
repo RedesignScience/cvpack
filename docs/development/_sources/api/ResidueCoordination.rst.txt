@@ -15,3 +15,4 @@ ResidueCoordination
     .. automethod:: setReferenceValue
     .. automethod:: setUnit
     .. automethod:: setUnusedForceGroup
+    .. automethod:: yaml_tag

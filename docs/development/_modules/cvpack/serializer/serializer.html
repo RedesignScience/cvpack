@@ -70,7 +70,7 @@
 <span class="sd">        &gt;&gt;&gt; iostream = io.StringIO()</span>
 <span class="sd">        &gt;&gt;&gt; serializer.serialize(radius_of_gyration, iostream)</span>
 <span class="sd">        &gt;&gt;&gt; print(iostream.getvalue())</span>
-<span class="sd">        !!python/object:cvpack.radius_of_gyration.RadiusOfGyration</span>
+<span class="sd">        !cvpack.RadiusOfGyration</span>
 <span class="sd">        group:</span>
 <span class="sd">        - 0</span>
 <span class="sd">        - 1</span>
@@ -80,7 +80,7 @@
 <span class="sd">        &lt;BLANKLINE&gt;</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">iostream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Dumper</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">CDumper</span><span class="p">))</span></div>
+    <span class="n">iostream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">safe_dump</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span></div>
 
 
 
@@ -115,7 +115,7 @@
 <span class="sd">        &lt;class &#39;cvpack.radius_of_gyration.RadiusOfGyration&#39;&gt;</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">iostream</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">CLoader</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">iostream</span><span class="o">.</span><span class="n">read</span><span class="p">())</span></div>
 
 </pre></div>
 
