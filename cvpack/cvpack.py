@@ -14,8 +14,8 @@ import typing as t
 
 import numpy as np
 import openmm
-from openmm import app as mmapp
 import yaml
+from openmm import app as mmapp
 
 from cvpack import unit as mmunit
 
@@ -27,7 +27,7 @@ class SerializableAtom(yaml.YAMLObject):
     A serializable version of OpenMM's Atom class.
     """
 
-    yaml_tag = "!cvpack.SerializableAtom"
+    yaml_tag = "!cvpack.Atom"
 
     def __init__(  # pylint: disable=super-init-not-called
         self, atom: t.Union[mmapp.topology.Atom, "SerializableAtom"]
@@ -58,7 +58,7 @@ class SerializableResidue(yaml.YAMLObject):
     A serializable version of OpenMM's Residue class.
     """
 
-    yaml_tag = "!cvpack.SerializableResidue"
+    yaml_tag = "!cvpack.Residue"
 
     def __init__(  # pylint: disable=super-init-not-called
         self, residue: t.Union[mmapp.topology.Residue, "SerializableResidue"]

@@ -170,7 +170,6 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
         num_collections, groups_per_collection, *others = collections.shape
         if others:
             raise ValueError("Array `collections` cannot have more than 2 dimensions")
-        print(type(collections[0, 0]))
         if np.any(collections < 0) or np.any(collections >= num_groups):
             raise ValueError("Group index out of bounds")
         super().__init__(groups_per_collection, function)

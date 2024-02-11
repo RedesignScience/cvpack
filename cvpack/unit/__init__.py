@@ -62,13 +62,13 @@ class SerializableUnit(_mmunit.Unit, yaml.YAMLObject):
         >>> from openmm.unit import nanometer, picosecond
         >>> SerializableUnit(nanometer)  # doctest: +ELLIPSIS
         Unit(..., name="nanometer", symbol="nm"): 1.0})
-        >>> dump = yaml.dump(SerializableUnit(nanometer/picosecond))
+        >>> dump = yaml.safe_dump(SerializableUnit(nanometer/picosecond))
         >>> print(dump)
-        !!python/object:cvpack.unit.SerializableUnit
+        !cvpack.Unit
         description: nanometer/picosecond
         version: 1
         <BLANKLINE>
-        >>> 2*yaml.load(dump, Loader=yaml.CLoader)
+        >>> 2*yaml.safe_load(dump)
         Quantity(value=2, unit=nanometer/picosecond)
     """
 
@@ -118,16 +118,16 @@ class SerializableQuantity(_mmunit.Quantity, yaml.YAMLObject):
         >>> from openmm.unit import nanometer
         >>> SerializableQuantity(1.0, nanometer)
         Quantity(value=1.0, unit=nanometer)
-        >>> dump = yaml.dump(SerializableQuantity(1.0, nanometer))
+        >>> dump = yaml.safe_dump(SerializableQuantity(1.0, nanometer))
         >>> print(dump)
-        !!python/object:cvpack.unit.SerializableQuantity
-        unit: !!python/object:cvpack.unit.SerializableUnit
+        !cvpack.Quantity
+        unit: !cvpack.Unit
           description: nanometer
           version: 1
         value: 1.0
         version: 1
         <BLANKLINE>
-        >>> yaml.load(dump, Loader=yaml.CLoader)
+        >>> yaml.safe_load(dump)
         Quantity(value=1.0, unit=nanometer)
     """
 
