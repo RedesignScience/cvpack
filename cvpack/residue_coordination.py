@@ -60,6 +60,8 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable
         weighByMass
             Whether the centroid of each residue should be weighted by the mass of the
             atoms in the residue
+        includeHydrogens
+            Whether hydrogen atoms should be included in the centroid calculations
 
     Raises
     ------
@@ -108,8 +110,8 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable
     @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        residueGroup1: t.Sequence[Residue],
-        residueGroup2: t.Sequence[Residue],
+        residueGroup1: t.Iterable[Residue],
+        residueGroup2: t.Iterable[Residue],
         pbc: bool = True,
         stepFunction: str = "1/(1+x^6)",
         thresholdDistance: mmunit.ScalarQuantity = mmunit.Quantity(
@@ -117,7 +119,10 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable
         ),
         normalize: bool = False,
         weighByMass: bool = True,
+        includeHydrogens: bool = True,
     ) -> None:
+        residueGroup1 = list(map(SerializableResidue, residueGroup1))
+        residueGroup2 = list(map(SerializableResidue, residueGroup2))
         nr1 = len(residueGroup1)
         nr2 = len(residueGroup2)
         self._ref_val = nr1 * nr2 if normalize else 1.0
@@ -129,22 +134,28 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable
         super().__init__(2, expression)
         self.setUsesPeriodicBoundaryConditions(pbc)
         for res in residueGroup1 + residueGroup2:
+            atoms = [
+                atom.index
+                for atom in res.atoms()
+                if includeHydrogens or atom.element != "H"
+            ]
             self.addGroup(
-                [atom.index for atom in res.atoms()],
-                *([] if weighByMass else [[1] * len(res)]),
+                atoms,
+                *([] if weighByMass else [[1] * len(atoms)]),
             )
         for idx1 in range(nr1):
             for idx2 in range(nr1, nr1 + nr2):
                 self.addBond([idx1, idx2], [])
         self._registerCV(
             mmunit.dimensionless,
-            list(map(SerializableResidue, residueGroup1)),
-            list(map(SerializableResidue, residueGroup2)),
+            residueGroup1,
+            residueGroup2,
             pbc,
             stepFunction,
             thresholdDistance,
             normalize,
             weighByMass,
+            includeHydrogens,
         )
 
     def getReferenceValue(self) -> mmunit.Quantity:
