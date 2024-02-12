@@ -107,14 +107,16 @@ yaml.SafeDumper.add_representer(
 )
 
 
-def evaluate_in_context(force: openmm.Force, context: openmm.Context) -> float:
-    """Evaluate the potential energy of a force in a given context.
+def evaluate_in_context(
+    forces: t.Union[openmm.Force, t.Iterable[openmm.Force]], context: openmm.Context
+) -> t.Union[float, t.List[float]]:
+    """Evaluate the potential energies of OpenMM Forces in a given context.
 
     Parameters
     ----------
-        force : openmm.Force
-            The force to be evaluated.
-        context : openmm.Context
+        forces
+            The forces to be evaluated.
+        context
             The context in which the force will be evaluated.
 
     Returns
@@ -122,15 +124,24 @@ def evaluate_in_context(force: openmm.Force, context: openmm.Context) -> float:
         float
             The potential energy of the force in the given context.
     """
+    is_single = isinstance(forces, openmm.Force)
+    if is_single:
+        forces = [forces]
     system = openmm.System()
     for _ in range(context.getSystem().getNumParticles()):
         system.addParticle(1.0)
-    system.addForce(deepcopy(force))
+    for i, force in enumerate(forces):
+        force_copy = deepcopy(force)
+        force_copy.setForceGroup(i)
+        system.addForce(force_copy)
     state = context.getState(getPositions=True)
     context = openmm.Context(system, openmm.VerletIntegrator(1.0))
     context.setPositions(state.getPositions())
     context.setPeriodicBoxVectors(*state.getPeriodicBoxVectors())
-    # pylint: disable=unexpected-keyword-arg # to avoid false positive
-    state = context.getState(getEnergy=True)
-    # pylint: enable=unexpected-keyword-arg
-    return mmunit.value_in_md_units(state.getPotentialEnergy())
+    energies = []
+    for i in range(len(forces)):
+        state = context.getState(  # pylint: disable=unexpected-keyword-arg
+            getEnergy=True, groups=1 << i
+        )
+        energies.append(mmunit.value_in_md_units(state.getPotentialEnergy()))
+    return energies[0] if is_single else tuple(energies)

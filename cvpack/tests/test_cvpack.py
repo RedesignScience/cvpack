@@ -758,7 +758,8 @@ def test_attraction_strength():
     perform_common_tests(colvar, context)
 
 
-def test_residue_coordination():
+@pytest.mark.parametrize("includeHs", [False, True])
+def test_residue_coordination(includeHs: bool):
     """
     Test whether a residue coordination CV is computed correctly.
 
@@ -769,16 +770,19 @@ def test_residue_coordination():
         list(it.islice(model.topology.residues(), start, end))
         for start, end in [(125, 142), (142, 156)]
     ]
-    centroids = [
-        np.vstack(
-            [np.mean(positions[[a.index for a in r.atoms()]], axis=0) for r in group]
-        )
-        for group in groups
-    ]
+    centroids = []
+    for group in groups:
+        residue_centroids = []
+        for r in group:
+            atoms = [a.index for a in r.atoms() if includeHs or a.element.symbol != "H"]
+            residue_centroids.append(np.mean(positions[atoms], axis=0))
+        centroids.append(np.vstack(residue_centroids))
     distances = np.linalg.norm(centroids[0][:, None, :] - centroids[1], axis=2)
     computed_cv = np.sum(1 / (1 + distances**6))
 
-    res_coord = cvpack.ResidueCoordination(*groups, pbc=False, weighByMass=False)
+    res_coord = cvpack.ResidueCoordination(
+        *groups, pbc=False, weighByMass=False, includeHydrogens=includeHs
+    )
     res_coord.setUnusedForceGroup(0, model.system)
     model.system.addForce(res_coord)
     context = openmm.Context(
