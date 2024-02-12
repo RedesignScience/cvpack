@@ -758,7 +758,7 @@ def test_attraction_strength():
     perform_common_tests(colvar, context)
 
 
-@pytest.mark.parametrize("include_hs", [False, True])
+@pytest.mark.parametrize("includeHs", [False, True])
 def test_residue_coordination(includeHs: bool):
     """
     Test whether a residue coordination CV is computed correctly.
