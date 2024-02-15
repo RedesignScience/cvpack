@@ -15,8 +15,8 @@ import openmm
 from cvpack import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
+from .path import Departure, Progress
 from .utils import convert_to_matrix
-from .path import Progress, Departure
 
 
 class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
@@ -55,7 +55,6 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
             expressions.append(f"{numerator}/({n - 1}*wsum)")
         else:
             expressions.append(f"xmin{n - 2} - log(wsum)/lambda")
-        expressions.append(self._getExpression(n))
         super().__init__("; ".join(reversed(expressions)))
         for i, variable in enumerate(variables):
             self.addCollectiveVariable(f"cv{i}", variable)

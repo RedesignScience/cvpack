@@ -13,7 +13,6 @@ from copy import deepcopy
 import numpy as np
 import openmm
 import yaml
-
 from numpy import typing as npt
 
 from cvpack import unit as mmunit
