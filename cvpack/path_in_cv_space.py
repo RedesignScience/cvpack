@@ -21,6 +21,53 @@ from .utils import convert_to_matrix
 
 
 class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
+    r"""
+    A measure of the system's progress (:math:`s`) or deviation (:math:`z`) with
+    respect to a path defined by a sequence of milestones in a collective variable
+    space :cite:`Branduardi_2007`:
+
+    .. math::
+
+        s({\bf r}) = \frac{
+            \dfrac{\sum_{i=1}^n i w_i({\bf r})}{\sum_{i=1}^n w_i({\bf r})} - 1
+        }{n-1}
+        \quad \text{or} \quad
+        z({\bf r}) = - \frac{1}{\lambda} \ln \sum_{i=1}^n w_i({\bf r})
+
+    where :math:`w_i({\bf r}) = e^{-\lambda \|{\bf c}({\bf r}) - \hat{\bf c}_i\|^2}` is
+    a Gaussian kernel, :math:`{\bf c}({\bf r})` is a vector of collective variables,
+    :math:`\hat{\bf c}_i` is a milestone located in the collective-variable space, and
+    :math:`\lambda` is a parameter that controls the width of the kernels. The path is
+    defined by the sequence of :math:`n` milestones.
+
+    The squared norm of a vector :math:`{\bf x}` in the collective variable space is
+    defined as
+
+    .. math::
+
+        \|{\bf x}\|^2 = {\bf x}^T {\bf D}^{-2} {\bf x}
+
+    where :math:`{\bf D}` is a diagonal matrix with a characteristic scale for each
+    collective variable as its diagonal elements.
+
+    Parameters
+    ----------
+    measure
+        The path-related measure to compute. Use `cvpack.path.progress` or
+        `cvpack.path.departure`
+    variables
+        The collective variables that define the space
+    milestones
+        The milestones in the collective variable space. The number of rows must be
+        equal to the number of milestones and the number of columns must be equal to
+        the number of collective variables
+    lambdaFactor
+        The width of the Gaussian kernels
+    scales
+        The characteristic scales for the collective variables. If not provided, the
+        scales are assumed to be 1 (in standard MD units) for each collective variable
+    """
+
     yaml_tag = "!PathInCVSpace"
 
     @mmunit.convert_quantities
