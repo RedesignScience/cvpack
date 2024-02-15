@@ -7,6 +7,8 @@
 
 """
 
+import math
+
 import openmm
 
 from cvpack import unit as mmunit
@@ -73,4 +75,5 @@ class Torsion(openmm.CustomTorsionForce, BaseCollectiveVariable):
         super().__init__("theta")
         self.addTorsion(atom1, atom2, atom3, atom4, [])
         self.setUsesPeriodicBoundaryConditions(pbc)
+        self._period = 2 * math.pi
         self._registerCV(mmunit.radians, atom1, atom2, atom3, atom4, pbc)

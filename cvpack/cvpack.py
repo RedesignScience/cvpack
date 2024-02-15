@@ -100,6 +100,7 @@ class BaseCollectiveVariable(openmm.Force, yaml.YAMLObject):
     _unit: mmunit.Unit = mmunit.dimensionless
     _mass_unit: mmunit.Unit = mmunit.dalton * mmunit.nanometers**2
     _args: t.Dict[str, t.Any] = {}
+    _period: t.Optional[float] = None
 
     def __getstate__(self) -> t.Dict[str, t.Any]:
         return self._args
@@ -107,7 +108,12 @@ class BaseCollectiveVariable(openmm.Force, yaml.YAMLObject):
     def __setstate__(self, keywords: t.Dict[str, t.Any]) -> None:
         self.__init__(**keywords)
 
-    def _registerCV(self, unit: mmunit.Unit, *args: t.Any, **kwargs: t.Any) -> None:
+    def _registerCV(
+        self,
+        unit: mmunit.Unit,
+        *args: t.Any,
+        **kwargs: t.Any,
+    ) -> None:
         """
         Register the newly created BaseCollectiveVariable subclass instance.
 
@@ -128,6 +134,7 @@ class BaseCollectiveVariable(openmm.Force, yaml.YAMLObject):
         self.setName(cls.__name__)
         self.setUnit(unit)
         self._mass_unit = mmunit.dalton * (mmunit.nanometers / self.getUnit()) ** 2
+        self._period = kwargs.get("period", None)
         arguments, _ = self.getArguments()
         self._args = dict(zip(arguments, args))
         self._args.update(kwargs)

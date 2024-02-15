@@ -65,6 +65,12 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
     function
         The function to be evaluated. It must be a valid
         :OpenMM:`CustomCentroidBondForce` expression
+    unit
+        The unit of measurement of the collective variable. It must be compatible
+        with the MD unit system (mass in `daltons`, distance in `nanometers`, time
+        in `picoseconds`, temperature in `kelvin`, energy in `kilojoules_per_mol`,
+        angle in `radians`). If the collective variables does not have a unit, use
+        `dimensionless`
     groups
         The groups of atoms to be used in the function. Each group must be specified
         as a list of atom indices with arbitrary length
@@ -73,12 +79,8 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
         of shape `(m, n)`, where `m` is the number of collections and `n` is the number
         groups per collection. If a 1D object is passed, it is assumed that `m` is 1 and
         `n` is the length of the object.
-    unit
-        The unit of measurement of the collective variable. It must be compatible
-        with the MD unit system (mass in `daltons`, distance in `nanometers`, time
-        in `picoseconds`, temperature in `kelvin`, energy in `kilojoules_per_mol`,
-        angle in `radians`). If the collective variables does not have a unit, use
-        `dimensionless`
+    period
+        The period of the collective variable if it is periodic, or `None` if it is not
     pbc
         Whether to use periodic boundary conditions
     weighByMass
@@ -158,6 +160,7 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
         unit: mmunit.Unit,
         groups: t.Iterable[t.Iterable[int]],
         collections: t.Optional[ArrayLike] = None,
+        period: t.Optional[mmunit.ScalarQuantity] = None,
         pbc: bool = True,
         weighByMass: bool = True,
         **parameters: t.Union[mmunit.ScalarQuantity, mmunit.VectorQuantity],
@@ -184,6 +187,7 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
             unit,
             groups,
             [list(map(int, collection)) for collection in collections],
+            period,
             pbc,
             weighByMass,
             **overalls,
