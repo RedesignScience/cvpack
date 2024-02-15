@@ -7,6 +7,7 @@
 
 """
 
+import itertools as it
 import typing as t
 from collections import OrderedDict
 
@@ -15,24 +16,28 @@ import openmm
 from cvpack import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
-from .path import Departure, Progress
+from .path import departure, progress, Measure
 from .utils import convert_to_matrix
 
 
 class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
+    yaml_tag = "!PathInCVSpace"
+
     @mmunit.convert_quantities
     def __init__(
         self,
-        mode: t.Union[Progress, Departure],
+        measure: Measure,
         variables: t.Iterable[BaseCollectiveVariable],
         milestones: mmunit.MatrixQuantity,
         lambdaFactor: mmunit.ScalarQuantity,
+        scales: t.Optional[t.Iterable[mmunit.ScalarQuantity]] = None,
     ) -> None:
-        if mode not in (Progress, Departure):
+        if measure not in (progress, departure):
             raise ValueError(
-                "Invalid mode. Use 'cvpack.path.Progress' or 'cvpack.path.Departure'."
+                "Invalid measure. Use 'cvpack.path.progress' or 'cvpack.path.departure'."
             )
         variables = list(variables)
+        scales = [1.0] * len(variables) if scales is None else list(scales)
         milestones, n, numvars = convert_to_matrix(milestones)
         if numvars != len(variables):
             raise ValueError("Wrong number of columns in the milestones matrix.")
@@ -41,7 +46,7 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
         definitions = OrderedDict({"lambda": lambdaFactor})
         for i, row in enumerate(milestones):
             definitions[f"x{i}"] = "+".join(
-                f"({value}-cv{j})^2" for j, value in enumerate(row)
+                f"({value}-cv{j})^2/{scales[j] ** 2}" for j, value in enumerate(row)
             )
         definitions["xmin0"] = "min(x0,x1)"
         for i in range(n - 2):
@@ -50,7 +55,7 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
             definitions[f"w{i}"] = f"exp(lambda*(xmin{n - 2}-x{i}))"
         definitions["wsum"] = "+".join(f"w{i}" for i in range(n))
         expressions = [f"{key}={value}" for key, value in definitions.items()]
-        if mode is Progress:
+        if measure is progress:
             numerator = "+".join(f"{i}*w{i}" for i in range(1, n))
             expressions.append(f"{numerator}/({n - 1}*wsum)")
         else:
@@ -60,7 +65,9 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
             self.addCollectiveVariable(f"cv{i}", variable)
         self._registerCV(
             mmunit.dimensionless,
+            measure,
             variables,
             milestones.tolist(),
             lambdaFactor,
+            scales,
         )

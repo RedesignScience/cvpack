@@ -1,4 +1,6 @@
-import typing as t
+from typing import Literal
 
-Progress = t.Literal["progress"]
-Departure = t.Literal["departure"]
+Measure = Literal["progress", "departure"]
+
+progress : Measure = "progress"
+departure : Measure = "departure"

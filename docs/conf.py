@@ -27,11 +27,8 @@ sys.path.insert(0, os.path.abspath(".."))
 
 def create_rst_file(cls):
     name = cls.__name__
-    methods = [
-        *filter(lambda x: not x.startswith("_"), BaseCollectiveVariable.__dict__),
-        *filter(lambda x: not x.startswith("_"), cls.__dict__),
-    ]
-    methods.sort()
+    methods = list(BaseCollectiveVariable.__dict__.keys()) + list(cls.__dict__.keys())
+    excluded = ["yaml_tag"]
     with open(f"api/{name}.rst", "w") as f:
         f.writelines(
             [
@@ -42,7 +39,11 @@ def create_rst_file(cls):
                 "    :member-order: alphabetical\n\n",
                 "    .. rubric:: Methods\n\n",
             ]
-            + [f"    .. automethod:: {method}\n" for method in methods]
+            + [
+                f"    .. automethod:: {method}\n"
+                for method in sorted(methods)
+                if not (method.startswith("_") or method in excluded)
+            ]
         )
 
 
@@ -207,7 +208,9 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "cvpack", "Collective Variable Package Documentation", [author], 1)]
+man_pages = [
+    (master_doc, "cvpack", "Collective Variable Package Documentation", [author], 1)
+]
 
 
 # -- Options for Texinfo output ----------------------------------------------
