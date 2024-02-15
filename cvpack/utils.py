@@ -10,8 +10,11 @@
 import typing as t
 from copy import deepcopy
 
+import numpy as np
 import openmm
 import yaml
+
+from numpy import typing as npt
 
 from cvpack import unit as mmunit
 
@@ -122,9 +125,10 @@ def evaluate_in_context(force: openmm.Force, context: openmm.Context) -> float:
         float
             The potential energy of the force in the given context.
     """
+    context_system = context.getSystem()
     system = openmm.System()
-    for _ in range(context.getSystem().getNumParticles()):
-        system.addParticle(1.0)
+    for index in range(context_system.getNumParticles()):
+        system.addParticle(context_system.getParticleMass(index))
     system.addForce(deepcopy(force))
     state = context.getState(getPositions=True)
     context = openmm.Context(system, openmm.VerletIntegrator(1.0))
@@ -134,3 +138,27 @@ def evaluate_in_context(force: openmm.Force, context: openmm.Context) -> float:
     state = context.getState(getEnergy=True)
     # pylint: enable=unexpected-keyword-arg
     return mmunit.value_in_md_units(state.getPotentialEnergy())
+
+
+def convert_to_matrix(array: npt.ArrayLike) -> t.Tuple[np.ndarray, int, int]:
+    """Convert a 1D or 2D array-like object to a 2D numpy array.
+
+    Parameters
+    ----------
+        array : array_like
+            The array to be converted.
+
+    Returns
+    -------
+        numpy.ndarray
+            The 2D numpy array.
+        int
+            The number of rows in the array.
+        int
+            The number of columns in the array.
+    """
+    array = np.atleast_2d(array)
+    numrows, numcols, *other_dimensions = array.shape
+    if other_dimensions:
+        raise ValueError("Array-like object cannot have more than two dimensions.")
+    return array, numrows, numcols
