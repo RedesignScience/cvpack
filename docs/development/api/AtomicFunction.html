@@ -41,7 +41,7 @@
 <h1>AtomicFunction<a class="headerlink" href="#atomicfunction" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="cvpack.AtomicFunction">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">AtomicFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/atomic_function.html#AtomicFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.AtomicFunction" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">AtomicFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/atomic_function.html#AtomicFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.AtomicFunction" title="Link to this definition">¶</a></dt>
 <dd><p>A generic function of the coordinates of atoms split into <cite>m</cite> groups of <cite>n</cite>
 atoms each:</p>
 <div class="math notranslate nohighlight">
@@ -63,13 +63,14 @@ value will be assigned to the corresponding group of atoms.</p>
 <li><p><strong>groups</strong> (<em>ArrayLike</em>) – The indices of the atoms in each group, passed as a 2D array-like object of
 shape <cite>(m, n)</cite>, where <cite>m</cite> is the number of groups and <cite>n</cite> is the number of
 atoms per group. If a 1D object is passed, it is assumed that <cite>m</cite> is 1 and
-<cite>n</cite> is the length of the object.</p></li>
+<cite>n</cite> is the length of the object</p></li>
 <li><p><strong>unit</strong> (<em>mmunit.Unit</em>) – The unit of measurement of the collective variable. It must be compatible
 with the MD unit system (mass in <cite>daltons</cite>, distance in <cite>nanometers</cite>, time
 in <cite>picoseconds</cite>, temperature in <cite>kelvin</cite>, energy in <cite>kilojoules_per_mol</cite>,
 angle in <cite>radians</cite>). If the collective variables does not have a unit, use
 <cite>unit.dimensionless</cite></p></li>
-<li><p><strong>pbc</strong> (<em>bool</em>) – Whether to use periodic boundary conditions</p></li>
+<li><p><strong>period</strong> (<em>t.Optional</em><em>[</em><em>mmunit.ScalarQuantity</em><em>]</em>) – The period of the collective variable if it is periodic, or <cite>None</cite> if it is not</p></li>
+<li><p><strong>pbc</strong> (<em>bool</em>) – Whether to use periodic boundary conditions when computing atomic distances</p></li>
 </ul>
 </dd>
 <dt class="field-even">Keyword Arguments<span class="colon">:</span></dt>

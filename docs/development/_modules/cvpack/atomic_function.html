@@ -87,15 +87,17 @@
 <span class="sd">        The indices of the atoms in each group, passed as a 2D array-like object of</span>
 <span class="sd">        shape `(m, n)`, where `m` is the number of groups and `n` is the number of</span>
 <span class="sd">        atoms per group. If a 1D object is passed, it is assumed that `m` is 1 and</span>
-<span class="sd">        `n` is the length of the object.</span>
+<span class="sd">        `n` is the length of the object</span>
 <span class="sd">    unit</span>
 <span class="sd">        The unit of measurement of the collective variable. It must be compatible</span>
 <span class="sd">        with the MD unit system (mass in `daltons`, distance in `nanometers`, time</span>
 <span class="sd">        in `picoseconds`, temperature in `kelvin`, energy in `kilojoules_per_mol`,</span>
 <span class="sd">        angle in `radians`). If the collective variables does not have a unit, use</span>
 <span class="sd">        `unit.dimensionless`</span>
+<span class="sd">    period</span>
+<span class="sd">        The period of the collective variable if it is periodic, or `None` if it is not</span>
 <span class="sd">    pbc</span>
-<span class="sd">        Whether to use periodic boundary conditions</span>
+<span class="sd">        Whether to use periodic boundary conditions when computing atomic distances</span>
 
 <span class="sd">    Keyword Args</span>
 <span class="sd">    ------------</span>
@@ -151,6 +153,7 @@
         <span class="n">function</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">unit</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Unit</span><span class="p">,</span>
         <span class="n">groups</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+        <span class="n">period</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">pbc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="o">**</span><span class="n">parameters</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">VectorQuantity</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -163,7 +166,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_addParameters</span><span class="p">(</span><span class="n">overalls</span><span class="p">,</span> <span class="n">perbonds</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">pbc</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
         <span class="n">unit</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">SerializableUnit</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
         <span class="n">groups</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">group</span><span class="p">))</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">pbc</span><span class="p">,</span> <span class="o">**</span><span class="n">overalls</span><span class="p">,</span> <span class="o">**</span><span class="n">perbonds</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span>
+            <span class="n">unit</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">period</span><span class="p">,</span> <span class="n">pbc</span><span class="p">,</span> <span class="o">**</span><span class="n">overalls</span><span class="p">,</span> <span class="o">**</span><span class="n">perbonds</span>
+        <span class="p">)</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_fromCustomForce</span><span class="p">(</span>
