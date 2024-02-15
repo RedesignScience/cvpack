@@ -7,6 +7,8 @@
 
 """
 
+import math
+
 import openmm
 
 from cvpack import unit as mmunit
@@ -64,4 +66,5 @@ class Angle(openmm.CustomAngleForce, BaseCollectiveVariable):
         super().__init__("theta")
         self.addAngle(atom1, atom2, atom3, [])
         self.setUsesPeriodicBoundaryConditions(pbc)
+        self._period = 2 * math.pi
         self._registerCV(mmunit.radians, atom1, atom2, atom3, pbc)

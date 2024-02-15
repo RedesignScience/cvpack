@@ -49,15 +49,17 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         The indices of the atoms in each group, passed as a 2D array-like object of
         shape `(m, n)`, where `m` is the number of groups and `n` is the number of
         atoms per group. If a 1D object is passed, it is assumed that `m` is 1 and
-        `n` is the length of the object.
+        `n` is the length of the object
     unit
         The unit of measurement of the collective variable. It must be compatible
         with the MD unit system (mass in `daltons`, distance in `nanometers`, time
         in `picoseconds`, temperature in `kelvin`, energy in `kilojoules_per_mol`,
         angle in `radians`). If the collective variables does not have a unit, use
         `unit.dimensionless`
+    period
+        The period of the collective variable if it is periodic, or `None` if it is not
     pbc
-        Whether to use periodic boundary conditions
+        Whether to use periodic boundary conditions when computing atomic distances
 
     Keyword Args
     ------------
@@ -113,6 +115,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         function: str,
         unit: mmunit.Unit,
         groups: ArrayLike,
+        period: t.Optional[mmunit.ScalarQuantity] = None,
         pbc: bool = True,
         **parameters: t.Union[mmunit.ScalarQuantity, mmunit.VectorQuantity],
     ) -> None:
@@ -125,7 +128,9 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         self._addParameters(overalls, perbonds, groups, pbc, unit)
         unit = mmunit.SerializableUnit(unit)
         groups = [list(map(int, group)) for group in groups]
-        self._registerCV(unit, function, unit, groups, pbc, **overalls, **perbonds)
+        self._registerCV(
+            unit, function, unit, groups, period, pbc, **overalls, **perbonds
+        )
 
     @classmethod
     def _fromCustomForce(
