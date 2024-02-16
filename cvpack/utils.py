@@ -147,3 +147,27 @@ def evaluate_in_context(
         )
         energies.append(mmunit.value_in_md_units(state.getPotentialEnergy()))
     return energies[0] if is_single else tuple(energies)
+
+
+def convert_to_matrix(array: npt.ArrayLike) -> t.Tuple[np.ndarray, int, int]:
+    """Convert a 1D or 2D array-like object to a 2D numpy array.
+
+    Parameters
+    ----------
+        array : array_like
+            The array to be converted.
+
+    Returns
+    -------
+        numpy.ndarray
+            The 2D numpy array.
+        int
+            The number of rows in the array.
+        int
+            The number of columns in the array.
+    """
+    array = np.atleast_2d(array)
+    numrows, numcols, *other_dimensions = array.shape
+    if other_dimensions:
+        raise ValueError("Array-like object cannot have more than two dimensions.")
+    return array, numrows, numcols

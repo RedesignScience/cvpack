@@ -7,7 +7,6 @@
 
 """
 
-import itertools as it
 import typing as t
 from collections import OrderedDict
 
@@ -48,7 +47,8 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
         \|{\bf x}\|^2 = {\bf x}^T {\bf D}^{-2} {\bf x}
 
     where :math:`{\bf D}` is a diagonal matrix with a characteristic scale for each
-    collective variable as its diagonal elements.
+    collective variable as its diagonal elements. Appropriate boundary conditions are
+    used for periodic collective variables.
 
     Parameters
     ----------
@@ -92,9 +92,10 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
             raise ValueError("At least two rows are required in the milestones matrix.")
         definitions = OrderedDict({"lambda": lambdaFactor})
         for i, row in enumerate(milestones):
-            definitions[f"x{i}"] = "+".join(
-                f"({value}-cv{j})^2/{scales[j] ** 2}" for j, value in enumerate(row)
-            )
+            summands = []
+            for j, (variable, value) in enumerate(zip(variables, row)):
+                summands.append(f"({value}-cv{j})^2/{scales[j] ** 2}")
+            definitions[f"x{i}"] = "+".join(summands)
         definitions["xmin0"] = "min(x0,x1)"
         for i in range(n - 2):
             definitions[f"xmin{i+1}"] = f"min(xmin{i},x{i+2})"
