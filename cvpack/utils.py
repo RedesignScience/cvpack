@@ -109,14 +109,16 @@ yaml.SafeDumper.add_representer(
 )
 
 
-def evaluate_in_context(force: openmm.Force, context: openmm.Context) -> float:
-    """Evaluate the potential energy of a force in a given context.
+def evaluate_in_context(
+    forces: t.Union[openmm.Force, t.Iterable[openmm.Force]], context: openmm.Context
+) -> t.Union[float, t.List[float]]:
+    """Evaluate the potential energies of OpenMM Forces in a given context.
 
     Parameters
     ----------
-        force : openmm.Force
-            The force to be evaluated.
-        context : openmm.Context
+        forces
+            The forces to be evaluated.
+        context
             The context in which the force will be evaluated.
 
     Returns
@@ -124,40 +126,24 @@ def evaluate_in_context(force: openmm.Force, context: openmm.Context) -> float:
         float
             The potential energy of the force in the given context.
     """
-    context_system = context.getSystem()
+    is_single = isinstance(forces, openmm.Force)
+    if is_single:
+        forces = [forces]
     system = openmm.System()
-    for index in range(context_system.getNumParticles()):
-        system.addParticle(context_system.getParticleMass(index))
-    system.addForce(deepcopy(force))
+    for _ in range(context.getSystem().getNumParticles()):
+        system.addParticle(1.0)
+    for i, force in enumerate(forces):
+        force_copy = deepcopy(force)
+        force_copy.setForceGroup(i)
+        system.addForce(force_copy)
     state = context.getState(getPositions=True)
     context = openmm.Context(system, openmm.VerletIntegrator(1.0))
     context.setPositions(state.getPositions())
     context.setPeriodicBoxVectors(*state.getPeriodicBoxVectors())
-    # pylint: disable=unexpected-keyword-arg # to avoid false positive
-    state = context.getState(getEnergy=True)
-    # pylint: enable=unexpected-keyword-arg
-    return mmunit.value_in_md_units(state.getPotentialEnergy())
-
-
-def convert_to_matrix(array: npt.ArrayLike) -> t.Tuple[np.ndarray, int, int]:
-    """Convert a 1D or 2D array-like object to a 2D numpy array.
-
-    Parameters
-    ----------
-        array : array_like
-            The array to be converted.
-
-    Returns
-    -------
-        numpy.ndarray
-            The 2D numpy array.
-        int
-            The number of rows in the array.
-        int
-            The number of columns in the array.
-    """
-    array = np.atleast_2d(array)
-    numrows, numcols, *other_dimensions = array.shape
-    if other_dimensions:
-        raise ValueError("Array-like object cannot have more than two dimensions.")
-    return array, numrows, numcols
+    energies = []
+    for i in range(len(forces)):
+        state = context.getState(  # pylint: disable=unexpected-keyword-arg
+            getEnergy=True, groups=1 << i
+        )
+        energies.append(mmunit.value_in_md_units(state.getPotentialEnergy()))
+    return energies[0] if is_single else tuple(energies)
