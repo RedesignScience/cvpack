@@ -91,11 +91,18 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
         if n < 2:
             raise ValueError("At least two rows are required in the milestones matrix.")
         definitions = OrderedDict({"lambda": lambdaFactor})
-        for i, row in enumerate(milestones):
-            summands = []
-            for j, (variable, value) in enumerate(zip(variables, row)):
-                summands.append(f"({value}-cv{j})^2/{scales[j] ** 2}")
-            definitions[f"x{i}"] = "+".join(summands)
+        periods = {
+            j: var.getPeriod().value_in_md_units()
+            for j, var in enumerate(variables)
+            if var.getPeriod() is not None
+        }
+        for i, values in enumerate(milestones):
+            deltas = [f"{value}-cv{j}" for j, value in enumerate(values)]
+            for j, period in periods.items():
+                deltas[j] = f"min(abs({deltas[j]}),{period}-abs({deltas[j]})"
+            definitions[f"x{i}"] = "+".join(
+                f"({delta}/{scale})^2" for delta, scale in zip(deltas, scales)
+            )
         definitions["xmin0"] = "min(x0,x1)"
         for i in range(n - 2):
             definitions[f"xmin{i+1}"] = f"min(xmin{i},x{i+2})"

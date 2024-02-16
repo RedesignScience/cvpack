@@ -256,6 +256,18 @@ class BaseCollectiveVariable(openmm.Force, yaml.YAMLObject):
         """
         return self._unit
 
+    def getPeriod(self) -> t.Optional[mmunit.SerializableQuantity]:
+        """
+        Get the period of this collective variable.
+
+        Returns
+        -------
+            The period of this collective variable or None if it is not periodic
+        """
+        if self._period is None:
+            return None
+        return mmunit.SerializableQuantity(self._period, self.getUnit())
+
     def setUnusedForceGroup(self, position: int, system: openmm.System) -> int:
         """
         Set the force group of this collective variable to the one at a given position
