@@ -1,7 +1,7 @@
 """
-.. class:: BasePathCollectiveVariable
+.. class:: PathInCVSpace
    :platform: Linux, MacOS, Windows
-   :synopsis: Base class for path collective variables.
+   :synopsis: A measure of progress or deviation with respect to a path in CV space
 
 .. classauthor:: Charlles Abreu <craabreu@gmail.com>
 
@@ -15,7 +15,7 @@ import openmm
 from cvpack import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
-from .path import departure, progress, Measure
+from .path import Measure, deviation, progress
 from .utils import convert_to_matrix
 
 
@@ -54,7 +54,7 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
     ----------
     measure
         The path-related measure to compute. Use `cvpack.path.progress` or
-        `cvpack.path.departure`
+        `cvpack.path.deviation`
     variables
         The collective variables that define the space
     milestones
@@ -71,7 +71,7 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
     yaml_tag = "!PathInCVSpace"
 
     @mmunit.convert_quantities
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         measure: Measure,
         variables: t.Iterable[BaseCollectiveVariable],
@@ -79,9 +79,10 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
         lambdaFactor: mmunit.ScalarQuantity,
         scales: t.Optional[t.Iterable[mmunit.ScalarQuantity]] = None,
     ) -> None:
-        if measure not in (progress, departure):
+        if measure not in (progress, deviation):
             raise ValueError(
-                "Invalid measure. Use 'cvpack.path.progress' or 'cvpack.path.departure'."
+                "Invalid measure argument. "
+                "Use 'cvpack.path.progress' or 'cvpack.path.deviation'."
             )
         variables = list(variables)
         scales = [1.0] * len(variables) if scales is None else list(scales)
