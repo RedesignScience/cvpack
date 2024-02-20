@@ -22,8 +22,8 @@ from .utils import convert_to_matrix
 class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
     r"""
     A measure of the system's progress (:math:`s`) or deviation (:math:`z`) with
-    respect to a path defined by a sequence of milestones in a collective variable
-    space :cite:`Branduardi_2007`:
+    respect to a path defined by a sequence of :math:`n` milestones positioned in a
+    collective variable space :cite:`Branduardi_2007`:
 
     .. math::
 
@@ -31,41 +31,90 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
             \dfrac{\sum_{i=1}^n i w_i({\bf r})}{\sum_{i=1}^n w_i({\bf r})} - 1
         }{n-1}
         \quad \text{or} \quad
-        z({\bf r}) = - \frac{1}{\lambda} \ln \sum_{i=1}^n w_i({\bf r})
+        z({\bf r}) = - 2 \sigma ^2 \ln \sum_{i=1}^n w_i({\bf r})
 
-    where :math:`w_i({\bf r}) = e^{-\lambda \|{\bf c}({\bf r}) - \hat{\bf c}_i\|^2}` is
-    a Gaussian kernel, :math:`{\bf c}({\bf r})` is a vector of collective variables,
-    :math:`\hat{\bf c}_i` is a milestone located in the collective-variable space, and
-    :math:`\lambda` is a parameter that controls the width of the kernels. The path is
-    defined by the sequence of :math:`n` milestones.
+    with :math:`w_i({\bf r})` being a Gaussian kernel centered at the :math:`i`-th
+    milestone, i.e.,
 
-    The squared norm of a vector :math:`{\bf x}` in the collective variable space is
-    defined as
+    .. math::
+
+        w_i({\bf r}) = \exp\left(\
+            -\frac{\|{\bf c}({\bf r}) - \hat{\bf c}_i\|^2}{2 \sigma^2}
+        \right)
+
+    where :math:`{\bf c}({\bf r})` is a vector of collective variables,
+    :math:`\hat{\bf c}_i` is the location of the :math:`i`-th milestone, and
+    :math:`\sigma` sets the width of the kernels. The squared norm of a vector
+    :math:`{\bf x}` in the collective variable space is defined as
 
     .. math::
 
         \|{\bf x}\|^2 = {\bf x}^T {\bf D}^{-2} {\bf x}
 
-    where :math:`{\bf D}` is a diagonal matrix with a characteristic scale for each
-    collective variable as its diagonal elements. Appropriate boundary conditions are
-    used for periodic collective variables.
+    where :math:`{\bf D}` is a diagonal matrix whose each diagonal element is the
+    characteristic scale of the corresponding collective variable, which makes
+    :math:`\|{\bf x}\|^2` dimensionless. Appropriate boundary conditions are used for
+    periodic CVs.
+
+    .. note::
+
+        The kernel width :math:`\sigma` is related to the parameter :math:`\lambda` of
+        Ref. :cite:`Branduardi_2007` by :math:`\sigma = \frac{1}{\sqrt{2\lambda}}`.
 
     Parameters
     ----------
     measure
-        The path-related measure to compute. Use `cvpack.path.progress` or
-        `cvpack.path.deviation`
+        The path-related measure to compute. Use ``cvpack.path.progress`` for
+        computing :math:`s({\bf r})` or ``cvpack.path.deviation`` for computing
+        :math:`z({\bf r})`.
     variables
         The collective variables that define the space
     milestones
         The milestones in the collective variable space. The number of rows must be
         equal to the number of milestones and the number of columns must be equal to
         the number of collective variables
-    lambdaFactor
-        The width of the Gaussian kernels
+    sigma
+        The width of the Gaussian kernels.
     scales
         The characteristic scales for the collective variables. If not provided, the
         scales are assumed to be 1 (in standard MD units) for each collective variable
+
+    Raises
+    ------
+    ValueError
+        If the number of rows in the milestones matrix is less than 2
+    ValueError
+        If the number of columns in the milestones matrix is different from the number
+        of collective variables
+    ValueError
+        If the measure is not `cvpack.path.progress` or `cvpack.path.deviation`
+
+    Examples
+    --------
+    >>> import cvpack
+    >>> from openmmtools import testsystems
+    >>> import numpy as np
+    >>> model = testsystems.AlanineDipeptideVacuum()
+    >>> phi_atoms = ["ACE-C", "ALA-N", "ALA-CA", "ALA-C"]
+    >>> psi_atoms = ["ALA-N", "ALA-CA", "ALA-C", "NME-N"]
+    >>> atoms = [f"{a.residue.name}-{a.name}" for a in model.topology.atoms()]
+    >>> milestones = np.array(
+    ...     [[1.3, -0.2], [1.2, 3.1], [-2.7, 2.9], [-1.3, 2.7], [-1.3, -0.4]]
+    ... )
+    >>> path_vars = []
+    >>> for measure in (cvpack.path.progress, cvpack.path.deviation):
+    ...     phi = cvpack.Torsion(*[atoms.index(atom) for atom in phi_atoms])
+    ...     psi = cvpack.Torsion(*[atoms.index(atom) for atom in psi_atoms])
+    ...     var = cvpack.PathInCVSpace(measure, [phi, psi], milestones, np.pi / 6)
+    ...     _ = var.setUnusedForceGroup(0, model.system)
+    ...     _ = model.system.addForce(var)
+    ...     path_vars.append(var)
+    >>> context = openmm.Context(model.system, openmm.VerletIntegrator(1.0))
+    >>> context.setPositions(model.positions)
+    >>> print(f"s = {path_vars[0].getValue(context, digits=6)}")
+    s = 0.5001634 dimensionless
+    >>> print(f"z = {path_vars[1].getValue(context, digits=6)}")
+    z = 0.251219 dimensionless
     """
 
     yaml_tag = "!PathInCVSpace"
@@ -76,12 +125,12 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
         measure: Measure,
         variables: t.Iterable[BaseCollectiveVariable],
         milestones: mmunit.MatrixQuantity,
-        lambdaFactor: mmunit.ScalarQuantity,
+        sigma: float,
         scales: t.Optional[t.Iterable[mmunit.ScalarQuantity]] = None,
     ) -> None:
         if measure not in (progress, deviation):
             raise ValueError(
-                "Invalid measure argument. "
+                "Invalid measure. "
                 "Use 'cvpack.path.progress' or 'cvpack.path.deviation'."
             )
         variables = list(variables)
@@ -91,18 +140,19 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
             raise ValueError("Wrong number of columns in the milestones matrix.")
         if n < 2:
             raise ValueError("At least two rows are required in the milestones matrix.")
-        definitions = OrderedDict({"lambda": lambdaFactor})
+        definitions = OrderedDict({"lambda": 1 / (2 * sigma**2)})
         periods = {
             j: var.getPeriod().value_in_md_units()
             for j, var in enumerate(variables)
             if var.getPeriod() is not None
         }
         for i, values in enumerate(milestones):
-            deltas = [f"{value}-cv{j}" for j, value in enumerate(values)]
+            deltas = [f"({value}-cv{j})" for j, value in enumerate(values)]
             for j, period in periods.items():
-                deltas[j] = f"min(abs({deltas[j]}),{period}-abs({deltas[j]})"
+                deltas[j] = f"min(abs{deltas[j]},{period}-abs{deltas[j]})"
             definitions[f"x{i}"] = "+".join(
-                f"({delta}/{scale})^2" for delta, scale in zip(deltas, scales)
+                f"{delta}^2" if scale == 1.0 else f"({delta}/{scale})^2"
+                for delta, scale in zip(deltas, scales)
             )
         definitions["xmin0"] = "min(x0,x1)"
         for i in range(n - 2):
@@ -113,7 +163,7 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
         expressions = [f"{key}={value}" for key, value in definitions.items()]
         if measure is progress:
             numerator = "+".join(f"{i}*w{i}" for i in range(1, n))
-            expressions.append(f"{numerator}/({n - 1}*wsum)")
+            expressions.append(f"({numerator})/({n - 1}*wsum)")
         else:
             expressions.append(f"xmin{n - 2} - log(wsum)/lambda")
         super().__init__("; ".join(reversed(expressions)))
@@ -124,6 +174,6 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
             measure,
             variables,
             milestones.tolist(),
-            lambdaFactor,
+            sigma,
             scales,
         )
