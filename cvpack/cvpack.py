@@ -141,6 +141,20 @@ class BaseCollectiveVariable(openmm.Force, yaml.YAMLObject):
         yaml.SafeLoader.add_constructor(cls.yaml_tag, cls.from_yaml)
         yaml.SafeDumper.add_representer(cls, cls.to_yaml)
 
+    def _registerPeriod(self, period: float) -> None:
+        """
+        Register the period of this collective variable.
+
+        This method must called from Subclass.__init__ if the collective variable is
+        periodic.
+
+        Parameters
+        ----------
+            period
+                The period of this collective variable
+        """
+        self._period = period
+
     def _getSingleForceState(
         self, context: openmm.Context, getEnergy: bool = False, getForces: bool = False
     ) -> openmm.State:
