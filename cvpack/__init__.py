@@ -45,6 +45,6 @@ for _cv in [
     Torsion,
     TorsionSimilarity,
 ]:
-    yaml.SafeLoader.add_constructor(_cv.yaml_tag, _cv.from_yaml)
     yaml.SafeDumper.add_representer(_cv, _cv.to_yaml)
+    yaml.SafeLoader.add_constructor(_cv.yaml_tag, _cv.from_yaml)
 del _cv

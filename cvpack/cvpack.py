@@ -49,8 +49,8 @@ class SerializableAtom(yaml.YAMLObject):
         self.__dict__.update(keywords)
 
 
-yaml.SafeLoader.add_constructor(SerializableAtom.yaml_tag, SerializableAtom.from_yaml)
 yaml.SafeDumper.add_representer(SerializableAtom, SerializableAtom.to_yaml)
+yaml.SafeLoader.add_constructor(SerializableAtom.yaml_tag, SerializableAtom.from_yaml)
 
 
 class SerializableResidue(yaml.YAMLObject):
@@ -86,10 +86,10 @@ class SerializableResidue(yaml.YAMLObject):
         return iter(self._atoms)
 
 
+yaml.SafeDumper.add_representer(SerializableResidue, SerializableResidue.to_yaml)
 yaml.SafeLoader.add_constructor(
     SerializableResidue.yaml_tag, SerializableResidue.from_yaml
 )
-yaml.SafeDumper.add_representer(SerializableResidue, SerializableResidue.to_yaml)
 
 
 class BaseCollectiveVariable(openmm.Force, yaml.YAMLObject):
@@ -138,8 +138,6 @@ class BaseCollectiveVariable(openmm.Force, yaml.YAMLObject):
         arguments, _ = self.getArguments()
         self._args = dict(zip(arguments, args))
         self._args.update(kwargs)
-        yaml.SafeLoader.add_constructor(cls.yaml_tag, cls.from_yaml)
-        yaml.SafeDumper.add_representer(cls, cls.to_yaml)
 
     def _registerPeriod(self, period: float) -> None:
         """

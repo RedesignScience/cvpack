@@ -101,11 +101,11 @@ class NonbondedForceSurrogate(
         return mmunit.value_in_md_units(self._switching_distance)
 
 
-yaml.SafeLoader.add_constructor(
-    NonbondedForceSurrogate.yaml_tag, NonbondedForceSurrogate.from_yaml
-)
 yaml.SafeDumper.add_representer(
     NonbondedForceSurrogate, NonbondedForceSurrogate.to_yaml
+)
+yaml.SafeLoader.add_constructor(
+    NonbondedForceSurrogate.yaml_tag, NonbondedForceSurrogate.from_yaml
 )
 
 
