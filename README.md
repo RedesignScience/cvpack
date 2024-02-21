@@ -55,6 +55,13 @@ The CVs implemented in CVPack are listed in the table below.
 | [Torsion]               | torsion angle formed by four atoms                               |
 | [Torsion similarity]    | degree of similarity between pairs of torsion angles             |
 
+Below is a list of new CVs already available in the development version:
+
+| Collective Variable     | Description                                                      |
+|-------------------------|------------------------------------------------------------------|
+| [PathInCVSpace]         | progress along (or deviation from) a predefined path in CV space |
+
+
 ### Installation and Usage
 
 CVPack is available as a conda package on the
@@ -98,22 +105,23 @@ Initial project based on the [CMS Cookiecutter] version 1.1.
 [OpenMM]:             https://openmm.org
 [UFED]:               https://ufedmm.readthedocs.io/en/latest/index.html
 
-[Angle]:                  https://redesignscience.github.io/cvpack/api/Angle.html
-[Atomic Function]:        https://redesignscience.github.io/cvpack/api/AtomicFunction.html
-[Attraction Strength]:    https://redesignscience.github.io/cvpack/api/AttractionStrength.html
-[Centroid Function]:      https://redesignscience.github.io/cvpack/api/CentroidFunction.html
-[Composite RMSD]:         https://redesignscience.github.io/cvpack/api/CompositeRMSD.html
-[Distance]:               https://redesignscience.github.io/cvpack/api/Distance.html
-[Helix angle content]:    https://redesignscience.github.io/cvpack/api/HelixAngleContent.html
-[Helix H-bond content]:   https://redesignscience.github.io/cvpack/api/HelixHBondContent.html
-[Helix RMSD content]:     https://redesignscience.github.io/cvpack/api/HelixRMSDContent.html
-[Helix torsion content]:  https://redesignscience.github.io/cvpack/api/HelixTorsionContent.html
-[Number of contacts]:     https://redesignscience.github.io/cvpack/api/NumberOfContacts.html
-[PathInCVSpace]:          https://redesignscience.github.io/cvpack/api/PathInCVSpace.html
-[Radius of gyration]:     https://redesignscience.github.io/cvpack/api/RadiusOfGyration.html
-[(Radius of gyration)^2]: https://redesignscience.github.io/cvpack/api/RadiusOfGyrationSq.html
-[Residue coordination]:   https://redesignscience.github.io/cvpack/api/ResidueCoordination.html
-[RMSD]:                   https://redesignscience.github.io/cvpack/api/RMSD.html
-[Sheet RMSD content]:     https://redesignscience.github.io/cvpack/api/SheetRMSDContent.html
-[Torsion]:                https://redesignscience.github.io/cvpack/api/Torsion.html
-[Torsion similarity]:     https://redesignscience.github.io/cvpack/api/TorsionSimilarity.html
+[Angle]:                  https://redesignscience.github.io/cvpack/latest/api/Angle.html
+[Atomic Function]:        https://redesignscience.github.io/cvpack/latest/api/AtomicFunction.html
+[Attraction Strength]:    https://redesignscience.github.io/cvpack/latest/api/AttractionStrength.html
+[Centroid Function]:      https://redesignscience.github.io/cvpack/latest/api/CentroidFunction.html
+[Composite RMSD]:         https://redesignscience.github.io/cvpack/latest/api/CompositeRMSD.html
+[Distance]:               https://redesignscience.github.io/cvpack/latest/api/Distance.html
+[Helix angle content]:    https://redesignscience.github.io/cvpack/latest/api/HelixAngleContent.html
+[Helix H-bond content]:   https://redesignscience.github.io/cvpack/latest/api/HelixHBondContent.html
+[Helix RMSD content]:     https://redesignscience.github.io/cvpack/latest/api/HelixRMSDContent.html
+[Helix torsion content]:  https://redesignscience.github.io/cvpack/latest/api/HelixTorsionContent.html
+[Number of contacts]:     https://redesignscience.github.io/cvpack/latest/api/NumberOfContacts.html
+[Radius of gyration]:     https://redesignscience.github.io/cvpack/latest/api/RadiusOfGyration.html
+[(Radius of gyration)^2]: https://redesignscience.github.io/cvpack/latest/api/RadiusOfGyrationSq.html
+[Residue coordination]:   https://redesignscience.github.io/cvpack/latest/api/ResidueCoordination.html
+[RMSD]:                   https://redesignscience.github.io/cvpack/latest/api/RMSD.html
+[Sheet RMSD content]:     https://redesignscience.github.io/cvpack/latest/api/SheetRMSDContent.html
+[Torsion]:                https://redesignscience.github.io/cvpack/latest/api/Torsion.html
+[Torsion similarity]:     https://redesignscience.github.io/cvpack/latest/api/TorsionSimilarity.html
+
+[PathInCVSpace]:          https://redesignscience.github.io/cvpack/development/api/PathInCVSpace.html
