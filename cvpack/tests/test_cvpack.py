@@ -799,3 +799,28 @@ def test_residue_coordination(includeHs: bool):
 
     assert cv_value / cv_value.unit == pytest.approx(computed_cv)
     perform_common_tests(res_coord, context)
+
+
+@pytest.mark.parametrize("metric", [cvpack.path.progress, cvpack.path.deviation])
+def test_path_in_cv_space(metric: cvpack.path.Metric):
+    """
+    Test whether a path in CV space is computed correctly.
+
+    """
+    print(metric)
+    model = testsystems.AlanineDipeptideVacuum()
+    phi_atoms = ["ACE-C", "ALA-N", "ALA-CA", "ALA-C"]
+    psi_atoms = ["ALA-N", "ALA-CA", "ALA-C", "NME-N"]
+    atoms = [f"{a.residue.name}-{a.name}" for a in model.topology.atoms()]
+    milestones = np.array(
+        [[1.3, -0.2], [1.2, 3.1], [-2.7, 2.9], [-1.3, 2.7], [-1.3, -0.4]]
+    )
+    phi = cvpack.Torsion(*[atoms.index(atom) for atom in phi_atoms])
+    psi = cvpack.Torsion(*[atoms.index(atom) for atom in psi_atoms])
+    var = cvpack.PathInCVSpace(metric, [phi, psi], milestones, np.pi / 6)
+    var.setUnusedForceGroup(0, model.system)
+    model.system.addForce(var)
+    context = openmm.Context(model.system, openmm.VerletIntegrator(1.0))
+    context.setPositions(model.positions)
+    var.getValue(context)
+    perform_common_tests(var, context)
