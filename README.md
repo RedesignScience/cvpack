@@ -46,6 +46,7 @@ The CVs implemented in CVPack are listed in the table below.
 | [Helix RMSD content]    | alpha-helix RMSD content of a sequence of residues               |
 | [Helix torsion content] | alpha-helix Ramachandran content of a sequence of residues       |
 | [Number of contacts]    | number of contacts between two groups of atoms                   |
+| [PathInCVSpace]         | progress along (deviation from) a predefined path in CV space    |
 | [Radius of gyration]    | radius of gyration of a group of atoms                           |
 | [(Radius of gyration)^2]| square of the radius of gyration of a group of atoms             |
 | [Residue coordination]  | number of contacts between two disjoint groups of residues       |
@@ -108,6 +109,7 @@ Initial project based on the [CMS Cookiecutter] version 1.1.
 [Helix RMSD content]:     https://redesignscience.github.io/cvpack/api/HelixRMSDContent.html
 [Helix torsion content]:  https://redesignscience.github.io/cvpack/api/HelixTorsionContent.html
 [Number of contacts]:     https://redesignscience.github.io/cvpack/api/NumberOfContacts.html
+[PathInCVSpace]:          https://redesignscience.github.io/cvpack/api/PathInCVSpace.html
 [Radius of gyration]:     https://redesignscience.github.io/cvpack/api/RadiusOfGyration.html
 [(Radius of gyration)^2]: https://redesignscience.github.io/cvpack/api/RadiusOfGyrationSq.html
 [Residue coordination]:   https://redesignscience.github.io/cvpack/api/ResidueCoordination.html

@@ -131,6 +131,8 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         self._registerCV(
             unit, function, unit, groups, period, pbc, **overalls, **perbonds
         )
+        if period is not None:
+            self._registerPeriod(period)
 
     @classmethod
     def _fromCustomForce(

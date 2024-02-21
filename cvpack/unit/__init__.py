@@ -96,8 +96,8 @@ class SerializableUnit(_mmunit.Unit, yaml.YAMLObject):
         self.__init__(kwds["description"])
 
 
-yaml.SafeLoader.add_constructor(SerializableUnit.yaml_tag, SerializableUnit.from_yaml)
 yaml.SafeDumper.add_representer(SerializableUnit, SerializableUnit.to_yaml)
+yaml.SafeLoader.add_constructor(SerializableUnit.yaml_tag, SerializableUnit.from_yaml)
 
 
 class SerializableQuantity(_mmunit.Quantity, yaml.YAMLObject):
@@ -156,10 +156,10 @@ class SerializableQuantity(_mmunit.Quantity, yaml.YAMLObject):
         return value_in_md_units(self)
 
 
+yaml.SafeDumper.add_representer(SerializableQuantity, SerializableQuantity.to_yaml)
 yaml.SafeLoader.add_constructor(
     SerializableQuantity.yaml_tag, SerializableQuantity.from_yaml
 )
-yaml.SafeDumper.add_representer(SerializableQuantity, SerializableQuantity.to_yaml)
 
 
 def value_in_md_units(  # pylint: disable=redefined-outer-name

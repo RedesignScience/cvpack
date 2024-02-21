@@ -193,3 +193,5 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
             **overalls,
             **perbonds,
         )
+        if period is not None:
+            self._registerPeriod(period)
