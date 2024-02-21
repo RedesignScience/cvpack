@@ -807,7 +807,6 @@ def test_path_in_cv_space(metric: cvpack.path.Metric):
     Test whether a path in CV space is computed correctly.
 
     """
-    print(metric)
     model = testsystems.AlanineDipeptideVacuum()
     phi_atoms = ["ACE-C", "ALA-N", "ALA-CA", "ALA-C"]
     psi_atoms = ["ALA-N", "ALA-CA", "ALA-C", "NME-N"]
@@ -817,10 +816,27 @@ def test_path_in_cv_space(metric: cvpack.path.Metric):
     )
     phi = cvpack.Torsion(*[atoms.index(atom) for atom in phi_atoms])
     psi = cvpack.Torsion(*[atoms.index(atom) for atom in psi_atoms])
-    var = cvpack.PathInCVSpace(metric, [phi, psi], milestones, np.pi / 6)
+    sigma = np.pi / 6
+    var = cvpack.PathInCVSpace(metric, [phi, psi], milestones, sigma)
     var.setUnusedForceGroup(0, model.system)
     model.system.addForce(var)
     context = openmm.Context(model.system, openmm.VerletIntegrator(1.0))
     context.setPositions(model.positions)
-    var.getValue(context)
+    cv_value = var.getValue(context)
+
+    def logsumexp(x, a=None):
+        xmax = np.max(x)
+        if a is None:
+            return xmax + np.log(np.sum(np.exp(x - xmax)))
+        return xmax + np.log(np.sum(a * np.exp(x - xmax)))
+
+    angles = np.array(var.getCollectiveVariableValues(context))
+    deltas = np.abs(milestones - angles)
+    x = -0.5 * np.sum(np.minimum(deltas, 2 * np.pi - deltas) ** 2, axis=1) / sigma**2
+    if metric is cvpack.path.progress:
+        n = len(x)
+        computed_value = np.exp(logsumexp(x, np.arange(n)) - logsumexp(x)) / (n - 1)
+    else:
+        computed_value = -2 * sigma**2 * logsumexp(x)
+    assert cv_value / cv_value.unit == pytest.approx(computed_value)
     perform_common_tests(var, context)
