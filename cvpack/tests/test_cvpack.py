@@ -87,6 +87,10 @@ def perform_common_tests(
     for _, annotation in args.items():
         assert annotation is not inspect.Parameter.empty
 
+    # Yaml tag must be defined and start with "!cvpack."
+    assert hasattr(collectiveVariable, "yaml_tag")
+    assert collectiveVariable.yaml_tag.startswith("!cvpack.")
+
     # Test serialization/deserialization
     pipe = io.StringIO()
     serializer.serialize(collectiveVariable, pipe)
