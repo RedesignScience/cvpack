@@ -9,8 +9,8 @@ SheetRMSDContent
 
     .. automethod:: getArguments
     .. automethod:: getEffectiveMass
+    .. automethod:: getPeriod
     .. automethod:: getUnit
     .. automethod:: getValue
     .. automethod:: setUnit
     .. automethod:: setUnusedForceGroup
-    .. automethod:: yaml_tag

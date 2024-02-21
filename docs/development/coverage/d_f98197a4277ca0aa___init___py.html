@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">469 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">463<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">6<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">464<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">5<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -64,8 +64,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_1162223856cd18a9_utils_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-15 15:40 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.4.2">coverage.py v7.4.2</a>,
+            created at 2024-02-21 16:47 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -178,8 +178,8 @@
     <p class="run"><span class="n"><a id="t96" href="#t96">96</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">__init__</span><span class="op">(</span><span class="nam">kwds</span><span class="op">[</span><span class="str">"description"</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t97" href="#t97">97</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t98" href="#t98">98</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t99" href="#t99">99</a></span><span class="t"><span class="nam">yaml</span><span class="op">.</span><span class="nam">SafeLoader</span><span class="op">.</span><span class="nam">add_constructor</span><span class="op">(</span><span class="nam">SerializableUnit</span><span class="op">.</span><span class="nam">yaml_tag</span><span class="op">,</span> <span class="nam">SerializableUnit</span><span class="op">.</span><span class="nam">from_yaml</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t100" href="#t100">100</a></span><span class="t"><span class="nam">yaml</span><span class="op">.</span><span class="nam">SafeDumper</span><span class="op">.</span><span class="nam">add_representer</span><span class="op">(</span><span class="nam">SerializableUnit</span><span class="op">,</span> <span class="nam">SerializableUnit</span><span class="op">.</span><span class="nam">to_yaml</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t99" href="#t99">99</a></span><span class="t"><span class="nam">yaml</span><span class="op">.</span><span class="nam">SafeDumper</span><span class="op">.</span><span class="nam">add_representer</span><span class="op">(</span><span class="nam">SerializableUnit</span><span class="op">,</span> <span class="nam">SerializableUnit</span><span class="op">.</span><span class="nam">to_yaml</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t100" href="#t100">100</a></span><span class="t"><span class="nam">yaml</span><span class="op">.</span><span class="nam">SafeLoader</span><span class="op">.</span><span class="nam">add_constructor</span><span class="op">(</span><span class="nam">SerializableUnit</span><span class="op">.</span><span class="nam">yaml_tag</span><span class="op">,</span> <span class="nam">SerializableUnit</span><span class="op">.</span><span class="nam">from_yaml</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t101" href="#t101">101</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t102" href="#t102">102</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t103" href="#t103">103</a></span><span class="t"><span class="key">class</span> <span class="nam">SerializableQuantity</span><span class="op">(</span><span class="nam">_mmunit</span><span class="op">.</span><span class="nam">Quantity</span><span class="op">,</span> <span class="nam">yaml</span><span class="op">.</span><span class="nam">YAMLObject</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -235,13 +235,13 @@
     <p class="pln"><span class="n"><a id="t153" href="#t153">153</a></span><span class="t"><span class="str">        Da, distance in nm, time in ps, temperature in K, energy in kJ/mol, angle in</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t154" href="#t154">154</a></span><span class="t"><span class="str">        rad).</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t155" href="#t155">155</a></span><span class="t"><span class="str">        """</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t156" href="#t156">156</a></span><span class="t">        <span class="key">return</span> <span class="nam">value_in_md_units</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t156" href="#t156">156</a></span><span class="t">        <span class="key">return</span> <span class="nam">value_in_md_units</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t157" href="#t157">157</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t158" href="#t158">158</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t159" href="#t159">159</a></span><span class="t"><span class="nam">yaml</span><span class="op">.</span><span class="nam">SafeLoader</span><span class="op">.</span><span class="nam">add_constructor</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t160" href="#t160">160</a></span><span class="t">    <span class="nam">SerializableQuantity</span><span class="op">.</span><span class="nam">yaml_tag</span><span class="op">,</span> <span class="nam">SerializableQuantity</span><span class="op">.</span><span class="nam">from_yaml</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t161" href="#t161">161</a></span><span class="t"><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t162" href="#t162">162</a></span><span class="t"><span class="nam">yaml</span><span class="op">.</span><span class="nam">SafeDumper</span><span class="op">.</span><span class="nam">add_representer</span><span class="op">(</span><span class="nam">SerializableQuantity</span><span class="op">,</span> <span class="nam">SerializableQuantity</span><span class="op">.</span><span class="nam">to_yaml</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t159" href="#t159">159</a></span><span class="t"><span class="nam">yaml</span><span class="op">.</span><span class="nam">SafeDumper</span><span class="op">.</span><span class="nam">add_representer</span><span class="op">(</span><span class="nam">SerializableQuantity</span><span class="op">,</span> <span class="nam">SerializableQuantity</span><span class="op">.</span><span class="nam">to_yaml</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t160" href="#t160">160</a></span><span class="t"><span class="nam">yaml</span><span class="op">.</span><span class="nam">SafeLoader</span><span class="op">.</span><span class="nam">add_constructor</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t161" href="#t161">161</a></span><span class="t">    <span class="nam">SerializableQuantity</span><span class="op">.</span><span class="nam">yaml_tag</span><span class="op">,</span> <span class="nam">SerializableQuantity</span><span class="op">.</span><span class="nam">from_yaml</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t162" href="#t162">162</a></span><span class="t"><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t163" href="#t163">163</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t164" href="#t164">164</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t165" href="#t165">165</a></span><span class="t"><span class="key">def</span> <span class="nam">value_in_md_units</span><span class="op">(</span>  <span class="com"># pylint: disable=redefined-outer-name</span>&nbsp;</span><span class="r"></span></p>
@@ -976,8 +976,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_1162223856cd18a9_utils_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-15 15:40 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.4.2">coverage.py v7.4.2</a>,
+            created at 2024-02-21 16:47 +0000
         </p>
     </div>
 </footer>

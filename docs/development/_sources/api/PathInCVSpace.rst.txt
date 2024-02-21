@@ -1,8 +1,8 @@
-HelixRMSDContent
-================
+PathInCVSpace
+=============
 
 .. currentmodule:: cvpack
-.. autoclass:: HelixRMSDContent
+.. autoclass:: PathInCVSpace
     :member-order: alphabetical
 
     .. rubric:: Methods

@@ -9,10 +9,10 @@ ResidueCoordination
 
     .. automethod:: getArguments
     .. automethod:: getEffectiveMass
+    .. automethod:: getPeriod
     .. automethod:: getReferenceValue
     .. automethod:: getUnit
     .. automethod:: getValue
     .. automethod:: setReferenceValue
     .. automethod:: setUnit
     .. automethod:: setUnusedForceGroup
-    .. automethod:: yaml_tag

@@ -10,8 +10,8 @@ RMSD
     .. automethod:: getArguments
     .. automethod:: getEffectiveMass
     .. automethod:: getNullBondForce
+    .. automethod:: getPeriod
     .. automethod:: getUnit
     .. automethod:: getValue
     .. automethod:: setUnit
     .. automethod:: setUnusedForceGroup
-    .. automethod:: yaml_tag

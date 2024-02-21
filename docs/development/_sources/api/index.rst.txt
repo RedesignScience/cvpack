@@ -15,13 +15,13 @@ Python API
     HelixRMSDContent
     HelixTorsionContent
     NumberOfContacts
+    PathInCVSpace
     RadiusOfGyration
     RadiusOfGyrationSq
     ResidueCoordination
     RMSD
     SheetRMSDContent
     Torsion
-    TorsionSimilarity
     TorsionSimilarity
 
 .. testsetup::

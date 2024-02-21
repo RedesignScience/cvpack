@@ -55,7 +55,7 @@
 <p>where <span class="math notranslate nohighlight">\(\phi_i({\bf r})\)</span> and <span class="math notranslate nohighlight">\(\psi_i({\bf r})\)</span> are the Ramachandran
 dihedral angles of residue <span class="math notranslate nohighlight">\(i\)</span>, <span class="math notranslate nohighlight">\(\phi_{\rm ref}\)</span> and
 <span class="math notranslate nohighlight">\(\psi_{\rm ref}\)</span> are their reference values in an alpha helix
-<span id="id1">[<a class="reference internal" href="../references.html#id4" title="Sven Hovmöller, Tuping Zhou, and Tomas Ohlson. Conformations of amino acids in proteins. Acta Crystallographica Section D Biological Crystallography, 58(5):768–776, apr 2002. doi:10.1107/s0907444902003359.">4</a>]</span>, and <span class="math notranslate nohighlight">\(\theta_{\rm tol}\)</span> is the threshold tolerance
+<span id="id1">[<a class="reference internal" href="../references.html#id5" title="Sven Hovmöller, Tuping Zhou, and Tomas Ohlson. Conformations of amino acids in proteins. Acta Crystallographica Section D Biological Crystallography, 58(5):768–776, apr 2002. doi:10.1107/s0907444902003359.">4</a>]</span>, and <span class="math notranslate nohighlight">\(\theta_{\rm tol}\)</span> is the threshold tolerance
 around these refenrences. <span class="math notranslate nohighlight">\(B_m(x)\)</span> is a smooth boxcar function given by</p>
 <div class="math notranslate nohighlight">
 \[B_m(x) = \frac{1}{1 + x^{2m}}\]</div>
@@ -152,7 +152,7 @@ variable.</p>
 <dd><p>Compute the effective mass of this collective variable at a given
 <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html">openmm.Context</a>.</p>
 <p>The effective mass of a collective variable <span class="math notranslate nohighlight">\(q({\bf r})\)</span> is defined as
-<span id="id2">[<a class="reference internal" href="../references.html#id2" title="Christophe Chipot and Andrew Pohorille, editors. Free Energy Calculations. Springer Berlin Heidelberg, 2007. URL: https://doi.org/10.1007/978-3-540-38448-9, doi:10.1007/978-3-540-38448-9.">1</a>]</span>:</p>
+<span id="id2">[<a class="reference internal" href="../references.html#id3" title="Christophe Chipot and Andrew Pohorille, editors. Free Energy Calculations. Springer Berlin Heidelberg, 2007. URL: https://doi.org/10.1007/978-3-540-38448-9, doi:10.1007/978-3-540-38448-9.">1</a>]</span>:</p>
 <div class="math notranslate nohighlight">
 \[m_\mathrm{eff}({\bf r}) = \left(
     \sum_{i=1}^N \frac{1}{m_i} \left\|
@@ -205,6 +205,17 @@ be rounded.</p></li>
 <span class="go">30.94693 Da</span>
 </pre></div>
 </div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cvpack.HelixTorsionContent.getPeriod">
+<span class="sig-name descname"><span class="pre">getPeriod</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.HelixTorsionContent.getPeriod" title="Link to this definition">¶</a></dt>
+<dd><p>Get the period of this collective variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The period of this collective variable or None if it is not periodic</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -283,20 +294,6 @@ force groups in the system</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="cvpack.HelixTorsionContent.yaml_tag">
-<span class="sig-name descname"><span class="pre">yaml_tag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.HelixTorsionContent.yaml_tag" title="Link to this definition">¶</a></dt>
-<dd><p>str(object=’’) -&gt; str
-str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</p>
-<p>Create a new string object from the given object. If encoding or
-errors is specified, then the object must expose a data buffer
-that will be decoded using the given encoding and error handler.
-Otherwise, returns the result of object.__str__() (if defined)
-or repr(object).
-encoding defaults to sys.getdefaultencoding().
-errors defaults to ‘strict’.</p>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -335,13 +332,13 @@ errors defaults to ‘strict’.</p>
 <li class="toctree-l2"><a class="reference internal" href="HelixRMSDContent.html">HelixRMSDContent</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">HelixTorsionContent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="NumberOfContacts.html">NumberOfContacts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PathInCVSpace.html">PathInCVSpace</a></li>
 <li class="toctree-l2"><a class="reference internal" href="RadiusOfGyration.html">RadiusOfGyration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="RadiusOfGyrationSq.html">RadiusOfGyrationSq</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ResidueCoordination.html">ResidueCoordination</a></li>
 <li class="toctree-l2"><a class="reference internal" href="RMSD.html">RMSD</a></li>
 <li class="toctree-l2"><a class="reference internal" href="SheetRMSDContent.html">SheetRMSDContent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Torsion.html">Torsion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="TorsionSimilarity.html">TorsionSimilarity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="TorsionSimilarity.html">TorsionSimilarity</a></li>
 </ul>
 </li>
