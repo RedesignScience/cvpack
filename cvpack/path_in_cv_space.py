@@ -1,7 +1,7 @@
 """
 .. class:: PathInCVSpace
    :platform: Linux, MacOS, Windows
-   :synopsis: A measure of progress or deviation with respect to a path in CV space
+   :synopsis: A metric of progress or deviation with respect to a path in CV space
 
 .. classauthor:: Charlles Abreu <craabreu@gmail.com>
 
@@ -15,13 +15,13 @@ import openmm
 from cvpack import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
-from .path import Measure, deviation, progress
+from .path import Metric, deviation, progress
 from .utils import convert_to_matrix
 
 
 class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
     r"""
-    A measure of the system's progress (:math:`s`) or deviation (:math:`z`) with
+    A metric of the system's progress (:math:`s`) or deviation (:math:`z`) with
     respect to a path defined by a sequence of :math:`n` milestones positioned in a
     collective variable space :cite:`Branduardi_2007`:
 
@@ -63,8 +63,8 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
 
     Parameters
     ----------
-    measure
-        The path-related measure to compute. Use ``cvpack.path.progress`` for
+    metric
+        The path-related metric to compute. Use ``cvpack.path.progress`` for
         computing :math:`s({\bf r})` or ``cvpack.path.deviation`` for computing
         :math:`z({\bf r})`.
     variables
@@ -87,7 +87,7 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
         If the number of columns in the milestones matrix is different from the number
         of collective variables
     ValueError
-        If the measure is not `cvpack.path.progress` or `cvpack.path.deviation`
+        If the metric is not `cvpack.path.progress` or `cvpack.path.deviation`
 
     Examples
     --------
@@ -102,10 +102,10 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
     ...     [[1.3, -0.2], [1.2, 3.1], [-2.7, 2.9], [-1.3, 2.7], [-1.3, -0.4]]
     ... )
     >>> path_vars = []
-    >>> for measure in (cvpack.path.progress, cvpack.path.deviation):
+    >>> for metric in (cvpack.path.progress, cvpack.path.deviation):
     ...     phi = cvpack.Torsion(*[atoms.index(atom) for atom in phi_atoms])
     ...     psi = cvpack.Torsion(*[atoms.index(atom) for atom in psi_atoms])
-    ...     var = cvpack.PathInCVSpace(measure, [phi, psi], milestones, np.pi / 6)
+    ...     var = cvpack.PathInCVSpace(metric, [phi, psi], milestones, np.pi / 6)
     ...     _ = var.setUnusedForceGroup(0, model.system)
     ...     _ = model.system.addForce(var)
     ...     path_vars.append(var)
@@ -117,20 +117,20 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
     z = 0.251219 dimensionless
     """
 
-    yaml_tag = "!PathInCVSpace"
+    yaml_tag = "!cvpack.PathInCVSpace"
 
     @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        measure: Measure,
+        metric: Metric,
         variables: t.Iterable[BaseCollectiveVariable],
         milestones: mmunit.MatrixQuantity,
         sigma: float,
         scales: t.Optional[t.Iterable[mmunit.ScalarQuantity]] = None,
     ) -> None:
-        if measure not in (progress, deviation):
+        if metric not in (progress, deviation):
             raise ValueError(
-                "Invalid measure. "
+                "Invalid metric. "
                 "Use 'cvpack.path.progress' or 'cvpack.path.deviation'."
             )
         variables = list(variables)
@@ -161,7 +161,7 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
             definitions[f"w{i}"] = f"exp(lambda*(xmin{n - 2}-x{i}))"
         definitions["wsum"] = "+".join(f"w{i}" for i in range(n))
         expressions = [f"{key}={value}" for key, value in definitions.items()]
-        if measure is progress:
+        if metric == progress:
             numerator = "+".join(f"{i}*w{i}" for i in range(1, n))
             expressions.append(f"({numerator})/({n - 1}*wsum)")
         else:
@@ -171,7 +171,7 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
             self.addCollectiveVariable(f"cv{i}", variable)
         self._registerCV(
             mmunit.dimensionless,
-            measure,
+            metric,
             variables,
             milestones.tolist(),
             sigma,
