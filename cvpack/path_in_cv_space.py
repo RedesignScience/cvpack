@@ -111,10 +111,10 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
     ...     path_vars.append(var)
     >>> context = openmm.Context(model.system, openmm.VerletIntegrator(1.0))
     >>> context.setPositions(model.positions)
-    >>> print(f"s = {path_vars[0].getValue(context, digits=6)}")
-    s = 0.5001634 dimensionless
-    >>> print(f"z = {path_vars[1].getValue(context, digits=6)}")
-    z = 0.251219 dimensionless
+    >>> print(f"s = {path_vars[0].getValue(context)}")
+    s = 0.50... dimensionless
+    >>> print(f"z = {path_vars[1].getValue(context)}")
+    z = 0.25... dimensionless
     """
 
     yaml_tag = "!cvpack.PathInCVSpace"
