@@ -25,7 +25,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
 
     .. math::
 
-        S_{\rm attr}({\bf r}) = &-\frac{1}{E_{\rm ref}} \Bigg[
+        S_{\rm attr}({\bf r}) = S_{1,2}({\bf r}) = &-\frac{1}{E_{\rm ref}} \Bigg[
             \sum_{i \in {\bf g}_1}
                 \sum_{\substack{j \in {\bf g}_2 \\ j \neq i}}
                     \epsilon_{ij} u_{\rm disp}\left(
@@ -44,6 +44,23 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     The Lennard-Jones parameters are given by the Lorentz-Berthelot mixing rule, i.e.
     :math:`\epsilon_{ij} = \sqrt{\epsilon_i \epsilon_j}`, and
     :math:`\sigma_{ij} = (\sigma_i + \sigma_j)/2`.
+
+    Optionally, one can provide a third atom group :math:`{\bf g}_3` to contrast
+    the attraction strength between :math:`{\bf g}_1` and :math:`{\bf g}_2` with
+    that between :math:`{\bf g}_1` and :math:`{\bf g}_3`. In this case, the
+    collective variable becomes
+
+    .. math::
+
+        S_{\rm attr}({\bf r}) = S_{1,2}({\bf r}) - S_{1,3}({\bf r})
+
+    .. note::
+
+        Groups :math:`{\bf g}_1` and :math:`{\bf g}_2` can overlap or even be the
+        same, in which case the collective variable will measure the strength of
+        the self-attraction of :math:`{\bf g}_1`. On the other hand, the contrast
+        group :math:`{\bf g}_3` cannot overlap with neither :math:`{\bf g}_1` nor
+        :math:`{\bf g}_2`.
 
     The function :math:`u_{\rm disp}(x)` is a Lennard-Jones-like reduced potential with
     a highly softened repulsion part, defined as
@@ -76,9 +93,9 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     distance, are taken from :openmm:`NonbondedForce` object.
 
     .. note::
-        Any non-exclusion exceptions involving atoms in :math:`{\bf g}_1` and
-        :math:`{\bf g}_2` in the provided :class:`openmm.NonbondedForce` are turned
-        into exclusions in this collective variable.
+        Any non-exclusion exceptions involving an atom in :math:`{\bf g}_1` and an atom
+        in either :math:`{\bf g}_2` or :math:`{\bf g}_3` are turned into exclusions in
+        this collective variable.
 
     Parameters
     ----------
@@ -93,6 +110,10 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
         A reference value (in energy units per mole) to which the collective variable
         should be normalized. One can also provide an :OpenMM:`Context` object from
         which to obtain a reference attraction strength.
+    contrastGroup
+        An optional third atom group to contrast the attraction strength between
+        :math:`{\bf g}_1` and :math:`{\bf g}_2` with that between :math:`{\bf g}_1`
+        and :math:`{\bf g}_3`.
 
     Examples
     --------
@@ -100,48 +121,37 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     >>> from openmm import unit
     >>> from openmmtools import testsystems
     >>> model = testsystems.HostGuestExplicit()
-    >>> group1, group2 = [], []
-    >>> for residue in model.topology.residues():
-    ...     if residue.name != "HOH":
-    ...         group = group1 if residue.name == "B2" else group2
-    ...         group.extend(atom.index for atom in residue.atoms())
+    >>> guest = [a.index for a in model.topology.atoms() if a.residue.name == "B2"]
+    >>> host = [a.index for a in model.topology.atoms() if a.residue.name == "CUC"]
     >>> forces = {f.getName(): f for f in model.system.getForces()}
-    >>> cv1 = cvpack.AttractionStrength(group1, group2, forces["NonbondedForce"])
-    >>> cv1.setUnusedForceGroup(0, model.system)
-    1
-    >>> model.system.addForce(cv1)
-    5
-    >>> cv2 = cvpack.AttractionStrength(
-    ...     group1, group2, forces["NonbondedForce"], 100*unit.kilojoules_per_mole,
-    ... )
-    >>> cv2.setUnusedForceGroup(0, model.system)
-    2
-    >>> model.system.addForce(cv2)
-    6
+    >>> cv1 = cvpack.AttractionStrength(guest, host, forces["NonbondedForce"])
+    >>> _ = cv1.setUnusedForceGroup(0, model.system)
+    >>> _ = model.system.addForce(cv1)
     >>> platform = openmm.Platform.getPlatformByName("Reference")
     >>> integrator = openmm.VerletIntegrator(1.0 * mmunit.femtoseconds)
     >>> context = openmm.Context(model.system, integrator, platform)
     >>> context.setPositions(model.positions)
     >>> print(cv1.getValue(context, 4))
     4912.5 dimensionless
-    >>> print(cv1.getEffectiveMass(context, 4))
-    2.1639e-07 nm**2 Da
+
+    >>> water = [a.index for a in model.topology.atoms() if a.residue.name == "HOH"]
+    >>> cv2 = cvpack.AttractionStrength(guest, water, forces["NonbondedForce"])
+    >>> _ = cv2.setUnusedForceGroup(0, model.system)
+    >>> _ = model.system.addForce(cv2)
+    >>> context.reinitialize(preserveState=True)
     >>> print(cv2.getValue(context, 4))
-    49.125 dimensionless
-    >>> print(cv2.getEffectiveMass(context, 4))
-    0.0021639 nm**2 Da
+    2063.3 dimensionless
+
     >>> cv3 = cvpack.AttractionStrength(
-    ...     group1, group2, forces["NonbondedForce"], context,
+    ...     guest, host, forces["NonbondedForce"], contrastGroup=water,
     ... )
-    >>> cv3.setUnusedForceGroup(0, model.system)
-    3
-    >>> model.system.addForce(cv3)
-    7
+    >>> _ = cv3.setUnusedForceGroup(0, model.system)
+    >>> _ = model.system.addForce(cv3)
     >>> context.reinitialize(preserveState=True)
     >>> print(cv3.getValue(context, 4))
-    1.0 dimensionless
-    >>> print(cv3.getEffectiveMass(context, 4))
-    5.2222 nm**2 Da
+    2849.2 dimensionless
+    >>> print(cv1.getValue(context, 4) - cv2.getValue(context, 4))
+    2849.2 dimensionless
     """
 
     yaml_tag = "!cvpack.AttractionStrength"
@@ -155,13 +165,17 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
         reference: t.Union[mmunit.ScalarQuantity, openmm.Context] = mmunit.Quantity(
             1.0, mmunit.kilojoule_per_mole
         ),
+        contrastGroup: t.Optional[t.Iterable[int]] = None,
     ) -> None:
         group1 = list(group1)
         group2 = list(group2)
+        contrasting = contrastGroup is not None
+        if contrasting:
+            contrastGroup = list(contrastGroup)
         nonbondedForce = NonbondedForceSurrogate(nonbondedForce)
         cutoff = nonbondedForce.getCutoffDistance()
         expression = (
-            "-(lj + coul)/ref"
+            f"-(lj + coul){'*sign1*sign2' if contrasting else ''}/ref"
             "; lj = 4*epsilon*(1/y^2 - 1/y)"
             f"; coul = {ONE_4PI_EPS0}*q1q2*(1/x + (x^2 - 3)/2)"
             f"; x = r/{cutoff}"
@@ -177,10 +191,13 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
         else:
             self.setNonbondedMethod(self.CutoffNonPeriodic)
         self.setCutoffDistance(cutoff)
-        for parameter in ("charge", "sigma", "epsilon"):
+        for parameter in ("charge", "sigma", "epsilon") + ("sign",) * contrasting:
             self.addPerParticleParameter(parameter)
         for atom in range(nonbondedForce.getNumParticles()):
-            self.addParticle(nonbondedForce.getParticleParameters(atom))
+            parameters = nonbondedForce.getParticleParameters(atom)
+            if contrasting:
+                parameters += (-1 if atom in contrastGroup else 1,)
+            self.addParticle(parameters)
         for exception in range(nonbondedForce.getNumExceptions()):
             i, j, *_ = nonbondedForce.getExceptionParameters(exception)
             self.addExclusion(i, j)
@@ -188,9 +205,17 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
         self.setSwitchingDistance(nonbondedForce.getSwitchingDistance())
         self.setUseLongRangeCorrection(False)
         self.addInteractionGroup(group1, group2)
+        if contrasting:
+            self.addInteractionGroup(group1, contrastGroup)
         if isinstance(reference, openmm.Context):
             reference = evaluate_in_context(self, reference)
         self.setEnergyFunction(expression.replace("ref = 1", f"ref = {reference}"))
+        # pylint: disable=duplicate-code
         self._registerCV(
-            mmunit.dimensionless, group1, group2, nonbondedForce, reference
+            mmunit.dimensionless,
+            group1,
+            group2,
+            nonbondedForce,
+            reference,
+            contrastGroup,
         )
