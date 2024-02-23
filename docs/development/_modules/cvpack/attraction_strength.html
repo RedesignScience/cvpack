@@ -63,7 +63,7 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        S_{\rm attr}({\bf r}) = &amp;-\frac{1}{E_{\rm ref}} \Bigg[</span>
+<span class="sd">        S_{\rm attr}({\bf r}) = S_{1,2}({\bf r}) = &amp;-\frac{1}{E_{\rm ref}} \Bigg[</span>
 <span class="sd">            \sum_{i \in {\bf g}_1}</span>
 <span class="sd">                \sum_{\substack{j \in {\bf g}_2 \\ j \neq i}}</span>
 <span class="sd">                    \epsilon_{ij} u_{\rm disp}\left(</span>
@@ -82,6 +82,23 @@
 <span class="sd">    The Lennard-Jones parameters are given by the Lorentz-Berthelot mixing rule, i.e.</span>
 <span class="sd">    :math:`\epsilon_{ij} = \sqrt{\epsilon_i \epsilon_j}`, and</span>
 <span class="sd">    :math:`\sigma_{ij} = (\sigma_i + \sigma_j)/2`.</span>
+
+<span class="sd">    Optionally, one can provide a third atom group :math:`{\bf g}_3` to contrast</span>
+<span class="sd">    the attraction strength between :math:`{\bf g}_1` and :math:`{\bf g}_2` with</span>
+<span class="sd">    that between :math:`{\bf g}_1` and :math:`{\bf g}_3`. In this case, the</span>
+<span class="sd">    collective variable becomes</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        S_{\rm attr}({\bf r}) = S_{1,2}({\bf r}) - S_{1,3}({\bf r})</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        Groups :math:`{\bf g}_1` and :math:`{\bf g}_2` can overlap or even be the</span>
+<span class="sd">        same, in which case the collective variable will measure the strength of</span>
+<span class="sd">        the self-attraction of :math:`{\bf g}_1`. On the other hand, the contrast</span>
+<span class="sd">        group :math:`{\bf g}_3` cannot overlap with neither :math:`{\bf g}_1` nor</span>
+<span class="sd">        :math:`{\bf g}_2`.</span>
 
 <span class="sd">    The function :math:`u_{\rm disp}(x)` is a Lennard-Jones-like reduced potential with</span>
 <span class="sd">    a highly softened repulsion part, defined as</span>
@@ -114,9 +131,9 @@
 <span class="sd">    distance, are taken from :openmm:`NonbondedForce` object.</span>
 
 <span class="sd">    .. note::</span>
-<span class="sd">        Any non-exclusion exceptions involving atoms in :math:`{\bf g}_1` and</span>
-<span class="sd">        :math:`{\bf g}_2` in the provided :class:`openmm.NonbondedForce` are turned</span>
-<span class="sd">        into exclusions in this collective variable.</span>
+<span class="sd">        Any non-exclusion exceptions involving an atom in :math:`{\bf g}_1` and an atom</span>
+<span class="sd">        in either :math:`{\bf g}_2` or :math:`{\bf g}_3` are turned into exclusions in</span>
+<span class="sd">        this collective variable.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -131,6 +148,10 @@
 <span class="sd">        A reference value (in energy units per mole) to which the collective variable</span>
 <span class="sd">        should be normalized. One can also provide an :OpenMM:`Context` object from</span>
 <span class="sd">        which to obtain a reference attraction strength.</span>
+<span class="sd">    contrastGroup</span>
+<span class="sd">        An optional third atom group to contrast the attraction strength between</span>
+<span class="sd">        :math:`{\bf g}_1` and :math:`{\bf g}_2` with that between :math:`{\bf g}_1`</span>
+<span class="sd">        and :math:`{\bf g}_3`.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -138,48 +159,37 @@
 <span class="sd">    &gt;&gt;&gt; from openmm import unit</span>
 <span class="sd">    &gt;&gt;&gt; from openmmtools import testsystems</span>
 <span class="sd">    &gt;&gt;&gt; model = testsystems.HostGuestExplicit()</span>
-<span class="sd">    &gt;&gt;&gt; group1, group2 = [], []</span>
-<span class="sd">    &gt;&gt;&gt; for residue in model.topology.residues():</span>
-<span class="sd">    ...     if residue.name != &quot;HOH&quot;:</span>
-<span class="sd">    ...         group = group1 if residue.name == &quot;B2&quot; else group2</span>
-<span class="sd">    ...         group.extend(atom.index for atom in residue.atoms())</span>
+<span class="sd">    &gt;&gt;&gt; guest = [a.index for a in model.topology.atoms() if a.residue.name == &quot;B2&quot;]</span>
+<span class="sd">    &gt;&gt;&gt; host = [a.index for a in model.topology.atoms() if a.residue.name == &quot;CUC&quot;]</span>
 <span class="sd">    &gt;&gt;&gt; forces = {f.getName(): f for f in model.system.getForces()}</span>
-<span class="sd">    &gt;&gt;&gt; cv1 = cvpack.AttractionStrength(group1, group2, forces[&quot;NonbondedForce&quot;])</span>
-<span class="sd">    &gt;&gt;&gt; cv1.setUnusedForceGroup(0, model.system)</span>
-<span class="sd">    1</span>
-<span class="sd">    &gt;&gt;&gt; model.system.addForce(cv1)</span>
-<span class="sd">    5</span>
-<span class="sd">    &gt;&gt;&gt; cv2 = cvpack.AttractionStrength(</span>
-<span class="sd">    ...     group1, group2, forces[&quot;NonbondedForce&quot;], 100*unit.kilojoules_per_mole,</span>
-<span class="sd">    ... )</span>
-<span class="sd">    &gt;&gt;&gt; cv2.setUnusedForceGroup(0, model.system)</span>
-<span class="sd">    2</span>
-<span class="sd">    &gt;&gt;&gt; model.system.addForce(cv2)</span>
-<span class="sd">    6</span>
+<span class="sd">    &gt;&gt;&gt; cv1 = cvpack.AttractionStrength(guest, host, forces[&quot;NonbondedForce&quot;])</span>
+<span class="sd">    &gt;&gt;&gt; _ = cv1.setUnusedForceGroup(0, model.system)</span>
+<span class="sd">    &gt;&gt;&gt; _ = model.system.addForce(cv1)</span>
 <span class="sd">    &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&quot;Reference&quot;)</span>
 <span class="sd">    &gt;&gt;&gt; integrator = openmm.VerletIntegrator(1.0 * mmunit.femtoseconds)</span>
 <span class="sd">    &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
 <span class="sd">    &gt;&gt;&gt; context.setPositions(model.positions)</span>
 <span class="sd">    &gt;&gt;&gt; print(cv1.getValue(context, 4))</span>
 <span class="sd">    4912.5 dimensionless</span>
-<span class="sd">    &gt;&gt;&gt; print(cv1.getEffectiveMass(context, 4))</span>
-<span class="sd">    2.1639e-07 nm**2 Da</span>
+
+<span class="sd">    &gt;&gt;&gt; water = [a.index for a in model.topology.atoms() if a.residue.name == &quot;HOH&quot;]</span>
+<span class="sd">    &gt;&gt;&gt; cv2 = cvpack.AttractionStrength(guest, water, forces[&quot;NonbondedForce&quot;])</span>
+<span class="sd">    &gt;&gt;&gt; _ = cv2.setUnusedForceGroup(0, model.system)</span>
+<span class="sd">    &gt;&gt;&gt; _ = model.system.addForce(cv2)</span>
+<span class="sd">    &gt;&gt;&gt; context.reinitialize(preserveState=True)</span>
 <span class="sd">    &gt;&gt;&gt; print(cv2.getValue(context, 4))</span>
-<span class="sd">    49.125 dimensionless</span>
-<span class="sd">    &gt;&gt;&gt; print(cv2.getEffectiveMass(context, 4))</span>
-<span class="sd">    0.0021639 nm**2 Da</span>
+<span class="sd">    2063.3 dimensionless</span>
+
 <span class="sd">    &gt;&gt;&gt; cv3 = cvpack.AttractionStrength(</span>
-<span class="sd">    ...     group1, group2, forces[&quot;NonbondedForce&quot;], context,</span>
+<span class="sd">    ...     guest, host, forces[&quot;NonbondedForce&quot;], contrastGroup=water,</span>
 <span class="sd">    ... )</span>
-<span class="sd">    &gt;&gt;&gt; cv3.setUnusedForceGroup(0, model.system)</span>
-<span class="sd">    3</span>
-<span class="sd">    &gt;&gt;&gt; model.system.addForce(cv3)</span>
-<span class="sd">    7</span>
+<span class="sd">    &gt;&gt;&gt; _ = cv3.setUnusedForceGroup(0, model.system)</span>
+<span class="sd">    &gt;&gt;&gt; _ = model.system.addForce(cv3)</span>
 <span class="sd">    &gt;&gt;&gt; context.reinitialize(preserveState=True)</span>
 <span class="sd">    &gt;&gt;&gt; print(cv3.getValue(context, 4))</span>
-<span class="sd">    1.0 dimensionless</span>
-<span class="sd">    &gt;&gt;&gt; print(cv3.getEffectiveMass(context, 4))</span>
-<span class="sd">    5.2222 nm**2 Da</span>
+<span class="sd">    2849.2 dimensionless</span>
+<span class="sd">    &gt;&gt;&gt; print(cv1.getValue(context, 4) - cv2.getValue(context, 4))</span>
+<span class="sd">    2849.2 dimensionless</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">yaml_tag</span> <span class="o">=</span> <span class="s2">&quot;!cvpack.AttractionStrength&quot;</span>
@@ -193,13 +203,17 @@
         <span class="n">reference</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">]</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span>
             <span class="mf">1.0</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">kilojoule_per_mole</span>
         <span class="p">),</span>
+        <span class="n">contrastGroup</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">group1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">group1</span><span class="p">)</span>
         <span class="n">group2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">group2</span><span class="p">)</span>
+        <span class="n">contrasting</span> <span class="o">=</span> <span class="n">contrastGroup</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">contrasting</span><span class="p">:</span>
+            <span class="n">contrastGroup</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">contrastGroup</span><span class="p">)</span>
         <span class="n">nonbondedForce</span> <span class="o">=</span> <span class="n">NonbondedForceSurrogate</span><span class="p">(</span><span class="n">nonbondedForce</span><span class="p">)</span>
         <span class="n">cutoff</span> <span class="o">=</span> <span class="n">nonbondedForce</span><span class="o">.</span><span class="n">getCutoffDistance</span><span class="p">()</span>
         <span class="n">expression</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;-(lj + coul)/ref&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;-(lj + coul)</span><span class="si">{</span><span class="s1">&#39;*sign1*sign2&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">contrasting</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">/ref&quot;</span>
             <span class="s2">&quot;; lj = 4*epsilon*(1/y^2 - 1/y)&quot;</span>
             <span class="sa">f</span><span class="s2">&quot;; coul = </span><span class="si">{</span><span class="n">ONE_4PI_EPS0</span><span class="si">}</span><span class="s2">*q1q2*(1/x + (x^2 - 3)/2)&quot;</span>
             <span class="sa">f</span><span class="s2">&quot;; x = r/</span><span class="si">{</span><span class="n">cutoff</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -215,10 +229,13 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">setNonbondedMethod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CutoffNonPeriodic</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setCutoffDistance</span><span class="p">(</span><span class="n">cutoff</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;charge&quot;</span><span class="p">,</span> <span class="s2">&quot;sigma&quot;</span><span class="p">,</span> <span class="s2">&quot;epsilon&quot;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;charge&quot;</span><span class="p">,</span> <span class="s2">&quot;sigma&quot;</span><span class="p">,</span> <span class="s2">&quot;epsilon&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;sign&quot;</span><span class="p">,)</span> <span class="o">*</span> <span class="n">contrasting</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">addPerParticleParameter</span><span class="p">(</span><span class="n">parameter</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nonbondedForce</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">addParticle</span><span class="p">(</span><span class="n">nonbondedForce</span><span class="o">.</span><span class="n">getParticleParameters</span><span class="p">(</span><span class="n">atom</span><span class="p">))</span>
+            <span class="n">parameters</span> <span class="o">=</span> <span class="n">nonbondedForce</span><span class="o">.</span><span class="n">getParticleParameters</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">contrasting</span><span class="p">:</span>
+                <span class="n">parameters</span> <span class="o">+=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">contrastGroup</span> <span class="k">else</span> <span class="mi">1</span><span class="p">,)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addParticle</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">exception</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nonbondedForce</span><span class="o">.</span><span class="n">getNumExceptions</span><span class="p">()):</span>
             <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">nonbondedForce</span><span class="o">.</span><span class="n">getExceptionParameters</span><span class="p">(</span><span class="n">exception</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">addExclusion</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
@@ -226,11 +243,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">setSwitchingDistance</span><span class="p">(</span><span class="n">nonbondedForce</span><span class="o">.</span><span class="n">getSwitchingDistance</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setUseLongRangeCorrection</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">addInteractionGroup</span><span class="p">(</span><span class="n">group1</span><span class="p">,</span> <span class="n">group2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">contrasting</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addInteractionGroup</span><span class="p">(</span><span class="n">group1</span><span class="p">,</span> <span class="n">contrastGroup</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">):</span>
             <span class="n">reference</span> <span class="o">=</span> <span class="n">evaluate_in_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setEnergyFunction</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;ref = 1&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;ref = </span><span class="si">{</span><span class="n">reference</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+        <span class="c1"># pylint: disable=duplicate-code</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span>
-            <span class="n">mmunit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">,</span> <span class="n">group1</span><span class="p">,</span> <span class="n">group2</span><span class="p">,</span> <span class="n">nonbondedForce</span><span class="p">,</span> <span class="n">reference</span>
+            <span class="n">mmunit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">,</span>
+            <span class="n">group1</span><span class="p">,</span>
+            <span class="n">group2</span><span class="p">,</span>
+            <span class="n">nonbondedForce</span><span class="p">,</span>
+            <span class="n">reference</span><span class="p">,</span>
+            <span class="n">contrastGroup</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 </pre></div>
