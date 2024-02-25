@@ -106,14 +106,16 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     nonbondedForce
         The :class:`openmm.NonbondedForce` object from which to collect the necessary
         parameters.
-    reference
-        A reference value (in energy units per mole) to which the collective variable
-        should be normalized. One can also provide an :OpenMM:`Context` object from
-        which to obtain a reference attraction strength.
     contrastGroup
         An optional third atom group to contrast the attraction strength between
         :math:`{\bf g}_1` and :math:`{\bf g}_2` with that between :math:`{\bf g}_1`
         and :math:`{\bf g}_3`.
+    reference
+        A reference value (in energy units per mole) to which the collective variable
+        should be normalized. One can also provide an :OpenMM:`Context` object from
+        which to extract a reference attraction strength. The extracted value will be
+        :math:`S_{1,2}({\bf r})` for :math:`E_{\rm ref} = 1`, regardless of whether
+        `contrastGroup` is provided or not.
 
     Examples
     --------
@@ -142,9 +144,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     >>> print(cv2.getValue(context, 4))
     2063.3 dimensionless
 
-    >>> cv3 = cvpack.AttractionStrength(
-    ...     guest, host, forces["NonbondedForce"], contrastGroup=water,
-    ... )
+    >>> cv3 = cvpack.AttractionStrength(guest, host, forces["NonbondedForce"], water)
     >>> _ = cv3.setUnusedForceGroup(0, model.system)
     >>> _ = model.system.addForce(cv3)
     >>> context.reinitialize(preserveState=True)
@@ -162,10 +162,10 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
         group1: t.Iterable[int],
         group2: t.Iterable[int],
         nonbondedForce: openmm.NonbondedForce,
+        contrastGroup: t.Optional[t.Iterable[int]] = None,
         reference: t.Union[mmunit.ScalarQuantity, openmm.Context] = mmunit.Quantity(
             1.0, mmunit.kilojoule_per_mole
         ),
-        contrastGroup: t.Optional[t.Iterable[int]] = None,
     ) -> None:
         group1 = list(group1)
         group2 = list(group2)
@@ -205,17 +205,17 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
         self.setSwitchingDistance(nonbondedForce.getSwitchingDistance())
         self.setUseLongRangeCorrection(False)
         self.addInteractionGroup(group1, group2)
-        if contrasting:
-            self.addInteractionGroup(group1, contrastGroup)
         if isinstance(reference, openmm.Context):
             reference = evaluate_in_context(self, reference)
         self.setEnergyFunction(expression.replace("ref = 1", f"ref = {reference}"))
+        if contrasting:
+            self.addInteractionGroup(group1, contrastGroup)
         # pylint: disable=duplicate-code
         self._registerCV(
             mmunit.dimensionless,
             group1,
             group2,
             nonbondedForce,
-            reference,
             contrastGroup,
+            reference,
         )
