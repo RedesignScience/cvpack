@@ -144,14 +144,16 @@
 <span class="sd">    nonbondedForce</span>
 <span class="sd">        The :class:`openmm.NonbondedForce` object from which to collect the necessary</span>
 <span class="sd">        parameters.</span>
-<span class="sd">    reference</span>
-<span class="sd">        A reference value (in energy units per mole) to which the collective variable</span>
-<span class="sd">        should be normalized. One can also provide an :OpenMM:`Context` object from</span>
-<span class="sd">        which to obtain a reference attraction strength.</span>
 <span class="sd">    contrastGroup</span>
 <span class="sd">        An optional third atom group to contrast the attraction strength between</span>
 <span class="sd">        :math:`{\bf g}_1` and :math:`{\bf g}_2` with that between :math:`{\bf g}_1`</span>
 <span class="sd">        and :math:`{\bf g}_3`.</span>
+<span class="sd">    reference</span>
+<span class="sd">        A reference value (in energy units per mole) to which the collective variable</span>
+<span class="sd">        should be normalized. One can also provide an :OpenMM:`Context` object from</span>
+<span class="sd">        which to extract a reference attraction strength. The extracted value will be</span>
+<span class="sd">        :math:`S_{1,2}({\bf r})` for :math:`E_{\rm ref} = 1`, regardless of whether</span>
+<span class="sd">        `contrastGroup` is provided or not.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -180,9 +182,7 @@
 <span class="sd">    &gt;&gt;&gt; print(cv2.getValue(context, 4))</span>
 <span class="sd">    2063.3 dimensionless</span>
 
-<span class="sd">    &gt;&gt;&gt; cv3 = cvpack.AttractionStrength(</span>
-<span class="sd">    ...     guest, host, forces[&quot;NonbondedForce&quot;], contrastGroup=water,</span>
-<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; cv3 = cvpack.AttractionStrength(guest, host, forces[&quot;NonbondedForce&quot;], water)</span>
 <span class="sd">    &gt;&gt;&gt; _ = cv3.setUnusedForceGroup(0, model.system)</span>
 <span class="sd">    &gt;&gt;&gt; _ = model.system.addForce(cv3)</span>
 <span class="sd">    &gt;&gt;&gt; context.reinitialize(preserveState=True)</span>
@@ -200,10 +200,10 @@
         <span class="n">group1</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
         <span class="n">group2</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
         <span class="n">nonbondedForce</span><span class="p">:</span> <span class="n">openmm</span><span class="o">.</span><span class="n">NonbondedForce</span><span class="p">,</span>
+        <span class="n">contrastGroup</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">reference</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">]</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span>
             <span class="mf">1.0</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">kilojoule_per_mole</span>
         <span class="p">),</span>
-        <span class="n">contrastGroup</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">group1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">group1</span><span class="p">)</span>
         <span class="n">group2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">group2</span><span class="p">)</span>
@@ -243,19 +243,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">setSwitchingDistance</span><span class="p">(</span><span class="n">nonbondedForce</span><span class="o">.</span><span class="n">getSwitchingDistance</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setUseLongRangeCorrection</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">addInteractionGroup</span><span class="p">(</span><span class="n">group1</span><span class="p">,</span> <span class="n">group2</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">contrasting</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">addInteractionGroup</span><span class="p">(</span><span class="n">group1</span><span class="p">,</span> <span class="n">contrastGroup</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">):</span>
             <span class="n">reference</span> <span class="o">=</span> <span class="n">evaluate_in_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setEnergyFunction</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;ref = 1&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;ref = </span><span class="si">{</span><span class="n">reference</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">contrasting</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addInteractionGroup</span><span class="p">(</span><span class="n">group1</span><span class="p">,</span> <span class="n">contrastGroup</span><span class="p">)</span>
         <span class="c1"># pylint: disable=duplicate-code</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span>
             <span class="n">mmunit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">,</span>
             <span class="n">group1</span><span class="p">,</span>
             <span class="n">group2</span><span class="p">,</span>
             <span class="n">nonbondedForce</span><span class="p">,</span>
-            <span class="n">reference</span><span class="p">,</span>
             <span class="n">contrastGroup</span><span class="p">,</span>
+            <span class="n">reference</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 </pre></div>
