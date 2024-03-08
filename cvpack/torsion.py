@@ -51,15 +51,15 @@ class Torsion(openmm.CustomTorsionForce, BaseCollectiveVariable):
     Example:
         >>> import cvpack
         >>> import openmm
-        >>> system =openmm.System()
+        >>> system = openmm.System()
         >>> [system.addParticle(1) for i in range(4)]
         [0, 1, 2, 3]
         >>> torsion = cvpack.Torsion(0, 1, 2, 3, pbc=False)
         >>> system.addForce(torsion)
         0
-        >>> integrator =openmm.VerletIntegrator(0)
-        >>> platform =openmm.Platform.getPlatformByName('Reference')
-        >>> context =openmm.Context(system, integrator, platform)
+        >>> integrator = openmm.VerletIntegrator(0)
+        >>> platform = openmm.Platform.getPlatformByName('Reference')
+        >>> context = openmm.Context(system, integrator, platform)
         >>> positions = [[0, 0, 0], [1, 0, 0], [1, 1, 0], [1, 1, 1]]
         >>> context.setPositions([openmm.Vec3(*pos) for pos in positions])
         >>> print(torsion.getValue(context, digits=6))

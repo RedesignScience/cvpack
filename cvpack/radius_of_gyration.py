@@ -66,9 +66,9 @@ class RadiusOfGyration(BaseRadiusOfGyration):
         1
         >>> model.system.addForce(radius_of_gyration)
         5
-        >>> platform =openmm.Platform.getPlatformByName('Reference')
-        >>> integrator =openmm.VerletIntegrator(0)
-        >>> context =openmm.Context(model.system, integrator, platform)
+        >>> platform = openmm.Platform.getPlatformByName('Reference')
+        >>> integrator = openmm.VerletIntegrator(0)
+        >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
         >>> print(radius_of_gyration.getValue(context, digits=6))
         0.2951431 nm
