@@ -10,6 +10,7 @@ from .attraction_strength import AttractionStrength  # noqa: F401
 from .centroid_function import CentroidFunction  # noqa: F401
 from .composite_rmsd import CompositeRMSD  # noqa: F401
 from .distance import Distance  # noqa: F401
+from .generic import Generic  # noqa: F401
 from .helix_angle_content import HelixAngleContent  # noqa: F401
 from .helix_hbond_content import HelixHBondContent  # noqa: F401
 from .helix_rmsd_content import HelixRMSDContent  # noqa: F401
@@ -31,6 +32,7 @@ for _cv in [
     CentroidFunction,
     CompositeRMSD,
     Distance,
+    Generic,
     HelixAngleContent,
     HelixHBondContent,
     HelixRMSDContent,
