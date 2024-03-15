@@ -153,6 +153,17 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     2849.2 dimensionless
     >>> print(cv1.getValue(context, 4) - cv2.getValue(context, 4))
     2849.2 dimensionless
+
+    >>> cv4 = cvpack.AttractionStrength(
+    ...     guest, host, forces["NonbondedForce"], water, contrastScaling=0.5
+    ... )
+    >>> _ = cv4.setUnusedForceGroup(0, model.system)
+    >>> _ = model.system.addForce(cv4)
+    >>> context.reinitialize(preserveState=True)
+    >>> print(cv4.getValue(context, 4))
+    3880.8 dimensionless
+    >>> print(1 * cv1.getValue(context, 4) - 0.5 * cv2.getValue(context, 4))
+    3880.8...
     """
 
     yaml_tag = "!cvpack.AttractionStrength"
@@ -167,7 +178,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
         reference: t.Union[mmunit.ScalarQuantity, openmm.Context] = mmunit.Quantity(
             1.0, mmunit.kilojoule_per_mole
         ),
-        contrastScaling: t.Optional[float] = 1.0,
+        contrastScaling: float = 1.0,
     ) -> None:
         group1 = list(group1)
         group2 = list(group2)
