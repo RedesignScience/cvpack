@@ -22,30 +22,18 @@ class OpenMMForceWrapper(BaseCollectiveVariable):
 
     Parameters
     ----------
-    function
-        The function to be evaluated. It must be a valid
-        :OpenMM:`CustomCentroidBondForce` expression
+    openmmForce
+        The OpenMM force whose potential energy will be used to define the collective
+        variable. It can be passed as an instance of :OpenMM:`Force` or as a string
+        containing the XML serialization of the force.
     unit
         The unit of measurement of the collective variable. It must be compatible
         with the MD unit system (mass in `daltons`, distance in `nanometers`, time
         in `picoseconds`, temperature in `kelvin`, energy in `kilojoules_per_mol`,
         angle in `radians`). If the collective variables does not have a unit, use
-        `dimensionless`
-    groups
-        The groups of atoms to be used in the function. Each group must be specified
-        as a list of atom indices with arbitrary length
-    collections
-        The indices of the groups in each collection, passed as a 2D array-like object
-        of shape `(m, n)`, where `m` is the number of collections and `n` is the number
-        groups per collection. If a 1D object is passed, it is assumed that `m` is 1 and
-        `n` is the length of the object.
+        `dimensionless`.
     period
-        The period of the collective variable if it is periodic, or `None` if it is not
-    pbc
-        Whether to use periodic boundary conditions
-    weighByMass
-        Whether to define the centroid as the center of mass of the group instead of
-        the geometric center
+        The period of the collective variable if it is periodic, or `None` if it is not.
 
     Example:
         >>> import cvpack
@@ -64,7 +52,7 @@ class OpenMMForceWrapper(BaseCollectiveVariable):
         >>> model.system.addForce(cv)
         5
         >>> integrator = openmm.VerletIntegrator(0)
-        >>> platform = openmm.Platform.getPlatformByName('Reference')
+        >>> platform = openmm.Platform.getPlatformByName("Reference")
         >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
         >>> print(cv.getValue(context))
@@ -85,8 +73,8 @@ class OpenMMForceWrapper(BaseCollectiveVariable):
             openmmForce = openmm.XmlSerializer.serialize(openmmForce)
         unit = mmunit.SerializableUnit(unit)
         force_copy = openmm.XmlSerializer.deserialize(openmmForce)
-        self.__dict__.update(force_copy.__dict__)
-        self.__class__.__bases__ += (force_copy.__class__,)
+        self.this = force_copy.this
+        self.__class__.__bases__ = (BaseCollectiveVariable, type(force_copy))
         self._registerCV(unit, openmmForce, unit, period)
         if period is not None:
             self._registerPeriod(period)
