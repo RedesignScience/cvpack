@@ -47,12 +47,13 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
 
     Optionally, one can provide a third atom group :math:`{\bf g}_3` to contrast
     the attraction strength between :math:`{\bf g}_1` and :math:`{\bf g}_2` with
-    that between :math:`{\bf g}_1` and :math:`{\bf g}_3`. In this case, the
-    collective variable becomes
+    that between :math:`{\bf g}_1` and :math:`{\bf g}_3`. One can also provide
+    a scaling factor :math:`\alpha` to balance the contributions of the two
+    interactions. In this case, the collective variable becomes
 
     .. math::
 
-        S_{\rm attr}({\bf r}) = S_{1,2}({\bf r}) - S_{1,3}({\bf r})
+        S_{\rm attr}({\bf r}) = S_{1,2}({\bf r}) - \alpha S_{1,3}({\bf r})
 
     .. note::
 
@@ -152,6 +153,17 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     2849.2 dimensionless
     >>> print(cv1.getValue(context, 4) - cv2.getValue(context, 4))
     2849.2 dimensionless
+
+    >>> cv4 = cvpack.AttractionStrength(
+    ...     guest, host, forces["NonbondedForce"], water, contrastScaling=0.5
+    ... )
+    >>> _ = cv4.setUnusedForceGroup(0, model.system)
+    >>> _ = model.system.addForce(cv4)
+    >>> context.reinitialize(preserveState=True)
+    >>> print(cv4.getValue(context, 4))
+    3880.8 dimensionless
+    >>> print(1 * cv1.getValue(context, 4) - 0.5 * cv2.getValue(context, 4))
+    3880.8...
     """
 
     yaml_tag = "!cvpack.AttractionStrength"
@@ -166,6 +178,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
         reference: t.Union[mmunit.ScalarQuantity, openmm.Context] = mmunit.Quantity(
             1.0, mmunit.kilojoule_per_mole
         ),
+        contrastScaling: float = 1.0,
     ) -> None:
         group1 = list(group1)
         group2 = list(group2)
@@ -194,10 +207,13 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
         for parameter in ("charge", "sigma", "epsilon") + ("sign",) * contrasting:
             self.addPerParticleParameter(parameter)
         for atom in range(nonbondedForce.getNumParticles()):
-            parameters = nonbondedForce.getParticleParameters(atom)
+            charge, sigma, epsilon = nonbondedForce.getParticleParameters(atom)
             if contrasting:
-                parameters += (-1 if atom in contrastGroup else 1,)
-            self.addParticle(parameters)
+                sign = -1 if atom in contrastGroup else 1
+                scale = contrastScaling if atom in contrastGroup else 1
+                self.addParticle([charge * scale, sigma, epsilon * scale**2, sign])
+            else:
+                self.addParticle([charge, sigma, epsilon])
         for exception in range(nonbondedForce.getNumExceptions()):
             i, j, *_ = nonbondedForce.getExceptionParameters(exception)
             self.addExclusion(i, j)
@@ -218,4 +234,5 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
             nonbondedForce,
             contrastGroup,
             reference,
+            contrastScaling,
         )
