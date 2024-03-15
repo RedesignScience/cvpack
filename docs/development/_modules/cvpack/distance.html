@@ -72,15 +72,15 @@
 <span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; import cvpack</span>
 <span class="sd">        &gt;&gt;&gt; import openmm</span>
-<span class="sd">        &gt;&gt;&gt; system =openmm.System()</span>
+<span class="sd">        &gt;&gt;&gt; system = openmm.System()</span>
 <span class="sd">        &gt;&gt;&gt; [system.addParticle(1) for i in range(2)]</span>
 <span class="sd">        [0, 1]</span>
 <span class="sd">        &gt;&gt;&gt; distance = cvpack.Distance(0, 1)</span>
 <span class="sd">        &gt;&gt;&gt; system.addForce(distance)</span>
 <span class="sd">        0</span>
-<span class="sd">        &gt;&gt;&gt; integrator =openmm.VerletIntegrator(0)</span>
-<span class="sd">        &gt;&gt;&gt; platform =openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; context =openmm.Context(system, integrator, platform)</span>
+<span class="sd">        &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
+<span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; context = openmm.Context(system, integrator, platform)</span>
 <span class="sd">        &gt;&gt;&gt; context.setPositions([openmm.Vec3(0, 0, 0),openmm.Vec3(1, 1, 1)])</span>
 <span class="sd">        &gt;&gt;&gt; print(distance.getValue(context, digits=5))</span>
 <span class="sd">        1.73205 nm</span>

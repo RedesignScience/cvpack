@@ -82,15 +82,15 @@
 <span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; import cvpack</span>
 <span class="sd">        &gt;&gt;&gt; import openmm</span>
-<span class="sd">        &gt;&gt;&gt; system =openmm.System()</span>
+<span class="sd">        &gt;&gt;&gt; system = openmm.System()</span>
 <span class="sd">        &gt;&gt;&gt; [system.addParticle(1) for i in range(3)]</span>
 <span class="sd">        [0, 1, 2]</span>
 <span class="sd">        &gt;&gt;&gt; angle = cvpack.Angle(0, 1, 2)</span>
 <span class="sd">        &gt;&gt;&gt; system.addForce(angle)</span>
 <span class="sd">        0</span>
-<span class="sd">        &gt;&gt;&gt; integrator =openmm.VerletIntegrator(0)</span>
-<span class="sd">        &gt;&gt;&gt; platform =openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; context =openmm.Context(system, integrator, platform)</span>
+<span class="sd">        &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
+<span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; context = openmm.Context(system, integrator, platform)</span>
 <span class="sd">        &gt;&gt;&gt; positions = [[0, 0, 0], [1, 0, 0], [1, 1, 0]]</span>
 <span class="sd">        &gt;&gt;&gt; context.setPositions([openmm.Vec3(*pos) for pos in positions])</span>
 <span class="sd">        &gt;&gt;&gt; print(angle.getValue(context, digits=6))</span>
