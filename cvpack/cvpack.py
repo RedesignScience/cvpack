@@ -108,6 +108,12 @@ class BaseCollectiveVariable(openmm.Force, yaml.YAMLObject):
     def __setstate__(self, keywords: t.Dict[str, t.Any]) -> None:
         self.__init__(**keywords)
 
+    def __copy__(self):
+        return yaml.safe_load(yaml.safe_dump(self))
+
+    def __deepcopy__(self, memo):
+        return yaml.safe_load(yaml.safe_dump(self))
+
     def _registerCV(
         self,
         unit: mmunit.Unit,
