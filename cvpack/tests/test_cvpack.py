@@ -840,3 +840,30 @@ def test_path_in_cv_space(metric: cvpack.path.Metric):
         computed_value = -2 * sigma**2 * logsumexp(x)
     assert cv_value / cv_value.unit == pytest.approx(computed_value)
     perform_common_tests(var, context)
+
+
+def test_openmm_force_wrapper():
+    """
+    Test whether an OpenMM force wrapper is computed correctly.
+
+    """
+    model = testsystems.AlanineDipeptideVacuum()
+    angle = openmm.CustomAngleForce("theta")
+    angle.addAngle(0, 1, 2)
+    cv = cvpack.OpenMMForceWrapper(angle, unit.radian, period=2 * np.pi)
+    assert isinstance(cv, openmm.CustomAngleForce)
+    group = cv.setUnusedForceGroup(0, model.system)
+    model.system.addForce(cv)
+    angle.setForceGroup(group + 1)
+    model.system.addForce(angle)
+    integrator = openmm.VerletIntegrator(0)
+    platform = openmm.Platform.getPlatformByName("Reference")
+    context = openmm.Context(model.system, integrator, platform)
+    context.setPositions(model.positions)
+    state = context.getState(  # pylint: disable=unexpected-keyword-arg
+        getEnergy=True,
+        groups={group + 1},
+    )
+    angle_value = state.getPotentialEnergy().value_in_unit(unit.kilojoule_per_mole)
+    assert cv.getValue(context) / unit.radians == pytest.approx(angle_value)
+    perform_common_tests(cv, context)
