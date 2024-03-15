@@ -134,7 +134,6 @@ class BaseCollectiveVariable(openmm.Force, yaml.YAMLObject):
         self.setName(cls.__name__)
         self.setUnit(unit)
         self._mass_unit = mmunit.dalton * (mmunit.nanometers / self.getUnit()) ** 2
-        self._period = kwargs.get("period", None)
         arguments, _ = self.getArguments()
         self._args = dict(zip(arguments, args))
         self._args.update(kwargs)
