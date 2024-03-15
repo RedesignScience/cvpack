@@ -63,9 +63,7 @@ class CompositeRMSD(CompositeRMSDForce, BaseCollectiveVariable):
 
         To use this class, you must install the `openmm-cpp-forces`_ conda package.
 
-    .. _openmm-cpp-forces:
-
-        https://anaconda.org/mdtools/openmm-cpp-forces
+    .. _openmm-cpp-forces: https://anaconda.org/mdtools/openmm-cpp-forces
 
     Parameters
     ----------
