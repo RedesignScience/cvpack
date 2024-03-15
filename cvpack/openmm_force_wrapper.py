@@ -18,7 +18,8 @@ from .cvpack import BaseCollectiveVariable
 
 class OpenMMForceWrapper(BaseCollectiveVariable):
     r"""
-    A generic collective variable.
+    A collective variable whose numerical value is computed from the potential energy,
+    in kJ/mol, of an OpenMM force object.
 
     Parameters
     ----------

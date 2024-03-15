@@ -46,6 +46,7 @@ The CVs implemented in CVPack are listed in the table below.
 | [Helix RMSD content]    | alpha-helix RMSD content of a sequence of residues               |
 | [Helix torsion content] | alpha-helix Ramachandran content of a sequence of residues       |
 | [Number of contacts]    | number of contacts between two groups of atoms                   |
+| [OpenMM Force wrapper]  | converts an OpenMM Force object into a CVPack CV                 |
 | [PathInCVSpace]         | progress along (deviation from) a predefined path in CV space    |
 | [Radius of gyration]    | radius of gyration of a group of atoms                           |
 | [(Radius of gyration)^2]| square of the radius of gyration of a group of atoms             |
