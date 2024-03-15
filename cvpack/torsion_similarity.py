@@ -71,9 +71,9 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, BaseCollectiveVariable):
         1
         >>> model.system.addForce(torsion_similarity)
         6
-        >>> integrator =openmm.VerletIntegrator(0)
-        >>> platform =openmm.Platform.getPlatformByName("Reference")
-        >>> context =openmm.Context(model.system, integrator, platform)
+        >>> integrator = openmm.VerletIntegrator(0)
+        >>> platform = openmm.Platform.getPlatformByName("Reference")
+        >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
         >>> print(torsion_similarity.getValue(context, digits=6))
         18.65992 dimensionless

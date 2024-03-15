@@ -68,9 +68,9 @@ class RadiusOfGyrationSq(BaseRadiusOfGyration):
         1
         >>> model.system.addForce(rgsq)
         5
-        >>> platform =openmm.Platform.getPlatformByName('Reference')
-        >>> integrator =openmm.VerletIntegrator(0)
-        >>> context =openmm.Context(model.system, integrator, platform)
+        >>> platform = openmm.Platform.getPlatformByName('Reference')
+        >>> integrator = openmm.VerletIntegrator(0)
+        >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
         >>> print(rgsq.getValue(context, digits=6))  # doctest: +ELLIPSIS
         0.0871... nm**2

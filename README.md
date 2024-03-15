@@ -46,7 +46,8 @@ The CVs implemented in CVPack are listed in the table below.
 | [Helix RMSD content]    | alpha-helix RMSD content of a sequence of residues               |
 | [Helix torsion content] | alpha-helix Ramachandran content of a sequence of residues       |
 | [Number of contacts]    | number of contacts between two groups of atoms                   |
-| [PathInCVSpace]         | progress along (or deviation from) a predefined path in CV space |
+| [OpenMM Force wrapper]  | converts an OpenMM Force object into a CVPack CV                 |
+| [Path in CV space]      | progress along (or deviation from) a predefined path in CV space |
 | [Radius of gyration]    | radius of gyration of a group of atoms                           |
 | [(Radius of gyration)^2]| square of the radius of gyration of a group of atoms             |
 | [Residue coordination]  | number of contacts between two disjoint groups of residues       |
@@ -109,7 +110,8 @@ Initial project based on the [CMS Cookiecutter] version 1.1.
 [Helix RMSD content]:     https://redesignscience.github.io/cvpack/latest/api/HelixRMSDContent.html
 [Helix torsion content]:  https://redesignscience.github.io/cvpack/latest/api/HelixTorsionContent.html
 [Number of contacts]:     https://redesignscience.github.io/cvpack/latest/api/NumberOfContacts.html
-[PathInCVSpace]:          https://redesignscience.github.io/cvpack/latest/api/PathInCVSpace.html
+[OpenMM Force wrapper]:   https://redesignscience.github.io/cvpack/latest/api/OpenMMForceWrapper.html
+[Path in CV space]:       https://redesignscience.github.io/cvpack/latest/api/PathInCVSpace.html
 [Radius of gyration]:     https://redesignscience.github.io/cvpack/latest/api/RadiusOfGyration.html
 [(Radius of gyration)^2]: https://redesignscience.github.io/cvpack/latest/api/RadiusOfGyrationSq.html
 [Residue coordination]:   https://redesignscience.github.io/cvpack/latest/api/ResidueCoordination.html
