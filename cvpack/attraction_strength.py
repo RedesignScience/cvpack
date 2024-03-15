@@ -199,9 +199,8 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
             charge, sigma, epsilon = nonbondedForce.getParticleParameters(atom)
             if contrasting:
                 sign = -1 if atom in contrastGroup else 1
-                self.addParticle(
-                    [charge * contrastScaling, sigma, epsilon * contrastScaling, sign]
-                )
+                scale = contrastScaling if atom in contrastGroup else 1
+                self.addParticle([charge * scale, sigma, epsilon * scale**2, sign])
             else:
                 self.addParticle([charge, sigma, epsilon])
         for exception in range(nonbondedForce.getNumExceptions()):
