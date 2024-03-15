@@ -9,6 +9,7 @@
 
 import typing as t
 from collections import OrderedDict
+from copy import deepcopy
 
 import openmm
 
@@ -101,10 +102,10 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
     >>> milestones = np.array(
     ...     [[1.3, -0.2], [1.2, 3.1], [-2.7, 2.9], [-1.3, 2.7], [-1.3, -0.4]]
     ... )
+    >>> phi = cvpack.Torsion(*[atoms.index(atom) for atom in phi_atoms])
+    >>> psi = cvpack.Torsion(*[atoms.index(atom) for atom in psi_atoms])
     >>> path_vars = []
     >>> for metric in (cvpack.path.progress, cvpack.path.deviation):
-    ...     phi = cvpack.Torsion(*[atoms.index(atom) for atom in phi_atoms])
-    ...     psi = cvpack.Torsion(*[atoms.index(atom) for atom in psi_atoms])
     ...     var = cvpack.PathInCVSpace(metric, [phi, psi], milestones, np.pi / 6)
     ...     _ = var.setUnusedForceGroup(0, model.system)
     ...     _ = model.system.addForce(var)
@@ -130,8 +131,7 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
     ) -> None:
         if metric not in (progress, deviation):
             raise ValueError(
-                "Invalid metric. "
-                "Use 'cvpack.path.progress' or 'cvpack.path.deviation'."
+                "Invalid metric. Use 'cvpack.path.progress' or 'cvpack.path.deviation'."
             )
         variables = list(variables)
         scales = [1.0] * len(variables) if scales is None else list(scales)
@@ -165,10 +165,10 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
             numerator = "+".join(f"{i}*w{i}" for i in range(1, n))
             expressions.append(f"({numerator})/({n - 1}*wsum)")
         else:
-            expressions.append(f"xmin{n - 2} - log(wsum)/lambda")
+            expressions.append(f"xmin{n - 2}-log(wsum)/lambda")
         super().__init__("; ".join(reversed(expressions)))
         for i, variable in enumerate(variables):
-            self.addCollectiveVariable(f"cv{i}", variable)
+            self.addCollectiveVariable(f"cv{i}", deepcopy(variable))
         self._registerCV(
             mmunit.dimensionless,
             metric,
