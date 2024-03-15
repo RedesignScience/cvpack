@@ -9,9 +9,12 @@ Collective Variable Package
 [![Documentation Status](https://github.com/RedesignScience/cvpack/workflows/Docs/badge.svg)](https://github.com/RedesignScience/cvpack/actions?query=workflow%3ADocs)
 [![Coverage Report](https://redesignscience.github.io/cvpack/development/coverage/coverage.svg)](https://redesignscience.github.io/cvpack/development/coverage)
 
-[![Conda cvpack version](https://img.shields.io/conda/v/mdtools/cvpack.svg)](https://anaconda.org/mdtools/cvpack)
-[![Conda cvpack platforms](https://img.shields.io/conda/pn/mdtools/cvpack.svg)](https://anaconda.org/mdtools/cvpack)
-[![Conda cvpack downloads](https://img.shields.io/conda/dn/mdtools/cvpack.svg)](https://anaconda.org/mdtools/cvpack)
+[![Conda version](https://img.shields.io/conda/v/mdtools/cvpack.svg)](https://anaconda.org/mdtools/cvpack)
+[![Conda platforms](https://img.shields.io/conda/pn/mdtools/cvpack.svg)](https://anaconda.org/mdtools/cvpack)
+[![Conda downloads](https://img.shields.io/conda/dn/mdtools/cvpack.svg)](https://anaconda.org/mdtools/cvpack)
+[![PyPI version](https://img.shields.io/pypi/v/cvpack.svg)](https://pypi.org/project/cvpack)
+[![PyPI version](https://img.shields.io/pypi/pyversions/cvpack.svg)](https://pypi.org/project/cvpack)
+[![PyPI version](https://img.shields.io/pypi/dm/cvpack.svg)](https://pypi.org/project/cvpack)
 
 [![License](https://img.shields.io/badge/License-MIT-yellowgreen.svg?style=flat)](https://github.com/RedesignScience/cvpack/blob/main/LICENSE.md)
 [![Twitter](https://badgen.net/badge/About/RedesignScience)](https://www.redesignscience.com)
@@ -119,4 +122,3 @@ Initial project based on the [CMS Cookiecutter] version 1.1.
 [Sheet RMSD content]:     https://redesignscience.github.io/cvpack/latest/api/SheetRMSDContent.html
 [Torsion]:                https://redesignscience.github.io/cvpack/latest/api/Torsion.html
 [Torsion similarity]:     https://redesignscience.github.io/cvpack/latest/api/TorsionSimilarity.html
-

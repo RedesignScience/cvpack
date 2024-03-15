@@ -8,12 +8,12 @@
 """
 
 import typing as t
-from copy import deepcopy
 
 import numpy as np
 import openmm
 import yaml
 from numpy import typing as npt
+from openmm import XmlSerializer
 
 from cvpack import unit as mmunit
 
@@ -133,7 +133,7 @@ def evaluate_in_context(
     for _ in range(context.getSystem().getNumParticles()):
         system.addParticle(1.0)
     for i, force in enumerate(forces):
-        force_copy = deepcopy(force)
+        force_copy = XmlSerializer.deserialize(XmlSerializer.serialize(force))
         force_copy.setForceGroup(i)
         system.addForce(force_copy)
     state = context.getState(getPositions=True)
