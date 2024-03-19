@@ -138,7 +138,7 @@ class BaseCollectiveVariable(openmm.Force, yaml.YAMLObject):
         """
         cls = self.__class__
         self.setName(cls.__name__)
-        self.setUnit(unit)
+        self._unit = unit
         self._mass_unit = mmunit.dalton * (mmunit.nanometers / self.getUnit()) ** 2
         arguments, _ = self.getArguments()
         self._args = dict(zip(arguments, args))
@@ -256,17 +256,6 @@ class BaseCollectiveVariable(openmm.Force, yaml.YAMLObject):
                 defaults[name] = parameter.default
         return arguments, defaults
 
-    def setUnit(self, unit: mmunit.Unit) -> None:
-        """
-        Set the unit of measurement of this collective variable.
-
-        Parameters
-        ----------
-            unit
-                The unit of measurement of this collective variable
-        """
-        self._unit = unit
-
     def getUnit(self) -> mmunit.Unit:
         """
         Get the unit of measurement of this collective variable.
@@ -284,6 +273,26 @@ class BaseCollectiveVariable(openmm.Force, yaml.YAMLObject):
         if self._period is None:
             return None
         return mmunit.SerializableQuantity(self._period, self.getUnit())
+
+    def setName(self, name: str) -> None:
+        """
+        Set the name of this collective variable. By default, each collective variable
+        is named after its class.
+
+        Parameters
+        ----------
+            name
+                The name of this collective variable. It must be a valid Python
+                identifier.
+
+        Raises
+        ------
+            ValueError
+                If the name is not a valid Python identifier
+        """
+        if not name.isidentifier():
+            raise ValueError(f"{name} is not a valid Python identifier.")
+        super().setName(name)
 
     def setUnusedForceGroup(self, position: int, system: openmm.System) -> int:
         """
