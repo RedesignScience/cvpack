@@ -72,7 +72,7 @@ class RadiusOfGyrationSq(BaseRadiusOfGyration):
         >>> integrator = openmm.VerletIntegrator(0)
         >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
-        >>> print(rgsq.getValue(context, digits=6))  # doctest: +ELLIPSIS
+        >>> print(rgsq.getValue(context))  # doctest: +ELLIPSIS
         0.0871... nm**2
 
     """

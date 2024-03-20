@@ -163,8 +163,8 @@ class SheetRMSDContent(BaseRMSDContent):
         >>> integrator = openmm.VerletIntegrator(0)
         >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
-        >>> print(sheet_content.getValue(context, digits=4))
-        1.0466 dimensionless
+        >>> print(sheet_content.getValue(context))
+        1.0465... dimensionless
         >>> blockwise_sheet_content = cvpack.SheetRMSDContent(
         ...     residues[:5] + residues[-5:],
         ...     model.system.getNumParticles(),
@@ -177,8 +177,8 @@ class SheetRMSDContent(BaseRMSDContent):
         >>> model.system.addForce(blockwise_sheet_content)
         7
         >>> context.reinitialize(preserveState=True)
-        >>> print(blockwise_sheet_content.getValue(context, digits=4))
-        0.98594 dimensionless
+        >>> print(blockwise_sheet_content.getValue(context))
+        0.9859... dimensionless
     """
 
     yaml_tag = "!cvpack.SheetRMSDContent"
