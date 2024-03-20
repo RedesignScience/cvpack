@@ -7,8 +7,8 @@
 
 """
 
-import typing as t
 import functools
+import typing as t
 
 import numpy as np
 import openmm
@@ -241,16 +241,16 @@ def compute_effective_mass(force: openmm.Force, context: openmm.Context) -> floa
     float
         The effective mass of the force at the given context
     """
-    state = get_single_force_state(force, context, getForces=True)
     # pylint: disable=protected-access,c-extension-no-member
+    state = get_single_force_state(force, context, getForces=True)
     get_mass = functools.partial(
         openmm._openmm.System_getParticleMass, context.getSystem()
     )
     force_vectors = state.getForces(asNumpy=True)._value
-    # pylint: enable=protected-access,c-extension-no-member
     squared_forces = np.sum(np.square(force_vectors), axis=1)
     nonzeros = np.nonzero(squared_forces)[0]
     if nonzeros.size == 0:
         return mmunit.Quantity(np.inf, force._mass_unit)
     mass_values = np.fromiter(map(get_mass, nonzeros), dtype=np.float64)
     return 1.0 / np.sum(squared_forces[nonzeros] / mass_values)
+    # pylint: enable=protected-access,c-extension-no-member

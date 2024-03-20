@@ -18,7 +18,7 @@ from openmm import app as mmapp
 from cvpack import unit as mmunit
 
 from .unit import value_in_md_units
-from .utils import get_single_force_state, compute_effective_mass
+from .utils import compute_effective_mass, get_single_force_state
 
 
 class SerializableAtom(yaml.YAMLObject):
