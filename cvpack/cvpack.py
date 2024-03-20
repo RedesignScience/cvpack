@@ -8,11 +8,9 @@
 """
 
 import collections
-import functools
 import inspect
 import typing as t
 
-import numpy as np
 import openmm
 import yaml
 from openmm import app as mmapp
@@ -20,6 +18,7 @@ from openmm import app as mmapp
 from cvpack import unit as mmunit
 
 from .unit import value_in_md_units
+from .utils import get_single_force_state, compute_effective_mass
 
 
 class SerializableAtom(yaml.YAMLObject):
@@ -157,48 +156,6 @@ class BaseCollectiveVariable(openmm.Force, yaml.YAMLObject):
                 The period of this collective variable
         """
         self._period = period
-
-    def _getSingleForceState(
-        self, context: openmm.Context, getEnergy: bool = False, getForces: bool = False
-    ) -> openmm.State:
-        """
-        Get an OpenMM State containing the potential energy and/or force values computed
-        from this single force object.
-
-        Parameters
-        ----------
-            context
-                The context from which the state should be extracted
-            getEnergy
-                If True, the potential energy will be computed
-            getForces
-                If True, the forces will be computed
-
-        Raises
-        ------
-            ValueError
-                If this force is not present in the given context
-        """
-        forces = context.getSystem().getForces()
-        if not any(force.this == self.this for force in forces):
-            raise RuntimeError("This force is not present in the given context.")
-        self_group = self.getForceGroup()
-        other_groups = {
-            force.getForceGroup() for force in forces if force.this != self.this
-        }
-        if self_group not in other_groups:
-            return context.getState(
-                getEnergy=getEnergy, getForces=getForces, groups=1 << self_group
-            )
-        old_group = self.getForceGroup()
-        new_group = self.setUnusedForceGroup(0, context.getSystem())
-        context.reinitialize(preserveState=True)
-        state = context.getState(
-            getEnergy=getEnergy, getForces=getForces, groups=1 << new_group
-        )
-        self.setForceGroup(old_group)
-        context.reinitialize(preserveState=True)
-        return state
 
     def _precisionRound(self, number: float, digits: t.Optional[int] = None) -> float:
         """
@@ -349,7 +306,7 @@ class BaseCollectiveVariable(openmm.Force, yaml.YAMLObject):
         -------
             The value of this collective variable at the given context
         """
-        state = self._getSingleForceState(context, getEnergy=True)
+        state = get_single_force_state(self, context, getEnergy=True)
         value = value_in_md_units(state.getPotentialEnergy())
         return mmunit.Quantity(self._precisionRound(value, digits), self.getUnit())
 
@@ -418,19 +375,7 @@ class BaseCollectiveVariable(openmm.Force, yaml.YAMLObject):
             >>> print(radius_of_gyration.getEffectiveMass(context, digits=6))
             30.94693 Da
         """
-        state = self._getSingleForceState(context, getForces=True)
-        # pylint: disable=protected-access,c-extension-no-member
-        get_mass = functools.partial(
-            openmm._openmm.System_getParticleMass, context.getSystem()
-        )
-        force_vectors = state.getForces(asNumpy=True)._value
-        # pylint: enable=protected-access,c-extension-no-member
-        squared_forces = np.sum(np.square(force_vectors), axis=1)
-        nonzeros = np.nonzero(squared_forces)[0]
-        if nonzeros.size == 0:
-            return mmunit.Quantity(np.inf, self._mass_unit)
-        mass_values = np.fromiter(map(get_mass, nonzeros), dtype=np.float64)
-        effective_mass = 1.0 / np.sum(squared_forces[nonzeros] / mass_values)
         return mmunit.Quantity(
-            self._precisionRound(effective_mass, digits), self._mass_unit
+            self._precisionRound(compute_effective_mass(self, context), digits),
+            self._mass_unit,
         )

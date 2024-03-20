@@ -8,6 +8,7 @@
 """
 
 import typing as t
+import functools
 
 import numpy as np
 import openmm
@@ -171,3 +172,85 @@ def convert_to_matrix(array: npt.ArrayLike) -> t.Tuple[np.ndarray, int, int]:
     if other_dimensions:
         raise ValueError("Array-like object cannot have more than two dimensions.")
     return array, numrows, numcols
+
+
+def get_single_force_state(
+    force: openmm.Force,
+    context: openmm.Context,
+    getEnergy: bool = False,
+    getForces: bool = False,
+) -> openmm.State:
+    """
+    Get an OpenMM State containing the potential energy and/or force values computed
+    from a single force object.
+
+    Parameters
+    ----------
+    force
+        The force object from which the state should be extracted
+    context
+        The context from which the state should be extracted
+    getEnergy
+        If True, the potential energy will be computed
+    getForces
+        If True, the forces will be computed
+
+    Returns
+    -------
+    openmm.State
+        The state containing the requested values
+
+    Raises
+    ------
+    ValueError
+        If this force is not present in the given context
+    """
+    forces = context.getSystem().getForces()
+    if not any(f.this == force.this for f in forces):
+        raise RuntimeError("This force is not present in the given context.")
+    self_group = force.getForceGroup()
+    other_groups = {force.getForceGroup() for f in forces if f.this != force.this}
+    if self_group not in other_groups:
+        return context.getState(
+            getEnergy=getEnergy, getForces=getForces, groups=1 << self_group
+        )
+    old_group = force.getForceGroup()
+    new_group = force.setUnusedForceGroup(0, context.getSystem())
+    context.reinitialize(preserveState=True)
+    state = context.getState(
+        getEnergy=getEnergy, getForces=getForces, groups=1 << new_group
+    )
+    force.setForceGroup(old_group)
+    context.reinitialize(preserveState=True)
+    return state
+
+
+def compute_effective_mass(force: openmm.Force, context: openmm.Context) -> float:
+    r"""
+    Compute the effective mass of an :OpenMM:`Force` at a given :OpenMM:`Context`.
+
+    Parameters
+    ----------
+    force
+        The force object from which the effective mass should be computed
+    context
+        The context at which the force's effective mass should be evaluated
+
+    Returns
+    -------
+    float
+        The effective mass of the force at the given context
+    """
+    state = get_single_force_state(force, context, getForces=True)
+    # pylint: disable=protected-access,c-extension-no-member
+    get_mass = functools.partial(
+        openmm._openmm.System_getParticleMass, context.getSystem()
+    )
+    force_vectors = state.getForces(asNumpy=True)._value
+    # pylint: enable=protected-access,c-extension-no-member
+    squared_forces = np.sum(np.square(force_vectors), axis=1)
+    nonzeros = np.nonzero(squared_forces)[0]
+    if nonzeros.size == 0:
+        return mmunit.Quantity(np.inf, force._mass_unit)
+    mass_values = np.fromiter(map(get_mass, nonzeros), dtype=np.float64)
+    return 1.0 / np.sum(squared_forces[nonzeros] / mass_values)
