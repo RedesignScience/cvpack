@@ -157,30 +157,6 @@ class BaseCollectiveVariable(openmm.Force, yaml.YAMLObject):
         """
         self._period = period
 
-    def _precisionRound(self, number: float, digits: t.Optional[int] = None) -> float:
-        """
-        Round a number to a specified number of precision digits (if specified).
-
-        The number of precision digits is defined as the number of digits after the
-        decimal point of the number's scientific notation representation.
-
-        Parameters
-        ----------
-            number
-                The number to be rounded
-            digits
-                The number of digits to round to. If None, the number will not be
-                rounded.
-
-        Returns
-        -------
-            The rounded number
-        """
-        if digits is None:
-            return number
-        power = f"{number:e}".split("e")[1]
-        return round(number, -(int(power) - digits))
-
     @classmethod
     def getArguments(cls) -> t.Tuple[collections.OrderedDict, collections.OrderedDict]:
         """
@@ -279,15 +255,9 @@ class BaseCollectiveVariable(openmm.Force, yaml.YAMLObject):
         self.setForceGroup(new_group)
         return new_group
 
-    def getValue(
-        self, context: openmm.Context, digits: t.Optional[int] = None
-    ) -> mmunit.Quantity:
+    def getValue(self, context: openmm.Context) -> mmunit.Quantity:
         """
         Evaluate this collective variable at a given :OpenMM:`Context`.
-
-        Optionally, the value can be rounded to a specified number of precision digits,
-        which is the number of digits after the decimal point of the value in scientific
-        notation.
 
         .. note::
 
@@ -298,9 +268,6 @@ class BaseCollectiveVariable(openmm.Force, yaml.YAMLObject):
         ----------
             context
                 The context at which this collective variable should be evaluated
-            digits
-                The number of precision digits to round to. If None, the value will not
-                be rounded.
 
         Returns
         -------
@@ -308,11 +275,9 @@ class BaseCollectiveVariable(openmm.Force, yaml.YAMLObject):
         """
         state = get_single_force_state(self, context, getEnergy=True)
         value = value_in_md_units(state.getPotentialEnergy())
-        return mmunit.Quantity(self._precisionRound(value, digits), self.getUnit())
+        return mmunit.Quantity(value, self.getUnit())
 
-    def getEffectiveMass(
-        self, context: openmm.Context, digits: t.Optional[int] = None
-    ) -> mmunit.Quantity:
+    def getEffectiveMass(self, context: openmm.Context) -> mmunit.Quantity:
         r"""
         Compute the effective mass of this collective variable at a given
         :OpenMM:`Context`.
@@ -328,10 +293,6 @@ class BaseCollectiveVariable(openmm.Force, yaml.YAMLObject):
                 \right\|^2
             \right)^{-1}
 
-        Optionally, effective mass of this collective variable can be rounded to a
-        specified number of precision digits, which is the number of digits after the
-        decimal point of the effective mass in scientific notation.
-
         .. note::
 
             This method will be more efficient if the collective variable is the only
@@ -342,9 +303,6 @@ class BaseCollectiveVariable(openmm.Force, yaml.YAMLObject):
             context
                 The context at which this collective variable's effective mass should be
                 evaluated
-            digits
-                The number of precision digits to round to. If None, the value will not
-                be rounded.
 
         Returns
         -------
@@ -372,10 +330,7 @@ class BaseCollectiveVariable(openmm.Force, yaml.YAMLObject):
             ...     model.system,openmm.VerletIntegrator(0), platform
             ... )
             >>> context.setPositions(model.positions)
-            >>> print(radius_of_gyration.getEffectiveMass(context, digits=6))
-            30.94693 Da
+            >>> print(radius_of_gyration.getEffectiveMass(context))
+            30.946... Da
         """
-        return mmunit.Quantity(
-            self._precisionRound(compute_effective_mass(self, context), digits),
-            self._mass_unit,
-        )
+        return mmunit.Quantity(compute_effective_mass(self, context), self._mass_unit)

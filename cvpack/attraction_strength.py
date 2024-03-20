@@ -134,25 +134,25 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     >>> integrator = openmm.VerletIntegrator(1.0 * mmunit.femtoseconds)
     >>> context = openmm.Context(model.system, integrator, platform)
     >>> context.setPositions(model.positions)
-    >>> print(cv1.getValue(context, 4))
-    4912.5 dimensionless
+    >>> print(cv1.getValue(context))
+    4912.5... dimensionless
 
     >>> water = [a.index for a in model.topology.atoms() if a.residue.name == "HOH"]
     >>> cv2 = cvpack.AttractionStrength(guest, water, forces["NonbondedForce"])
     >>> _ = cv2.setUnusedForceGroup(0, model.system)
     >>> _ = model.system.addForce(cv2)
     >>> context.reinitialize(preserveState=True)
-    >>> print(cv2.getValue(context, 4))
-    2063.3 dimensionless
+    >>> print(cv2.getValue(context))
+    2063.3... dimensionless
 
     >>> cv3 = cvpack.AttractionStrength(guest, host, forces["NonbondedForce"], water)
     >>> _ = cv3.setUnusedForceGroup(0, model.system)
     >>> _ = model.system.addForce(cv3)
     >>> context.reinitialize(preserveState=True)
-    >>> print(cv3.getValue(context, 4))
-    2849.2 dimensionless
-    >>> print(cv1.getValue(context, 4) - cv2.getValue(context, 4))
-    2849.2 dimensionless
+    >>> print(cv3.getValue(context))
+    2849.17... dimensionless
+    >>> print(cv1.getValue(context) - cv2.getValue(context))
+    2849.17... dimensionless
 
     >>> cv4 = cvpack.AttractionStrength(
     ...     guest, host, forces["NonbondedForce"], water, contrastScaling=0.5
@@ -160,9 +160,9 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     >>> _ = cv4.setUnusedForceGroup(0, model.system)
     >>> _ = model.system.addForce(cv4)
     >>> context.reinitialize(preserveState=True)
-    >>> print(cv4.getValue(context, 4))
-    3880.8 dimensionless
-    >>> print(1 * cv1.getValue(context, 4) - 0.5 * cv2.getValue(context, 4))
+    >>> print(cv4.getValue(context))
+    3880.8... dimensionless
+    >>> print(1 * cv1.getValue(context) - 0.5 * cv2.getValue(context))
     3880.8...
     """
 
