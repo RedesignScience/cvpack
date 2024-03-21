@@ -128,7 +128,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         """
         cls = self.__class__
         self.setName(cls.__name__)
-        self.setUnit(unit)
+        self._unit = unit
         self._mass_unit = mmunit.dalton * (mmunit.nanometers / self.getUnit()) ** 2
         arguments, _ = self.getArguments()
         self._args = dict(zip(arguments, args))
@@ -180,17 +180,6 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
             if parameter.default is not inspect.Parameter.empty:
                 defaults[name] = parameter.default
         return arguments, defaults
-
-    def setUnit(self, unit: mmunit.Unit) -> None:
-        """
-        Set the unit of measurement of this collective variable.
-
-        Parameters
-        ----------
-            unit
-                The unit of measurement of this collective variable
-        """
-        self._unit = unit
 
     def getUnit(self) -> mmunit.Unit:
         """
