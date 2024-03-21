@@ -19,6 +19,8 @@ from cvpack import unit as mmunit
 
 from .serializer import Serializable
 
+# pylint: disable=protected-access,c-extension-no-member
+
 
 class NonbondedForceSurrogate(
     Serializable
@@ -210,7 +212,6 @@ def get_single_force_state(
         return context.getState(
             getEnergy=getEnergy, getForces=getForces, groups=1 << self_group
         )
-    # old_group = force.getForceGroup()
     new_group = force._setUnusedForceGroup(context.getSystem())
     context.reinitialize(preserveState=True)
     state = context.getState(
@@ -237,7 +238,6 @@ def compute_effective_mass(force: openmm.Force, context: openmm.Context) -> floa
     float
         The effective mass of the force at the given context
     """
-    # pylint: disable=protected-access,c-extension-no-member
     state = get_single_force_state(force, context, getForces=True)
     get_mass = functools.partial(
         openmm._openmm.System_getParticleMass, context.getSystem()
@@ -249,4 +249,3 @@ def compute_effective_mass(force: openmm.Force, context: openmm.Context) -> floa
         return mmunit.Quantity(np.inf, force._mass_unit)
     mass_values = np.fromiter(map(get_mass, nonzeros), dtype=np.float64)
     return 1.0 / np.sum(squared_forces[nonzeros] / mass_values)
-    # pylint: enable=protected-access,c-extension-no-member

@@ -59,7 +59,7 @@ def test_argument_inspection():
 
     # pylint: enable=missing-class-docstring, unused-argument
 
-    args, defaults = Test._getArguments()
+    args, defaults = Test._getArguments()  # pylint: disable=protected-access
     assert args["first"] is int
     assert args["second"] is float
     assert args["third"] is str
@@ -82,7 +82,7 @@ def perform_common_tests(
     assert unity.value_in_unit_system(unit.md_unit_system) == 1
 
     # Class must have full type annotation (except for argument `self`)
-    args, _ = collectiveVariable._getArguments()
+    args, _ = collectiveVariable._getArguments()  # pylint: disable=protected-access
     for _, annotation in args.items():
         assert annotation is not inspect.Parameter.empty
 

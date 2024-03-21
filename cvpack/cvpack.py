@@ -227,7 +227,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         return mmunit.SerializableQuantity(self._period, self.getUnit())
 
     def addToSystem(
-        self, system: openmm.System, set_unused_force_group: bool = True
+        self, system: openmm.System, setUnusedForceGroup: bool = True
     ) -> None:
         """
         Add this collective variable to an :OpenMM:`System`.
@@ -236,11 +236,11 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         ----------
         system
             The system to which this collective variable should be added
-        set_unused_force_group
+        setUnusedForceGroup
             If True, the force group of this collective variable will be set to the
             first available force group in the system
         """
-        if set_unused_force_group:
+        if setUnusedForceGroup:
             self._setUnusedForceGroup(system)
         system.addForce(self)
 
