@@ -130,8 +130,8 @@
 <span class="sd">        &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
 <span class="sd">        &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
 <span class="sd">        &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">        &gt;&gt;&gt; print(helix_content.getValue(context, digits=6))</span>
-<span class="sd">        18.76058 dimensionless</span>
+<span class="sd">        &gt;&gt;&gt; print(helix_content.getValue(context))</span>
+<span class="sd">        18.7605... dimensionless</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">yaml_tag</span> <span class="o">=</span> <span class="s2">&quot;!cvpack.HelixAngleContent&quot;</span>

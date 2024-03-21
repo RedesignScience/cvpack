@@ -108,8 +108,8 @@
 <span class="sd">        &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
 <span class="sd">        &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
 <span class="sd">        &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">        &gt;&gt;&gt; print(radius_of_gyration.getValue(context, digits=6))</span>
-<span class="sd">        0.2951431 nm</span>
+<span class="sd">        &gt;&gt;&gt; print(radius_of_gyration.getValue(context))</span>
+<span class="sd">        0.2951... nm</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 

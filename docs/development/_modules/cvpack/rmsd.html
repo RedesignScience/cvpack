@@ -180,8 +180,8 @@
 <span class="sd">            &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
 <span class="sd">            &gt;&gt;&gt; context.setPositions(model.positions)</span>
 <span class="sd">            &gt;&gt;&gt; integrator.step(100)</span>
-<span class="sd">            &gt;&gt;&gt; print(rmsd.getValue(context, digits=6))</span>
-<span class="sd">            0.104363 nm</span>
+<span class="sd">            &gt;&gt;&gt; print(rmsd.getValue(context))</span>
+<span class="sd">            0.10436... nm</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">force</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">HarmonicBondForce</span><span class="p">()</span>

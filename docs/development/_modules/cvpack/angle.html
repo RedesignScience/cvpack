@@ -93,8 +93,8 @@
 <span class="sd">        &gt;&gt;&gt; context = openmm.Context(system, integrator, platform)</span>
 <span class="sd">        &gt;&gt;&gt; positions = [[0, 0, 0], [1, 0, 0], [1, 1, 0]]</span>
 <span class="sd">        &gt;&gt;&gt; context.setPositions([openmm.Vec3(*pos) for pos in positions])</span>
-<span class="sd">        &gt;&gt;&gt; print(angle.getValue(context, digits=6))</span>
-<span class="sd">        1.570796 rad</span>
+<span class="sd">        &gt;&gt;&gt; print(angle.getValue(context))</span>
+<span class="sd">        1.570796... rad</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 

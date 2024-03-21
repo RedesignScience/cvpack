@@ -61,7 +61,7 @@ rounded to seven decimal places, and printed to the screen::
     context = openmm.Context(model.system, integrator, platform)
     context.setPositions(model.positions)
     for cv in helix_content:
-        print(f"{cv.getName()}: {cv.getValue(context, digits=7)}")
+        print(f"{cv.getName()}: {cv.getValue(context)}")
 
 The output should be::
 

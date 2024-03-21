@@ -157,8 +157,8 @@
 <span class="sd">        &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
 <span class="sd">        &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
 <span class="sd">        &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">        &gt;&gt;&gt; print(helix_content.getValue(context, digits=4))</span>
-<span class="sd">        15.981 dimensionless</span>
+<span class="sd">        &gt;&gt;&gt; print(helix_content.getValue(context))</span>
+<span class="sd">        15.98... dimensionless</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">yaml_tag</span> <span class="o">=</span> <span class="s2">&quot;!cvpack.HelixRMSDContent&quot;</span>

@@ -110,10 +110,10 @@ corresponding group of atoms.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">theta1</span> <span class="o">=</span> <span class="n">angle1</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">)</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">radian</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">theta2</span> <span class="o">=</span> <span class="n">angle2</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">)</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">radian</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="mi">500</span><span class="o">*</span><span class="p">((</span><span class="n">theta1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">theta2</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="mi">3</span><span class="p">))</span>
-<span class="go">429.479</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">colvar</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">digits</span><span class="o">=</span><span class="mi">6</span><span class="p">))</span>
-<span class="go">429.479 kJ/mol</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="mi">500</span><span class="o">*</span><span class="p">((</span><span class="n">theta1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">theta2</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+<span class="go">429.479...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">colvar</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
+<span class="go">429.479... kJ/mol</span>
 </pre></div>
 </div>
 <p class="rubric">Methods</p>
@@ -188,13 +188,13 @@ does not have a unit, use <cite>unit.dimensionless</cite></p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">copies</span><span class="p">:</span>
 <span class="gp">... </span>   <span class="n">state</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getEnergy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="p">{</span><span class="n">indices</span><span class="p">[</span><span class="n">name</span><span class="p">]})</span>
 <span class="gp">... </span>   <span class="n">value</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">getPotentialEnergy</span><span class="p">()</span> <span class="o">/</span> <span class="n">unit</span><span class="o">.</span><span class="n">kilojoules_per_mole</span>
-<span class="gp">... </span>   <span class="n">copy_value</span> <span class="o">=</span> <span class="n">copies</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">digits</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="gp">... </span>   <span class="n">copy_value</span> <span class="o">=</span> <span class="n">copies</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 <span class="gp">... </span>   <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: original=</span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">, copy=</span><span class="si">{</span><span class="n">copy_value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="go">HarmonicBondForce: original=2094.312483, copy=2094.312 kJ/mol</span>
-<span class="go">HarmonicAngleForce: original=3239.795215, copy=3239.795 kJ/mol</span>
-<span class="go">PeriodicTorsionForce: original=4226.051934, copy=4226.052 kJ/mol</span>
-<span class="go">CustomExternalForce: original=5.021558, copy=5.021558 kJ/mol</span>
-<span class="go">HelixTorsionContent: original=17.452849, copy=17.45285 dimensionless</span>
+<span class="go">HarmonicBondForce: original=2094.312..., copy=2094.312... kJ/mol</span>
+<span class="go">HarmonicAngleForce: original=3239.795..., copy=3239.795... kJ/mol</span>
+<span class="go">PeriodicTorsionForce: original=4226.05..., copy=4226.05... kJ/mol</span>
+<span class="go">CustomExternalForce: original=5.02155..., copy=5.02155... kJ/mol</span>
+<span class="go">HelixTorsionContent: original=17.4528..., copy=17.4528... dimensionless</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -232,7 +232,7 @@ variable.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cvpack.AtomicFunction.getEffectiveMass">
-<span class="sig-name descname"><span class="pre">getEffectiveMass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.AtomicFunction.getEffectiveMass" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getEffectiveMass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.AtomicFunction.getEffectiveMass" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the effective mass of this collective variable at a given
 <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html">openmm.Context</a>.</p>
 <p>The effective mass of a collective variable <span class="math notranslate nohighlight">\(q({\bf r})\)</span> is defined as
@@ -243,9 +243,6 @@ variable.</p>
         \frac{dq}{d{\bf r}_i}
     \right\|^2
 \right)^{-1}\]</div>
-<p>Optionally, effective mass of this collective variable can be rounded to a
-specified number of precision digits, which is the number of digits after the
-decimal point of the effective mass in scientific notation.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This method will be more efficient if the collective variable is the only
@@ -253,12 +250,8 @@ force in its force group (see <a class="reference external" href="http://docs.op
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>context</strong> (<em>Context</em>) – The context at which this collective variable’s effective mass should be
-evaluated</p></li>
-<li><p><strong>digits</strong> (<em>int</em><em> | </em><em>None</em>) – The number of precision digits to round to. If None, the value will not
-be rounded.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>context</strong> (<em>Context</em>) – The context at which this collective variable’s effective mass should be
+evaluated</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>The effective mass of this collective variable at the given context</p>
@@ -285,8 +278,8 @@ be rounded.</p></li>
 <span class="gp">... </span>    <span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">,</span><span class="n">openmm</span><span class="o">.</span><span class="n">VerletIntegrator</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">platform</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">radius_of_gyration</span><span class="o">.</span><span class="n">getEffectiveMass</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">digits</span><span class="o">=</span><span class="mi">6</span><span class="p">))</span>
-<span class="go">30.94693 Da</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">radius_of_gyration</span><span class="o">.</span><span class="n">getEffectiveMass</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
+<span class="go">30.946... Da</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -315,11 +308,8 @@ be rounded.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cvpack.AtomicFunction.getValue">
-<span class="sig-name descname"><span class="pre">getValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.AtomicFunction.getValue" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.AtomicFunction.getValue" title="Link to this definition">¶</a></dt>
 <dd><p>Evaluate this collective variable at a given <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html">openmm.Context</a>.</p>
-<p>Optionally, the value can be rounded to a specified number of precision digits,
-which is the number of digits after the decimal point of the value in scientific
-notation.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This method will be more efficient if the collective variable is the only
@@ -327,11 +317,7 @@ force in its force group (see <a class="reference external" href="http://docs.op
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>context</strong> (<em>Context</em>) – The context at which this collective variable should be evaluated</p></li>
-<li><p><strong>digits</strong> (<em>int</em><em> | </em><em>None</em>) – The number of precision digits to round to. If None, the value will not
-be rounded.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>context</strong> (<em>Context</em>) – The context at which this collective variable should be evaluated</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>The value of this collective variable at the given context</p>

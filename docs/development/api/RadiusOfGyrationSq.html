@@ -86,7 +86,7 @@ center</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">integrator</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">VerletIntegrator</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="n">integrator</span><span class="p">,</span> <span class="n">platform</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">rgsq</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">digits</span><span class="o">=</span><span class="mi">6</span><span class="p">))</span>  
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">rgsq</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>  
 <span class="go">0.0871... nm**2</span>
 </pre></div>
 </div>
@@ -124,7 +124,7 @@ variable.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cvpack.RadiusOfGyrationSq.getEffectiveMass">
-<span class="sig-name descname"><span class="pre">getEffectiveMass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.RadiusOfGyrationSq.getEffectiveMass" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getEffectiveMass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.RadiusOfGyrationSq.getEffectiveMass" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the effective mass of this collective variable at a given
 <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html">openmm.Context</a>.</p>
 <p>The effective mass of a collective variable <span class="math notranslate nohighlight">\(q({\bf r})\)</span> is defined as
@@ -135,9 +135,6 @@ variable.</p>
         \frac{dq}{d{\bf r}_i}
     \right\|^2
 \right)^{-1}\]</div>
-<p>Optionally, effective mass of this collective variable can be rounded to a
-specified number of precision digits, which is the number of digits after the
-decimal point of the effective mass in scientific notation.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This method will be more efficient if the collective variable is the only
@@ -145,12 +142,8 @@ force in its force group (see <a class="reference external" href="http://docs.op
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>context</strong> (<em>Context</em>) – The context at which this collective variable’s effective mass should be
-evaluated</p></li>
-<li><p><strong>digits</strong> (<em>int</em><em> | </em><em>None</em>) – The number of precision digits to round to. If None, the value will not
-be rounded.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>context</strong> (<em>Context</em>) – The context at which this collective variable’s effective mass should be
+evaluated</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>The effective mass of this collective variable at the given context</p>
@@ -177,8 +170,8 @@ be rounded.</p></li>
 <span class="gp">... </span>    <span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">,</span><span class="n">openmm</span><span class="o">.</span><span class="n">VerletIntegrator</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">platform</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">radius_of_gyration</span><span class="o">.</span><span class="n">getEffectiveMass</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">digits</span><span class="o">=</span><span class="mi">6</span><span class="p">))</span>
-<span class="go">30.94693 Da</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">radius_of_gyration</span><span class="o">.</span><span class="n">getEffectiveMass</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
+<span class="go">30.946... Da</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -207,11 +200,8 @@ be rounded.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cvpack.RadiusOfGyrationSq.getValue">
-<span class="sig-name descname"><span class="pre">getValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.RadiusOfGyrationSq.getValue" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.RadiusOfGyrationSq.getValue" title="Link to this definition">¶</a></dt>
 <dd><p>Evaluate this collective variable at a given <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html">openmm.Context</a>.</p>
-<p>Optionally, the value can be rounded to a specified number of precision digits,
-which is the number of digits after the decimal point of the value in scientific
-notation.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This method will be more efficient if the collective variable is the only
@@ -219,11 +209,7 @@ force in its force group (see <a class="reference external" href="http://docs.op
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>context</strong> (<em>Context</em>) – The context at which this collective variable should be evaluated</p></li>
-<li><p><strong>digits</strong> (<em>int</em><em> | </em><em>None</em>) – The number of precision digits to round to. If None, the value will not
-be rounded.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>context</strong> (<em>Context</em>) – The context at which this collective variable should be evaluated</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>The value of this collective variable at the given context</p>

@@ -82,8 +82,8 @@
 <span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; context = openmm.Context(system, integrator, platform)</span>
 <span class="sd">        &gt;&gt;&gt; context.setPositions([openmm.Vec3(0, 0, 0),openmm.Vec3(1, 1, 1)])</span>
-<span class="sd">        &gt;&gt;&gt; print(distance.getValue(context, digits=5))</span>
-<span class="sd">        1.73205 nm</span>
+<span class="sd">        &gt;&gt;&gt; print(distance.getValue(context))</span>
+<span class="sd">        1.7320... nm</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 

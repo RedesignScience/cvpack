@@ -139,10 +139,10 @@
 <span class="sd">        &gt;&gt;&gt; context.setPositions(model.positions)</span>
 <span class="sd">        &gt;&gt;&gt; theta1 = angle1.getValue(context).value_in_unit(openmm.unit.radian)</span>
 <span class="sd">        &gt;&gt;&gt; theta2 = angle2.getValue(context).value_in_unit(openmm.unit.radian)</span>
-<span class="sd">        &gt;&gt;&gt; print(round(500*((theta1 - np.pi/2)**2 + (theta2 - np.pi/3)**2), 3))</span>
-<span class="sd">        429.479</span>
-<span class="sd">        &gt;&gt;&gt; print(colvar.getValue(context, digits=6))</span>
-<span class="sd">        429.479 kJ/mol</span>
+<span class="sd">        &gt;&gt;&gt; print(500*((theta1 - np.pi/2)**2 + (theta2 - np.pi/3)**2))</span>
+<span class="sd">        429.479...</span>
+<span class="sd">        &gt;&gt;&gt; print(colvar.getValue(context))</span>
+<span class="sd">        429.479... kJ/mol</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">yaml_tag</span> <span class="o">=</span> <span class="s2">&quot;!cvpack.AtomicFunction&quot;</span>
@@ -368,13 +368,13 @@
 <span class="sd">        &gt;&gt;&gt; for name in copies:</span>
 <span class="sd">        ...    state = context.getState(getEnergy=True, groups={indices[name]})</span>
 <span class="sd">        ...    value = state.getPotentialEnergy() / unit.kilojoules_per_mole</span>
-<span class="sd">        ...    copy_value = copies[name].getValue(context, digits=6)</span>
+<span class="sd">        ...    copy_value = copies[name].getValue(context)</span>
 <span class="sd">        ...    print(f&quot;{name}: original={value:.6f}, copy={copy_value}&quot;)</span>
-<span class="sd">        HarmonicBondForce: original=2094.312483, copy=2094.312 kJ/mol</span>
-<span class="sd">        HarmonicAngleForce: original=3239.795215, copy=3239.795 kJ/mol</span>
-<span class="sd">        PeriodicTorsionForce: original=4226.051934, copy=4226.052 kJ/mol</span>
-<span class="sd">        CustomExternalForce: original=5.021558, copy=5.021558 kJ/mol</span>
-<span class="sd">        HelixTorsionContent: original=17.452849, copy=17.45285 dimensionless</span>
+<span class="sd">        HarmonicBondForce: original=2094.312..., copy=2094.312... kJ/mol</span>
+<span class="sd">        HarmonicAngleForce: original=3239.795..., copy=3239.795... kJ/mol</span>
+<span class="sd">        PeriodicTorsionForce: original=4226.05..., copy=4226.05... kJ/mol</span>
+<span class="sd">        CustomExternalForce: original=5.02155..., copy=5.02155... kJ/mol</span>
+<span class="sd">        HelixTorsionContent: original=17.4528..., copy=17.4528... dimensionless</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span>
             <span class="n">force</span><span class="p">,</span>
