@@ -145,8 +145,6 @@
 <span class="sd">        429.479... kJ/mol</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">yaml_tag</span> <span class="o">=</span> <span class="s2">&quot;!cvpack.AtomicFunction&quot;</span>
-
     <span class="nd">@mmunit</span><span class="o">.</span><span class="n">convert_quantities</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -396,6 +394,9 @@
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Force </span><span class="si">{</span><span class="n">force</span><span class="si">}</span><span class="s2"> is not convertible to an AtomicFunction&quot;</span><span class="p">)</span></div>
 </div>
 
+
+
+<span class="n">AtomicFunction</span><span class="o">.</span><span class="n">registerTag</span><span class="p">(</span><span class="s2">&quot;!cvpack.AtomicFunction&quot;</span><span class="p">)</span>
 </pre></div>
 
           </div>

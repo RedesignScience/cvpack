@@ -115,8 +115,6 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">yaml_tag</span> <span class="o">=</span> <span class="s2">&quot;!cvpack.RadiusOfGyrationSq&quot;</span>
-
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">pbc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">weighByMass</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -127,6 +125,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">addBond</span><span class="p">([</span><span class="n">atom</span><span class="p">,</span> <span class="n">num_atoms</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span><span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">pbc</span><span class="p">,</span> <span class="n">weighByMass</span><span class="p">)</span></div>
 
+
+
+<span class="n">RadiusOfGyrationSq</span><span class="o">.</span><span class="n">registerTag</span><span class="p">(</span><span class="s2">&quot;!cvpack.RadiusOfGyrationSq&quot;</span><span class="p">)</span>
 </pre></div>
 
           </div>

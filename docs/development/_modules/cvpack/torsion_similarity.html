@@ -117,8 +117,6 @@
 <span class="sd">        18.659... dimensionless</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">yaml_tag</span> <span class="o">=</span> <span class="s2">&quot;!cvpack.TorsionSimilarity&quot;</span>
-
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">firstList</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
@@ -135,6 +133,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">setUsesPeriodicBoundaryConditions</span><span class="p">(</span><span class="n">pbc</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span><span class="n">mmunit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">,</span> <span class="n">firstList</span><span class="p">,</span> <span class="n">secondList</span><span class="p">)</span></div>
 
+
+
+<span class="n">TorsionSimilarity</span><span class="o">.</span><span class="n">registerTag</span><span class="p">(</span><span class="s2">&quot;!cvpack.TorsionSimilarity&quot;</span><span class="p">)</span>
 </pre></div>
 
           </div>

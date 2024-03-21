@@ -100,8 +100,6 @@
 <span class="sd">        0.00538... nm**2 Da/(rad**2)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">yaml_tag</span> <span class="o">=</span> <span class="s2">&quot;!cvpack.OpenMMForceWrapper&quot;</span>
-
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments, super-init-not-called</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">openmmForce</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">openmm</span><span class="o">.</span><span class="n">Force</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
@@ -118,6 +116,9 @@
         <span class="k">if</span> <span class="n">period</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_registerPeriod</span><span class="p">(</span><span class="n">period</span><span class="p">)</span></div>
 
+
+
+<span class="n">OpenMMForceWrapper</span><span class="o">.</span><span class="n">registerTag</span><span class="p">(</span><span class="s2">&quot;!cvpack.OpenMMForceWrapper&quot;</span><span class="p">)</span>
 </pre></div>
 
           </div>
