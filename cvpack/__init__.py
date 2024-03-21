@@ -11,6 +11,7 @@ from .helix_angle_content import HelixAngleContent  # noqa: F401
 from .helix_hbond_content import HelixHBondContent  # noqa: F401
 from .helix_rmsd_content import HelixRMSDContent  # noqa: F401
 from .helix_torsion_content import HelixTorsionContent  # noqa: F401
+from .meta_collective_variable import MetaCollectiveVariable  # noqa: F401
 from .number_of_contacts import NumberOfContacts  # noqa: F401
 from .openmm_force_wrapper import OpenMMForceWrapper  # noqa: F401
 from .path_in_cv_space import PathInCVSpace  # noqa: F401
