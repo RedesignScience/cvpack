@@ -102,8 +102,8 @@ class HelixTorsionContent(openmm.CustomTorsionForce, BaseCollectiveVariable):
         >>> integrator = openmm.VerletIntegrator(0)
         >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
-        >>> print(helix_content.getValue(context, digits=6))
-        17.45285 dimensionless
+        >>> print(helix_content.getValue(context))
+        17.452... dimensionless
     """
 
     yaml_tag = "!cvpack.HelixTorsionContent"

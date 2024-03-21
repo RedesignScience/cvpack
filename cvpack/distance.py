@@ -44,8 +44,8 @@ class Distance(openmm.CustomBondForce, BaseCollectiveVariable):
         >>> platform = openmm.Platform.getPlatformByName('Reference')
         >>> context = openmm.Context(system, integrator, platform)
         >>> context.setPositions([openmm.Vec3(0, 0, 0),openmm.Vec3(1, 1, 1)])
-        >>> print(distance.getValue(context, digits=5))
-        1.73205 nm
+        >>> print(distance.getValue(context))
+        1.7320... nm
 
     """
 

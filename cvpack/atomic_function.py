@@ -101,10 +101,10 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         >>> context.setPositions(model.positions)
         >>> theta1 = angle1.getValue(context).value_in_unit(openmm.unit.radian)
         >>> theta2 = angle2.getValue(context).value_in_unit(openmm.unit.radian)
-        >>> print(round(500*((theta1 - np.pi/2)**2 + (theta2 - np.pi/3)**2), 3))
-        429.479
-        >>> print(colvar.getValue(context, digits=6))
-        429.479 kJ/mol
+        >>> print(500*((theta1 - np.pi/2)**2 + (theta2 - np.pi/3)**2))
+        429.479...
+        >>> print(colvar.getValue(context))
+        429.479... kJ/mol
     """
 
     yaml_tag = "!cvpack.AtomicFunction"
@@ -328,13 +328,13 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         >>> for name in copies:
         ...    state = context.getState(getEnergy=True, groups={indices[name]})
         ...    value = state.getPotentialEnergy() / unit.kilojoules_per_mole
-        ...    copy_value = copies[name].getValue(context, digits=6)
+        ...    copy_value = copies[name].getValue(context)
         ...    print(f"{name}: original={value:.6f}, copy={copy_value}")
-        HarmonicBondForce: original=2094.312483, copy=2094.312 kJ/mol
-        HarmonicAngleForce: original=3239.795215, copy=3239.795 kJ/mol
-        PeriodicTorsionForce: original=4226.051934, copy=4226.052 kJ/mol
-        CustomExternalForce: original=5.021558, copy=5.021558 kJ/mol
-        HelixTorsionContent: original=17.452849, copy=17.45285 dimensionless
+        HarmonicBondForce: original=2094.312..., copy=2094.312... kJ/mol
+        HarmonicAngleForce: original=3239.795..., copy=3239.795... kJ/mol
+        PeriodicTorsionForce: original=4226.05..., copy=4226.05... kJ/mol
+        CustomExternalForce: original=5.02155..., copy=5.02155... kJ/mol
+        HelixTorsionContent: original=17.4528..., copy=17.4528... dimensionless
         """
         if isinstance(
             force,

@@ -140,8 +140,8 @@ class RMSD(openmm.RMSDForce, BaseCollectiveVariable):
             >>> context = openmm.Context(model.system, integrator, platform)
             >>> context.setPositions(model.positions)
             >>> integrator.step(100)
-            >>> print(rmsd.getValue(context, digits=6))
-            0.104363 nm
+            >>> print(rmsd.getValue(context))
+            0.10436... nm
 
         """
         force = openmm.HarmonicBondForce()

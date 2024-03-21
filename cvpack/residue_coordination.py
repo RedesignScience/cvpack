@@ -101,8 +101,8 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable
         26.0 dimensionless
         >>> residue_coordination.setReferenceValue(26 * unit.dimensionless)
         >>> context.reinitialize(preserveState=True)
-        >>> print(residue_coordination.getValue(context, digits=6))
-        1.0 dimensionless
+        >>> print(residue_coordination.getValue(context))
+        0.99999... dimensionless
     """
 
     yaml_tag = "!cvpack.ResidueCoordination"

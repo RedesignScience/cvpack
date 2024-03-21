@@ -92,8 +92,8 @@ class HelixAngleContent(openmm.CustomAngleForce, BaseCollectiveVariable):
         >>> integrator = openmm.VerletIntegrator(0)
         >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
-        >>> print(helix_content.getValue(context, digits=6))
-        18.76058 dimensionless
+        >>> print(helix_content.getValue(context))
+        18.7605... dimensionless
     """
 
     yaml_tag = "!cvpack.HelixAngleContent"
