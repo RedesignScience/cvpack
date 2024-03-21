@@ -100,10 +100,7 @@
 <span class="sd">        &gt;&gt;&gt; model = testsystems.AlanineDipeptideVacuum()</span>
 <span class="sd">        &gt;&gt;&gt; num_atoms = model.system.getNumParticles()</span>
 <span class="sd">        &gt;&gt;&gt; radius_of_gyration = cvpack.RadiusOfGyration(list(range(num_atoms)))</span>
-<span class="sd">        &gt;&gt;&gt; radius_of_gyration.setUnusedForceGroup(0, model.system)</span>
-<span class="sd">        1</span>
-<span class="sd">        &gt;&gt;&gt; model.system.addForce(radius_of_gyration)</span>
-<span class="sd">        5</span>
+<span class="sd">        &gt;&gt;&gt; radius_of_gyration.addToSystem(model.system)</span>
 <span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
 <span class="sd">        &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>

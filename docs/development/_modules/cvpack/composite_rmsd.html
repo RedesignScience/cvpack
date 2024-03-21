@@ -143,10 +143,7 @@
 <span class="sd">    ...     )</span>
 <span class="sd">    ... except ImportError:</span>
 <span class="sd">    ...     pytest.skip(&quot;openmm-cpp-forces is not installed&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; composite_rmsd.setUnusedForceGroup(0, model.system)</span>
-<span class="sd">    1</span>
-<span class="sd">    &gt;&gt;&gt; model.system.addForce(composite_rmsd)</span>
-<span class="sd">    5</span>
+<span class="sd">    &gt;&gt;&gt; composite_rmsd.addToSystem(model.system)</span>
 <span class="sd">    &gt;&gt;&gt; context = mm.Context(</span>
 <span class="sd">    ...     model.system,</span>
 <span class="sd">    ...     mm.VerletIntegrator(1.0 * unit.femtoseconds),</span>

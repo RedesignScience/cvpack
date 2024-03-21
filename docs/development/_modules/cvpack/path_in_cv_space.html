@@ -145,8 +145,7 @@
 <span class="sd">    &gt;&gt;&gt; path_vars = []</span>
 <span class="sd">    &gt;&gt;&gt; for metric in (cvpack.path.progress, cvpack.path.deviation):</span>
 <span class="sd">    ...     var = cvpack.PathInCVSpace(metric, [phi, psi], milestones, np.pi / 6)</span>
-<span class="sd">    ...     _ = var.setUnusedForceGroup(0, model.system)</span>
-<span class="sd">    ...     _ = model.system.addForce(var)</span>
+<span class="sd">    ...     var.addToSystem(model.system)</span>
 <span class="sd">    ...     path_vars.append(var)</span>
 <span class="sd">    &gt;&gt;&gt; context = openmm.Context(model.system, openmm.VerletIntegrator(1.0))</span>
 <span class="sd">    &gt;&gt;&gt; context.setPositions(model.positions)</span>

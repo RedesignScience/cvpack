@@ -159,10 +159,7 @@
 <span class="sd">        &gt;&gt;&gt; res_coord = cvpack.ResidueCoordination(</span>
 <span class="sd">        ...     residues[115:124], residues[126:135], stepFunction=&quot;step(1-x)&quot;</span>
 <span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; res_coord.setUnusedForceGroup(0, model.system)</span>
-<span class="sd">        1</span>
-<span class="sd">        &gt;&gt;&gt; model.system.addForce(res_coord)</span>
-<span class="sd">        6</span>
+<span class="sd">        &gt;&gt;&gt; res_coord.addToSystem(model.system)</span>
 <span class="sd">        &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
 <span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
@@ -180,10 +177,7 @@
 <span class="sd">        ...    atoms[115:124] + atoms[126:135],</span>
 <span class="sd">        ...    list(it.product(range(9), range(9, 18))),</span>
 <span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; colvar.setUnusedForceGroup(0, model.system)</span>
-<span class="sd">        2</span>
-<span class="sd">        &gt;&gt;&gt; model.system.addForce(colvar)</span>
-<span class="sd">        7</span>
+<span class="sd">        &gt;&gt;&gt; colvar.addToSystem(model.system)</span>
 <span class="sd">        &gt;&gt;&gt; context.reinitialize(preserveState=True)</span>
 <span class="sd">        &gt;&gt;&gt; print(colvar.getValue(context))</span>
 <span class="sd">        33.0 dimensionless</span>

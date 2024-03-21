@@ -166,8 +166,7 @@
 <span class="sd">    &gt;&gt;&gt; host = [a.index for a in model.topology.atoms() if a.residue.name == &quot;CUC&quot;]</span>
 <span class="sd">    &gt;&gt;&gt; forces = {f.getName(): f for f in model.system.getForces()}</span>
 <span class="sd">    &gt;&gt;&gt; cv1 = cvpack.AttractionStrength(guest, host, forces[&quot;NonbondedForce&quot;])</span>
-<span class="sd">    &gt;&gt;&gt; _ = cv1.setUnusedForceGroup(0, model.system)</span>
-<span class="sd">    &gt;&gt;&gt; _ = model.system.addForce(cv1)</span>
+<span class="sd">    &gt;&gt;&gt; cv1.addToSystem(model.system)</span>
 <span class="sd">    &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&quot;Reference&quot;)</span>
 <span class="sd">    &gt;&gt;&gt; integrator = openmm.VerletIntegrator(1.0 * mmunit.femtoseconds)</span>
 <span class="sd">    &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
@@ -177,15 +176,13 @@
 
 <span class="sd">    &gt;&gt;&gt; water = [a.index for a in model.topology.atoms() if a.residue.name == &quot;HOH&quot;]</span>
 <span class="sd">    &gt;&gt;&gt; cv2 = cvpack.AttractionStrength(guest, water, forces[&quot;NonbondedForce&quot;])</span>
-<span class="sd">    &gt;&gt;&gt; _ = cv2.setUnusedForceGroup(0, model.system)</span>
-<span class="sd">    &gt;&gt;&gt; _ = model.system.addForce(cv2)</span>
+<span class="sd">    &gt;&gt;&gt; cv2.addToSystem(model.system)</span>
 <span class="sd">    &gt;&gt;&gt; context.reinitialize(preserveState=True)</span>
 <span class="sd">    &gt;&gt;&gt; print(cv2.getValue(context))</span>
 <span class="sd">    2063.3... dimensionless</span>
 
 <span class="sd">    &gt;&gt;&gt; cv3 = cvpack.AttractionStrength(guest, host, forces[&quot;NonbondedForce&quot;], water)</span>
-<span class="sd">    &gt;&gt;&gt; _ = cv3.setUnusedForceGroup(0, model.system)</span>
-<span class="sd">    &gt;&gt;&gt; _ = model.system.addForce(cv3)</span>
+<span class="sd">    &gt;&gt;&gt; cv3.addToSystem(model.system)</span>
 <span class="sd">    &gt;&gt;&gt; context.reinitialize(preserveState=True)</span>
 <span class="sd">    &gt;&gt;&gt; print(cv3.getValue(context))</span>
 <span class="sd">    2849.17... dimensionless</span>
@@ -195,8 +192,7 @@
 <span class="sd">    &gt;&gt;&gt; cv4 = cvpack.AttractionStrength(</span>
 <span class="sd">    ...     guest, host, forces[&quot;NonbondedForce&quot;], water, contrastScaling=0.5</span>
 <span class="sd">    ... )</span>
-<span class="sd">    &gt;&gt;&gt; _ = cv4.setUnusedForceGroup(0, model.system)</span>
-<span class="sd">    &gt;&gt;&gt; _ = model.system.addForce(cv4)</span>
+<span class="sd">    &gt;&gt;&gt; cv4.addToSystem(model.system)</span>
 <span class="sd">    &gt;&gt;&gt; context.reinitialize(preserveState=True)</span>
 <span class="sd">    &gt;&gt;&gt; print(cv4.getValue(context))</span>
 <span class="sd">    3880.8... dimensionless</span>

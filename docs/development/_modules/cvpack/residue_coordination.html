@@ -126,10 +126,7 @@
 <span class="sd">        ...     stepFunction=&quot;step(1-x)&quot;,</span>
 <span class="sd">        ...     thresholdDistance=0.6*unit.nanometers,</span>
 <span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; residue_coordination.setUnusedForceGroup(0, model.system)</span>
-<span class="sd">        1</span>
-<span class="sd">        &gt;&gt;&gt; model.system.addForce(residue_coordination)</span>
-<span class="sd">        6</span>
+<span class="sd">        &gt;&gt;&gt; residue_coordination.addToSystem(model.system)</span>
 <span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; context = openmm.Context(</span>
 <span class="sd">        ...     model.system, openmm.CustomIntegrator(0), platform</span>

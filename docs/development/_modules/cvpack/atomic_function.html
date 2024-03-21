@@ -131,8 +131,8 @@
 <span class="sd">        ...     k = 1000 * unit.kilojoules_per_mole/unit.radian**2,</span>
 <span class="sd">        ...     theta0 = [np.pi/2, np.pi/3] * unit.radian,</span>
 <span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; [model.system.addForce(f) for f in [angle1, angle2, colvar]]</span>
-<span class="sd">        [5, 6, 7]</span>
+<span class="sd">        &gt;&gt;&gt; for cv in [angle1, angle2, colvar]:</span>
+<span class="sd">        ...     cv.addToSystem(model.system)</span>
 <span class="sd">        &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
 <span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>

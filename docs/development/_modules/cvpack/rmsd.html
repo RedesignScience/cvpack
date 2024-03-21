@@ -107,10 +107,7 @@
 <span class="sd">        &gt;&gt;&gt; num_atoms = model.topology.getNumAtoms()</span>
 <span class="sd">        &gt;&gt;&gt; group = list(range(num_atoms))</span>
 <span class="sd">        &gt;&gt;&gt; rmsd = cvpack.RMSD(model.positions, group, num_atoms)</span>
-<span class="sd">        &gt;&gt;&gt; rmsd.setUnusedForceGroup(0, model.system)</span>
-<span class="sd">        1</span>
-<span class="sd">        &gt;&gt;&gt; model.system.addForce(rmsd)</span>
-<span class="sd">        6</span>
+<span class="sd">        &gt;&gt;&gt; rmsd.addToSystem(model.system)</span>
 <span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; integrator = openmm.VerletIntegrator(2*unit.femtoseconds)</span>
 <span class="sd">        &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
@@ -171,8 +168,8 @@
 <span class="sd">            &gt;&gt;&gt; rmsd = cvpack.RMSD(</span>
 <span class="sd">            ...     model.positions, group, model.topology.getNumAtoms()</span>
 <span class="sd">            ... )</span>
-<span class="sd">            &gt;&gt;&gt; [model.system.addForce(f) for f in [rmsd, rmsd.getNullBondForce()]]</span>
-<span class="sd">            [3, 4]</span>
+<span class="sd">            &gt;&gt;&gt; rmsd.addToSystem(model.system)</span>
+<span class="sd">            &gt;&gt;&gt; _ = model.system.addForce(rmsd.getNullBondForce())</span>
 <span class="sd">            &gt;&gt;&gt; integrator = openmm.VerletIntegrator(2*unit.femtoseconds)</span>
 <span class="sd">            &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
 <span class="sd">            &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>

@@ -7,10 +7,8 @@ SheetRMSDContent
 
     .. rubric:: Methods
 
-    .. automethod:: getArguments
+    .. automethod:: addToSystem
     .. automethod:: getEffectiveMass
     .. automethod:: getPeriod
     .. automethod:: getUnit
     .. automethod:: getValue
-    .. automethod:: setUnit
-    .. automethod:: setUnusedForceGroup

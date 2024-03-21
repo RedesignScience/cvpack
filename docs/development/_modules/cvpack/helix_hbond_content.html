@@ -110,10 +110,7 @@
 <span class="sd">        &gt;&gt;&gt; print(*[r.name for r in residues])</span>
 <span class="sd">        LYS ASP GLU ... ILE LEU ARG</span>
 <span class="sd">        &gt;&gt;&gt; helix_content = cvpack.HelixHBondContent(residues)</span>
-<span class="sd">        &gt;&gt;&gt; helix_content.setUnusedForceGroup(0, model.system)</span>
-<span class="sd">        1</span>
-<span class="sd">        &gt;&gt;&gt; model.system.addForce(helix_content)</span>
-<span class="sd">        6</span>
+<span class="sd">        &gt;&gt;&gt; helix_content.addToSystem(model.system)</span>
 <span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
 <span class="sd">        &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>

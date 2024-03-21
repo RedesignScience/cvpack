@@ -7,11 +7,9 @@ AtomicFunction
 
     .. rubric:: Methods
 
+    .. automethod:: addToSystem
     .. automethod:: fromOpenMMForce
-    .. automethod:: getArguments
     .. automethod:: getEffectiveMass
     .. automethod:: getPeriod
     .. automethod:: getUnit
     .. automethod:: getValue
-    .. automethod:: setUnit
-    .. automethod:: setUnusedForceGroup

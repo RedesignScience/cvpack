@@ -7,12 +7,10 @@ ResidueCoordination
 
     .. rubric:: Methods
 
-    .. automethod:: getArguments
+    .. automethod:: addToSystem
     .. automethod:: getEffectiveMass
     .. automethod:: getPeriod
     .. automethod:: getReferenceValue
     .. automethod:: getUnit
     .. automethod:: getValue
     .. automethod:: setReferenceValue
-    .. automethod:: setUnit
-    .. automethod:: setUnusedForceGroup

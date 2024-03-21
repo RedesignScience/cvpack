@@ -7,11 +7,9 @@ RMSD
 
     .. rubric:: Methods
 
-    .. automethod:: getArguments
+    .. automethod:: addToSystem
     .. automethod:: getEffectiveMass
     .. automethod:: getNullBondForce
     .. automethod:: getPeriod
     .. automethod:: getUnit
     .. automethod:: getValue
-    .. automethod:: setUnit
-    .. automethod:: setUnusedForceGroup

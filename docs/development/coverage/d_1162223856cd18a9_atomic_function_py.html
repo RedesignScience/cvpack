@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_1162223856cd18a9_attraction_strength_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.4">coverage.py v7.4.4</a>,
-            created at 2024-03-21 13:46 +0000
+            created at 2024-03-21 19:17 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -175,8 +175,8 @@
     <p class="pln"><span class="n"><a id="t93" href="#t93">93</a></span><span class="t"><span class="str">        ...     k = 1000 * unit.kilojoules_per_mole/unit.radian**2,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t94" href="#t94">94</a></span><span class="t"><span class="str">        ...     theta0 = [np.pi/2, np.pi/3] * unit.radian,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t95" href="#t95">95</a></span><span class="t"><span class="str">        ... )</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t96" href="#t96">96</a></span><span class="t"><span class="str">        >>> [model.system.addForce(f) for f in [angle1, angle2, colvar]]</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t97" href="#t97">97</a></span><span class="t"><span class="str">        [5, 6, 7]</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t96" href="#t96">96</a></span><span class="t"><span class="str">        >>> for cv in [angle1, angle2, colvar]:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t97" href="#t97">97</a></span><span class="t"><span class="str">        ...     cv.addToSystem(model.system)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t98" href="#t98">98</a></span><span class="t"><span class="str">        >>> integrator = openmm.VerletIntegrator(0)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t99" href="#t99">99</a></span><span class="t"><span class="str">        >>> platform = openmm.Platform.getPlatformByName('Reference')</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t100" href="#t100">100</a></span><span class="t"><span class="str">        >>> context = openmm.Context(model.system, integrator, platform)</span>&nbsp;</span><span class="r"></span></p>
@@ -446,7 +446,7 @@
             <a id="nextFileLink" class="nav" href="d_1162223856cd18a9_attraction_strength_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.4">coverage.py v7.4.4</a>,
-            created at 2024-03-21 13:46 +0000
+            created at 2024-03-21 19:17 +0000
         </p>
     </div>
 </footer>
