@@ -44,14 +44,10 @@ class OpenMMForceWrapper(BaseCollectiveVariable):
         >>> from openmmtools import testsystems
         >>> model = testsystems.AlanineDipeptideVacuum()
         >>> angle = openmm.CustomAngleForce("theta")
-        >>> angle.addAngle(0, 1, 2)
-        0
+        >>> _ = angle.addAngle(0, 1, 2)
         >>> cv = cvpack.OpenMMForceWrapper(angle, unit.radian, period=2*np.pi)
         >>> assert isinstance(cv, openmm.CustomAngleForce)
-        >>> cv.setUnusedForceGroup(0, model.system)
-        1
-        >>> model.system.addForce(cv)
-        5
+        >>> cv.addToSystem(model.system)
         >>> integrator = openmm.VerletIntegrator(0)
         >>> platform = openmm.Platform.getPlatformByName("Reference")
         >>> context = openmm.Context(model.system, integrator, platform)

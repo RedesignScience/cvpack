@@ -346,8 +346,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
             ...     top.select('not water')
             ... )
             >>> for cv in [phi, psi, radius_of_gyration]:
-            ...     _ = cv._setUnusedForceGroup(model.system)
-            ...     _ = model.system.addForce(cv)
+            ...     cv.addToSystem(model.system)
             >>> context = openmm.Context(
             ...     model.system, openmm.VerletIntegrator(0)
             ... )

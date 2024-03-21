@@ -128,8 +128,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     >>> host = [a.index for a in model.topology.atoms() if a.residue.name == "CUC"]
     >>> forces = {f.getName(): f for f in model.system.getForces()}
     >>> cv1 = cvpack.AttractionStrength(guest, host, forces["NonbondedForce"])
-    >>> _ = cv1.setUnusedForceGroup(0, model.system)
-    >>> _ = model.system.addForce(cv1)
+    >>> cv1.addToSystem(model.system)
     >>> platform = openmm.Platform.getPlatformByName("Reference")
     >>> integrator = openmm.VerletIntegrator(1.0 * mmunit.femtoseconds)
     >>> context = openmm.Context(model.system, integrator, platform)
@@ -139,15 +138,13 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
 
     >>> water = [a.index for a in model.topology.atoms() if a.residue.name == "HOH"]
     >>> cv2 = cvpack.AttractionStrength(guest, water, forces["NonbondedForce"])
-    >>> _ = cv2.setUnusedForceGroup(0, model.system)
-    >>> _ = model.system.addForce(cv2)
+    >>> cv2.addToSystem(model.system)
     >>> context.reinitialize(preserveState=True)
     >>> print(cv2.getValue(context))
     2063.3... dimensionless
 
     >>> cv3 = cvpack.AttractionStrength(guest, host, forces["NonbondedForce"], water)
-    >>> _ = cv3.setUnusedForceGroup(0, model.system)
-    >>> _ = model.system.addForce(cv3)
+    >>> cv3.addToSystem(model.system)
     >>> context.reinitialize(preserveState=True)
     >>> print(cv3.getValue(context))
     2849.17... dimensionless
@@ -157,8 +154,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     >>> cv4 = cvpack.AttractionStrength(
     ...     guest, host, forces["NonbondedForce"], water, contrastScaling=0.5
     ... )
-    >>> _ = cv4.setUnusedForceGroup(0, model.system)
-    >>> _ = model.system.addForce(cv4)
+    >>> cv4.addToSystem(model.system)
     >>> context.reinitialize(preserveState=True)
     >>> print(cv4.getValue(context))
     3880.8... dimensionless

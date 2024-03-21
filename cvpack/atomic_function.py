@@ -93,8 +93,8 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         ...     k = 1000 * unit.kilojoules_per_mole/unit.radian**2,
         ...     theta0 = [np.pi/2, np.pi/3] * unit.radian,
         ... )
-        >>> [model.system.addForce(f) for f in [angle1, angle2, colvar]]
-        [5, 6, 7]
+        >>> for cv in [angle1, angle2, colvar]:
+        ...     cv.addToSystem(model.system)
         >>> integrator = openmm.VerletIntegrator(0)
         >>> platform = openmm.Platform.getPlatformByName('Reference')
         >>> context = openmm.Context(model.system, integrator, platform)
