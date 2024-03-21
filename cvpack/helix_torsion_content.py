@@ -156,4 +156,5 @@ class HelixTorsionContent(openmm.CustomTorsionForce, BaseCollectiveVariable):
             halfExponent,
         )
 
+
 HelixTorsionContent.registerTag("!cvpack.HelixTorsionContent")

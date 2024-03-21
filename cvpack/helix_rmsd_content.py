@@ -154,4 +154,5 @@ class HelixRMSDContent(BaseRMSDContent):
             normalize,
         )
 
+
 HelixRMSDContent.registerTag("!cvpack.HelixRMSDContent")

@@ -125,4 +125,5 @@ class HelixHBondContent(openmm.CustomBondForce, BaseCollectiveVariable):
             normalize,
         )
 
+
 HelixHBondContent.registerTag("!cvpack.HelixHBondContent")
