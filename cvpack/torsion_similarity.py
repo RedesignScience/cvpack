@@ -79,8 +79,6 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, BaseCollectiveVariable):
         18.659... dimensionless
     """
 
-    yaml_tag = "!cvpack.TorsionSimilarity"
-
     def __init__(
         self,
         firstList: t.Iterable[t.Tuple[int, int, int, int]],
@@ -96,3 +94,6 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, BaseCollectiveVariable):
             self.addBond([*first, *second], [])
         self.setUsesPeriodicBoundaryConditions(pbc)
         self._registerCV(mmunit.dimensionless, firstList, secondList)
+
+
+TorsionSimilarity.registerTag("!cvpack.TorsionSimilarity")

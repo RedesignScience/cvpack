@@ -17,16 +17,15 @@ from openmm import app as mmapp
 
 from cvpack import unit as mmunit
 
+from .serializer import Serializable
 from .unit import value_in_md_units
 from .utils import compute_effective_mass, get_single_force_state
 
 
-class SerializableAtom(yaml.YAMLObject):
+class SerializableAtom(Serializable):
     r"""
     A serializable version of OpenMM's Atom class.
     """
-
-    yaml_tag = "!cvpack.Atom"
 
     def __init__(  # pylint: disable=super-init-not-called
         self, atom: t.Union[mmapp.topology.Atom, "SerializableAtom"]
@@ -48,16 +47,11 @@ class SerializableAtom(yaml.YAMLObject):
         self.__dict__.update(keywords)
 
 
-yaml.SafeDumper.add_representer(SerializableAtom, SerializableAtom.to_yaml)
-yaml.SafeLoader.add_constructor(SerializableAtom.yaml_tag, SerializableAtom.from_yaml)
+SerializableAtom.registerTag("!cvpack.Atom")
 
 
-class SerializableResidue(yaml.YAMLObject):
-    r"""
-    A serializable version of OpenMM's Residue class.
-    """
-
-    yaml_tag = "!cvpack.Residue"
+class SerializableResidue(Serializable):
+    r"""A serializable version of OpenMM's Residue class."""
 
     def __init__(  # pylint: disable=super-init-not-called
         self, residue: t.Union[mmapp.topology.Residue, "SerializableResidue"]
@@ -85,13 +79,10 @@ class SerializableResidue(yaml.YAMLObject):
         return iter(self._atoms)
 
 
-yaml.SafeDumper.add_representer(SerializableResidue, SerializableResidue.to_yaml)
-yaml.SafeLoader.add_constructor(
-    SerializableResidue.yaml_tag, SerializableResidue.from_yaml
-)
+SerializableResidue.registerTag("!cvpack.Residue")
 
 
-class BaseCollectiveVariable(openmm.Force, yaml.YAMLObject):
+class BaseCollectiveVariable(openmm.Force, Serializable):
     r"""
     An abstract class with common attributes and method for all CVs.
     """

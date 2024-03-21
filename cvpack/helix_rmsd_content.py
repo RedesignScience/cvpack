@@ -123,8 +123,6 @@ class HelixRMSDContent(BaseRMSDContent):
         15.98... dimensionless
     """
 
-    yaml_tag = "!cvpack.HelixRMSDContent"
-
     @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
@@ -155,3 +153,5 @@ class HelixRMSDContent(BaseRMSDContent):
             stepFunction,
             normalize,
         )
+
+HelixRMSDContent.registerTag("!cvpack.HelixRMSDContent")

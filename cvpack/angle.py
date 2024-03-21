@@ -60,11 +60,12 @@ class Angle(openmm.CustomAngleForce, BaseCollectiveVariable):
 
     """
 
-    yaml_tag = "!cvpack.Angle"
-
     def __init__(self, atom1: int, atom2: int, atom3: int, pbc: bool = False) -> None:
         super().__init__("theta")
         self.addAngle(atom1, atom2, atom3, [])
         self.setUsesPeriodicBoundaryConditions(pbc)
         self._registerCV(mmunit.radians, atom1, atom2, atom3, pbc)
         self._registerPeriod(2 * math.pi)
+
+
+Angle.registerTag("!cvpack.Angle")

@@ -7,10 +7,10 @@
 
 """
 
-import yaml
+from .serializer import Serializable
 
 
-class Metric(yaml.YAMLObject):
+class Metric(Serializable):
     """
     A measure of progress or deviation with respect to a path in CV space
     """
@@ -26,9 +26,14 @@ class Metric(yaml.YAMLObject):
     def __eq__(self, other: object) -> bool:
         return isinstance(other, Metric) and self.name == other.name
 
+    def __getstate__(self) -> dict:
+        return {"name": self.name}
 
-yaml.SafeDumper.add_representer(Metric, Metric.to_yaml)
-yaml.SafeLoader.add_constructor(Metric.yaml_tag, Metric.from_yaml)
+    def __setstate__(self, state: dict) -> None:
+        self.name = state["name"]
+
+
+Metric.registerTag("!cvpack.path.Metric")
 
 
 progress: Metric = Metric("progress")

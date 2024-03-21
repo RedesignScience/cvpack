@@ -75,8 +75,6 @@ class RadiusOfGyration(BaseRadiusOfGyration):
 
     """
 
-    yaml_tag = "!cvpack.RadiusOfGyration"
-
     def __init__(
         self, group: t.Iterable[int], pbc: bool = False, weighByMass: bool = False
     ) -> None:
@@ -91,3 +89,6 @@ class RadiusOfGyration(BaseRadiusOfGyration):
         )
         self.addBond(list(range(num_groups)))
         self._registerCV(mmunit.nanometers, group, pbc, weighByMass)
+
+
+RadiusOfGyration.registerTag("!cvpack.RadiusOfGyration")

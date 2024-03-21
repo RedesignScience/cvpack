@@ -12,19 +12,18 @@ import typing as t
 
 import numpy as np
 import openmm
-import yaml
 from numpy import typing as npt
 from openmm import XmlSerializer
 
 from cvpack import unit as mmunit
 
+from .serializer import Serializable
+
 
 class NonbondedForceSurrogate(
-    yaml.YAMLObject
+    Serializable
 ):  # pylint: disable=too-many-instance-attributes
     """A surrogate class for the NonbondedForce class in OpenMM."""
-
-    yaml_tag = "!cvpack.NonbondedForce"
 
     def __init__(self, other: openmm.NonbondedForce) -> None:
         self._cutoff = other.getCutoffDistance()
@@ -102,12 +101,7 @@ class NonbondedForceSurrogate(
         return mmunit.value_in_md_units(self._switching_distance)
 
 
-yaml.SafeDumper.add_representer(
-    NonbondedForceSurrogate, NonbondedForceSurrogate.to_yaml
-)
-yaml.SafeLoader.add_constructor(
-    NonbondedForceSurrogate.yaml_tag, NonbondedForceSurrogate.from_yaml
-)
+NonbondedForceSurrogate.registerTag("!cvpack.NonbondedForce")
 
 
 def evaluate_in_context(

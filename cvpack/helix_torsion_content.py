@@ -106,8 +106,6 @@ class HelixTorsionContent(openmm.CustomTorsionForce, BaseCollectiveVariable):
         17.452... dimensionless
     """
 
-    yaml_tag = "!cvpack.HelixTorsionContent"
-
     @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
@@ -157,3 +155,5 @@ class HelixTorsionContent(openmm.CustomTorsionForce, BaseCollectiveVariable):
             tolerance,
             halfExponent,
         )
+
+HelixTorsionContent.registerTag("!cvpack.HelixTorsionContent")

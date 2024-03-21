@@ -67,8 +67,6 @@ class Torsion(openmm.CustomTorsionForce, BaseCollectiveVariable):
 
     """
 
-    yaml_tag = "!cvpack.Torsion"
-
     def __init__(  # pylint: disable=too-many-arguments
         self, atom1: int, atom2: int, atom3: int, atom4: int, pbc: bool = False
     ) -> None:
@@ -77,3 +75,6 @@ class Torsion(openmm.CustomTorsionForce, BaseCollectiveVariable):
         self.setUsesPeriodicBoundaryConditions(pbc)
         self._registerCV(mmunit.radians, atom1, atom2, atom3, atom4, pbc)
         self._registerPeriod(2 * math.pi)
+
+
+Torsion.registerTag("!cvpack.Torsion")

@@ -107,8 +107,6 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         429.479... kJ/mol
     """
 
-    yaml_tag = "!cvpack.AtomicFunction"
-
     @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
@@ -354,3 +352,6 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         if isinstance(force, openmm.PeriodicTorsionForce):
             return cls._fromPeriodicTorsionForce(force, unit, pbc)
         raise TypeError(f"Force {force} is not convertible to an AtomicFunction")
+
+
+AtomicFunction.registerTag("!cvpack.AtomicFunction")

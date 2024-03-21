@@ -96,8 +96,6 @@ class HelixAngleContent(openmm.CustomAngleForce, BaseCollectiveVariable):
         18.7605... dimensionless
     """
 
-    yaml_tag = "!cvpack.HelixAngleContent"
-
     @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
@@ -139,3 +137,6 @@ class HelixAngleContent(openmm.CustomAngleForce, BaseCollectiveVariable):
             halfExponent,
             normalize,
         )
+
+
+HelixAngleContent.registerTag("!cvpack.HelixAngleContent")

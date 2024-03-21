@@ -105,8 +105,6 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable
         0.99999... dimensionless
     """
 
-    yaml_tag = "!cvpack.ResidueCoordination"
-
     @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
@@ -184,3 +182,6 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable
             expression.replace(f"refval={self._ref_val}", f"refval={value}")
         )
         self._ref_val = value
+
+
+ResidueCoordination.registerTag("!cvpack.ResidueCoordination")

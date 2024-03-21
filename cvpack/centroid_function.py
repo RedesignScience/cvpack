@@ -151,8 +151,6 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
         33.0 dimensionless
     """
 
-    yaml_tag = "!cvpack.CentroidFunction"
-
     @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
@@ -195,3 +193,6 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
         )
         if period is not None:
             self._registerPeriod(period)
+
+
+CentroidFunction.registerTag("!cvpack.CentroidFunction")
