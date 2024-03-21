@@ -48,29 +48,28 @@ class RadiusOfGyrationSq(BaseRadiusOfGyration):
 
     Parameters
     ----------
-        group
-            The indices of the atoms in the group
-        pbc
-            Whether to use periodic boundary conditions
-        weighByMass
-            Whether to use the center of mass of the group instead of its geometric
-            center
+    group
+        The indices of the atoms in the group
+    pbc
+        Whether to use periodic boundary conditions
+    weighByMass
+        Whether to use the center of mass of the group instead of its geometric center
 
     Example
     -------
-        >>> import cvpack
-        >>> import openmm
-        >>> from openmmtools import testsystems
-        >>> model = testsystems.AlanineDipeptideVacuum()
-        >>> num_atoms = model.system.getNumParticles()
-        >>> rgsq = cvpack.RadiusOfGyrationSq(list(range(num_atoms)))
-        >>> rgsq.addToSystem(model.system)
-        >>> platform = openmm.Platform.getPlatformByName('Reference')
-        >>> integrator = openmm.VerletIntegrator(0)
-        >>> context = openmm.Context(model.system, integrator, platform)
-        >>> context.setPositions(model.positions)
-        >>> print(rgsq.getValue(context))  # doctest: +ELLIPSIS
-        0.0871... nm**2
+    >>> import cvpack
+    >>> import openmm
+    >>> from openmmtools import testsystems
+    >>> model = testsystems.AlanineDipeptideVacuum()
+    >>> num_atoms = model.system.getNumParticles()
+    >>> rgsq = cvpack.RadiusOfGyrationSq(list(range(num_atoms)))
+    >>> rgsq.addToSystem(model.system)
+    >>> platform = openmm.Platform.getPlatformByName('Reference')
+    >>> integrator = openmm.VerletIntegrator(0)
+    >>> context = openmm.Context(model.system, integrator, platform)
+    >>> context.setPositions(model.positions)
+    >>> print(rgsq.getValue(context))  # doctest: +ELLIPSIS
+    0.0871... nm**2
 
     """
 

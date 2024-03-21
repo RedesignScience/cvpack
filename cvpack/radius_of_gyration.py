@@ -46,29 +46,28 @@ class RadiusOfGyration(BaseRadiusOfGyration):
 
     Parameters
     ----------
-        group
-            The indices of the atoms in the group
-        pbc
-            Whether to use periodic boundary conditions
-        weighByMass
-            Whether to use the center of mass of the group instead of its geometric
-            center
+    group
+        The indices of the atoms in the group
+    pbc
+        Whether to use periodic boundary conditions
+    weighByMass
+        Whether to use the center of mass of the group instead of its geometric center
 
     Example
     -------
-        >>> import cvpack
-        >>> import openmm
-        >>> from openmmtools import testsystems
-        >>> model = testsystems.AlanineDipeptideVacuum()
-        >>> num_atoms = model.system.getNumParticles()
-        >>> radius_of_gyration = cvpack.RadiusOfGyration(list(range(num_atoms)))
-        >>> radius_of_gyration.addToSystem(model.system)
-        >>> platform = openmm.Platform.getPlatformByName('Reference')
-        >>> integrator = openmm.VerletIntegrator(0)
-        >>> context = openmm.Context(model.system, integrator, platform)
-        >>> context.setPositions(model.positions)
-        >>> print(radius_of_gyration.getValue(context))
-        0.2951... nm
+    >>> import cvpack
+    >>> import openmm
+    >>> from openmmtools import testsystems
+    >>> model = testsystems.AlanineDipeptideVacuum()
+    >>> num_atoms = model.system.getNumParticles()
+    >>> radius_of_gyration = cvpack.RadiusOfGyration(list(range(num_atoms)))
+    >>> radius_of_gyration.addToSystem(model.system)
+    >>> platform = openmm.Platform.getPlatformByName('Reference')
+    >>> integrator = openmm.VerletIntegrator(0)
+    >>> context = openmm.Context(model.system, integrator, platform)
+    >>> context.setPositions(model.positions)
+    >>> print(radius_of_gyration.getValue(context))
+    0.2951... nm
 
     """
 
