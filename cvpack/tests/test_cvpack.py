@@ -13,14 +13,13 @@ import mdtraj
 import numpy as np
 import openmm
 import pytest
-from openmm import app
+from openmm import app, unit
 from openmmtools import testsystems
 from openmmtools.constants import ONE_4PI_EPS0
 from scipy.spatial.transform import Rotation
 
 import cvpack
 from cvpack import serializer
-from openmm import unit
 from cvpack.units import value_in_md_units
 
 
@@ -574,9 +573,7 @@ def test_sheet_rmsd_content():
 
     """
     model = testsystems.SrcImplicit()
-    positions = np.vstack(
-        [np.array(pos) for pos in value_in_md_units(model.positions)]
-    )
+    positions = np.vstack([np.array(pos) for pos in value_in_md_units(model.positions)])
     topology = mdtraj.Topology.from_openmm(model.topology)
     residues = list(it.islice(model.topology.residues(), 68, 82))
 

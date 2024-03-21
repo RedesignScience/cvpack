@@ -14,15 +14,7 @@ from openmm import unit as mmunit
 
 from .base_rmsd_content import BaseRMSDContent
 from .cvpack import SerializableResidue
-from .units import (value_in_md_units,
-    MatrixQuantity,
-    Quantity,
-    ScalarQuantity,
-    Unit,
-    VectorQuantity,
-    convert_quantities,
-    preprocess_units,
-)
+from .units import ScalarQuantity, convert_quantities
 
 # pylint: disable=protected-access
 ALPHA_POSITIONS = BaseRMSDContent._loadPositions("ideal_alpha_helix.csv")

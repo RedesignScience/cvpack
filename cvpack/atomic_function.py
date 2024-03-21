@@ -17,15 +17,7 @@ from numpy.typing import ArrayLike
 from openmm import unit as mmunit
 
 from .base_custom_function import BaseCustomFunction
-from .units import (value_in_md_units,
-    MatrixQuantity,
-    Quantity,
-    ScalarQuantity,
-    Unit,
-    VectorQuantity,
-    convert_quantities,
-    preprocess_units,
-)
+from .units import ScalarQuantity, Unit, VectorQuantity, convert_quantities
 
 
 class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):

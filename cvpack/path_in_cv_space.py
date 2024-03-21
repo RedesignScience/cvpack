@@ -16,15 +16,7 @@ from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
 from .path import Metric, deviation, progress
-from .units import (value_in_md_units,
-    MatrixQuantity,
-    Quantity,
-    ScalarQuantity,
-    Unit,
-    VectorQuantity,
-    convert_quantities,
-    preprocess_units,
-)
+from .units import MatrixQuantity, ScalarQuantity, convert_quantities
 from .utils import convert_to_matrix
 
 

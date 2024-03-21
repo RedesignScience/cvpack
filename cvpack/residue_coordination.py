@@ -14,15 +14,7 @@ from openmm import unit as mmunit
 from openmm.app.topology import Residue
 
 from .cvpack import BaseCollectiveVariable, SerializableResidue
-from .units import (value_in_md_units,
-    MatrixQuantity,
-    Quantity,
-    ScalarQuantity,
-    Unit,
-    VectorQuantity,
-    convert_quantities,
-    preprocess_units,
-)
+from .units import ScalarQuantity, convert_quantities
 
 
 class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable):

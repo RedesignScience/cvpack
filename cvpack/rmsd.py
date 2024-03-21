@@ -14,15 +14,7 @@ import openmm
 from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
-from .units import (value_in_md_units,
-    MatrixQuantity,
-    Quantity,
-    ScalarQuantity,
-    Unit,
-    VectorQuantity,
-    convert_quantities,
-    preprocess_units,
-)
+from .units import MatrixQuantity, VectorQuantity, convert_quantities
 
 
 class RMSD(openmm.RMSDForce, BaseCollectiveVariable):

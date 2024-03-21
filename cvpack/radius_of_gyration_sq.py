@@ -13,15 +13,6 @@ import typing as t
 from openmm import unit as mmunit
 
 from .base_radius_of_gyration import BaseRadiusOfGyration
-from .units import (value_in_md_units,
-    MatrixQuantity,
-    Quantity,
-    ScalarQuantity,
-    Unit,
-    VectorQuantity,
-    convert_quantities,
-    preprocess_units,
-)
 
 
 class RadiusOfGyrationSq(BaseRadiusOfGyration):

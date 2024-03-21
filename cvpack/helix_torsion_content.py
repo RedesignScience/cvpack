@@ -14,15 +14,7 @@ from openmm import app as mmapp
 from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable, SerializableResidue
-from .units import (value_in_md_units,
-    MatrixQuantity,
-    Quantity,
-    ScalarQuantity,
-    Unit,
-    VectorQuantity,
-    convert_quantities,
-    preprocess_units,
-)
+from .units import ScalarQuantity, convert_quantities
 
 
 class HelixTorsionContent(openmm.CustomTorsionForce, BaseCollectiveVariable):
