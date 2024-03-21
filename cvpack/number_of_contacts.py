@@ -10,10 +10,18 @@
 import typing as t
 
 import openmm
-
-from cvpack import unit as mmunit
+from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
+from .units import (value_in_md_units,
+    MatrixQuantity,
+    Quantity,
+    ScalarQuantity,
+    Unit,
+    VectorQuantity,
+    convert_quantities,
+    preprocess_units,
+)
 from .utils import NonbondedForceSurrogate, evaluate_in_context
 
 
@@ -120,17 +128,15 @@ class NumberOfContacts(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     0.99999... dimensionless
     """
 
-    @mmunit.convert_quantities
+    @convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
         group1: t.Sequence[int],
         group2: t.Sequence[int],
         nonbondedForce: openmm.NonbondedForce,
-        reference: t.Union[mmunit.ScalarQuantity, openmm.Context] = 1.0,
+        reference: t.Union[ScalarQuantity, openmm.Context] = 1.0,
         stepFunction: str = "1/(1+x^6)",
-        thresholdDistance: mmunit.ScalarQuantity = mmunit.Quantity(
-            0.3, mmunit.nanometers
-        ),
+        thresholdDistance: ScalarQuantity = mmunit.Quantity(0.3, mmunit.nanometers),
         cutoffFactor: float = 2.0,
         switchFactor: t.Optional[float] = 1.5,
     ) -> None:

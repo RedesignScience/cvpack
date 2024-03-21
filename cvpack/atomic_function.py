@@ -14,10 +14,18 @@ import typing as t
 import numpy as np
 import openmm
 from numpy.typing import ArrayLike
-
-from cvpack import unit as mmunit
+from openmm import unit as mmunit
 
 from .base_custom_function import BaseCustomFunction
+from .units import (value_in_md_units,
+    MatrixQuantity,
+    Quantity,
+    ScalarQuantity,
+    Unit,
+    VectorQuantity,
+    convert_quantities,
+    preprocess_units,
+)
 
 
 class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
@@ -81,7 +89,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         >>> import cvpack
         >>> import openmm
         >>> import numpy as np
-        >>> from cvpack import unit
+        >>> from openmm import unit
         >>> from openmmtools import testsystems
         >>> model = testsystems.AlanineDipeptideVacuum()
         >>> angle1 = cvpack.Angle(0, 5, 10)
@@ -107,15 +115,15 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         429.479... kJ/mol
     """
 
-    @mmunit.convert_quantities
+    @convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
         function: str,
         unit: mmunit.Unit,
         groups: ArrayLike,
-        period: t.Optional[mmunit.ScalarQuantity] = None,
+        period: t.Optional[ScalarQuantity] = None,
         pbc: bool = True,
-        **parameters: t.Union[mmunit.ScalarQuantity, mmunit.VectorQuantity],
+        **parameters: t.Union[ScalarQuantity, VectorQuantity],
     ) -> None:
         groups = np.atleast_2d(groups)
         num_groups, atoms_per_group, *other_dimensions = groups.shape
@@ -124,7 +132,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         super().__init__(atoms_per_group, function)
         overalls, perbonds = self._extractParameters(num_groups, **parameters)
         self._addParameters(overalls, perbonds, groups, pbc, unit)
-        unit = mmunit.SerializableUnit(unit)
+        unit = Unit(unit)
         groups = [list(map(int, group)) for group in groups]
         self._registerCV(
             unit, function, unit, groups, period, pbc, **overalls, **perbonds
@@ -282,7 +290,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         >>> import cvpack
         >>> import numpy as np
         >>> import openmm
-        >>> from cvpack import unit
+        >>> from openmm import unit
         >>> from openmm import app
         >>> from openmmtools import testsystems
         >>> model = testsystems.LysozymeImplicit()

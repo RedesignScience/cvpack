@@ -12,11 +12,19 @@ from collections import OrderedDict
 from copy import deepcopy
 
 import openmm
-
-from cvpack import unit as mmunit
+from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
 from .path import Metric, deviation, progress
+from .units import (value_in_md_units,
+    MatrixQuantity,
+    Quantity,
+    ScalarQuantity,
+    Unit,
+    VectorQuantity,
+    convert_quantities,
+    preprocess_units,
+)
 from .utils import convert_to_matrix
 
 
@@ -117,14 +125,14 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
     z = 0.25... dimensionless
     """
 
-    @mmunit.convert_quantities
+    @convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
         metric: Metric,
         variables: t.Iterable[BaseCollectiveVariable],
-        milestones: mmunit.MatrixQuantity,
+        milestones: MatrixQuantity,
         sigma: float,
-        scales: t.Optional[t.Iterable[mmunit.ScalarQuantity]] = None,
+        scales: t.Optional[t.Iterable[ScalarQuantity]] = None,
     ) -> None:
         if metric not in (progress, deviation):
             raise ValueError(

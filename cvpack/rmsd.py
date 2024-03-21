@@ -11,10 +11,18 @@ import typing as t
 
 import numpy as np
 import openmm
-
-from cvpack import unit as mmunit
+from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
+from .units import (value_in_md_units,
+    MatrixQuantity,
+    Quantity,
+    ScalarQuantity,
+    Unit,
+    VectorQuantity,
+    convert_quantities,
+    preprocess_units,
+)
 
 
 class RMSD(openmm.RMSDForce, BaseCollectiveVariable):
@@ -81,12 +89,10 @@ class RMSD(openmm.RMSDForce, BaseCollectiveVariable):
 
     """
 
-    @mmunit.convert_quantities
+    @convert_quantities
     def __init__(
         self,
-        referencePositions: t.Union[
-            mmunit.MatrixQuantity, t.Dict[int, mmunit.VectorQuantity]
-        ],
+        referencePositions: t.Union[MatrixQuantity, t.Dict[int, VectorQuantity]],
         group: t.Iterable[int],
         numAtoms: t.Optional[int] = None,
     ) -> None:

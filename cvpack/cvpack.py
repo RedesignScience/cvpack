@@ -14,11 +14,18 @@ import typing as t
 import openmm
 import yaml
 from openmm import app as mmapp
-
-from cvpack import unit as mmunit
+from openmm import unit as mmunit
 
 from .serializer import Serializable
-from .unit import value_in_md_units
+from .units import (value_in_md_units,
+    MatrixQuantity,
+    Quantity,
+    ScalarQuantity,
+    Unit,
+    VectorQuantity,
+    convert_quantities,
+    preprocess_units,
+)
 from .utils import compute_effective_mass, get_single_force_state
 
 
@@ -214,7 +221,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         """
         return self._unit
 
-    def getPeriod(self) -> t.Optional[mmunit.SerializableQuantity]:
+    def getPeriod(self) -> t.Optional[Quantity]:
         """
         Get the period of this collective variable.
 
@@ -224,7 +231,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         """
         if self._period is None:
             return None
-        return mmunit.SerializableQuantity(self._period, self.getUnit())
+        return Quantity(self._period, self.getUnit())
 
     def addToSystem(
         self, system: openmm.System, setUnusedForceGroup: bool = True

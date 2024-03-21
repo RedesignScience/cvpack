@@ -11,11 +11,19 @@ import typing as t
 
 import numpy as np
 from openmm import app as mmapp
-
-from cvpack import unit as mmunit
+from openmm import unit as mmunit
 
 from .base_rmsd_content import BaseRMSDContent
 from .cvpack import SerializableResidue
+from .units import (value_in_md_units,
+    MatrixQuantity,
+    Quantity,
+    ScalarQuantity,
+    Unit,
+    VectorQuantity,
+    convert_quantities,
+    preprocess_units,
+)
 
 # pylint: disable=protected-access
 PARABETA_POSITIONS = BaseRMSDContent._loadPositions("ideal_parallel_beta_sheet.csv")
@@ -175,14 +183,14 @@ class SheetRMSDContent(BaseRMSDContent):
         0.9859... dimensionless
     """
 
-    @mmunit.convert_quantities
+    @convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
         residues: t.Sequence[mmapp.topology.Residue],
         numAtoms: int,
         parallel: bool = False,
         blockSizes: t.Optional[t.Sequence[int]] = None,
-        thresholdRMSD: mmunit.ScalarQuantity = mmunit.Quantity(0.08, mmunit.nanometers),
+        thresholdRMSD: ScalarQuantity = mmunit.Quantity(0.08, mmunit.nanometers),
         stepFunction: str = "(1+x^4)/(1+x^4+x^8)",
         normalize: bool = False,
     ) -> None:

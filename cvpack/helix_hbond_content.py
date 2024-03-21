@@ -12,10 +12,18 @@ import typing as t
 
 import openmm
 from openmm import app as mmapp
-
-from cvpack import unit as mmunit
+from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable, SerializableResidue
+from .units import (value_in_md_units,
+    MatrixQuantity,
+    Quantity,
+    ScalarQuantity,
+    Unit,
+    VectorQuantity,
+    convert_quantities,
+    preprocess_units,
+)
 
 
 class HelixHBondContent(openmm.CustomBondForce, BaseCollectiveVariable):
@@ -81,14 +89,12 @@ class HelixHBondContent(openmm.CustomBondForce, BaseCollectiveVariable):
         15.880... dimensionless
     """
 
-    @mmunit.convert_quantities
+    @convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
         residues: t.Sequence[mmapp.topology.Residue],
         pbc: bool = False,
-        thresholdDistance: mmunit.ScalarQuantity = mmunit.Quantity(
-            0.33, mmunit.nanometers
-        ),
+        thresholdDistance: ScalarQuantity = mmunit.Quantity(0.33, mmunit.nanometers),
         halfExponent: int = 3,
         normalize: bool = False,
     ) -> None:

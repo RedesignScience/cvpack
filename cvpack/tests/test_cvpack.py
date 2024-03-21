@@ -19,7 +19,9 @@ from openmmtools.constants import ONE_4PI_EPS0
 from scipy.spatial.transform import Rotation
 
 import cvpack
-from cvpack import serializer, unit
+from cvpack import serializer
+from openmm import unit
+from cvpack.units import value_in_md_units
 
 
 def test_cvpack_imported():
@@ -193,7 +195,7 @@ def test_radius_of_gyration():
     """
     model = testsystems.AlanineDipeptideVacuum()
     masses = np.array(
-        [unit.value_in_md_units(atom.element.mass) for atom in model.topology.atoms()]
+        [value_in_md_units(atom.element.mass) for atom in model.topology.atoms()]
     )
     positions = model.positions.value_in_unit(unit.nanometers)
     centroid = positions.mean(axis=0)
@@ -223,7 +225,7 @@ def test_radius_of_gyration_squared():
     """
     model = testsystems.AlanineDipeptideVacuum()
     masses = np.array(
-        [unit.value_in_md_units(atom.element.mass) for atom in model.topology.atoms()]
+        [value_in_md_units(atom.element.mass) for atom in model.topology.atoms()]
     )
     positions = model.positions.value_in_unit(unit.nanometers)
     centroid = positions.mean(axis=0)
@@ -239,9 +241,9 @@ def test_radius_of_gyration_squared():
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
     context.setPositions(model.positions)
-    rg_sq_value = unit.value_in_md_units(rg_sq.getValue(context))
+    rg_sq_value = value_in_md_units(rg_sq.getValue(context))
     assert rg_sq_value == pytest.approx(rgsq)
-    weighted_rg_sq_value = unit.value_in_md_units(weighted_rg_sq.getValue(context))
+    weighted_rg_sq_value = value_in_md_units(weighted_rg_sq.getValue(context))
     assert weighted_rg_sq_value == pytest.approx(weighted_rgsq)
     perform_common_tests(rg_sq, context)
 
@@ -573,7 +575,7 @@ def test_sheet_rmsd_content():
     """
     model = testsystems.SrcImplicit()
     positions = np.vstack(
-        [np.array(pos) for pos in unit.value_in_md_units(model.positions)]
+        [np.array(pos) for pos in value_in_md_units(model.positions)]
     )
     topology = mdtraj.Topology.from_openmm(model.topology)
     residues = list(it.islice(model.topology.residues(), 68, 82))
@@ -736,7 +738,7 @@ def test_attraction_strength():
     integreator = openmm.VerletIntegrator(0)
     context = openmm.Context(system, integreator, platform)
     context.setPositions(positions)
-    assert unit.value_in_md_units(colvar.getValue(context)) == pytest.approx(strength)
+    assert value_in_md_units(colvar.getValue(context)) == pytest.approx(strength)
     perform_common_tests(colvar, context)
 
 

@@ -10,10 +10,18 @@
 import typing as t
 
 import numpy as np
-
-from cvpack import unit as mmunit
+from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
+from .units import (value_in_md_units,
+    MatrixQuantity,
+    Quantity,
+    ScalarQuantity,
+    Unit,
+    VectorQuantity,
+    convert_quantities,
+    preprocess_units,
+)
 
 
 class _Stub:  # pylint: disable=too-few-public-methods
@@ -92,7 +100,7 @@ class CompositeRMSD(CompositeRMSDForce, BaseCollectiveVariable):
     >>> import openmm as mm
     >>> import pytest
     >>> from openmmtools import testsystems
-    >>> from cvpack import unit
+    >>> from openmm import unit
     >>> model = testsystems.HostGuestVacuum()
     >>> host_atoms, guest_atoms = (
     ...     [a.index for a in r.atoms()]
@@ -120,12 +128,10 @@ class CompositeRMSD(CompositeRMSDForce, BaseCollectiveVariable):
     0.0 nm
     """
 
-    @mmunit.convert_quantities
+    @convert_quantities
     def __init__(
         self,
-        referencePositions: t.Union[
-            mmunit.MatrixQuantity, t.Dict[int, mmunit.VectorQuantity]
-        ],
+        referencePositions: t.Union[MatrixQuantity, t.Dict[int, VectorQuantity]],
         groups: t.Iterable[t.Iterable[int]],
         numAtoms: t.Optional[int] = None,
     ) -> None:

@@ -14,10 +14,18 @@ import numpy as np
 import openmm
 from numpy import typing as npt
 from openmm import XmlSerializer
-
-from cvpack import unit as mmunit
+from openmm import unit as mmunit
 
 from .serializer import Serializable
+from .units import (value_in_md_units,
+    MatrixQuantity,
+    Quantity,
+    ScalarQuantity,
+    Unit,
+    VectorQuantity,
+    convert_quantities,
+    preprocess_units,
+)
 
 # pylint: disable=protected-access,c-extension-no-member
 
@@ -69,7 +77,7 @@ class NonbondedForceSurrogate(
 
     def getCutoffDistance(self) -> float:
         """Get the cutoff distance."""
-        return mmunit.value_in_md_units(self._cutoff)
+        return value_in_md_units(self._cutoff)
 
     def usesPeriodicBoundaryConditions(self) -> bool:
         """Return whether periodic boundary conditions are used."""
@@ -81,7 +89,7 @@ class NonbondedForceSurrogate(
 
     def getParticleParameters(self, index: int) -> t.Tuple[float, float, float]:
         """Get the parameters of a particle at the given index."""
-        return tuple(map(mmunit.value_in_md_units, self._particle_parameters[index]))
+        return tuple(map(value_in_md_units, self._particle_parameters[index]))
 
     def getNumExceptions(self):
         """Get the number of exceptions."""
@@ -92,7 +100,7 @@ class NonbondedForceSurrogate(
     ) -> t.Tuple[int, int, float, float, float]:
         """Get the parameters of an exception at the given index."""
         i, j, *params = self._exception_parameters[index]
-        return i, j, *map(mmunit.value_in_md_units, params)
+        return i, j, *map(value_in_md_units, params)
 
     def getUseSwitchingFunction(self) -> bool:
         """Return whether a switching function is used."""
@@ -100,7 +108,7 @@ class NonbondedForceSurrogate(
 
     def getSwitchingDistance(self) -> float:
         """Get the switching distance."""
-        return mmunit.value_in_md_units(self._switching_distance)
+        return value_in_md_units(self._switching_distance)
 
 
 NonbondedForceSurrogate.registerTag("!cvpack.NonbondedForce")
@@ -142,7 +150,7 @@ def evaluate_in_context(
         state = context.getState(  # pylint: disable=unexpected-keyword-arg
             getEnergy=True, groups=1 << i
         )
-        energies.append(mmunit.value_in_md_units(state.getPotentialEnergy()))
+        energies.append(value_in_md_units(state.getPotentialEnergy()))
     return energies[0] if is_single else tuple(energies)
 
 

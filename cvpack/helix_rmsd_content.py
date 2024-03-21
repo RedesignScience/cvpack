@@ -10,11 +10,19 @@
 import typing as t
 
 from openmm import app as mmapp
-
-from cvpack import unit as mmunit
+from openmm import unit as mmunit
 
 from .base_rmsd_content import BaseRMSDContent
 from .cvpack import SerializableResidue
+from .units import (value_in_md_units,
+    MatrixQuantity,
+    Quantity,
+    ScalarQuantity,
+    Unit,
+    VectorQuantity,
+    convert_quantities,
+    preprocess_units,
+)
 
 # pylint: disable=protected-access
 ALPHA_POSITIONS = BaseRMSDContent._loadPositions("ideal_alpha_helix.csv")
@@ -120,12 +128,12 @@ class HelixRMSDContent(BaseRMSDContent):
         15.98... dimensionless
     """
 
-    @mmunit.convert_quantities
+    @convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
         residues: t.Sequence[mmapp.topology.Residue],
         numAtoms: int,
-        thresholdRMSD: mmunit.ScalarQuantity = mmunit.Quantity(0.08, mmunit.nanometers),
+        thresholdRMSD: ScalarQuantity = mmunit.Quantity(0.08, mmunit.nanometers),
         stepFunction: str = "(1+x^4)/(1+x^4+x^8)",
         normalize: bool = False,
     ) -> None:

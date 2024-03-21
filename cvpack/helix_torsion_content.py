@@ -11,10 +11,18 @@ import typing as t
 
 import openmm
 from openmm import app as mmapp
-
-from cvpack import unit as mmunit
+from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable, SerializableResidue
+from .units import (value_in_md_units,
+    MatrixQuantity,
+    Quantity,
+    ScalarQuantity,
+    Unit,
+    VectorQuantity,
+    convert_quantities,
+    preprocess_units,
+)
 
 
 class HelixTorsionContent(openmm.CustomTorsionForce, BaseCollectiveVariable):
@@ -103,14 +111,14 @@ class HelixTorsionContent(openmm.CustomTorsionForce, BaseCollectiveVariable):
         17.452... dimensionless
     """
 
-    @mmunit.convert_quantities
+    @convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
         residues: t.Sequence[mmapp.topology.Residue],
         pbc: bool = False,
-        phiReference: mmunit.ScalarQuantity = mmunit.Quantity(-63.8, mmunit.degrees),
-        psiReference: mmunit.ScalarQuantity = mmunit.Quantity(-41.1, mmunit.degrees),
-        tolerance: mmunit.ScalarQuantity = mmunit.Quantity(25, mmunit.degrees),
+        phiReference: ScalarQuantity = mmunit.Quantity(-63.8, mmunit.degrees),
+        psiReference: ScalarQuantity = mmunit.Quantity(-41.1, mmunit.degrees),
+        tolerance: ScalarQuantity = mmunit.Quantity(25, mmunit.degrees),
         halfExponent: int = 3,
         normalize: bool = False,
     ) -> None:

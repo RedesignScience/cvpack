@@ -12,10 +12,18 @@ import typing as t
 import numpy as np
 import openmm
 from numpy.typing import ArrayLike
-
-from cvpack import unit as mmunit
+from openmm import unit as mmunit
 
 from .base_custom_function import BaseCustomFunction
+from .units import (value_in_md_units,
+    MatrixQuantity,
+    Quantity,
+    ScalarQuantity,
+    Unit,
+    VectorQuantity,
+    convert_quantities,
+    preprocess_units,
+)
 
 
 class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
@@ -145,17 +153,17 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
         33.0 dimensionless
     """
 
-    @mmunit.convert_quantities
+    @convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
         function: str,
         unit: mmunit.Unit,
         groups: t.Iterable[t.Iterable[int]],
         collections: t.Optional[ArrayLike] = None,
-        period: t.Optional[mmunit.ScalarQuantity] = None,
+        period: t.Optional[ScalarQuantity] = None,
         pbc: bool = True,
         weighByMass: bool = True,
-        **parameters: t.Union[mmunit.ScalarQuantity, mmunit.VectorQuantity],
+        **parameters: t.Union[ScalarQuantity, VectorQuantity],
     ) -> None:
         groups = [list(map(int, group)) for group in groups]
         num_groups = len(groups)
@@ -172,7 +180,7 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
             self.addGroup(group, *([] if weighByMass else [[1] * len(group)]))
         overalls, perbonds = self._extractParameters(num_collections, **parameters)
         self._addParameters(overalls, perbonds, collections, pbc, unit)
-        unit = mmunit.SerializableUnit(unit)
+        unit = Unit(unit)
         self._registerCV(
             unit,
             function,

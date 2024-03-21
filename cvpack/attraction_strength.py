@@ -10,10 +10,18 @@
 import typing as t
 
 import openmm
-
-from cvpack import unit as mmunit
+from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
+from .units import (value_in_md_units,
+    MatrixQuantity,
+    Quantity,
+    ScalarQuantity,
+    Unit,
+    VectorQuantity,
+    convert_quantities,
+    preprocess_units,
+)
 from .utils import NonbondedForceSurrogate, evaluate_in_context
 
 ONE_4PI_EPS0 = 138.93545764438198
@@ -162,14 +170,14 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     3880.8...
     """
 
-    @mmunit.convert_quantities
+    @convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
         group1: t.Iterable[int],
         group2: t.Iterable[int],
         nonbondedForce: openmm.NonbondedForce,
         contrastGroup: t.Optional[t.Iterable[int]] = None,
-        reference: t.Union[mmunit.ScalarQuantity, openmm.Context] = mmunit.Quantity(
+        reference: t.Union[ScalarQuantity, openmm.Context] = mmunit.Quantity(
             1.0, mmunit.kilojoule_per_mole
         ),
         contrastScaling: float = 1.0,

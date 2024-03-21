@@ -10,11 +10,19 @@
 import typing as t
 
 import openmm
+from openmm import unit as mmunit
 from openmm.app.topology import Residue
 
-from cvpack import unit as mmunit
-
 from .cvpack import BaseCollectiveVariable, SerializableResidue
+from .units import (value_in_md_units,
+    MatrixQuantity,
+    Quantity,
+    ScalarQuantity,
+    Unit,
+    VectorQuantity,
+    convert_quantities,
+    preprocess_units,
+)
 
 
 class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable):
@@ -102,16 +110,14 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable
         0.99999... dimensionless
     """
 
-    @mmunit.convert_quantities
+    @convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
         residueGroup1: t.Iterable[Residue],
         residueGroup2: t.Iterable[Residue],
         pbc: bool = True,
         stepFunction: str = "1/(1+x^6)",
-        thresholdDistance: mmunit.ScalarQuantity = mmunit.Quantity(
-            1.0, mmunit.nanometers
-        ),
+        thresholdDistance: ScalarQuantity = mmunit.Quantity(1.0, mmunit.nanometers),
         normalize: bool = False,
         weighByMass: bool = True,
         includeHydrogens: bool = True,
@@ -164,8 +170,8 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable
         """
         return self._ref_val * self.getUnit()
 
-    @mmunit.convert_quantities
-    def setReferenceValue(self, value: mmunit.ScalarQuantity) -> None:
+    @convert_quantities
+    def setReferenceValue(self, value: ScalarQuantity) -> None:
         """
         Set the reference value used for normalizing the residue coordination.
 
