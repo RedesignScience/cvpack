@@ -105,10 +105,7 @@ class CompositeRMSD(CompositeRMSDForce, BaseCollectiveVariable):
     ...     )
     ... except ImportError:
     ...     pytest.skip("openmm-cpp-forces is not installed")
-    >>> composite_rmsd.setUnusedForceGroup(0, model.system)
-    1
-    >>> model.system.addForce(composite_rmsd)
-    5
+    >>> composite_rmsd.addToSystem(model.system)
     >>> context = mm.Context(
     ...     model.system,
     ...     mm.VerletIntegrator(1.0 * unit.femtoseconds),

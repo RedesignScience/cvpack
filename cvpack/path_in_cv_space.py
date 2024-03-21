@@ -107,8 +107,7 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
     >>> path_vars = []
     >>> for metric in (cvpack.path.progress, cvpack.path.deviation):
     ...     var = cvpack.PathInCVSpace(metric, [phi, psi], milestones, np.pi / 6)
-    ...     _ = var.setUnusedForceGroup(0, model.system)
-    ...     _ = model.system.addForce(var)
+    ...     var.addToSystem(model.system)
     ...     path_vars.append(var)
     >>> context = openmm.Context(model.system, openmm.VerletIntegrator(1.0))
     >>> context.setPositions(model.positions)

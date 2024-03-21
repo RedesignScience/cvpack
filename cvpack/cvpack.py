@@ -128,9 +128,9 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         """
         cls = self.__class__
         self.setName(cls.__name__)
-        self.setUnit(unit)
+        self._unit = unit
         self._mass_unit = mmunit.dalton * (mmunit.nanometers / self.getUnit()) ** 2
-        arguments, _ = self.getArguments()
+        arguments, _ = self._getArguments()
         self._args = dict(zip(arguments, args))
         self._args.update(kwargs)
 
@@ -149,21 +149,22 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         self._period = period
 
     @classmethod
-    def getArguments(cls) -> t.Tuple[collections.OrderedDict, collections.OrderedDict]:
+    def _getArguments(cls) -> t.Tuple[collections.OrderedDict, collections.OrderedDict]:
         """
         Inspect the arguments needed for constructing an instance of this collective
         variable.
 
         Returns
         -------
+        OrderedDict
             A dictionary with the type annotations of all arguments
-
+        OrderedDict
             A dictionary with the default values of optional arguments
 
         Example
         -------
             >>> import cvpack
-            >>> args, defaults = cvpack.RadiusOfGyration.getArguments()
+            >>> args, defaults = cvpack.RadiusOfGyration._getArguments()
             >>> for name, annotation in args.items():
             ...     print(f"{name}: {annotation}")
             group: typing.Iterable[int]
@@ -180,16 +181,32 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
                 defaults[name] = parameter.default
         return arguments, defaults
 
-    def setUnit(self, unit: mmunit.Unit) -> None:
+    def _setUnusedForceGroup(self, system: openmm.System) -> None:
         """
-        Set the unit of measurement of this collective variable.
+        Set the force group of this collective variable to the one at a given position
+        in the ascending ordered list of unused force groups in an :OpenMM:`System`.
+
+        .. note::
+
+            Evaluating a collective variable (see :meth:`getValue`) or computing its
+            effective mass (see :meth:`getEffectiveMass`) is more efficient when the
+            collective variable is the only force in its own force group.
 
         Parameters
         ----------
-            unit
-                The unit of measurement of this collective variable
+            system
+                The system to search for unused force groups
+
+        Raises
+        ------
+            RuntimeError
+                If all force groups are already in use
         """
-        self._unit = unit
+        used_groups = {force.getForceGroup() for force in system.getForces()}
+        new_group = next(filter(lambda i: i not in used_groups, range(32)), None)
+        if new_group is None:
+            raise RuntimeError("All force groups are already in use.")
+        self.setForceGroup(new_group)
 
     def getUnit(self) -> mmunit.Unit:
         """
@@ -209,42 +226,23 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
             return None
         return mmunit.SerializableQuantity(self._period, self.getUnit())
 
-    def setUnusedForceGroup(self, position: int, system: openmm.System) -> int:
+    def addToSystem(
+        self, system: openmm.System, setUnusedForceGroup: bool = True
+    ) -> None:
         """
-        Set the force group of this collective variable to the one at a given position
-        in the ascending ordered list of unused force groups in an :OpenMM:`System`.
-
-        .. note::
-
-            Evaluating a collective variable (see :meth:`getValue`) or computing its
-            effective mass (see :meth:`getEffectiveMass`) is more efficient when the
-            collective variable is the only force in its own force group.
+        Add this collective variable to an :OpenMM:`System`.
 
         Parameters
         ----------
-            position
-                The position of the force group in the ascending ordered list of unused
-                force groups in the system
-            system
-                The system to search for unused force groups
-
-        Returns
-        -------
-            The index of the force group that was set
-
-        Raises
-        ------
-            RuntimeError
-                If all force groups are already in use
+        system
+            The system to which this collective variable should be added
+        setUnusedForceGroup
+            If True, the force group of this collective variable will be set to the
+            first available force group in the system
         """
-        free_groups = sorted(
-            set(range(32)) - {force.getForceGroup() for force in system.getForces()}
-        )
-        if not free_groups:
-            raise RuntimeError("All force groups are already in use.")
-        new_group = free_groups[position]
-        self.setForceGroup(new_group)
-        return new_group
+        if setUnusedForceGroup:
+            self._setUnusedForceGroup(system)
+        system.addForce(self)
 
     def getValue(self, context: openmm.Context) -> mmunit.Quantity:
         """
@@ -257,12 +255,43 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
 
         Parameters
         ----------
-            context
-                The context at which this collective variable should be evaluated
+        context
+            The context at which this collective variable should be evaluated
 
         Returns
         -------
+        unit.Quantity
             The value of this collective variable at the given context
+
+
+        Example
+        -------
+        In this example, we compute the values of the backbone dihedral angles and
+        the radius of gyration of an alanine dipeptide molecule in water:
+
+        >>> import cvpack
+        >>> import openmm
+        >>> from openmmtools import testsystems
+        >>> model = testsystems.AlanineDipeptideExplicit()
+        >>> top = model.mdtraj_topology
+        >>> backbone_atoms = top.select("name N C CA and resid 1 2")
+        >>> phi = cvpack.Torsion(*backbone_atoms[0:4])
+        >>> psi = cvpack.Torsion(*backbone_atoms[1:5])
+        >>> radius_of_gyration = cvpack.RadiusOfGyration(
+        ...     top.select('not water')
+        ... )
+        >>> for cv in [phi, psi, radius_of_gyration]:
+        ...     cv.addToSystem(model.system)
+        >>> context = openmm.Context(
+        ...     model.system, openmm.VerletIntegrator(0)
+        ... )
+        >>> context.setPositions(model.positions)
+        >>> print(phi.getValue(context))
+        3.1415... rad
+        >>> print(psi.getValue(context))
+        3.1415... rad
+        >>> print(radius_of_gyration.getValue(context))
+        0.29514... nm
         """
         state = get_single_force_state(self, context, getEnergy=True)
         value = value_in_md_units(state.getPotentialEnergy())
@@ -291,36 +320,41 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
 
         Parameters
         ----------
-            context
-                The context at which this collective variable's effective mass should be
-                evaluated
+        context
+            The context at which this collective variable's effective mass should be
+            evaluated
 
         Returns
         -------
+        unit.Quantity
             The effective mass of this collective variable at the given context
 
         Example
         -------
+            In this example, we compute the effective masses of the backbone dihedral
+            angles and the radius of gyration of an alanine dipeptide molecule in water:
+
             >>> import cvpack
             >>> import openmm
             >>> from openmmtools import testsystems
-            >>> model = testsystems.AlanineDipeptideImplicit()
-            >>> peptide = [
-            ...     a.index
-            ...     for a in model.topology.atoms()
-            ...     if a.residue.name != 'HOH'
-            ... ]
-            >>> radius_of_gyration = cvpack.RadiusOfGyration(peptide)
-            >>> radius_of_gyration.setForceGroup(1)
-            >>> radius_of_gyration.setUnusedForceGroup(0, model.system)
-            1
-            >>> model.system.addForce(radius_of_gyration)
-            6
-            >>> platform = openmm.Platform.getPlatformByName('Reference')
+            >>> model = testsystems.AlanineDipeptideExplicit()
+            >>> top = model.mdtraj_topology
+            >>> backbone_atoms = top.select("name N C CA and resid 1 2")
+            >>> phi = cvpack.Torsion(*backbone_atoms[0:4])
+            >>> psi = cvpack.Torsion(*backbone_atoms[1:5])
+            >>> radius_of_gyration = cvpack.RadiusOfGyration(
+            ...     top.select('not water')
+            ... )
+            >>> for cv in [phi, psi, radius_of_gyration]:
+            ...     cv.addToSystem(model.system)
             >>> context = openmm.Context(
-            ...     model.system,openmm.VerletIntegrator(0), platform
+            ...     model.system, openmm.VerletIntegrator(0)
             ... )
             >>> context.setPositions(model.positions)
+            >>> print(phi.getEffectiveMass(context))
+            0.05119... nm**2 Da/(rad**2)
+            >>> print(psi.getEffectiveMass(context))
+            0.05186... nm**2 Da/(rad**2)
             >>> print(radius_of_gyration.getEffectiveMass(context))
             30.946... Da
         """

@@ -72,10 +72,7 @@ class HelixHBondContent(openmm.CustomBondForce, BaseCollectiveVariable):
         >>> print(*[r.name for r in residues])
         LYS ASP GLU ... ILE LEU ARG
         >>> helix_content = cvpack.HelixHBondContent(residues)
-        >>> helix_content.setUnusedForceGroup(0, model.system)
-        1
-        >>> model.system.addForce(helix_content)
-        6
+        >>> helix_content.addToSystem(model.system)
         >>> platform = openmm.Platform.getPlatformByName('Reference')
         >>> integrator = openmm.VerletIntegrator(0)
         >>> context = openmm.Context(model.system, integrator, platform)

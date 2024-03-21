@@ -69,10 +69,7 @@ class RMSD(openmm.RMSDForce, BaseCollectiveVariable):
         >>> num_atoms = model.topology.getNumAtoms()
         >>> group = list(range(num_atoms))
         >>> rmsd = cvpack.RMSD(model.positions, group, num_atoms)
-        >>> rmsd.setUnusedForceGroup(0, model.system)
-        1
-        >>> model.system.addForce(rmsd)
-        6
+        >>> rmsd.addToSystem(model.system)
         >>> platform = openmm.Platform.getPlatformByName('Reference')
         >>> integrator = openmm.VerletIntegrator(2*unit.femtoseconds)
         >>> context = openmm.Context(model.system, integrator, platform)
@@ -131,8 +128,8 @@ class RMSD(openmm.RMSDForce, BaseCollectiveVariable):
             >>> rmsd = cvpack.RMSD(
             ...     model.positions, group, model.topology.getNumAtoms()
             ... )
-            >>> [model.system.addForce(f) for f in [rmsd, rmsd.getNullBondForce()]]
-            [3, 4]
+            >>> rmsd.addToSystem(model.system)
+            >>> _ = model.system.addForce(rmsd.getNullBondForce())
             >>> integrator = openmm.VerletIntegrator(2*unit.femtoseconds)
             >>> platform = openmm.Platform.getPlatformByName('Reference')
             >>> context = openmm.Context(model.system, integrator, platform)

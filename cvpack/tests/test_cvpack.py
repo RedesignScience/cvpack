@@ -37,8 +37,7 @@ def test_effective_mass():
     """
     model = testsystems.AlanineDipeptideVacuum()
     rg_cv = cvpack.RadiusOfGyration(range(model.system.getNumParticles()))
-    rg_cv.setUnusedForceGroup(0, model.system)
-    model.system.addForce(rg_cv)
+    rg_cv.addToSystem(model.system)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
@@ -60,7 +59,7 @@ def test_argument_inspection():
 
     # pylint: enable=missing-class-docstring, unused-argument
 
-    args, defaults = Test.getArguments()
+    args, defaults = Test._getArguments()  # pylint: disable=protected-access
     assert args["first"] is int
     assert args["second"] is float
     assert args["third"] is str
@@ -83,7 +82,7 @@ def perform_common_tests(
     assert unity.value_in_unit_system(unit.md_unit_system) == 1
 
     # Class must have full type annotation (except for argument `self`)
-    args, _ = collectiveVariable.getArguments()
+    args, _ = collectiveVariable._getArguments()  # pylint: disable=protected-access
     for _, annotation in args.items():
         assert annotation is not inspect.Parameter.empty
 
@@ -96,8 +95,7 @@ def perform_common_tests(
     serializer.serialize(collectiveVariable, pipe)
     pipe.seek(0)
     new_cv = serializer.deserialize(pipe)
-    new_cv.setUnusedForceGroup(0, context.getSystem())
-    context.getSystem().addForce(new_cv)
+    new_cv.addToSystem(context.getSystem())
     context.reinitialize(preserveState=True)
     value1 = collectiveVariable.getValue(context)
     value2 = new_cv.getValue(context)
@@ -131,8 +129,7 @@ def test_distance():
     model = testsystems.AlanineDipeptideVacuum()
     atom1, atom2 = 0, 5
     distance = cvpack.Distance(atom1, atom2)
-    distance.setUnusedForceGroup(0, model.system)
-    model.system.addForce(distance)
+    distance.addToSystem(model.system)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
@@ -151,8 +148,7 @@ def test_angle():
     model = testsystems.AlanineDipeptideVacuum()
     atoms = [0, 5, 10]
     angle = cvpack.Angle(*atoms)
-    angle.setUnusedForceGroup(0, model.system)
-    model.system.addForce(angle)
+    angle.addToSystem(model.system)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
@@ -173,8 +169,7 @@ def test_torsion():
     model = testsystems.AlanineDipeptideVacuum()
     atoms = [0, 5, 10, 15]
     torsion = cvpack.Torsion(*atoms)
-    torsion.setUnusedForceGroup(0, model.system)
-    model.system.addForce(torsion)
+    torsion.addToSystem(model.system)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
@@ -208,10 +203,8 @@ def test_radius_of_gyration():
     rg_cv = cvpack.RadiusOfGyration(range(num_atoms))
     weighted_rgsq = np.sum((positions - center_of_mass) ** 2) / num_atoms
     weighted_rg_cv = cvpack.RadiusOfGyration(range(num_atoms), weighByMass=True)
-    rg_cv.setUnusedForceGroup(0, model.system)
-    model.system.addForce(rg_cv)
-    weighted_rg_cv.setUnusedForceGroup(0, model.system)
-    model.system.addForce(weighted_rg_cv)
+    rg_cv.addToSystem(model.system)
+    weighted_rg_cv.addToSystem(model.system)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
@@ -240,10 +233,8 @@ def test_radius_of_gyration_squared():
     rg_sq = cvpack.RadiusOfGyrationSq(range(num_atoms))
     weighted_rgsq = np.sum((positions - center_of_mass) ** 2) / num_atoms
     weighted_rg_sq = cvpack.RadiusOfGyrationSq(range(num_atoms), weighByMass=True)
-    rg_sq.setUnusedForceGroup(0, model.system)
-    model.system.addForce(rg_sq)
-    weighted_rg_sq.setUnusedForceGroup(0, model.system)
-    model.system.addForce(weighted_rg_sq)
+    rg_sq.addToSystem(model.system)
+    weighted_rg_sq.addToSystem(model.system)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
@@ -288,8 +279,7 @@ def test_number_of_contacts():
         forces["NonbondedForce"],
         switchFactor=None,
     )
-    number_of_contacts.setUnusedForceGroup(0, model.system)
-    model.system.addForce(number_of_contacts)
+    number_of_contacts.addToSystem(model.system)
     integrator = openmm.CustomIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
@@ -320,8 +310,7 @@ def run_rmsd_test(
         group,
         num_atoms,
     )
-    rmsd.setUnusedForceGroup(0, model.system)
-    model.system.addForce(rmsd)
+    rmsd.addToSystem(model.system)
     integrator = openmm.VerletIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
@@ -340,8 +329,7 @@ def test_rmsd():
     model = testsystems.AlanineDipeptideVacuum()
     num_atoms = model.topology.getNumAtoms()
     rmsd = cvpack.RMSD(model.positions, np.arange(num_atoms), num_atoms)
-    rmsd.setUnusedForceGroup(0, model.system)
-    model.system.addForce(rmsd)
+    rmsd.addToSystem(model.system)
     integrator = openmm.VerletIntegrator(2 * unit.femtosecond)
     integrator.setIntegrationForceGroups({0})
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -386,10 +374,8 @@ def test_composite_rmsd():
         )
     except ImportError:
         pytest.skip("openmm-cpp-forces is not installed")
-    crmsd1.setUnusedForceGroup(0, model.system)
-    crmsd2.setUnusedForceGroup(1, model.system)
-    model.system.addForce(crmsd1)
-    model.system.addForce(crmsd2)
+    crmsd1.addToSystem(model.system)
+    crmsd2.addToSystem(model.system)
     context = openmm.Context(
         model.system,
         openmm.VerletIntegrator(0),
@@ -420,8 +406,7 @@ def test_helix_torsion_content():
         helix_content = cvpack.HelixTorsionContent(residues)
     assert str(excinfo.value) == "Could not find atom N in residue TMP163"
     helix_content = cvpack.HelixTorsionContent(residues[0:-1])
-    helix_content.setUnusedForceGroup(0, model.system)
-    model.system.addForce(helix_content)
+    helix_content.addToSystem(model.system)
     integrator = openmm.VerletIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
@@ -454,8 +439,7 @@ def test_helix_angle_content():
         helix_content = cvpack.HelixAngleContent(residues)
     assert str(excinfo.value) == "Could not find atom CA in residue TMP163"
     helix_content = cvpack.HelixAngleContent(residues[0:-1])
-    helix_content.setUnusedForceGroup(0, model.system)
-    model.system.addForce(helix_content)
+    helix_content.addToSystem(model.system)
     integrator = openmm.VerletIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
@@ -486,8 +470,7 @@ def test_helix_hbond_content():
     with pytest.raises(ValueError):
         helix_content = cvpack.HelixHBondContent(residues)
     helix_content = cvpack.HelixHBondContent(residues[58:79])
-    helix_content.setUnusedForceGroup(0, model.system)
-    model.system.addForce(helix_content)
+    helix_content.addToSystem(model.system)
     integrator = openmm.VerletIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
     context = openmm.Context(model.system, integrator, platform)
@@ -514,8 +497,7 @@ def test_helix_rmsd_content():
 
     start, end = 39, 51
     helix_content = cvpack.HelixRMSDContent(residues[start:end], num_atoms)
-    helix_content.setUnusedForceGroup(0, model.system)
-    model.system.addForce(helix_content)
+    helix_content.addToSystem(model.system)
     context = openmm.Context(
         model.system,
         openmm.VerletIntegrator(0),
@@ -568,8 +550,7 @@ def test_helix_torsion_similarity():
         np.vstack([phi_atoms[1:], psi_atoms[1:]]),
         np.vstack([phi_atoms[:-1], psi_atoms[:-1]]),
     )
-    torsion_similarity.setUnusedForceGroup(0, model.system)
-    model.system.addForce(torsion_similarity)
+    torsion_similarity.addToSystem(model.system)
     context = openmm.Context(
         model.system,
         openmm.VerletIntegrator(0),
@@ -599,8 +580,7 @@ def test_sheet_rmsd_content():
 
     sheet_content = cvpack.SheetRMSDContent(residues, topology.n_atoms)
     sheet_content.setForceGroup(31)
-    sheet_content.setUnusedForceGroup(0, model.system)
-    model.system.addForce(sheet_content)
+    sheet_content.addToSystem(model.system)
     context = openmm.Context(
         model.system,
         openmm.VerletIntegrator(0),
@@ -652,8 +632,7 @@ def test_atomic_function():
         str(excinfo.value) == "Unit angstrom is not compatible with the MD unit system."
     )
     colvar = cvpack.AtomicFunction(function, unit.nanometers, atoms)
-    colvar.setUnusedForceGroup(0, model.system)
-    model.system.addForce(colvar)
+    colvar.addToSystem(model.system)
     context = openmm.Context(
         model.system,
         openmm.VerletIntegrator(0),
@@ -692,8 +671,7 @@ def test_centroid_function():
     colvar = cvpack.CentroidFunction(
         function, unit.nanometers, groups, weighByMass=False
     )
-    colvar.setUnusedForceGroup(0, model.system)
-    model.system.addForce(colvar)
+    colvar.addToSystem(model.system)
     context = openmm.Context(
         model.system,
         openmm.VerletIntegrator(0),
@@ -787,8 +765,7 @@ def test_residue_coordination(includeHs: bool):
     res_coord = cvpack.ResidueCoordination(
         *groups, pbc=False, weighByMass=False, includeHydrogens=includeHs
     )
-    res_coord.setUnusedForceGroup(0, model.system)
-    model.system.addForce(res_coord)
+    res_coord.addToSystem(model.system)
     context = openmm.Context(
         model.system,
         openmm.VerletIntegrator(0),
@@ -818,8 +795,7 @@ def test_path_in_cv_space(metric: cvpack.path.Metric):
     psi = cvpack.Torsion(*[atoms.index(atom) for atom in psi_atoms])
     sigma = np.pi / 6
     var = cvpack.PathInCVSpace(metric, [phi, psi], milestones, sigma)
-    var.setUnusedForceGroup(0, model.system)
-    model.system.addForce(var)
+    var.addToSystem(model.system)
     context = openmm.Context(model.system, openmm.VerletIntegrator(1.0))
     context.setPositions(model.positions)
     cv_value = var.getValue(context)
@@ -852,9 +828,8 @@ def test_openmm_force_wrapper():
     angle.addAngle(0, 1, 2)
     cv = cvpack.OpenMMForceWrapper(angle, unit.radian, period=2 * np.pi)
     assert isinstance(cv, openmm.CustomAngleForce)
-    group = cv.setUnusedForceGroup(0, model.system)
-    model.system.addForce(cv)
-    angle.setForceGroup(group + 1)
+    cv.addToSystem(model.system)
+    angle.setForceGroup(cv.getForceGroup() + 1)
     model.system.addForce(angle)
     integrator = openmm.VerletIntegrator(0)
     platform = openmm.Platform.getPlatformByName("Reference")
@@ -862,7 +837,7 @@ def test_openmm_force_wrapper():
     context.setPositions(model.positions)
     state = context.getState(  # pylint: disable=unexpected-keyword-arg
         getEnergy=True,
-        groups={group + 1},
+        groups={cv.getForceGroup() + 1},
     )
     angle_value = state.getPotentialEnergy().value_in_unit(unit.kilojoule_per_mole)
     assert cv.getValue(context) / unit.radians == pytest.approx(angle_value)

@@ -100,10 +100,7 @@ class NumberOfContacts(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     ...     forces["NonbondedForce"],
     ...     stepFunction="step(1-x)",
     ... )
-    >>> nc.setUnusedForceGroup(0, model.system)
-    1
-    >>> model.system.addForce(nc)
-    5
+    >>> nc.addToSystem(model.system)
     >>> platform = openmm.Platform.getPlatformByName("Reference")
     >>> integrator = openmm.VerletIntegrator(1.0 * mmunit.femtoseconds)
     >>> context = openmm.Context(model.system, integrator, platform)
@@ -117,10 +114,7 @@ class NumberOfContacts(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     ...     stepFunction="step(1-x)",
     ...     reference=context,
     ... )
-    >>> nc_normalized.setUnusedForceGroup(0, model.system)
-    2
-    >>> model.system.addForce(nc_normalized)
-    6
+    >>> nc_normalized.addToSystem(model.system)
     >>> context.reinitialize(preserveState=True)
     >>> print(nc_normalized.getValue(context))
     0.99999... dimensionless

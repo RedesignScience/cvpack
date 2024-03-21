@@ -19,6 +19,8 @@ from cvpack import unit as mmunit
 
 from .serializer import Serializable
 
+# pylint: disable=protected-access,c-extension-no-member
+
 
 class NonbondedForceSurrogate(
     Serializable
@@ -199,22 +201,23 @@ def get_single_force_state(
     ValueError
         If this force is not present in the given context
     """
-    forces = context.getSystem().getForces()
-    if not any(f.this == force.this for f in forces):
+    forces_and_groups = [
+        (f, f.getForceGroup()) for f in context.getSystem().getForces()
+    ]
+    if not any(f.this == force.this for f, _ in forces_and_groups):
         raise RuntimeError("This force is not present in the given context.")
     self_group = force.getForceGroup()
-    other_groups = {force.getForceGroup() for f in forces if f.this != force.this}
+    other_groups = {g for f, g in forces_and_groups if f.this != force.this}
     if self_group not in other_groups:
         return context.getState(
             getEnergy=getEnergy, getForces=getForces, groups=1 << self_group
         )
-    old_group = force.getForceGroup()
-    new_group = force.setUnusedForceGroup(0, context.getSystem())
+    new_group = force._setUnusedForceGroup(context.getSystem())
     context.reinitialize(preserveState=True)
     state = context.getState(
         getEnergy=getEnergy, getForces=getForces, groups=1 << new_group
     )
-    force.setForceGroup(old_group)
+    force.setForceGroup(self_group)
     context.reinitialize(preserveState=True)
     return state
 
@@ -235,7 +238,6 @@ def compute_effective_mass(force: openmm.Force, context: openmm.Context) -> floa
     float
         The effective mass of the force at the given context
     """
-    # pylint: disable=protected-access,c-extension-no-member
     state = get_single_force_state(force, context, getForces=True)
     get_mass = functools.partial(
         openmm._openmm.System_getParticleMass, context.getSystem()
@@ -247,4 +249,3 @@ def compute_effective_mass(force: openmm.Force, context: openmm.Context) -> floa
         return mmunit.Quantity(np.inf, force._mass_unit)
     mass_values = np.fromiter(map(get_mass, nonzeros), dtype=np.float64)
     return 1.0 / np.sum(squared_forces[nonzeros] / mass_values)
-    # pylint: enable=protected-access,c-extension-no-member

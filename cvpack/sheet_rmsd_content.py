@@ -155,10 +155,7 @@ class SheetRMSDContent(BaseRMSDContent):
         ... )
         >>> sheet_content.getNumResidueBlocks()
         28
-        >>> sheet_content.setUnusedForceGroup(0, model.system)
-        1
-        >>> model.system.addForce(sheet_content)
-        6
+        >>> sheet_content.addToSystem(model.system)
         >>> platform = openmm.Platform.getPlatformByName('Reference')
         >>> integrator = openmm.VerletIntegrator(0)
         >>> context = openmm.Context(model.system, integrator, platform)
@@ -172,10 +169,7 @@ class SheetRMSDContent(BaseRMSDContent):
         ... )
         >>> blockwise_sheet_content.getNumResidueBlocks()
         9
-        >>> blockwise_sheet_content.setUnusedForceGroup(0, model.system)
-        2
-        >>> model.system.addForce(blockwise_sheet_content)
-        7
+        >>> blockwise_sheet_content.addToSystem(model.system)
         >>> context.reinitialize(preserveState=True)
         >>> print(blockwise_sheet_content.getValue(context))
         0.9859... dimensionless

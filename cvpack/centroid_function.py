@@ -121,10 +121,7 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
         >>> res_coord = cvpack.ResidueCoordination(
         ...     residues[115:124], residues[126:135], stepFunction="step(1-x)"
         ... )
-        >>> res_coord.setUnusedForceGroup(0, model.system)
-        1
-        >>> model.system.addForce(res_coord)
-        6
+        >>> res_coord.addToSystem(model.system)
         >>> integrator = openmm.VerletIntegrator(0)
         >>> platform = openmm.Platform.getPlatformByName('Reference')
         >>> context = openmm.Context(model.system, integrator, platform)
@@ -142,10 +139,7 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
         ...    atoms[115:124] + atoms[126:135],
         ...    list(it.product(range(9), range(9, 18))),
         ... )
-        >>> colvar.setUnusedForceGroup(0, model.system)
-        2
-        >>> model.system.addForce(colvar)
-        7
+        >>> colvar.addToSystem(model.system)
         >>> context.reinitialize(preserveState=True)
         >>> print(colvar.getValue(context))
         33.0 dimensionless
