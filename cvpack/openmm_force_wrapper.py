@@ -62,8 +62,6 @@ class OpenMMForceWrapper(BaseCollectiveVariable):
         0.00538... nm**2 Da/(rad**2)
     """
 
-    yaml_tag = "!cvpack.OpenMMForceWrapper"
-
     def __init__(  # pylint: disable=too-many-arguments, super-init-not-called
         self,
         openmmForce: t.Union[openmm.Force, str],
@@ -79,3 +77,6 @@ class OpenMMForceWrapper(BaseCollectiveVariable):
         self._registerCV(unit, openmmForce, unit, period)
         if period is not None:
             self._registerPeriod(period)
+
+
+OpenMMForceWrapper.registerTag("!cvpack.OpenMMForceWrapper")

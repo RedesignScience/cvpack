@@ -84,8 +84,6 @@ class HelixHBondContent(openmm.CustomBondForce, BaseCollectiveVariable):
         15.880... dimensionless
     """
 
-    yaml_tag = "!cvpack.HelixHBondContent"
-
     @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
@@ -126,3 +124,6 @@ class HelixHBondContent(openmm.CustomBondForce, BaseCollectiveVariable):
             halfExponent,
             normalize,
         )
+
+
+HelixHBondContent.registerTag("!cvpack.HelixHBondContent")

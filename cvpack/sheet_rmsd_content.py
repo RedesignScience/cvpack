@@ -181,8 +181,6 @@ class SheetRMSDContent(BaseRMSDContent):
         0.9859... dimensionless
     """
 
-    yaml_tag = "!cvpack.SheetRMSDContent"
-
     @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
@@ -235,3 +233,6 @@ class SheetRMSDContent(BaseRMSDContent):
             stepFunction,
             normalize,
         )
+
+
+SheetRMSDContent.registerTag("!cvpack.SheetRMSDContent")

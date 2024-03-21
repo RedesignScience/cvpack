@@ -84,8 +84,6 @@ class RMSD(openmm.RMSDForce, BaseCollectiveVariable):
 
     """
 
-    yaml_tag = "!cvpack.RMSD"
-
     @mmunit.convert_quantities
     def __init__(
         self,
@@ -149,3 +147,6 @@ class RMSD(openmm.RMSDForce, BaseCollectiveVariable):
         for i, j in zip(group[:-1], group[1:]):
             force.addBond(i, j, 0.0, 0.0)
         return force
+
+
+RMSD.registerTag("!cvpack.RMSD")

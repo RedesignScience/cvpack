@@ -118,8 +118,6 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
     z = 0.25... dimensionless
     """
 
-    yaml_tag = "!cvpack.PathInCVSpace"
-
     @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
@@ -177,3 +175,6 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
             sigma,
             scales,
         )
+
+
+PathInCVSpace.registerTag("!cvpack.PathInCVSpace")

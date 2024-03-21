@@ -166,8 +166,6 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     3880.8...
     """
 
-    yaml_tag = "!cvpack.AttractionStrength"
-
     @mmunit.convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
@@ -236,3 +234,6 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
             reference,
             contrastScaling,
         )
+
+
+AttractionStrength.registerTag("!cvpack.AttractionStrength")

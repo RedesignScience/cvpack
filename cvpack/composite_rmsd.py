@@ -123,8 +123,6 @@ class CompositeRMSD(CompositeRMSDForce, BaseCollectiveVariable):
     0.0 nm
     """
 
-    yaml_tag = "!cvpack.CompositeRMSD"
-
     @mmunit.convert_quantities
     def __init__(
         self,
@@ -149,3 +147,6 @@ class CompositeRMSD(CompositeRMSDForce, BaseCollectiveVariable):
         for group in groups:
             self.addGroup(group)
         self._registerCV(mmunit.nanometers, defined_coords, groups, num_atoms)
+
+
+CompositeRMSD.registerTag("!cvpack.CompositeRMSD")
