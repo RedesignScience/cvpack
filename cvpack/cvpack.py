@@ -156,8 +156,9 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
 
         Returns
         -------
+        OrderedDict
             A dictionary with the type annotations of all arguments
-
+        OrderedDict
             A dictionary with the default values of optional arguments
 
         Example
@@ -291,36 +292,42 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
 
         Parameters
         ----------
-            context
-                The context at which this collective variable's effective mass should be
-                evaluated
+        context
+            The context at which this collective variable's effective mass should be
+            evaluated
 
         Returns
         -------
+        unit.Quantity
             The effective mass of this collective variable at the given context
 
         Example
         -------
+            In this example, we compute the effective masses of the backbone dihedral
+            angles and the radius of gyration of an alanine dipeptide molecule in water:
+
             >>> import cvpack
             >>> import openmm
             >>> from openmmtools import testsystems
-            >>> model = testsystems.AlanineDipeptideImplicit()
-            >>> peptide = [
-            ...     a.index
-            ...     for a in model.topology.atoms()
-            ...     if a.residue.name != 'HOH'
-            ... ]
-            >>> radius_of_gyration = cvpack.RadiusOfGyration(peptide)
-            >>> radius_of_gyration.setForceGroup(1)
-            >>> radius_of_gyration.setUnusedForceGroup(0, model.system)
-            1
-            >>> model.system.addForce(radius_of_gyration)
-            6
-            >>> platform = openmm.Platform.getPlatformByName('Reference')
+            >>> model = testsystems.AlanineDipeptideExplicit()
+            >>> top = model.mdtraj_topology
+            >>> backbone_atoms = top.select("name N C CA and resid 1 2")
+            >>> phi = cvpack.Torsion(*backbone_atoms[0:4])
+            >>> psi = cvpack.Torsion(*backbone_atoms[1:5])
+            >>> radius_of_gyration = cvpack.RadiusOfGyration(
+            ...     top.select('not water')
+            ... )
+            >>> for cv in [phi, psi, radius_of_gyration]:
+            ...     _ = cv.setUnusedForceGroup(0, model.system)
+            ...     _ = model.system.addForce(cv)
             >>> context = openmm.Context(
-            ...     model.system,openmm.VerletIntegrator(0), platform
+            ...     model.system, openmm.VerletIntegrator(0)
             ... )
             >>> context.setPositions(model.positions)
+            >>> print(phi.getEffectiveMass(context))
+            0.05119... nm**2 Da/(rad**2)
+            >>> print(psi.getEffectiveMass(context))
+            0.05186... nm**2 Da/(rad**2)
             >>> print(radius_of_gyration.getEffectiveMass(context))
             30.946... Da
         """
