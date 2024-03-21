@@ -181,6 +181,33 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
                 defaults[name] = parameter.default
         return arguments, defaults
 
+    def _setUnusedForceGroup(self, system: openmm.System) -> None:
+        """
+        Set the force group of this collective variable to the one at a given position
+        in the ascending ordered list of unused force groups in an :OpenMM:`System`.
+
+        .. note::
+
+            Evaluating a collective variable (see :meth:`getValue`) or computing its
+            effective mass (see :meth:`getEffectiveMass`) is more efficient when the
+            collective variable is the only force in its own force group.
+
+        Parameters
+        ----------
+            system
+                The system to search for unused force groups
+
+        Raises
+        ------
+            RuntimeError
+                If all force groups are already in use
+        """
+        used_groups = {force.getForceGroup() for force in system.getForces()}
+        new_group = next(filter(lambda i: i not in used_groups, range(32)), None)
+        if new_group is None:
+            raise RuntimeError("All force groups are already in use.")
+        self.setForceGroup(new_group)
+
     def getUnit(self) -> mmunit.Unit:
         """
         Get the unit of measurement of this collective variable.
@@ -199,42 +226,23 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
             return None
         return mmunit.SerializableQuantity(self._period, self.getUnit())
 
-    def setUnusedForceGroup(self, position: int, system: openmm.System) -> int:
+    def addToSystem(
+        self, system: openmm.System, set_unused_force_group: bool = True
+    ) -> None:
         """
-        Set the force group of this collective variable to the one at a given position
-        in the ascending ordered list of unused force groups in an :OpenMM:`System`.
-
-        .. note::
-
-            Evaluating a collective variable (see :meth:`getValue`) or computing its
-            effective mass (see :meth:`getEffectiveMass`) is more efficient when the
-            collective variable is the only force in its own force group.
+        Add this collective variable to an :OpenMM:`System`.
 
         Parameters
         ----------
-            position
-                The position of the force group in the ascending ordered list of unused
-                force groups in the system
-            system
-                The system to search for unused force groups
-
-        Returns
-        -------
-            The index of the force group that was set
-
-        Raises
-        ------
-            RuntimeError
-                If all force groups are already in use
+        system
+            The system to which this collective variable should be added
+        set_unused_force_group
+            If True, the force group of this collective variable will be set to the
+            first available force group in the system
         """
-        free_groups = sorted(
-            set(range(32)) - {force.getForceGroup() for force in system.getForces()}
-        )
-        if not free_groups:
-            raise RuntimeError("All force groups are already in use.")
-        new_group = free_groups[position]
-        self.setForceGroup(new_group)
-        return new_group
+        if set_unused_force_group:
+            self._setUnusedForceGroup(system)
+        system.addForce(self)
 
     def getValue(self, context: openmm.Context) -> mmunit.Quantity:
         """
@@ -273,8 +281,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         ...     top.select('not water')
         ... )
         >>> for cv in [phi, psi, radius_of_gyration]:
-        ...     _ = cv.setUnusedForceGroup(0, model.system)
-        ...     _ = model.system.addForce(cv)
+        ...     cv.addToSystem(model.system)
         >>> context = openmm.Context(
         ...     model.system, openmm.VerletIntegrator(0)
         ... )
@@ -339,7 +346,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
             ...     top.select('not water')
             ... )
             >>> for cv in [phi, psi, radius_of_gyration]:
-            ...     _ = cv.setUnusedForceGroup(0, model.system)
+            ...     _ = cv._setUnusedForceGroup(model.system)
             ...     _ = model.system.addForce(cv)
             >>> context = openmm.Context(
             ...     model.system, openmm.VerletIntegrator(0)

@@ -199,22 +199,24 @@ def get_single_force_state(
     ValueError
         If this force is not present in the given context
     """
-    forces = context.getSystem().getForces()
-    if not any(f.this == force.this for f in forces):
+    forces_and_groups = [
+        (f, f.getForceGroup()) for f in context.getSystem().getForces()
+    ]
+    if not any(f.this == force.this for f, _ in forces_and_groups):
         raise RuntimeError("This force is not present in the given context.")
     self_group = force.getForceGroup()
-    other_groups = {force.getForceGroup() for f in forces if f.this != force.this}
+    other_groups = {g for f, g in forces_and_groups if f.this != force.this}
     if self_group not in other_groups:
         return context.getState(
             getEnergy=getEnergy, getForces=getForces, groups=1 << self_group
         )
-    old_group = force.getForceGroup()
-    new_group = force.setUnusedForceGroup(0, context.getSystem())
+    # old_group = force.getForceGroup()
+    new_group = force._setUnusedForceGroup(context.getSystem())
     context.reinitialize(preserveState=True)
     state = context.getState(
         getEnergy=getEnergy, getForces=getForces, groups=1 << new_group
     )
-    force.setForceGroup(old_group)
+    force.setForceGroup(self_group)
     context.reinitialize(preserveState=True)
     return state
 
