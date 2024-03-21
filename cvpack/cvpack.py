@@ -130,7 +130,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         self.setName(cls.__name__)
         self._unit = unit
         self._mass_unit = mmunit.dalton * (mmunit.nanometers / self.getUnit()) ** 2
-        arguments, _ = self.getArguments()
+        arguments, _ = self._getArguments()
         self._args = dict(zip(arguments, args))
         self._args.update(kwargs)
 
@@ -149,7 +149,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         self._period = period
 
     @classmethod
-    def getArguments(cls) -> t.Tuple[collections.OrderedDict, collections.OrderedDict]:
+    def _getArguments(cls) -> t.Tuple[collections.OrderedDict, collections.OrderedDict]:
         """
         Inspect the arguments needed for constructing an instance of this collective
         variable.
@@ -164,7 +164,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         Example
         -------
             >>> import cvpack
-            >>> args, defaults = cvpack.RadiusOfGyration.getArguments()
+            >>> args, defaults = cvpack.RadiusOfGyration._getArguments()
             >>> for name, annotation in args.items():
             ...     print(f"{name}: {annotation}")
             group: typing.Iterable[int]
