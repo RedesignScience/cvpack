@@ -247,12 +247,44 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
 
         Parameters
         ----------
-            context
-                The context at which this collective variable should be evaluated
+        context
+            The context at which this collective variable should be evaluated
 
         Returns
         -------
+        unit.Quantity
             The value of this collective variable at the given context
+
+
+        Example
+        -------
+        In this example, we compute the values of the backbone dihedral angles and
+        the radius of gyration of an alanine dipeptide molecule in water:
+
+        >>> import cvpack
+        >>> import openmm
+        >>> from openmmtools import testsystems
+        >>> model = testsystems.AlanineDipeptideExplicit()
+        >>> top = model.mdtraj_topology
+        >>> backbone_atoms = top.select("name N C CA and resid 1 2")
+        >>> phi = cvpack.Torsion(*backbone_atoms[0:4])
+        >>> psi = cvpack.Torsion(*backbone_atoms[1:5])
+        >>> radius_of_gyration = cvpack.RadiusOfGyration(
+        ...     top.select('not water')
+        ... )
+        >>> for cv in [phi, psi, radius_of_gyration]:
+        ...     _ = cv.setUnusedForceGroup(0, model.system)
+        ...     _ = model.system.addForce(cv)
+        >>> context = openmm.Context(
+        ...     model.system, openmm.VerletIntegrator(0)
+        ... )
+        >>> context.setPositions(model.positions)
+        >>> print(phi.getValue(context))
+        3.1415... rad
+        >>> print(psi.getValue(context))
+        3.1415... rad
+        >>> print(radius_of_gyration.getValue(context))
+        0.29514... nm
         """
         state = get_single_force_state(self, context, getEnergy=True)
         value = value_in_md_units(state.getPotentialEnergy())
