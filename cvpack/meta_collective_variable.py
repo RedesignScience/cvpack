@@ -16,7 +16,8 @@ import openmm
 from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
-from .units import ScalarQuantity, VectorQuantity, preprocess_units, Quantity
+from .units import Quantity, ScalarQuantity, VectorQuantity, preprocess_units
+from .utils import compute_effective_mass
 
 
 class MetaCollectiveVariable(openmm.CustomCVForce, BaseCollectiveVariable):
@@ -42,8 +43,10 @@ class MetaCollectiveVariable(openmm.CustomCVForce, BaseCollectiveVariable):
         The function to be evaluated. It must be a valid :OpenMM:`CustomCVForce`
         expression.
     collective_variables
-        A sequence of collective variables to be used in the function. The name of each
-        collective variable must be unique and match a symbol used in the function.
+        A sequence of :class:`BaseCollectiveVariable` instances that represent the
+        collective variables on which the meta-collective variable depends. The name
+        of each collective variable must be unique and match a symbol used in the
+        function.
     unit
         The unit of measurement of the collective variable. It must be compatible
         with the MD unit system (mass in `daltons`, distance in `nanometers`, time
@@ -64,13 +67,12 @@ class MetaCollectiveVariable(openmm.CustomCVForce, BaseCollectiveVariable):
     >>> import cvpack
     >>> import math
     >>> import openmm
-    >>> import numpy as np
     >>> from openmm import unit
     >>> from openmmtools import testsystems
     >>> model = testsystems.AlanineDipeptideVacuum()
     >>> phi = cvpack.Torsion(6, 8, 14, 16, name="phi")
     >>> driving_force = cvpack.MetaCollectiveVariable(
-    ...     f"kappa/2 * min(delta,{2*math.pi}-delta)^2; delta=abs(phi-phi0)",
+    ...     f"0.5*kappa*min(delta,{2*math.pi}-delta)^2; delta=abs(phi-phi0)",
     ...     [phi],
     ...     unit.kilojoules_per_mole,
     ...     kappa = 1000 * unit.kilojoules_per_mole/unit.radian**2,
@@ -83,8 +85,10 @@ class MetaCollectiveVariable(openmm.CustomCVForce, BaseCollectiveVariable):
     >>> context.setPositions(model.positions)
     >>> driving_force.getValue(context)
     548.3... kJ/mol
-    >>> driving_force.getValues(context)
-    {'phi': 3.1415912746972743 rad}
+    >>> driving_force.getInnerValues(context)
+    {'phi': 3.14... rad}
+    >>> driving_force.getInnerEffectiveMasses(context)
+    {'phi': 0.05119... nm**2 Da/(rad**2)}
     """
 
     @preprocess_units
@@ -99,8 +103,8 @@ class MetaCollectiveVariable(openmm.CustomCVForce, BaseCollectiveVariable):
     ) -> None:
         super().__init__(function)
         self._cvs = {cv.getName(): copy(cv) for cv in collective_variables}
-        for name, cv in self._cvs.items():
-            self.addCollectiveVariable(name, cv)
+        for cvname, cv in self._cvs.items():
+            self.addCollectiveVariable(cvname, cv)
         for parameter, value in parameters.items():
             self.addGlobalParameter(parameter, value)
         self._registerCV(
@@ -108,12 +112,54 @@ class MetaCollectiveVariable(openmm.CustomCVForce, BaseCollectiveVariable):
         )
         self._registerPeriod(period)
 
-    def getValues(self, context: openmm.Context) -> ScalarQuantity:
+    def getInnerValues(self, context: openmm.Context) -> t.Dict[str, Quantity]:
+        """
+        Get the values of the collective variables on which the meta-collective variable
+        depends. The values are returned as a dictionary with the names of the
+        collective variables as keys.
+
+        Parameters
+        ----------
+        context
+            The context in which the collective variables will be evaluated.
+
+        Returns
+        -------
+        Dict[str, Quantity]
+            A dictionary with the names of the collective variables as keys and their
+            values as values.
+        """
+        values = self.getCollectiveVariableValues(context)
         return {
             name: Quantity(value, cv.getUnit())
-            for (name, cv), value in zip(
-                self._cvs.items(), self.getCollectiveVariableValues(context)
-            )
+            for (name, cv), value in zip(self._cvs.items(), values)
+        }
+
+    def getInnerEffectiveMasses(self, context: openmm.Context) -> t.Dict[str, Quantity]:
+        """
+        Get the effective masses of the collective variables on which the
+        meta-collective variable depends. The effective masses are calculated from the
+        forces acting on the particles that represent the collective variables.
+
+        Parameters
+        ----------
+        context
+            The context in which the collective variables will be evaluated.
+
+        Returns
+        -------
+        Dict[str, Quantity]
+            A dictionary with the names of the collective variables as keys and their
+            effective masses as values.
+        """
+        inner_context = self.getInnerContext(context)
+        masses = [
+            compute_effective_mass(force, inner_context)
+            for force in inner_context.getSystem().getForces()
+        ]
+        return {
+            name: Quantity(mass, cv.getMassUnit())
+            for (name, cv), mass in zip(self._cvs.items(), masses)
         }
 
 
