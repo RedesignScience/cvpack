@@ -74,7 +74,7 @@ class MetaCollectiveVariable(openmm.CustomCVForce, BaseCollectiveVariable):
     ...     [phi],
     ...     unit.kilojoules_per_mole,
     ...     kappa = 1000 * unit.kilojoules_per_mole/unit.radian**2,
-    ...     phi0 = math.pi/2 * unit.radian,
+    ...     phi0 = 120 * unit.degrees
     ... )
     >>> driving_force.addToSystem(model.system)
     >>> integrator = openmm.VerletIntegrator(0)
@@ -82,7 +82,7 @@ class MetaCollectiveVariable(openmm.CustomCVForce, BaseCollectiveVariable):
     >>> context = openmm.Context(model.system, integrator, platform)
     >>> context.setPositions(model.positions)
     >>> print(driving_force.getValue(context))
-    1233.70... kJ/mol
+    548.3... kJ/mol
     """
 
     @preprocess_units
@@ -96,9 +96,8 @@ class MetaCollectiveVariable(openmm.CustomCVForce, BaseCollectiveVariable):
         **parameters: t.Union[ScalarQuantity, VectorQuantity],
     ) -> None:
         super().__init__(function)
-        self._collective_variables = list(map(copy, collective_variables))
-        for cv in self._collective_variables:
-            self.addCollectiveVariable(cv.getName(), cv)
+        for cv in collective_variables:
+            self.addCollectiveVariable(cv.getName(), copy(cv))
         for parameter, value in parameters.items():
             self.addGlobalParameter(parameter, value)
         self._registerCV(
