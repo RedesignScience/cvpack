@@ -46,27 +46,28 @@ class BaseRMSDContent(openmm.CustomCVForce, BaseCollectiveVariable):
             for block in residue_blocks
         ]
 
-        def expression(start):
+        def get_expression(start):
             summands = []
             definitions = []
             for i in range(start, min(start + 32, num_residue_blocks)):
                 summands.append(stepFunction.replace("x", f"x{i}"))
                 definitions.append(f"x{i}=rmsd{i}/{value_in_md_units(thresholdRMSD)}")
-            return ";".join(["+".join(summands)] + definitions)
+            summation = "+".join(summands)
+            if normalize:
+                summation = f"({summation})/{num_residue_blocks}"
+            return ";".join([summation] + definitions)
 
         if num_residue_blocks <= 32:
-            summation = expression(0)
+            expression = get_expression(0)
             force = self
         else:
-            summation = "+".join(
+            expression = "+".join(
                 f"chunk{i}" for i in range((num_residue_blocks + 31) // 32)
             )
-        super().__init__(
-            f"({summation})/{num_residue_blocks}" if normalize else summation
-        )
+        super().__init__(expression)
         for index in range(num_residue_blocks):
             if num_residue_blocks > 32 and index % 32 == 0:
-                force = openmm.CustomCVForce(expression(index))
+                force = openmm.CustomCVForce(get_expression(index))
                 self.addCollectiveVariable(f"chunk{index//32}", force)
             force.addCollectiveVariable(
                 f"rmsd{index}",

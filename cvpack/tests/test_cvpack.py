@@ -478,7 +478,8 @@ def test_helix_hbond_content():
     perform_common_tests(helix_content, context)
 
 
-def test_helix_rmsd_content():
+@pytest.mark.parametrize("normalize", [False, True])
+def test_helix_rmsd_content(normalize: bool):
     """
     Test whether a helix rmsd content is computed correctly.
 
@@ -489,12 +490,14 @@ def test_helix_rmsd_content():
     residues = list(model.topology.residues())
     with pytest.raises(ValueError) as excinfo:
         helix_content = cvpack.HelixRMSDContent(
-            residues[len(residues) - 37 :], num_atoms
+            residues[len(residues) - 37 :], num_atoms, normalize=normalize
         )
     assert str(excinfo.value) == "Atom N not found in residue TMP163"
 
     start, end = 39, 51
-    helix_content = cvpack.HelixRMSDContent(residues[start:end], num_atoms)
+    helix_content = cvpack.HelixRMSDContent(
+        residues[start:end], num_atoms, normalize=normalize
+    )
     helix_content.addToSystem(model.system)
     context = openmm.Context(
         model.system,
@@ -518,6 +521,8 @@ def test_helix_rmsd_content():
             ref.xyz[:, group, :] = positions
             x4 = (mdtraj.rmsd(traj, ref, 0, group).item() / 0.08) ** 4
             computed_value += (1 + x4) / (1 + x4 + x4**2)
+        if normalize:
+            computed_value /= len(atoms) // 5 - 5
         return computed_value
 
     def select_atoms(stard, end):
@@ -564,7 +569,8 @@ def test_helix_torsion_similarity():
     perform_common_tests(torsion_similarity, context)
 
 
-def test_sheet_rmsd_content():
+@pytest.mark.parametrize("normalize", [False, True])
+def test_sheet_rmsd_content(normalize: bool):
     """
     Test whether a sheet rmsd content is computed correctly.
 
@@ -574,7 +580,9 @@ def test_sheet_rmsd_content():
     topology = mdtraj.Topology.from_openmm(model.topology)
     residues = list(it.islice(model.topology.residues(), 68, 82))
 
-    sheet_content = cvpack.SheetRMSDContent(residues, topology.n_atoms)
+    sheet_content = cvpack.SheetRMSDContent(
+        residues, topology.n_atoms, normalize=normalize
+    )
     sheet_content.setForceGroup(31)
     sheet_content.addToSystem(model.system)
     context = openmm.Context(
@@ -602,11 +610,14 @@ def test_sheet_rmsd_content():
         residue_atoms.append(tuple(atoms[name] for name in ["N", "CA", "CB", "C", "O"]))
 
     min_separation = 5
-    computed_value = sum(
+    terms = [
         compute_step_function([i, i + 1, i + 2, j, j + 1, j + 2])
         for i, j in it.combinations(range(len(residues) - 2), 2)
         if j - i >= min_separation
-    )
+    ]
+    computed_value = sum(terms)
+    if normalize:
+        computed_value /= len(terms)
 
     assert cv_value / cv_value.unit == pytest.approx(computed_value, abs=1e-5)
     perform_common_tests(sheet_content, context)
