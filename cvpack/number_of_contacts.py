@@ -107,7 +107,7 @@ class NumberOfContacts(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     >>> integrator = openmm.VerletIntegrator(1.0 * mmunit.femtoseconds)
     >>> context = openmm.Context(model.system, integrator, platform)
     >>> context.setPositions(model.positions)
-    >>> print(nc.getValue(context))
+    >>> nc.getValue(context)
     30.0... dimensionless
     >>> nc_normalized = cvpack.NumberOfContacts(
     ...     group1,
@@ -118,7 +118,7 @@ class NumberOfContacts(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     ... )
     >>> nc_normalized.addToSystem(model.system)
     >>> context.reinitialize(preserveState=True)
-    >>> print(nc_normalized.getValue(context))
+    >>> nc_normalized.getValue(context)
     0.99999... dimensionless
     """
 

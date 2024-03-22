@@ -162,7 +162,7 @@ class SheetRMSDContent(BaseRMSDContent):
     >>> integrator = openmm.VerletIntegrator(0)
     >>> context = openmm.Context(model.system, integrator, platform)
     >>> context.setPositions(model.positions)
-    >>> print(sheet_content.getValue(context))
+    >>> sheet_content.getValue(context)
     1.0465... dimensionless
     >>> blockwise_sheet_content = cvpack.SheetRMSDContent(
     ...     residues[:5] + residues[-5:],
@@ -173,7 +173,7 @@ class SheetRMSDContent(BaseRMSDContent):
     9
     >>> blockwise_sheet_content.addToSystem(model.system)
     >>> context.reinitialize(preserveState=True)
-    >>> print(blockwise_sheet_content.getValue(context))
+    >>> blockwise_sheet_content.getValue(context)
     0.9859... dimensionless
     """
 

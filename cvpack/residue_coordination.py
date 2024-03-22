@@ -96,11 +96,11 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable
     ...     model.system, openmm.CustomIntegrator(0), platform
     ... )
     >>> context.setPositions(model.positions)
-    >>> print(residue_coordination.getValue(context))
+    >>> residue_coordination.getValue(context)
     26.0 dimensionless
     >>> residue_coordination.setReferenceValue(26 * unit.dimensionless)
     >>> context.reinitialize(preserveState=True)
-    >>> print(residue_coordination.getValue(context))
+    >>> residue_coordination.getValue(context)
     0.99999... dimensionless
     """
 

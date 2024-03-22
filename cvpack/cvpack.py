@@ -86,8 +86,8 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
     An abstract class with common attributes and method for all CVs.
     """
 
-    _unit: mmunit.Unit = None
-    _mass_unit: mmunit.Unit = mmunit.dalton * mmunit.nanometers**2
+    _unit: Unit = Unit("dimensionless")
+    _mass_unit: Unit = Unit("dalton")
     _args: t.Dict[str, t.Any] = {}
     _period: t.Optional[float] = None
 
@@ -131,7 +131,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         """
         self.setName(name)
         self._unit = Unit("dimensionless") if unit is None else unit
-        self._mass_unit = mmunit.dalton * (mmunit.nanometers / self._unit) ** 2
+        self._mass_unit = Unit(mmunit.dalton * (mmunit.nanometers / self._unit) ** 2)
         arguments, _ = self._getArguments()
         self._args = dict(zip(arguments, args))
         self._args.update(kwargs)
@@ -211,11 +211,17 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
             raise RuntimeError("All force groups are already in use.")
         self.setForceGroup(new_group)
 
-    def getUnit(self) -> mmunit.Unit:
+    def getUnit(self) -> Unit:
         """
         Get the unit of measurement of this collective variable.
         """
         return self._unit
+
+    def getMassUnit(self) -> Unit:
+        """
+        Get the unit of measurement of the effective mass of this collective variable.
+        """
+        return self._mass_unit
 
     def getPeriod(self) -> t.Optional[Quantity]:
         """
@@ -247,7 +253,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
             self._setUnusedForceGroup(system)
         system.addForce(self)
 
-    def getValue(self, context: openmm.Context) -> mmunit.Quantity:
+    def getValue(self, context: openmm.Context) -> Quantity:
         """
         Evaluate this collective variable at a given :OpenMM:`Context`.
 
@@ -289,18 +295,18 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         ...     model.system, openmm.VerletIntegrator(0)
         ... )
         >>> context.setPositions(model.positions)
-        >>> print(phi.getValue(context))
+        >>> phi.getValue(context)
         3.1415... rad
-        >>> print(psi.getValue(context))
+        >>> psi.getValue(context)
         3.1415... rad
-        >>> print(radius_of_gyration.getValue(context))
+        >>> radius_of_gyration.getValue(context)
         0.29514... nm
         """
         state = get_single_force_state(self, context, getEnergy=True)
         value = value_in_md_units(state.getPotentialEnergy())
-        return mmunit.Quantity(value, self.getUnit())
+        return Quantity(value, self.getUnit())
 
-    def getEffectiveMass(self, context: openmm.Context) -> mmunit.Quantity:
+    def getEffectiveMass(self, context: openmm.Context) -> Quantity:
         r"""
         Compute the effective mass of this collective variable at a given
         :OpenMM:`Context`.
@@ -354,11 +360,11 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         ...     model.system, openmm.VerletIntegrator(0)
         ... )
         >>> context.setPositions(model.positions)
-        >>> print(phi.getEffectiveMass(context))
+        >>> phi.getEffectiveMass(context)
         0.05119... nm**2 Da/(rad**2)
-        >>> print(psi.getEffectiveMass(context))
+        >>> psi.getEffectiveMass(context)
         0.05186... nm**2 Da/(rad**2)
-        >>> print(radius_of_gyration.getEffectiveMass(context))
+        >>> radius_of_gyration.getEffectiveMass(context)
         30.946... Da
         """
-        return mmunit.Quantity(compute_effective_mass(self, context), self._mass_unit)
+        return Quantity(compute_effective_mass(self, context), self._mass_unit)
