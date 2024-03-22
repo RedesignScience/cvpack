@@ -59,48 +59,44 @@ class HelixTorsionContent(openmm.CustomTorsionForce, BaseCollectiveVariable):
 
     Parameters
     ----------
-        residues
-            The residues in the sequence
-        pbc
-            Whether to use periodic boundary conditions
-        phiReference
-            The reference value of the phi dihedral angle in an alpha helix
-        psiReference
-            The reference value of the psi dihedral angle in an alpha helix
-        tolerance
-            The threshold tolerance around the reference values
-        halfExponent
-            The parameter :math:`m` of the boxcar function
-        normalize
-            Whether to normalize the collective variable to the range :math:`[0, 1]`
+    residues
+        The residues in the sequence
+    pbc
+        Whether to use periodic boundary conditions
+    phiReference
+        The reference value of the phi dihedral angle in an alpha helix
+    psiReference
+        The reference value of the psi dihedral angle in an alpha helix
+    tolerance
+        The threshold tolerance around the reference values
+    halfExponent
+        The parameter :math:`m` of the boxcar function
+    normalize
+        Whether to normalize the collective variable to the range :math:`[0, 1]`
 
     Raises
     ------
-        ValueError
-            If some residue does not contain a :math:`\phi` or :math:`\psi` angle
+    ValueError
+        If some residue does not contain a :math:`\phi` or :math:`\psi` angle
 
     Example
     -------
-        >>> import cvpack
-        >>> import openmm
-        >>> from openmm import app, unit
-        >>> from openmmtools import testsystems
-        >>> model = testsystems.LysozymeImplicit()
-        >>> residues = [
-        ...     r
-        ...     for r in model.topology.residues()
-        ...     if 59 <= r.index <= 79
-        ... ]
-        >>> print(*[r.name for r in residues])
-        LYS ASP GLU ... ILE LEU ARG
-        >>> helix_content = cvpack.HelixTorsionContent(residues)
-        >>> helix_content.addToSystem(model.system)
-        >>> platform = openmm.Platform.getPlatformByName('Reference')
-        >>> integrator = openmm.VerletIntegrator(0)
-        >>> context = openmm.Context(model.system, integrator, platform)
-        >>> context.setPositions(model.positions)
-        >>> print(helix_content.getValue(context))
-        17.452... dimensionless
+    >>> import cvpack
+    >>> import openmm
+    >>> from openmm import app, unit
+    >>> from openmmtools import testsystems
+    >>> model = testsystems.LysozymeImplicit()
+    >>> residues = list(model.topology.residues())[59:80]
+    >>> print(*[r.name for r in residues])
+    LYS ASP GLU ... ILE LEU ARG
+    >>> helix_content = cvpack.HelixTorsionContent(residues)
+    >>> helix_content.addToSystem(model.system)
+    >>> platform = openmm.Platform.getPlatformByName('Reference')
+    >>> integrator = openmm.VerletIntegrator(0)
+    >>> context = openmm.Context(model.system, integrator, platform)
+    >>> context.setPositions(model.positions)
+    >>> print(helix_content.getValue(context))
+    17.452... dimensionless
     """
 
     @convert_quantities
@@ -108,9 +104,9 @@ class HelixTorsionContent(openmm.CustomTorsionForce, BaseCollectiveVariable):
         self,
         residues: t.Sequence[mmapp.topology.Residue],
         pbc: bool = False,
-        phiReference: ScalarQuantity = mmunit.Quantity(-63.8, mmunit.degrees),
-        psiReference: ScalarQuantity = mmunit.Quantity(-41.1, mmunit.degrees),
-        tolerance: ScalarQuantity = mmunit.Quantity(25, mmunit.degrees),
+        phiReference: ScalarQuantity = -63.8 * mmunit.degrees,
+        psiReference: ScalarQuantity = -41.1 * mmunit.degrees,
+        tolerance: ScalarQuantity = 25 * mmunit.degrees,
         halfExponent: int = 3,
         normalize: bool = False,
     ) -> None:
@@ -123,8 +119,11 @@ class HelixTorsionContent(openmm.CustomTorsionForce, BaseCollectiveVariable):
             )
 
         numerator = 1 / (2 * (len(residues) - 2)) if normalize else 1 / 2
+        tol = tolerance
+        if mmunit.is_quantity(tol):
+            tol = tol.value_in_unit_system(mmunit.md_unit_system)
         super().__init__(
-            f"{numerator}/(1+x^{2*halfExponent}); x=(theta-theta_ref)/{tolerance}"
+            f"{numerator}/(1+x^{2*halfExponent}); x=(theta-theta_ref)/{tol}"
         )
         self.addPerTorsionParameter("theta_ref")
         for i in range(1, len(residues) - 1):

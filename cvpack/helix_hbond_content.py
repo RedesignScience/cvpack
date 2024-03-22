@@ -48,45 +48,40 @@ class HelixHBondContent(openmm.CustomBondForce, BaseCollectiveVariable):
 
     Parameters
     ----------
-        residues
-            The residues in the sequence
-        pbc
-            Whether to use periodic boundary conditions
-        thresholdDistance
-            The threshold distance for a hydrogen bond
-        halfExponent
-            The parameter :math:`m` of the step function.
+    residues
+        The residues in the sequence
+    pbc
+        Whether to use periodic boundary conditions
+    thresholdDistance
+        The threshold distance for a hydrogen bond
+    halfExponent
+        The parameter :math:`m` of the step function.
 
     Example
     -------
-        >>> import cvpack
-        >>> import openmm
-        >>> from openmm import app, unit
-        >>> from openmmtools import testsystems
-        >>> model = testsystems.LysozymeImplicit()
-        >>> residues = [
-        ...     r
-        ...     for r in model.topology.residues()
-        ...     if 59 <= r.index <= 79
-        ... ]
-        >>> print(*[r.name for r in residues])
-        LYS ASP GLU ... ILE LEU ARG
-        >>> helix_content = cvpack.HelixHBondContent(residues)
-        >>> helix_content.addToSystem(model.system)
-        >>> platform = openmm.Platform.getPlatformByName('Reference')
-        >>> integrator = openmm.VerletIntegrator(0)
-        >>> context = openmm.Context(model.system, integrator, platform)
-        >>> context.setPositions(model.positions)
-        >>> print(helix_content.getValue(context))
-        15.880... dimensionless
+    >>> import cvpack
+    >>> import openmm
+    >>> from openmm import app, unit
+    >>> from openmmtools import testsystems
+    >>> model = testsystems.LysozymeImplicit()
+    >>> residues = list(model.topology.residues())[59:80]
+    >>> print(*[r.name for r in residues])
+    LYS ASP GLU ... ILE LEU ARG
+    >>> helix_content = cvpack.HelixHBondContent(residues)
+    >>> helix_content.addToSystem(model.system)
+    >>> platform = openmm.Platform.getPlatformByName('Reference')
+    >>> integrator = openmm.VerletIntegrator(0)
+    >>> context = openmm.Context(model.system, integrator, platform)
+    >>> context.setPositions(model.positions)
+    >>> print(helix_content.getValue(context))
+    15.880... dimensionless
     """
 
-    @convert_quantities
     def __init__(  # pylint: disable=too-many-arguments
         self,
         residues: t.Sequence[mmapp.topology.Residue],
         pbc: bool = False,
-        thresholdDistance: ScalarQuantity = mmunit.Quantity(0.33, mmunit.nanometers),
+        thresholdDistance: ScalarQuantity = 0.33 * mmunit.nanometers,
         halfExponent: int = 3,
         normalize: bool = False,
     ) -> None:
@@ -101,7 +96,10 @@ class HelixHBondContent(openmm.CustomBondForce, BaseCollectiveVariable):
             )
 
         numerator = 1 / (len(residues) - 4) if normalize else 1
-        super().__init__(f"{numerator}/(1+x^{2*halfExponent}); x=r/{thresholdDistance}")
+        threshold = thresholdDistance
+        if mmunit.is_quantity(threshold):
+            threshold = threshold.value_in_unit_system(mmunit.md_unit_system)
+        super().__init__(f"{numerator}/(1+x^{2*halfExponent}); x=r/{threshold}")
         hydrogen_pattern = regex.compile(r"\b(H|1H|HN1|HT1|H1|HN)\b")
         oxygen_pattern = regex.compile(r"\b(O|OCT1|OC1|OT1|O1)\b")
         for i in range(4, len(residues)):

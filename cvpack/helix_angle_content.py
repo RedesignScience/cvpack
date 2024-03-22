@@ -76,11 +76,7 @@ class HelixAngleContent(openmm.CustomAngleForce, BaseCollectiveVariable):
     >>> from openmm import app, unit
     >>> from openmmtools import testsystems
     >>> model = testsystems.LysozymeImplicit()
-    >>> residues = [
-    ...     r
-    ...     for r in model.topology.residues()
-    ...     if 59 <= r.index <= 79
-    ... ]
+    >>> residues = list(model.topology.residues())[59:80]
     >>> print(*[r.name for r in residues])  # doctest: +ELLIPSIS
     LYS ASP GLU ... ILE LEU ARG
     >>> helix_content = cvpack.HelixAngleContent(residues)
