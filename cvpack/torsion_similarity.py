@@ -7,10 +7,9 @@
 
 """
 
-import typing as t
-
 import numpy as np
 import openmm
+from numpy.typing import ArrayLike
 from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
@@ -77,9 +76,10 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, BaseCollectiveVariable):
 
     def __init__(
         self,
-        firstList: t.Iterable[t.Tuple[int, int, int, int]],
-        secondList: t.Iterable[t.Tuple[int, int, int, int]],
+        firstList: ArrayLike,
+        secondList: ArrayLike,
         pbc: bool = False,
+        name: str = "torsion_similarity",
     ) -> None:
         firstList = [list(map(int, first)) for first in firstList]
         secondList = [list(map(int, second)) for second in secondList]
@@ -89,7 +89,7 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, BaseCollectiveVariable):
         for first, second in zip(firstList, secondList):
             self.addBond([*first, *second], [])
         self.setUsesPeriodicBoundaryConditions(pbc)
-        self._registerCV(mmunit.dimensionless, firstList, secondList)
+        self._registerCV(name, mmunit.dimensionless, firstList, secondList)
 
 
 TorsionSimilarity.registerTag("!cvpack.TorsionSimilarity")

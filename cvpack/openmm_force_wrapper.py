@@ -1,7 +1,7 @@
 """
-.. class:: Generic
+.. class:: OpenMMForceWrapper
    :platform: Linux, MacOS, Windows
-   :synopsis: Generic collective variable
+   :synopsis: A collective variable built from the potential energy of an OpenMM force
 
 .. classauthor:: Charlles Abreu <craabreu@gmail.com>
 
@@ -63,6 +63,7 @@ class OpenMMForceWrapper(BaseCollectiveVariable):
         openmmForce: t.Union[openmm.Force, str],
         unit: mmunit.Unit,
         period: t.Optional[ScalarQuantity] = None,
+        name: str = "openmm_force_wrapper",
     ) -> None:
         if isinstance(openmmForce, openmm.Force):
             openmmForce = openmm.XmlSerializer.serialize(openmmForce)
@@ -70,7 +71,7 @@ class OpenMMForceWrapper(BaseCollectiveVariable):
         force_copy = openmm.XmlSerializer.deserialize(openmmForce)
         self.this = force_copy.this
         self.__class__.__bases__ = (BaseCollectiveVariable, type(force_copy))
-        self._registerCV(unit, openmmForce, unit, period)
+        self._registerCV(name, unit, openmmForce, unit, period)
         if period is not None:
             self._registerPeriod(period)
 

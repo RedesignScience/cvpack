@@ -68,12 +68,18 @@ class Torsion(openmm.CustomTorsionForce, BaseCollectiveVariable):
     """
 
     def __init__(
-        self, atom1: int, atom2: int, atom3: int, atom4: int, pbc: bool = False
+        self,
+        atom1: int,
+        atom2: int,
+        atom3: int,
+        atom4: int,
+        pbc: bool = False,
+        name: str = "torsion",
     ) -> None:
         super().__init__("theta")
         self.addTorsion(atom1, atom2, atom3, atom4, [])
         self.setUsesPeriodicBoundaryConditions(pbc)
-        self._registerCV(mmunit.radians, atom1, atom2, atom3, atom4, pbc)
+        self._registerCV(name, mmunit.radians, atom1, atom2, atom3, atom4, pbc)
         self._registerPeriod(2 * math.pi)
 
 

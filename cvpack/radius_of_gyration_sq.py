@@ -74,14 +74,18 @@ class RadiusOfGyrationSq(BaseRadiusOfGyration):
     """
 
     def __init__(
-        self, group: t.Iterable[int], pbc: bool = False, weighByMass: bool = False
+        self,
+        group: t.Iterable[int],
+        pbc: bool = False,
+        weighByMass: bool = False,
+        name: str = "radius_of_gyration_sq",
     ) -> None:
         group = list(group)
         num_atoms = len(group)
         super().__init__(2, f"distance(g1, g2)^2/{num_atoms}", group, pbc, weighByMass)
         for atom in group:
             self.addBond([atom, num_atoms])
-        self._registerCV(mmunit.nanometers**2, group, pbc, weighByMass)
+        self._registerCV(name, mmunit.nanometers**2, group, pbc, weighByMass)
 
 
 RadiusOfGyrationSq.registerTag("!cvpack.RadiusOfGyrationSq")

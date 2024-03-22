@@ -32,13 +32,15 @@ class Angle(openmm.CustomAngleForce, BaseCollectiveVariable):
     Parameters
     ----------
     atom1
-        The index of the first atom
+        The index of the first atom.
     atom2
-        The index of the second atom
+        The index of the second atom.
     atom3
-        The index of the third atom
+        The index of the third atom.
     pbc
-        Whether to use periodic boundary conditions
+        Whether to use periodic boundary conditions.
+    name
+        The name of the collective variable. Must be a valid Python name.
 
     Example
     -------
@@ -60,11 +62,18 @@ class Angle(openmm.CustomAngleForce, BaseCollectiveVariable):
 
     """
 
-    def __init__(self, atom1: int, atom2: int, atom3: int, pbc: bool = False) -> None:
+    def __init__(
+        self,
+        atom1: int,
+        atom2: int,
+        atom3: int,
+        pbc: bool = False,
+        name: str = "angle",
+    ) -> None:
         super().__init__("theta")
         self.addAngle(atom1, atom2, atom3, [])
         self.setUsesPeriodicBoundaryConditions(pbc)
-        self._registerCV(mmunit.radians, atom1, atom2, atom3, pbc)
+        self._registerCV(name, mmunit.radians, atom1, atom2, atom3, pbc)
         self._registerPeriod(2 * math.pi)
 
 

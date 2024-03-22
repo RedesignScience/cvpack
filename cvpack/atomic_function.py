@@ -60,6 +60,8 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         The period of the collective variable if it is periodic, or `None` if it is not
     pbc
         Whether to use periodic boundary conditions when computing atomic distances
+    name
+        The name of the collective variable.
 
     Keyword Args
     ------------
@@ -114,6 +116,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         groups: ArrayLike,
         period: t.Optional[ScalarQuantity] = None,
         pbc: bool = True,
+        name: str = "atomic_function",
         **parameters: t.Union[ScalarQuantity, VectorQuantity],
     ) -> None:
         groups = np.atleast_2d(groups)
@@ -125,7 +128,15 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         self._addParameters(overalls, perbonds, groups, pbc, unit)
         groups = [[int(atom) for atom in group] for group in groups]
         self._registerCV(
-            unit, function, unit, groups, period, pbc, **overalls, **perbonds
+            name,
+            unit,
+            function,
+            unit,
+            groups,
+            period,
+            pbc,
+            **overalls,
+            **perbonds,
         )
         if period is not None:
             self._registerPeriod(period)

@@ -117,6 +117,11 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
         which to extract a reference attraction strength. The extracted value will be
         :math:`S_{1,2}({\bf r})` for :math:`E_{\rm ref} = 1`, regardless of whether
         `contrastGroup` is provided or not.
+    contrastScaling
+        A scaling factor :math:`\alpha` to balance the contributions of the two
+        interactions. The default is 1.0.
+    name
+        The name of the collective variable.
 
     Examples
     --------
@@ -172,6 +177,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
             1.0 * mmunit.kilojoule_per_mole
         ),
         contrastScaling: float = 1.0,
+        name: str = "attraction_strength",
     ) -> None:
         group1 = list(group1)
         group2 = list(group2)
@@ -223,6 +229,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
             self.addInteractionGroup(group1, contrastGroup)
         # pylint: disable=duplicate-code
         self._registerCV(
+            name,
             mmunit.dimensionless,
             group1,
             group2,

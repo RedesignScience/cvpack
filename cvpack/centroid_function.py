@@ -87,6 +87,7 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
         Whether to define the centroid as the center of mass of the group instead of
         the geometric center
 
+
     Keyword Args
     ------------
     **parameters
@@ -154,6 +155,7 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
         period: t.Optional[ScalarQuantity] = None,
         pbc: bool = True,
         weighByMass: bool = True,
+        name: str = "centroid_function",
         **parameters: t.Union[ScalarQuantity, VectorQuantity],
     ) -> None:
         groups = [list(map(int, group)) for group in groups]
@@ -172,6 +174,7 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
         overalls, perbonds = self._extractParameters(num_collections, **parameters)
         self._addParameters(overalls, perbonds, collections, pbc, unit)
         self._registerCV(
+            name,
             unit,
             function,
             unit,

@@ -112,6 +112,7 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable
         normalize: bool = False,
         weighByMass: bool = True,
         includeHydrogens: bool = True,
+        name: str = "residue_coordination",
     ) -> None:
         residueGroup1 = list(map(SerializableResidue, residueGroup1))
         residueGroup2 = list(map(SerializableResidue, residueGroup2))
@@ -139,6 +140,7 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable
             for idx2 in range(nr1, nr1 + nr2):
                 self.addBond([idx1, idx2], [])
         self._registerCV(
+            name,
             mmunit.dimensionless,
             residueGroup1,
             residueGroup2,

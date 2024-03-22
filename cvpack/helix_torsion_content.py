@@ -108,6 +108,7 @@ class HelixTorsionContent(openmm.CustomTorsionForce, BaseCollectiveVariable):
         tolerance: ScalarQuantity = 25 * mmunit.degrees,
         halfExponent: int = 3,
         normalize: bool = False,
+        name: str = "helix_torsion_content",
     ) -> None:
         def find_atom(residue: mmapp.topology.Residue, name: str) -> int:
             for atom in residue.atoms():
@@ -141,7 +142,8 @@ class HelixTorsionContent(openmm.CustomTorsionForce, BaseCollectiveVariable):
                 [psiReference],
             )
         self.setUsesPeriodicBoundaryConditions(pbc)
-        self._registerCV(  # pylint: disable=duplicate-code
+        self._registerCV(
+            name,  # pylint: disable=duplicate-code
             mmunit.dimensionless,
             list(map(SerializableResidue, residues)),
             pbc,

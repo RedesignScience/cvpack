@@ -97,6 +97,7 @@ class HelixAngleContent(openmm.CustomAngleForce, BaseCollectiveVariable):
         tolerance: ScalarQuantity = mmunit.Quantity(15, mmunit.degrees),
         halfExponent: int = 3,
         normalize: bool = False,
+        name: str = "helix_angle_content",
     ) -> None:
         def find_alpha_carbon(residue: mmapp.topology.Residue) -> int:
             for atom in residue.atoms():
@@ -124,7 +125,8 @@ class HelixAngleContent(openmm.CustomAngleForce, BaseCollectiveVariable):
                 [],
             )
         self.setUsesPeriodicBoundaryConditions(pbc)
-        self._registerCV(  # pylint: disable=duplicate-code
+        self._registerCV(
+            name,  # pylint: disable=duplicate-code
             mmunit.dimensionless,
             list(map(SerializableResidue, residues)),
             pbc,

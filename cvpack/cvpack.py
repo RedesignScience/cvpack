@@ -106,6 +106,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
     @preprocess_units
     def _registerCV(
         self,
+        name: str,
         unit: mmunit.Unit,
         *args: t.Any,
         **kwargs: t.Any,
@@ -117,6 +118,8 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
 
         Parameters
         ----------
+        name
+            The name of this collective variable.
         unit
             The unit of measurement of this collective variable. It must be a unit
             in the MD unit system (mass in Da, distance in nm, time in ps,
@@ -126,8 +129,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         kwargs
             The keyword arguments needed to construct this collective variable
         """
-        cls = self.__class__
-        self.setName(cls.__name__)
+        self.setName(name)
         self._unit = unit
         self._mass_unit = mmunit.dalton * (mmunit.nanometers / self.getUnit()) ** 2
         arguments, _ = self._getArguments()
@@ -170,8 +172,9 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         group: typing.Iterable[int]
         pbc: <class 'bool'>
         weighByMass: <class 'bool'>
+        name: <class 'str'>
         >>> print(*defaults.items())
-        ('pbc', False) ('weighByMass', False)
+        ('pbc', False) ('weighByMass', False) ('name', 'radius_of_gyration')
         """
         arguments = collections.OrderedDict()
         defaults = collections.OrderedDict()

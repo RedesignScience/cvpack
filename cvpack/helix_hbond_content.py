@@ -84,6 +84,7 @@ class HelixHBondContent(openmm.CustomBondForce, BaseCollectiveVariable):
         thresholdDistance: ScalarQuantity = 0.33 * mmunit.nanometers,
         halfExponent: int = 3,
         normalize: bool = False,
+        name: str = "helix_hbond_content",
     ) -> None:
         def find_atom(residue: mmapp.topology.Residue, pattern: t.Pattern) -> int:
             for atom in residue.atoms():
@@ -109,7 +110,8 @@ class HelixHBondContent(openmm.CustomBondForce, BaseCollectiveVariable):
                 [],
             )
         self.setUsesPeriodicBoundaryConditions(pbc)
-        self._registerCV(  # pylint: disable=duplicate-code
+        self._registerCV(
+            name,  # pylint: disable=duplicate-code
             mmunit.dimensionless,
             list(map(SerializableResidue, residues)),
             pbc,

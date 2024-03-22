@@ -72,7 +72,11 @@ class RadiusOfGyration(BaseRadiusOfGyration):
     """
 
     def __init__(
-        self, group: t.Iterable[int], pbc: bool = False, weighByMass: bool = False
+        self,
+        group: t.Iterable[int],
+        pbc: bool = False,
+        weighByMass: bool = False,
+        name: str = "radius_of_gyration",
     ) -> None:
         group = list(group)
         num_atoms = len(group)
@@ -84,7 +88,7 @@ class RadiusOfGyration(BaseRadiusOfGyration):
             num_groups, f"sqrt(({sum_dist_sq})/{num_atoms})", group, pbc, weighByMass
         )
         self.addBond(list(range(num_groups)))
-        self._registerCV(mmunit.nanometers, group, pbc, weighByMass)
+        self._registerCV(name, mmunit.nanometers, group, pbc, weighByMass)
 
 
 RadiusOfGyration.registerTag("!cvpack.RadiusOfGyration")

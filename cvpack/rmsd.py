@@ -84,13 +84,14 @@ class RMSD(openmm.RMSDForce, BaseRMSD):
         referencePositions: t.Union[MatrixQuantity, t.Dict[int, VectorQuantity]],
         group: t.Iterable[int],
         numAtoms: t.Optional[int] = None,
+        name: str = "rmsd",
     ) -> None:
         group = list(map(int, group))
         num_atoms = numAtoms or len(referencePositions)
         defined_coords = self._getDefinedCoords(referencePositions, group)
         all_coords = self._getAllCoords(defined_coords, num_atoms)
         super().__init__(all_coords, group)
-        self._registerCV(mmunit.nanometers, defined_coords, group, num_atoms)
+        self._registerCV(name, mmunit.nanometers, defined_coords, group, num_atoms)
 
     def getNullBondForce(self) -> openmm.HarmonicBondForce:
         """

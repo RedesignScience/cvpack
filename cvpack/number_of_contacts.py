@@ -130,6 +130,7 @@ class NumberOfContacts(openmm.CustomNonbondedForce, BaseCollectiveVariable):
         thresholdDistance: ScalarQuantity = 0.3 * mmunit.nanometers,
         cutoffFactor: float = 2.0,
         switchFactor: t.Optional[float] = 1.5,
+        name: str = "number_of_contacts",
     ) -> None:
         nonbondedForce = NonbondedForceSurrogate(nonbondedForce)
         num_atoms = nonbondedForce.getNumParticles()
@@ -157,6 +158,7 @@ class NumberOfContacts(openmm.CustomNonbondedForce, BaseCollectiveVariable):
             reference = evaluate_in_context(self, reference)
         self.setEnergyFunction(expression.replace("/1;", f"/{reference};"))
         self._registerCV(
+            name,
             mmunit.dimensionless,
             group1,
             group2,

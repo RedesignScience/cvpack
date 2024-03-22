@@ -184,6 +184,7 @@ class SheetRMSDContent(BaseRMSDContent):
         thresholdRMSD: ScalarQuantity = 0.08 * mmunit.nanometers,
         stepFunction: str = "(1+x^4)/(1+x^4+x^8)",
         normalize: bool = False,
+        name: str = "sheet_rmsd_content",
     ) -> None:
         if blockSizes is None:
             min_distance = 6 if parallel else 5
@@ -217,6 +218,7 @@ class SheetRMSDContent(BaseRMSDContent):
             normalize,
         )
         self._registerCV(
+            name,
             mmunit.dimensionless,
             list(map(SerializableResidue, residues)),
             numAtoms,

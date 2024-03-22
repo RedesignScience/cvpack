@@ -79,6 +79,10 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
     scales
         The characteristic scales for the collective variables. If not provided, the
         scales are assumed to be 1 (in standard MD units) for each collective variable
+    name
+        The name of the collective variable. If not provided, it is set to
+        "path_progress_in_cv_space" or "path_deviation_in_cv_space" depending on the
+        metric
 
     Raises
     ------
@@ -124,11 +128,14 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
         milestones: MatrixQuantity,
         sigma: float,
         scales: t.Optional[t.Iterable[ScalarQuantity]] = None,
+        name: t.Optional[str] = None,
     ) -> None:
         if metric not in (progress, deviation):
             raise ValueError(
                 "Invalid metric. Use 'cvpack.path.progress' or 'cvpack.path.deviation'."
             )
+        if name is None:
+            name = f"path_{metric.name}_in_cv_space"
         variables = list(variables)
         if scales is None:
             cv_scales = [1.0] * len(variables)
@@ -169,6 +176,7 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
         for i, variable in enumerate(variables):
             self.addCollectiveVariable(f"cv{i}", deepcopy(variable))
         self._registerCV(
+            name,
             mmunit.dimensionless,
             metric,
             variables,
