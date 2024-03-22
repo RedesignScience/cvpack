@@ -88,19 +88,21 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    residues</span>
-<span class="sd">        The residues in the sequence</span>
+<span class="sd">        The residues in the sequence.</span>
 <span class="sd">    pbc</span>
-<span class="sd">        Whether to use periodic boundary conditions</span>
+<span class="sd">        Whether to use periodic boundary conditions.</span>
 <span class="sd">    thetaReference</span>
 <span class="sd">        The reference value of the</span>
 <span class="sd">        :math:`{\rm C}_\alpha{\rm -C}_\alpha{\rm -C}_\alpha` angle in an alpha</span>
-<span class="sd">        helix</span>
+<span class="sd">        helix.</span>
 <span class="sd">    tolerance</span>
-<span class="sd">        The threshold tolerance around the reference values</span>
+<span class="sd">        The threshold tolerance around the reference values.</span>
 <span class="sd">    halfExponent</span>
-<span class="sd">        The parameter :math:`m` of the boxcar function</span>
+<span class="sd">        The parameter :math:`m` of the boxcar function.</span>
 <span class="sd">    normalize</span>
-<span class="sd">        Whether to normalize the collective variable to the range :math:`[0, 1]`</span>
+<span class="sd">        Whether to normalize the collective variable to the range :math:`[0, 1]`.</span>
+<span class="sd">    name</span>
+<span class="sd">        The name of the collective variable.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -131,10 +133,11 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">residues</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">mmapp</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">Residue</span><span class="p">],</span>
         <span class="n">pbc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">thetaReference</span><span class="p">:</span> <span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="mi">88</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">degrees</span><span class="p">),</span>
-        <span class="n">tolerance</span><span class="p">:</span> <span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">degrees</span><span class="p">),</span>
+        <span class="n">thetaReference</span><span class="p">:</span> <span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="mi">88</span> <span class="o">*</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span>
+        <span class="n">tolerance</span><span class="p">:</span> <span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="mi">15</span> <span class="o">*</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span>
         <span class="n">halfExponent</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
         <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;helix_angle_content&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">def</span> <span class="nf">find_alpha_carbon</span><span class="p">(</span><span class="n">residue</span><span class="p">:</span> <span class="n">mmapp</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">Residue</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">():</span>
@@ -162,9 +165,11 @@
                 <span class="p">[],</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setUsesPeriodicBoundaryConditions</span><span class="p">(</span><span class="n">pbc</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span>  <span class="c1"># pylint: disable=duplicate-code</span>
-            <span class="n">mmunit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">,</span>
-            <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">SerializableResidue</span><span class="p">,</span> <span class="n">residues</span><span class="p">)),</span>
+        <span class="n">residues</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">SerializableResidue</span><span class="p">,</span> <span class="n">residues</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="n">residues</span><span class="p">,</span>
             <span class="n">pbc</span><span class="p">,</span>
             <span class="n">thetaReference</span><span class="p">,</span>
             <span class="n">tolerance</span><span class="p">,</span>

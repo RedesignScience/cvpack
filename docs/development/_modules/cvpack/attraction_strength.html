@@ -155,6 +155,11 @@
 <span class="sd">        which to extract a reference attraction strength. The extracted value will be</span>
 <span class="sd">        :math:`S_{1,2}({\bf r})` for :math:`E_{\rm ref} = 1`, regardless of whether</span>
 <span class="sd">        `contrastGroup` is provided or not.</span>
+<span class="sd">    contrastScaling</span>
+<span class="sd">        A scaling factor :math:`\alpha` to balance the contributions of the two</span>
+<span class="sd">        interactions. The default is 1.0.</span>
+<span class="sd">    name</span>
+<span class="sd">        The name of the collective variable.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -210,6 +215,7 @@
             <span class="mf">1.0</span> <span class="o">*</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">kilojoule_per_mole</span>
         <span class="p">),</span>
         <span class="n">contrastScaling</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;attraction_strength&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">group1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">group1</span><span class="p">)</span>
         <span class="n">group2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">group2</span><span class="p">)</span>
@@ -217,12 +223,11 @@
         <span class="k">if</span> <span class="n">contrasting</span><span class="p">:</span>
             <span class="n">contrastGroup</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">contrastGroup</span><span class="p">)</span>
         <span class="n">nonbondedForce</span> <span class="o">=</span> <span class="n">NonbondedForceSurrogate</span><span class="p">(</span><span class="n">nonbondedForce</span><span class="p">)</span>
-        <span class="n">cutoff</span> <span class="o">=</span> <span class="n">nonbondedForce</span><span class="o">.</span><span class="n">getCutoffDistance</span><span class="p">()</span>
         <span class="n">expression</span> <span class="o">=</span> <span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;-(lj + coul)</span><span class="si">{</span><span class="s1">&#39;*sign1*sign2&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">contrasting</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">/ref&quot;</span>
             <span class="s2">&quot;; lj = 4*epsilon*(1/y^2 - 1/y)&quot;</span>
             <span class="sa">f</span><span class="s2">&quot;; coul = </span><span class="si">{</span><span class="n">ONE_4PI_EPS0</span><span class="si">}</span><span class="s2">*q1q2*(1/x + (x^2 - 3)/2)&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;; x = r/</span><span class="si">{</span><span class="n">cutoff</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;; x = r/</span><span class="si">{</span><span class="n">nonbondedForce</span><span class="o">.</span><span class="n">getCutoffDistance</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="s2">&quot;; y = abs((r/sigma)^6 - 2) + 2&quot;</span>
             <span class="s2">&quot;; q1q2 = min(0, charge1*charge2)&quot;</span>
             <span class="s2">&quot;; epsilon = sqrt(epsilon1*epsilon2)&quot;</span>
@@ -230,11 +235,12 @@
             <span class="s2">&quot;; ref = 1&quot;</span>
         <span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">expression</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">nonbondedForce</span><span class="o">.</span><span class="n">usesPeriodicBoundaryConditions</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">setNonbondedMethod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CutoffPeriodic</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">setNonbondedMethod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CutoffNonPeriodic</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">setCutoffDistance</span><span class="p">(</span><span class="n">cutoff</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setNonbondedMethod</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">CutoffPeriodic</span>
+            <span class="k">if</span> <span class="n">nonbondedForce</span><span class="o">.</span><span class="n">usesPeriodicBoundaryConditions</span><span class="p">()</span>
+            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">CutoffNonPeriodic</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setCutoffDistance</span><span class="p">(</span><span class="n">nonbondedForce</span><span class="o">.</span><span class="n">getCutoffDistance</span><span class="p">())</span>
         <span class="k">for</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;charge&quot;</span><span class="p">,</span> <span class="s2">&quot;sigma&quot;</span><span class="p">,</span> <span class="s2">&quot;epsilon&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;sign&quot;</span><span class="p">,)</span> <span class="o">*</span> <span class="n">contrasting</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">addPerParticleParameter</span><span class="p">(</span><span class="n">parameter</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nonbondedForce</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()):</span>
@@ -259,9 +265,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">setEnergyFunction</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;ref = 1&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;ref = </span><span class="si">{</span><span class="n">reference</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">contrasting</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">addInteractionGroup</span><span class="p">(</span><span class="n">group1</span><span class="p">,</span> <span class="n">contrastGroup</span><span class="p">)</span>
-        <span class="c1"># pylint: disable=duplicate-code</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span>
-            <span class="n">mmunit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">,</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
             <span class="n">group1</span><span class="p">,</span>
             <span class="n">group2</span><span class="p">,</span>
             <span class="n">nonbondedForce</span><span class="p">,</span>

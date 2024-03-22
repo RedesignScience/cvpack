@@ -41,7 +41,7 @@
 <h1>PathInCVSpace<a class="headerlink" href="#pathincvspace" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="cvpack.PathInCVSpace">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">PathInCVSpace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milestones</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scales</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/path_in_cv_space.html#PathInCVSpace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.PathInCVSpace" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">PathInCVSpace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milestones</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scales</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/path_in_cv_space.html#PathInCVSpace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.PathInCVSpace" title="Link to this definition">¶</a></dt>
 <dd><p>A metric of the system’s progress (<span class="math notranslate nohighlight">\(s\)</span>) or deviation (<span class="math notranslate nohighlight">\(z\)</span>) with
 respect to a path defined by a sequence of <span class="math notranslate nohighlight">\(n\)</span> milestones positioned in a
 collective variable space <span id="id1">[<a class="reference internal" href="../references.html#id2" title="Davide Branduardi, Francesco Luigi Gervasio, and Michele Parrinello. From A to B in free energy space. The Journal of Chemical Physics, 126(5):054103, February 2007. doi:10.1063/1.2432340.">6</a>]</span>:</p>
@@ -78,13 +78,16 @@ Ref. <span id="id2">[<a class="reference internal" href="../references.html#id2"
 <li><p><strong>metric</strong> (<em>Metric</em>) – The path-related metric to compute. Use <code class="docutils literal notranslate"><span class="pre">cvpack.path.progress</span></code> for
 computing <span class="math notranslate nohighlight">\(s({\bf r})\)</span> or <code class="docutils literal notranslate"><span class="pre">cvpack.path.deviation</span></code> for computing
 <span class="math notranslate nohighlight">\(z({\bf r})\)</span>.</p></li>
-<li><p><strong>variables</strong> (<em>Iterable</em><em>[</em><em>BaseCollectiveVariable</em><em>]</em>) – The collective variables that define the space</p></li>
+<li><p><strong>variables</strong> (<em>Iterable</em><em>[</em><em>BaseCollectiveVariable</em><em>]</em>) – The collective variables that define the space.</p></li>
 <li><p><strong>milestones</strong> (<em>Quantity</em><em> | </em><em>ndarray</em><em> | </em><em>Sequence</em><em>[</em><em>Vec3</em><em>] </em><em>| </em><em>Sequence</em><em>[</em><em>ndarray</em><em>]</em>) – The milestones in the collective variable space. The number of rows must be
 equal to the number of milestones and the number of columns must be equal to
-the number of collective variables</p></li>
+the number of collective variables.</p></li>
 <li><p><strong>sigma</strong> (<em>float</em>) – The width of the Gaussian kernels.</p></li>
 <li><p><strong>scales</strong> (<em>Iterable</em><em>[</em><em>Quantity</em><em> | </em><em>Real</em><em>] </em><em>| </em><em>None</em>) – The characteristic scales for the collective variables. If not provided, the
-scales are assumed to be 1 (in standard MD units) for each collective variable</p></li>
+scales are assumed to be 1 (in standard MD units) for each collective variable.</p></li>
+<li><p><strong>name</strong> (<em>str</em><em> | </em><em>None</em>) – The name of the collective variable. If not provided, it is set to
+“path_progress_in_cv_space” or “path_deviation_in_cv_space” depending on the
+metric.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>

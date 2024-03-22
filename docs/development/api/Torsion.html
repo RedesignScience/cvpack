@@ -41,7 +41,7 @@
 <h1>Torsion<a class="headerlink" href="#torsion" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="cvpack.Torsion">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">Torsion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">atom1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/torsion.html#Torsion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.Torsion" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">Torsion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">atom1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'torsion'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/torsion.html#Torsion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.Torsion" title="Link to this definition">¶</a></dt>
 <dd><p>The torsion angle formed by four atoms:</p>
 <div class="math notranslate nohighlight">
 \[\varphi({\bf r}) = {\rm atan2}\left(\frac{
@@ -58,11 +58,12 @@ receives the numerator and denominator above as separate arguments.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>atom1</strong> (<em>int</em>) – The index of the first atom</p></li>
-<li><p><strong>atom2</strong> (<em>int</em>) – The index of the second atom</p></li>
-<li><p><strong>atom3</strong> (<em>int</em>) – The index of the third atom</p></li>
-<li><p><strong>atom4</strong> (<em>int</em>) – The index of the fourth atom</p></li>
-<li><p><strong>pbc</strong> (<em>bool</em>) – Whether to use periodic boundary conditions</p></li>
+<li><p><strong>atom1</strong> (<em>int</em>) – The index of the first atom.</p></li>
+<li><p><strong>atom2</strong> (<em>int</em>) – The index of the second atom.</p></li>
+<li><p><strong>atom3</strong> (<em>int</em>) – The index of the third atom.</p></li>
+<li><p><strong>atom4</strong> (<em>int</em>) – The index of the fourth atom.</p></li>
+<li><p><strong>pbc</strong> (<em>bool</em>) – Whether to use periodic boundary conditions in distance calculations.</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – The name of the collective variable.</p></li>
 </ul>
 </dd>
 </dl>

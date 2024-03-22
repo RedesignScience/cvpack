@@ -95,30 +95,32 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    group1</span>
-<span class="sd">        The indices of the atoms in the first group</span>
+<span class="sd">        The indices of the atoms in the first group.</span>
 <span class="sd">    group2</span>
-<span class="sd">        The indices of the atoms in the second group</span>
+<span class="sd">        The indices of the atoms in the second group.</span>
 <span class="sd">    nonbondedForce</span>
 <span class="sd">        The :class:`openmm.NonbondedForce` object from which the total number of</span>
 <span class="sd">        atoms, the exclusions, and whether to use periodic boundary conditions are</span>
-<span class="sd">        taken</span>
+<span class="sd">        taken.</span>
 <span class="sd">    reference</span>
 <span class="sd">        A dimensionless reference value to which the collective variable should be</span>
 <span class="sd">        normalized. One can also provide an :OpenMM:`Context` object from which to</span>
 <span class="sd">        obtain the reference number of contacts.</span>
 <span class="sd">    stepFunction</span>
 <span class="sd">        The function &quot;step(1-x)&quot; (for analysis only) or a continuous approximation</span>
-<span class="sd">        thereof</span>
+<span class="sd">        thereof.</span>
 <span class="sd">    thresholdDistance</span>
 <span class="sd">        The threshold distance (:math:`r_0`) for considering two atoms as being in</span>
-<span class="sd">        contact</span>
+<span class="sd">        contact.</span>
 <span class="sd">    cutoffFactor</span>
 <span class="sd">        The factor :math:`x_c` that multiplies the threshold distance to define</span>
-<span class="sd">        the cutoff distance</span>
+<span class="sd">        the cutoff distance.</span>
 <span class="sd">    switchFactor</span>
 <span class="sd">        The factor :math:`x_s` that multiplies the threshold distance to define</span>
 <span class="sd">        the distance at which the step function starts switching off smoothly.</span>
 <span class="sd">        If None, it switches off abruptly at the cutoff distance.</span>
+<span class="sd">    name</span>
+<span class="sd">        The name of the collective variable.</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
@@ -168,6 +170,7 @@
         <span class="n">thresholdDistance</span><span class="p">:</span> <span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span><span class="p">,</span>
         <span class="n">cutoffFactor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
         <span class="n">switchFactor</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;number_of_contacts&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">nonbondedForce</span> <span class="o">=</span> <span class="n">NonbondedForceSurrogate</span><span class="p">(</span><span class="n">nonbondedForce</span><span class="p">)</span>
         <span class="n">num_atoms</span> <span class="o">=</span> <span class="n">nonbondedForce</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()</span>
@@ -195,7 +198,8 @@
             <span class="n">reference</span> <span class="o">=</span> <span class="n">evaluate_in_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setEnergyFunction</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/1;&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;/</span><span class="si">{</span><span class="n">reference</span><span class="si">}</span><span class="s2">;&quot;</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span>
-            <span class="n">mmunit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">,</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
             <span class="n">group1</span><span class="p">,</span>
             <span class="n">group2</span><span class="p">,</span>
             <span class="n">nonbondedForce</span><span class="p">,</span>

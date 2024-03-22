@@ -41,7 +41,7 @@
 <h1>HelixAngleContent<a class="headerlink" href="#helixanglecontent" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="cvpack.HelixAngleContent">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">HelixAngleContent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">residues</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thetaReference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Quantity(value=88,</span> <span class="pre">unit=degree)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Quantity(value=15,</span> <span class="pre">unit=degree)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">halfExponent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/helix_angle_content.html#HelixAngleContent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.HelixAngleContent" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">HelixAngleContent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">residues</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thetaReference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Quantity(value=88,</span> <span class="pre">unit=degree)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Quantity(value=15,</span> <span class="pre">unit=degree)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">halfExponent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'helix_angle_content'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/helix_angle_content.html#HelixAngleContent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.HelixAngleContent" title="Link to this definition">¶</a></dt>
 <dd><p>The alpha-helix angle content of a sequence of <cite>n</cite> residues:</p>
 <div class="math notranslate nohighlight">
 \[\alpha_{\theta}({\bf r}) = \sum_{i=2}^{n-1} B_m\left(
@@ -66,14 +66,15 @@ of residues is 37.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>residues</strong> (<em>Sequence</em><em>[</em><em>Residue</em><em>]</em>) – The residues in the sequence</p></li>
-<li><p><strong>pbc</strong> (<em>bool</em>) – Whether to use periodic boundary conditions</p></li>
+<li><p><strong>residues</strong> (<em>Sequence</em><em>[</em><em>Residue</em><em>]</em>) – The residues in the sequence.</p></li>
+<li><p><strong>pbc</strong> (<em>bool</em>) – Whether to use periodic boundary conditions.</p></li>
 <li><p><strong>thetaReference</strong> (<em>Quantity</em><em> | </em><em>Real</em>) – The reference value of the
 <span class="math notranslate nohighlight">\({\rm C}_\alpha{\rm -C}_\alpha{\rm -C}_\alpha\)</span> angle in an alpha
-helix</p></li>
-<li><p><strong>tolerance</strong> (<em>Quantity</em><em> | </em><em>Real</em>) – The threshold tolerance around the reference values</p></li>
-<li><p><strong>halfExponent</strong> (<em>int</em>) – The parameter <span class="math notranslate nohighlight">\(m\)</span> of the boxcar function</p></li>
-<li><p><strong>normalize</strong> (<em>bool</em>) – Whether to normalize the collective variable to the range <span class="math notranslate nohighlight">\([0, 1]\)</span></p></li>
+helix.</p></li>
+<li><p><strong>tolerance</strong> (<em>Quantity</em><em> | </em><em>Real</em>) – The threshold tolerance around the reference values.</p></li>
+<li><p><strong>halfExponent</strong> (<em>int</em>) – The parameter <span class="math notranslate nohighlight">\(m\)</span> of the boxcar function.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>) – Whether to normalize the collective variable to the range <span class="math notranslate nohighlight">\([0, 1]\)</span>.</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – The name of the collective variable.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>

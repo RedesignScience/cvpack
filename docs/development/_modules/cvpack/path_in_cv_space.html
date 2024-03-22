@@ -48,7 +48,6 @@
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 
 <span class="kn">import</span> <span class="nn">openmm</span>
-<span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
 <span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">BaseCollectiveVariable</span>
 <span class="kn">from</span> <span class="nn">.path</span> <span class="kn">import</span> <span class="n">Metric</span><span class="p">,</span> <span class="n">deviation</span><span class="p">,</span> <span class="n">progress</span>
@@ -107,16 +106,20 @@
 <span class="sd">        computing :math:`s({\bf r})` or ``cvpack.path.deviation`` for computing</span>
 <span class="sd">        :math:`z({\bf r})`.</span>
 <span class="sd">    variables</span>
-<span class="sd">        The collective variables that define the space</span>
+<span class="sd">        The collective variables that define the space.</span>
 <span class="sd">    milestones</span>
 <span class="sd">        The milestones in the collective variable space. The number of rows must be</span>
 <span class="sd">        equal to the number of milestones and the number of columns must be equal to</span>
-<span class="sd">        the number of collective variables</span>
+<span class="sd">        the number of collective variables.</span>
 <span class="sd">    sigma</span>
 <span class="sd">        The width of the Gaussian kernels.</span>
 <span class="sd">    scales</span>
 <span class="sd">        The characteristic scales for the collective variables. If not provided, the</span>
-<span class="sd">        scales are assumed to be 1 (in standard MD units) for each collective variable</span>
+<span class="sd">        scales are assumed to be 1 (in standard MD units) for each collective variable.</span>
+<span class="sd">    name</span>
+<span class="sd">        The name of the collective variable. If not provided, it is set to</span>
+<span class="sd">        &quot;path_progress_in_cv_space&quot; or &quot;path_deviation_in_cv_space&quot; depending on the</span>
+<span class="sd">        metric.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -162,16 +165,16 @@
         <span class="n">milestones</span><span class="p">:</span> <span class="n">MatrixQuantity</span><span class="p">,</span>
         <span class="n">sigma</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">scales</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="n">ScalarQuantity</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="n">deviation</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;Invalid metric. Use &#39;cvpack.path.progress&#39; or &#39;cvpack.path.deviation&#39;.&quot;</span>
             <span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;path_</span><span class="si">{</span><span class="n">metric</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_in_cv_space&quot;</span>
         <span class="n">variables</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">scales</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">cv_scales</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">cv_scales</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">scales</span><span class="p">)</span>
+        <span class="n">cv_scales</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span> <span class="k">if</span> <span class="n">scales</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">scales</span><span class="p">)</span>
         <span class="n">milestones</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">numvars</span> <span class="o">=</span> <span class="n">convert_to_matrix</span><span class="p">(</span><span class="n">milestones</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">numvars</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">variables</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Wrong number of columns in the milestones matrix.&quot;</span><span class="p">)</span>
@@ -207,7 +210,8 @@
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">variable</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">variables</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">addCollectiveVariable</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;cv</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">variable</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span>
-            <span class="n">mmunit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">,</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
             <span class="n">metric</span><span class="p">,</span>
             <span class="n">variables</span><span class="p">,</span>
             <span class="n">milestones</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>

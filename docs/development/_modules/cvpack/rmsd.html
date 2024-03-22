@@ -95,6 +95,8 @@
 <span class="sd">        The total number of atoms in the system, including those that are not in</span>
 <span class="sd">        ``group``. This argument is necessary only if ``referencePositions`` does not</span>
 <span class="sd">        contain all atoms in the system.</span>
+<span class="sd">    name</span>
+<span class="sd">        The name of the collective variable.</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
@@ -122,13 +124,14 @@
         <span class="n">referencePositions</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">MatrixQuantity</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">VectorQuantity</span><span class="p">]],</span>
         <span class="n">group</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
         <span class="n">numAtoms</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rmsd&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">group</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">group</span><span class="p">))</span>
         <span class="n">num_atoms</span> <span class="o">=</span> <span class="n">numAtoms</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">referencePositions</span><span class="p">)</span>
         <span class="n">defined_coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getDefinedCoords</span><span class="p">(</span><span class="n">referencePositions</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
         <span class="n">all_coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getAllCoords</span><span class="p">(</span><span class="n">defined_coords</span><span class="p">,</span> <span class="n">num_atoms</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">all_coords</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span><span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span><span class="p">,</span> <span class="n">defined_coords</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">num_atoms</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span><span class="p">,</span> <span class="n">defined_coords</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">num_atoms</span><span class="p">)</span>
 
 <div class="viewcode-block" id="RMSD.getNullBondForce">
 <a class="viewcode-back" href="../../api/RMSD.html#cvpack.RMSD.getNullBondForce">[docs]</a>

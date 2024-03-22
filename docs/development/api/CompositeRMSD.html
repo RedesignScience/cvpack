@@ -41,7 +41,7 @@
 <h1>CompositeRMSD<a class="headerlink" href="#compositermsd" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="cvpack.CompositeRMSD">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">CompositeRMSD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">referencePositions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numAtoms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/composite_rmsd.html#CompositeRMSD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.CompositeRMSD" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">CompositeRMSD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">referencePositions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numAtoms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'composite_rmsd'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/composite_rmsd.html#CompositeRMSD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.CompositeRMSD" title="Link to this definition">¶</a></dt>
 <dd><p>The composite root-mean-square deviation (RMSD) between the current and reference
 coordinates of <span class="math notranslate nohighlight">\(m\)</span> groups of atoms:</p>
 <div class="math notranslate nohighlight">
@@ -78,6 +78,7 @@ from atom indices to coordinate vectors. It must contain all atoms in
 <li><p><strong>numAtoms</strong> (<em>int</em><em> | </em><em>None</em>) – The total number of atoms in the system, including those that are not in
 <code class="docutils literal notranslate"><span class="pre">groups</span></code>. This argument is necessary only if <code class="docutils literal notranslate"><span class="pre">referencePositions</span></code> does not
 contain all atoms in the system.</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – The name of the collective variable.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>

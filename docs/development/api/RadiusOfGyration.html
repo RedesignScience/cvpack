@@ -41,7 +41,7 @@
 <h1>RadiusOfGyration<a class="headerlink" href="#radiusofgyration" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="cvpack.RadiusOfGyration">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">RadiusOfGyration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighByMass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/radius_of_gyration.html#RadiusOfGyration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.RadiusOfGyration" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">RadiusOfGyration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighByMass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'radius_of_gyration'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/radius_of_gyration.html#RadiusOfGyration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.RadiusOfGyration" title="Link to this definition">¶</a></dt>
 <dd><p>The radius of gyration of a group of <span class="math notranslate nohighlight">\(n\)</span> atoms:</p>
 <div class="math notranslate nohighlight">
 \[r_g({\bf r}) = \sqrt{ \frac{1}{n} \sum_{i=1}^n \left\|
@@ -63,9 +63,10 @@ of atoms is large. In this case, <a class="reference internal" href="RadiusOfGyr
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>group</strong> (<em>Iterable</em><em>[</em><em>int</em><em>]</em>) – The indices of the atoms in the group</p></li>
-<li><p><strong>pbc</strong> (<em>bool</em>) – Whether to use periodic boundary conditions</p></li>
-<li><p><strong>weighByMass</strong> (<em>bool</em>) – Whether to use the center of mass of the group instead of its geometric center</p></li>
+<li><p><strong>group</strong> (<em>Iterable</em><em>[</em><em>int</em><em>]</em>) – The indices of the atoms in the group.</p></li>
+<li><p><strong>pbc</strong> (<em>bool</em>) – Whether to use periodic boundary conditions.</p></li>
+<li><p><strong>weighByMass</strong> (<em>bool</em>) – Whether to use the center of mass of the group instead of its geometric center.</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – The name of the collective variable.</p></li>
 </ul>
 </dd>
 </dl>

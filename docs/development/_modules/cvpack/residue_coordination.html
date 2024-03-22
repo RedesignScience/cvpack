@@ -81,25 +81,27 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    residueGroup1</span>
-<span class="sd">        The residues in the first group</span>
+<span class="sd">        The residues in the first group.</span>
 <span class="sd">    residueGroup2</span>
-<span class="sd">        The residues in the second group</span>
+<span class="sd">        The residues in the second group.</span>
 <span class="sd">    pbc</span>
-<span class="sd">        Whether the system has periodic boundary conditions</span>
+<span class="sd">        Whether the system has periodic boundary conditions.</span>
 <span class="sd">    stepFunction</span>
 <span class="sd">        The function &quot;step(1-x)&quot; (for analysis only) or a continuous approximation</span>
-<span class="sd">        thereof</span>
+<span class="sd">        thereof.</span>
 <span class="sd">    thresholdDistance</span>
 <span class="sd">        The threshold distance (:math:`r_0`) for considering two residues as being</span>
-<span class="sd">        in contact</span>
+<span class="sd">        in contact.</span>
 <span class="sd">    normalize</span>
 <span class="sd">        Whether the number of contacts should be normalized by the total number of</span>
-<span class="sd">        possible contacts</span>
+<span class="sd">        possible contacts.</span>
 <span class="sd">    weighByMass</span>
 <span class="sd">        Whether the centroid of each residue should be weighted by the mass of the</span>
-<span class="sd">        atoms in the residue</span>
+<span class="sd">        atoms in the residue.</span>
 <span class="sd">    includeHydrogens</span>
-<span class="sd">        Whether hydrogen atoms should be included in the centroid calculations</span>
+<span class="sd">        Whether hydrogen atoms should be included in the centroid calculations.</span>
+<span class="sd">    name</span>
+<span class="sd">        The name of the collective variable.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -150,6 +152,7 @@
         <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">weighByMass</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">includeHydrogens</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;residue_coordination&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">residueGroup1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">SerializableResidue</span><span class="p">,</span> <span class="n">residueGroup1</span><span class="p">))</span>
         <span class="n">residueGroup2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">SerializableResidue</span><span class="p">,</span> <span class="n">residueGroup2</span><span class="p">))</span>
@@ -177,7 +180,8 @@
             <span class="k">for</span> <span class="n">idx2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nr1</span><span class="p">,</span> <span class="n">nr1</span> <span class="o">+</span> <span class="n">nr2</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">addBond</span><span class="p">([</span><span class="n">idx1</span><span class="p">,</span> <span class="n">idx2</span><span class="p">],</span> <span class="p">[])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span>
-            <span class="n">mmunit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">,</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
             <span class="n">residueGroup1</span><span class="p">,</span>
             <span class="n">residueGroup2</span><span class="p">,</span>
             <span class="n">pbc</span><span class="p">,</span>
