@@ -16,7 +16,7 @@ import openmm
 from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
-from .units import ScalarQuantity, VectorQuantity, preprocess_units
+from .units import ScalarQuantity, VectorQuantity, preprocess_units, Quantity
 
 
 class MetaCollectiveVariable(openmm.CustomCVForce, BaseCollectiveVariable):
@@ -81,8 +81,10 @@ class MetaCollectiveVariable(openmm.CustomCVForce, BaseCollectiveVariable):
     >>> platform = openmm.Platform.getPlatformByName('Reference')
     >>> context = openmm.Context(model.system, integrator, platform)
     >>> context.setPositions(model.positions)
-    >>> print(driving_force.getValue(context))
+    >>> driving_force.getValue(context)
     548.3... kJ/mol
+    >>> driving_force.getValues(context)
+    {'phi': 3.1415912746972743 rad}
     """
 
     @preprocess_units
@@ -96,14 +98,23 @@ class MetaCollectiveVariable(openmm.CustomCVForce, BaseCollectiveVariable):
         **parameters: t.Union[ScalarQuantity, VectorQuantity],
     ) -> None:
         super().__init__(function)
-        for cv in collective_variables:
-            self.addCollectiveVariable(cv.getName(), copy(cv))
+        self._cvs = {cv.getName(): copy(cv) for cv in collective_variables}
+        for name, cv in self._cvs.items():
+            self.addCollectiveVariable(name, cv)
         for parameter, value in parameters.items():
             self.addGlobalParameter(parameter, value)
         self._registerCV(
             name, unit, function, collective_variables, unit, period, **parameters
         )
         self._registerPeriod(period)
+
+    def getValues(self, context: openmm.Context) -> ScalarQuantity:
+        return {
+            name: Quantity(value, cv.getUnit())
+            for (name, cv), value in zip(
+                self._cvs.items(), self.getCollectiveVariableValues(context)
+            )
+        }
 
 
 MetaCollectiveVariable.registerTag("!cvpack.MetaCollectiveVariable")
