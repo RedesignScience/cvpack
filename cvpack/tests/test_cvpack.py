@@ -19,7 +19,7 @@ from openmmtools.constants import ONE_4PI_EPS0
 from scipy.spatial.transform import Rotation
 
 import cvpack
-from cvpack import serializer
+from cvpack import serialization
 from cvpack.units import value_in_md_units
 
 
@@ -90,9 +90,9 @@ def perform_common_tests(
 
     # Test serialization/deserialization
     pipe = io.StringIO()
-    serializer.serialize(collectiveVariable, pipe)
+    serialization.serialize(collectiveVariable, pipe)
     pipe.seek(0)
-    new_cv = serializer.deserialize(pipe)
+    new_cv = serialization.deserialize(pipe)
     new_cv.addToSystem(context.getSystem())
     context.reinitialize(preserveState=True)
     value1 = collectiveVariable.getValue(context)

@@ -13,7 +13,7 @@ from openmm import app as mmapp
 from openmm import unit as mmunit
 
 from .base_rmsd_content import BaseRMSDContent
-from .cvpack import SerializableResidue
+from .serialization import SerializableResidue
 from .units import ScalarQuantity
 
 # pylint: disable=protected-access

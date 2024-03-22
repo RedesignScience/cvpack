@@ -17,7 +17,7 @@ import numpy as np
 import openmm
 from openmm import unit as mmunit
 
-from .serializer import Serializable
+from ..serialization import Serializable
 
 ScalarQuantity = t.Union[mmunit.Quantity, Real]
 VectorQuantity = t.Union[mmunit.Quantity, np.ndarray, openmm.Vec3]
