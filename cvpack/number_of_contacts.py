@@ -13,7 +13,7 @@ import openmm
 from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
-from .units import ScalarQuantity, convert_quantities
+from .units import ScalarQuantity
 from .utils import NonbondedForceSurrogate, evaluate_in_context
 
 
@@ -120,22 +120,24 @@ class NumberOfContacts(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     0.99999... dimensionless
     """
 
-    @convert_quantities
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(
         self,
         group1: t.Sequence[int],
         group2: t.Sequence[int],
         nonbondedForce: openmm.NonbondedForce,
         reference: t.Union[ScalarQuantity, openmm.Context] = 1.0,
         stepFunction: str = "1/(1+x^6)",
-        thresholdDistance: ScalarQuantity = mmunit.Quantity(0.3, mmunit.nanometers),
+        thresholdDistance: ScalarQuantity = 0.3 * mmunit.nanometers,
         cutoffFactor: float = 2.0,
         switchFactor: t.Optional[float] = 1.5,
     ) -> None:
         nonbondedForce = NonbondedForceSurrogate(nonbondedForce)
         num_atoms = nonbondedForce.getNumParticles()
         pbc = nonbondedForce.usesPeriodicBoundaryConditions()
-        expression = f"({stepFunction})/1; x=r/{thresholdDistance}"
+        threshold = thresholdDistance
+        if mmunit.is_quantity(threshold):
+            threshold = threshold.value_in_unit_system(mmunit.md_unit_system)
+        expression = f"({stepFunction})/1; x=r/{threshold}"
         super().__init__(expression)
         nonbonded_method = self.CutoffPeriodic if pbc else self.CutoffNonPeriodic
         self.setNonbondedMethod(nonbonded_method)
