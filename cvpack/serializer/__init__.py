@@ -1,6 +1,12 @@
 """
-Serializer submodule of CV Package
+Serializer submodule of CVPack
 
 """
 
-from .serializer import Serializable, deserialize, serialize  # noqa: F401
+from .serializer import (  # noqa: F401
+    Serializable,
+    SerializableAtom,
+    SerializableResidue,
+    deserialize,
+    serialize,
+)

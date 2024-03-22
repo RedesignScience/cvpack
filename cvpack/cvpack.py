@@ -13,72 +13,11 @@ import typing as t
 
 import openmm
 import yaml
-from openmm import app as mmapp
 from openmm import unit as mmunit
 
 from .serializer import Serializable
 from .units import Quantity, Unit, preprocess_units, value_in_md_units
 from .utils import compute_effective_mass, get_single_force_state
-
-
-class SerializableAtom(Serializable):
-    r"""
-    A serializable version of OpenMM's Atom class.
-    """
-
-    def __init__(  # pylint: disable=super-init-not-called
-        self, atom: t.Union[mmapp.topology.Atom, "SerializableAtom"]
-    ) -> None:
-        self.name = atom.name
-        self.index = atom.index
-        if isinstance(atom, mmapp.topology.Atom):
-            self.element = atom.element.symbol
-            self.residue = atom.residue.index
-        else:
-            self.element = atom.element
-            self.residue = atom.residue
-        self.id = atom.id
-
-    def __getstate__(self) -> t.Dict[str, t.Any]:
-        return self.__dict__
-
-    def __setstate__(self, keywords: t.Dict[str, t.Any]) -> None:
-        self.__dict__.update(keywords)
-
-
-SerializableAtom.registerTag("!cvpack.Atom")
-
-
-class SerializableResidue(Serializable):
-    r"""A serializable version of OpenMM's Residue class."""
-
-    def __init__(  # pylint: disable=super-init-not-called
-        self, residue: t.Union[mmapp.topology.Residue, "SerializableResidue"]
-    ) -> None:
-        self.name = residue.name
-        self.index = residue.index
-        if isinstance(residue, mmapp.topology.Residue):
-            self.chain = residue.chain.index
-        else:
-            self.chain = residue.chain
-        self.id = residue.id
-        self._atoms = list(map(SerializableAtom, residue.atoms()))
-
-    def __getstate__(self) -> t.Dict[str, t.Any]:
-        return self.__dict__
-
-    def __setstate__(self, keywords: t.Dict[str, t.Any]) -> None:
-        self.__dict__.update(keywords)
-
-    def __len__(self) -> int:
-        return len(self._atoms)
-
-    def atoms(self):
-        """Iterate over all Atoms in the Residue."""
-        return iter(self._atoms)
-
-
-SerializableResidue.registerTag("!cvpack.Residue")
 
 
 class BaseCollectiveVariable(openmm.Force, Serializable):
