@@ -46,10 +46,10 @@
 <span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">t</span>
 
 <span class="kn">import</span> <span class="nn">openmm</span>
-
-<span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
+<span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
 <span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">BaseCollectiveVariable</span>
+<span class="kn">from</span> <span class="nn">.units</span> <span class="kn">import</span> <span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">value_in_md_units</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">NonbondedForceSurrogate</span><span class="p">,</span> <span class="n">evaluate_in_context</span>
 
 <span class="n">ONE_4PI_EPS0</span> <span class="o">=</span> <span class="mf">138.93545764438198</span>
@@ -200,15 +200,14 @@
 <span class="sd">    3880.8...</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="nd">@mmunit</span><span class="o">.</span><span class="n">convert_quantities</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">group1</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
         <span class="n">group2</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
         <span class="n">nonbondedForce</span><span class="p">:</span> <span class="n">openmm</span><span class="o">.</span><span class="n">NonbondedForce</span><span class="p">,</span>
         <span class="n">contrastGroup</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">reference</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">]</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span>
-            <span class="mf">1.0</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">kilojoule_per_mole</span>
+        <span class="n">reference</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mf">1.0</span> <span class="o">*</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">kilojoule_per_mole</span>
         <span class="p">),</span>
         <span class="n">contrastScaling</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -255,6 +254,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">addInteractionGroup</span><span class="p">(</span><span class="n">group1</span><span class="p">,</span> <span class="n">group2</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">):</span>
             <span class="n">reference</span> <span class="o">=</span> <span class="n">evaluate_in_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">reference</span> <span class="o">=</span> <span class="n">value_in_md_units</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setEnergyFunction</span><span class="p">(</span><span class="n">expression</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;ref = 1&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;ref = </span><span class="si">{</span><span class="n">reference</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">contrasting</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">addInteractionGroup</span><span class="p">(</span><span class="n">group1</span><span class="p">,</span> <span class="n">contrastGroup</span><span class="p">)</span>

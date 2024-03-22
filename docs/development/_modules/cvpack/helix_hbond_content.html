@@ -48,10 +48,10 @@
 
 <span class="kn">import</span> <span class="nn">openmm</span>
 <span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">app</span> <span class="k">as</span> <span class="n">mmapp</span>
-
-<span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
+<span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
 <span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">BaseCollectiveVariable</span><span class="p">,</span> <span class="n">SerializableResidue</span>
+<span class="kn">from</span> <span class="nn">.units</span> <span class="kn">import</span> <span class="n">ScalarQuantity</span>
 
 
 <div class="viewcode-block" id="HelixHBondContent">
@@ -86,47 +86,40 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">        residues</span>
-<span class="sd">            The residues in the sequence</span>
-<span class="sd">        pbc</span>
-<span class="sd">            Whether to use periodic boundary conditions</span>
-<span class="sd">        thresholdDistance</span>
-<span class="sd">            The threshold distance for a hydrogen bond</span>
-<span class="sd">        halfExponent</span>
-<span class="sd">            The parameter :math:`m` of the step function.</span>
+<span class="sd">    residues</span>
+<span class="sd">        The residues in the sequence</span>
+<span class="sd">    pbc</span>
+<span class="sd">        Whether to use periodic boundary conditions</span>
+<span class="sd">    thresholdDistance</span>
+<span class="sd">        The threshold distance for a hydrogen bond</span>
+<span class="sd">    halfExponent</span>
+<span class="sd">        The parameter :math:`m` of the step function.</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
-<span class="sd">        &gt;&gt;&gt; import cvpack</span>
-<span class="sd">        &gt;&gt;&gt; import openmm</span>
-<span class="sd">        &gt;&gt;&gt; from openmm import app, unit</span>
-<span class="sd">        &gt;&gt;&gt; from openmmtools import testsystems</span>
-<span class="sd">        &gt;&gt;&gt; model = testsystems.LysozymeImplicit()</span>
-<span class="sd">        &gt;&gt;&gt; residues = [</span>
-<span class="sd">        ...     r</span>
-<span class="sd">        ...     for r in model.topology.residues()</span>
-<span class="sd">        ...     if 59 &lt;= r.index &lt;= 79</span>
-<span class="sd">        ... ]</span>
-<span class="sd">        &gt;&gt;&gt; print(*[r.name for r in residues])</span>
-<span class="sd">        LYS ASP GLU ... ILE LEU ARG</span>
-<span class="sd">        &gt;&gt;&gt; helix_content = cvpack.HelixHBondContent(residues)</span>
-<span class="sd">        &gt;&gt;&gt; helix_content.addToSystem(model.system)</span>
-<span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
-<span class="sd">        &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
-<span class="sd">        &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">        &gt;&gt;&gt; print(helix_content.getValue(context))</span>
-<span class="sd">        15.880... dimensionless</span>
+<span class="sd">    &gt;&gt;&gt; import cvpack</span>
+<span class="sd">    &gt;&gt;&gt; import openmm</span>
+<span class="sd">    &gt;&gt;&gt; from openmm import app, unit</span>
+<span class="sd">    &gt;&gt;&gt; from openmmtools import testsystems</span>
+<span class="sd">    &gt;&gt;&gt; model = testsystems.LysozymeImplicit()</span>
+<span class="sd">    &gt;&gt;&gt; residues = list(model.topology.residues())[59:80]</span>
+<span class="sd">    &gt;&gt;&gt; print(*[r.name for r in residues])</span>
+<span class="sd">    LYS ASP GLU ... ILE LEU ARG</span>
+<span class="sd">    &gt;&gt;&gt; helix_content = cvpack.HelixHBondContent(residues)</span>
+<span class="sd">    &gt;&gt;&gt; helix_content.addToSystem(model.system)</span>
+<span class="sd">    &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
+<span class="sd">    &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
+<span class="sd">    &gt;&gt;&gt; context.setPositions(model.positions)</span>
+<span class="sd">    &gt;&gt;&gt; print(helix_content.getValue(context))</span>
+<span class="sd">    15.880... dimensionless</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="nd">@mmunit</span><span class="o">.</span><span class="n">convert_quantities</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">residues</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">mmapp</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">Residue</span><span class="p">],</span>
         <span class="n">pbc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">thresholdDistance</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span>
-            <span class="mf">0.33</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span>
-        <span class="p">),</span>
+        <span class="n">thresholdDistance</span><span class="p">:</span> <span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="mf">0.33</span> <span class="o">*</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span><span class="p">,</span>
         <span class="n">halfExponent</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
         <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -141,7 +134,10 @@
             <span class="p">)</span>
 
         <span class="n">numerator</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">residues</span><span class="p">)</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span> <span class="k">if</span> <span class="n">normalize</span> <span class="k">else</span> <span class="mi">1</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">numerator</span><span class="si">}</span><span class="s2">/(1+x^</span><span class="si">{</span><span class="mi">2</span><span class="o">*</span><span class="n">halfExponent</span><span class="si">}</span><span class="s2">); x=r/</span><span class="si">{</span><span class="n">thresholdDistance</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">threshold</span> <span class="o">=</span> <span class="n">thresholdDistance</span>
+        <span class="k">if</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">is_quantity</span><span class="p">(</span><span class="n">threshold</span><span class="p">):</span>
+            <span class="n">threshold</span> <span class="o">=</span> <span class="n">threshold</span><span class="o">.</span><span class="n">value_in_unit_system</span><span class="p">(</span><span class="n">mmunit</span><span class="o">.</span><span class="n">md_unit_system</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">numerator</span><span class="si">}</span><span class="s2">/(1+x^</span><span class="si">{</span><span class="mi">2</span><span class="o">*</span><span class="n">halfExponent</span><span class="si">}</span><span class="s2">); x=r/</span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">hydrogen_pattern</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b(H|1H|HN1|HT1|H1|HN)\b&quot;</span><span class="p">)</span>
         <span class="n">oxygen_pattern</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b(O|OCT1|OC1|OT1|O1)\b&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">residues</span><span class="p">)):</span>

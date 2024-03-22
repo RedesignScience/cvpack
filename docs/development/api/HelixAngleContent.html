@@ -86,11 +86,7 @@ helix</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">app</span><span class="p">,</span> <span class="n">unit</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">openmmtools</span> <span class="kn">import</span> <span class="n">testsystems</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">testsystems</span><span class="o">.</span><span class="n">LysozymeImplicit</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">residues</span> <span class="o">=</span> <span class="p">[</span>
-<span class="gp">... </span>    <span class="n">r</span>
-<span class="gp">... </span>    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">residues</span><span class="p">()</span>
-<span class="gp">... </span>    <span class="k">if</span> <span class="mi">59</span> <span class="o">&lt;=</span> <span class="n">r</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;=</span> <span class="mi">79</span>
-<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">residues</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">residues</span><span class="p">())[</span><span class="mi">59</span><span class="p">:</span><span class="mi">80</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">residues</span><span class="p">])</span>  
 <span class="go">LYS ASP GLU ... ILE LEU ARG</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">helix_content</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">HelixAngleContent</span><span class="p">(</span><span class="n">residues</span><span class="p">)</span>

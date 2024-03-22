@@ -46,11 +46,11 @@
 <span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">t</span>
 
 <span class="kn">import</span> <span class="nn">openmm</span>
+<span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 <span class="kn">from</span> <span class="nn">openmm.app.topology</span> <span class="kn">import</span> <span class="n">Residue</span>
 
-<span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
-
 <span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">BaseCollectiveVariable</span><span class="p">,</span> <span class="n">SerializableResidue</span>
+<span class="kn">from</span> <span class="nn">.units</span> <span class="kn">import</span> <span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">value_in_md_units</span>
 
 
 <div class="viewcode-block" id="ResidueCoordination">
@@ -80,76 +80,73 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">        residueGroup1</span>
-<span class="sd">            The residues in the first group</span>
-<span class="sd">        residueGroup2</span>
-<span class="sd">            The residues in the second group</span>
-<span class="sd">        pbc</span>
-<span class="sd">            Whether the system has periodic boundary conditions</span>
-<span class="sd">        stepFunction</span>
-<span class="sd">            The function &quot;step(1-x)&quot; (for analysis only) or a continuous approximation</span>
-<span class="sd">            thereof</span>
-<span class="sd">        thresholdDistance</span>
-<span class="sd">            The threshold distance (:math:`r_0`) for considering two residues as being</span>
-<span class="sd">            in contact</span>
-<span class="sd">        normalize</span>
-<span class="sd">            Whether the number of contacts should be normalized by the total number of</span>
-<span class="sd">            possible contacts</span>
-<span class="sd">        weighByMass</span>
-<span class="sd">            Whether the centroid of each residue should be weighted by the mass of the</span>
-<span class="sd">            atoms in the residue</span>
-<span class="sd">        includeHydrogens</span>
-<span class="sd">            Whether hydrogen atoms should be included in the centroid calculations</span>
+<span class="sd">    residueGroup1</span>
+<span class="sd">        The residues in the first group</span>
+<span class="sd">    residueGroup2</span>
+<span class="sd">        The residues in the second group</span>
+<span class="sd">    pbc</span>
+<span class="sd">        Whether the system has periodic boundary conditions</span>
+<span class="sd">    stepFunction</span>
+<span class="sd">        The function &quot;step(1-x)&quot; (for analysis only) or a continuous approximation</span>
+<span class="sd">        thereof</span>
+<span class="sd">    thresholdDistance</span>
+<span class="sd">        The threshold distance (:math:`r_0`) for considering two residues as being</span>
+<span class="sd">        in contact</span>
+<span class="sd">    normalize</span>
+<span class="sd">        Whether the number of contacts should be normalized by the total number of</span>
+<span class="sd">        possible contacts</span>
+<span class="sd">    weighByMass</span>
+<span class="sd">        Whether the centroid of each residue should be weighted by the mass of the</span>
+<span class="sd">        atoms in the residue</span>
+<span class="sd">    includeHydrogens</span>
+<span class="sd">        Whether hydrogen atoms should be included in the centroid calculations</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
-<span class="sd">        ValueError</span>
-<span class="sd">            If the two groups of residues are not disjoint</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the two groups of residues are not disjoint</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
-<span class="sd">        &gt;&gt;&gt; import cvpack</span>
-<span class="sd">        &gt;&gt;&gt; import itertools as it</span>
-<span class="sd">        &gt;&gt;&gt; import openmm</span>
-<span class="sd">        &gt;&gt;&gt; from openmm import app, unit</span>
-<span class="sd">        &gt;&gt;&gt; from openmmtools import testsystems</span>
-<span class="sd">        &gt;&gt;&gt; model = testsystems.LysozymeImplicit()</span>
-<span class="sd">        &gt;&gt;&gt; group1 = list(it.islice(model.topology.residues(), 125, 142))</span>
-<span class="sd">        &gt;&gt;&gt; print(*[r.name for r in group1])  # doctest: +ELLIPSIS</span>
-<span class="sd">        TRP ASP GLU ... ASN GLN THR</span>
-<span class="sd">        &gt;&gt;&gt; group2 = list(it.islice(model.topology.residues(), 142, 156))</span>
-<span class="sd">        &gt;&gt;&gt; print(*[r.name for r in group2])  # doctest: +ELLIPSIS</span>
-<span class="sd">        PRO ASN ARG ... ARG THR GLY</span>
-<span class="sd">        &gt;&gt;&gt; residue_coordination = cvpack.ResidueCoordination(</span>
-<span class="sd">        ...     group1,</span>
-<span class="sd">        ...     group2,</span>
-<span class="sd">        ...     stepFunction=&quot;step(1-x)&quot;,</span>
-<span class="sd">        ...     thresholdDistance=0.6*unit.nanometers,</span>
-<span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; residue_coordination.addToSystem(model.system)</span>
-<span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; context = openmm.Context(</span>
-<span class="sd">        ...     model.system, openmm.CustomIntegrator(0), platform</span>
-<span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">        &gt;&gt;&gt; print(residue_coordination.getValue(context))</span>
-<span class="sd">        26.0 dimensionless</span>
-<span class="sd">        &gt;&gt;&gt; residue_coordination.setReferenceValue(26 * unit.dimensionless)</span>
-<span class="sd">        &gt;&gt;&gt; context.reinitialize(preserveState=True)</span>
-<span class="sd">        &gt;&gt;&gt; print(residue_coordination.getValue(context))</span>
-<span class="sd">        0.99999... dimensionless</span>
+<span class="sd">    &gt;&gt;&gt; import cvpack</span>
+<span class="sd">    &gt;&gt;&gt; import itertools as it</span>
+<span class="sd">    &gt;&gt;&gt; import openmm</span>
+<span class="sd">    &gt;&gt;&gt; from openmm import app, unit</span>
+<span class="sd">    &gt;&gt;&gt; from openmmtools import testsystems</span>
+<span class="sd">    &gt;&gt;&gt; model = testsystems.LysozymeImplicit()</span>
+<span class="sd">    &gt;&gt;&gt; group1 = list(it.islice(model.topology.residues(), 125, 142))</span>
+<span class="sd">    &gt;&gt;&gt; print(*[r.name for r in group1])  # doctest: +ELLIPSIS</span>
+<span class="sd">    TRP ASP GLU ... ASN GLN THR</span>
+<span class="sd">    &gt;&gt;&gt; group2 = list(it.islice(model.topology.residues(), 142, 156))</span>
+<span class="sd">    &gt;&gt;&gt; print(*[r.name for r in group2])  # doctest: +ELLIPSIS</span>
+<span class="sd">    PRO ASN ARG ... ARG THR GLY</span>
+<span class="sd">    &gt;&gt;&gt; residue_coordination = cvpack.ResidueCoordination(</span>
+<span class="sd">    ...     group1,</span>
+<span class="sd">    ...     group2,</span>
+<span class="sd">    ...     stepFunction=&quot;step(1-x)&quot;,</span>
+<span class="sd">    ...     thresholdDistance=0.6*unit.nanometers,</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; residue_coordination.addToSystem(model.system)</span>
+<span class="sd">    &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; context = openmm.Context(</span>
+<span class="sd">    ...     model.system, openmm.CustomIntegrator(0), platform</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; context.setPositions(model.positions)</span>
+<span class="sd">    &gt;&gt;&gt; print(residue_coordination.getValue(context))</span>
+<span class="sd">    26.0 dimensionless</span>
+<span class="sd">    &gt;&gt;&gt; residue_coordination.setReferenceValue(26 * unit.dimensionless)</span>
+<span class="sd">    &gt;&gt;&gt; context.reinitialize(preserveState=True)</span>
+<span class="sd">    &gt;&gt;&gt; print(residue_coordination.getValue(context))</span>
+<span class="sd">    0.99999... dimensionless</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="nd">@mmunit</span><span class="o">.</span><span class="n">convert_quantities</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">residueGroup1</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Residue</span><span class="p">],</span>
         <span class="n">residueGroup2</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Residue</span><span class="p">],</span>
         <span class="n">pbc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">stepFunction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;1/(1+x^6)&quot;</span><span class="p">,</span>
-        <span class="n">thresholdDistance</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span>
-            <span class="mf">1.0</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span>
-        <span class="p">),</span>
+        <span class="n">thresholdDistance</span><span class="p">:</span> <span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span><span class="p">,</span>
         <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">weighByMass</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">includeHydrogens</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -161,7 +158,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_ref_val</span> <span class="o">=</span> <span class="n">nr1</span> <span class="o">*</span> <span class="n">nr2</span> <span class="k">if</span> <span class="n">normalize</span> <span class="k">else</span> <span class="mf">1.0</span>
         <span class="n">expression</span> <span class="o">=</span> <span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">stepFunction</span><span class="si">}</span><span class="s2">)/refval&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;; x=distance(g1,g2)/</span><span class="si">{</span><span class="n">thresholdDistance</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;; x=distance(g1,g2)/</span><span class="si">{</span><span class="n">value_in_md_units</span><span class="p">(</span><span class="n">thresholdDistance</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="sa">f</span><span class="s2">&quot;; refval=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_ref_val</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">expression</span><span class="p">)</span>
@@ -207,8 +204,7 @@
 
 <div class="viewcode-block" id="ResidueCoordination.setReferenceValue">
 <a class="viewcode-back" href="../../api/ResidueCoordination.html#cvpack.ResidueCoordination.setReferenceValue">[docs]</a>
-    <span class="nd">@mmunit</span><span class="o">.</span><span class="n">convert_quantities</span>
-    <span class="k">def</span> <span class="nf">setReferenceValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">setReferenceValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">ScalarQuantity</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the reference value used for normalizing the residue coordination.</span>
 
@@ -218,6 +214,7 @@
 <span class="sd">                The reference value.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">expression</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getEnergyFunction</span><span class="p">()</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">value_in_md_units</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setEnergyFunction</span><span class="p">(</span>
             <span class="n">expression</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;refval=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_ref_val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;refval=</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="p">)</span>

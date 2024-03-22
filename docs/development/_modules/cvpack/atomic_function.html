@@ -50,10 +50,10 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">openmm</span>
 <span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">ArrayLike</span>
-
-<span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
+<span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
 <span class="kn">from</span> <span class="nn">.base_custom_function</span> <span class="kn">import</span> <span class="n">BaseCustomFunction</span>
+<span class="kn">from</span> <span class="nn">.units</span> <span class="kn">import</span> <span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">VectorQuantity</span>
 
 
 <div class="viewcode-block" id="AtomicFunction">
@@ -116,44 +116,43 @@
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
-<span class="sd">        &gt;&gt;&gt; import cvpack</span>
-<span class="sd">        &gt;&gt;&gt; import openmm</span>
-<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
-<span class="sd">        &gt;&gt;&gt; from cvpack import unit</span>
-<span class="sd">        &gt;&gt;&gt; from openmmtools import testsystems</span>
-<span class="sd">        &gt;&gt;&gt; model = testsystems.AlanineDipeptideVacuum()</span>
-<span class="sd">        &gt;&gt;&gt; angle1 = cvpack.Angle(0, 5, 10)</span>
-<span class="sd">        &gt;&gt;&gt; angle2 = cvpack.Angle(10, 15, 20)</span>
-<span class="sd">        &gt;&gt;&gt; colvar = cvpack.AtomicFunction(</span>
-<span class="sd">        ...     &quot;(k/2)*(angle(p1, p2, p3) - theta0)^2&quot;,</span>
-<span class="sd">        ...     unit.kilojoules_per_mole,</span>
-<span class="sd">        ...     [[0, 5, 10], [10, 15, 20]],</span>
-<span class="sd">        ...     k = 1000 * unit.kilojoules_per_mole/unit.radian**2,</span>
-<span class="sd">        ...     theta0 = [np.pi/2, np.pi/3] * unit.radian,</span>
-<span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; for cv in [angle1, angle2, colvar]:</span>
-<span class="sd">        ...     cv.addToSystem(model.system)</span>
-<span class="sd">        &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
-<span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
-<span class="sd">        &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">        &gt;&gt;&gt; theta1 = angle1.getValue(context).value_in_unit(openmm.unit.radian)</span>
-<span class="sd">        &gt;&gt;&gt; theta2 = angle2.getValue(context).value_in_unit(openmm.unit.radian)</span>
-<span class="sd">        &gt;&gt;&gt; print(500*((theta1 - np.pi/2)**2 + (theta2 - np.pi/3)**2))</span>
-<span class="sd">        429.479...</span>
-<span class="sd">        &gt;&gt;&gt; print(colvar.getValue(context))</span>
-<span class="sd">        429.479... kJ/mol</span>
+<span class="sd">    &gt;&gt;&gt; import cvpack</span>
+<span class="sd">    &gt;&gt;&gt; import openmm</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; from openmm import unit</span>
+<span class="sd">    &gt;&gt;&gt; from openmmtools import testsystems</span>
+<span class="sd">    &gt;&gt;&gt; model = testsystems.AlanineDipeptideVacuum()</span>
+<span class="sd">    &gt;&gt;&gt; angle1 = cvpack.Angle(0, 5, 10)</span>
+<span class="sd">    &gt;&gt;&gt; angle2 = cvpack.Angle(10, 15, 20)</span>
+<span class="sd">    &gt;&gt;&gt; colvar = cvpack.AtomicFunction(</span>
+<span class="sd">    ...     &quot;(k/2)*(angle(p1, p2, p3) - theta0)^2&quot;,</span>
+<span class="sd">    ...     unit.kilojoules_per_mole,</span>
+<span class="sd">    ...     [[0, 5, 10], [10, 15, 20]],</span>
+<span class="sd">    ...     k = 1000 * unit.kilojoules_per_mole/unit.radian**2,</span>
+<span class="sd">    ...     theta0 = [np.pi/2, np.pi/3] * unit.radian,</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; for cv in [angle1, angle2, colvar]:</span>
+<span class="sd">    ...     cv.addToSystem(model.system)</span>
+<span class="sd">    &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
+<span class="sd">    &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
+<span class="sd">    &gt;&gt;&gt; context.setPositions(model.positions)</span>
+<span class="sd">    &gt;&gt;&gt; theta1 = angle1.getValue(context) / openmm.unit.radian</span>
+<span class="sd">    &gt;&gt;&gt; theta2 = angle2.getValue(context) / openmm.unit.radian</span>
+<span class="sd">    &gt;&gt;&gt; print(500*((theta1 - np.pi/2)**2 + (theta2 - np.pi/3)**2))</span>
+<span class="sd">    429.479...</span>
+<span class="sd">    &gt;&gt;&gt; print(colvar.getValue(context))</span>
+<span class="sd">    429.479... kJ/mol</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="nd">@mmunit</span><span class="o">.</span><span class="n">convert_quantities</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">function</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">unit</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Unit</span><span class="p">,</span>
         <span class="n">groups</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
-        <span class="n">period</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">period</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">ScalarQuantity</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">pbc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">parameters</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">VectorQuantity</span><span class="p">],</span>
+        <span class="o">**</span><span class="n">parameters</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">VectorQuantity</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">groups</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
         <span class="n">num_groups</span><span class="p">,</span> <span class="n">atoms_per_group</span><span class="p">,</span> <span class="o">*</span><span class="n">other_dimensions</span> <span class="o">=</span> <span class="n">groups</span><span class="o">.</span><span class="n">shape</span>
@@ -162,8 +161,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">atoms_per_group</span><span class="p">,</span> <span class="n">function</span><span class="p">)</span>
         <span class="n">overalls</span><span class="p">,</span> <span class="n">perbonds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extractParameters</span><span class="p">(</span><span class="n">num_groups</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_addParameters</span><span class="p">(</span><span class="n">overalls</span><span class="p">,</span> <span class="n">perbonds</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">pbc</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
-        <span class="n">unit</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">SerializableUnit</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
-        <span class="n">groups</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">group</span><span class="p">))</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">]</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">int</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">group</span><span class="p">]</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span>
             <span class="n">unit</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">period</span><span class="p">,</span> <span class="n">pbc</span><span class="p">,</span> <span class="o">**</span><span class="n">overalls</span><span class="p">,</span> <span class="o">**</span><span class="n">perbonds</span>
         <span class="p">)</span>
@@ -322,7 +320,7 @@
 <span class="sd">        &gt;&gt;&gt; import cvpack</span>
 <span class="sd">        &gt;&gt;&gt; import numpy as np</span>
 <span class="sd">        &gt;&gt;&gt; import openmm</span>
-<span class="sd">        &gt;&gt;&gt; from cvpack import unit</span>
+<span class="sd">        &gt;&gt;&gt; from openmm import unit</span>
 <span class="sd">        &gt;&gt;&gt; from openmm import app</span>
 <span class="sd">        &gt;&gt;&gt; from openmmtools import testsystems</span>
 <span class="sd">        &gt;&gt;&gt; model = testsystems.LysozymeImplicit()</span>

@@ -45,17 +45,16 @@
 
 <span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">t</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">openmm</span>
+<span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
-<span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
-
-<span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">BaseCollectiveVariable</span>
+<span class="kn">from</span> <span class="nn">.base_rmsd</span> <span class="kn">import</span> <span class="n">BaseRMSD</span>
+<span class="kn">from</span> <span class="nn">.units</span> <span class="kn">import</span> <span class="n">MatrixQuantity</span><span class="p">,</span> <span class="n">VectorQuantity</span>
 
 
 <div class="viewcode-block" id="RMSD">
 <a class="viewcode-back" href="../../api/RMSD.html#cvpack.RMSD">[docs]</a>
-<span class="k">class</span> <span class="nc">RMSD</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">RMSDForce</span><span class="p">,</span> <span class="n">BaseCollectiveVariable</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">RMSD</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">RMSDForce</span><span class="p">,</span> <span class="n">BaseRMSD</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The root-mean-square deviation (RMSD) between the current and reference</span>
 <span class="sd">    coordinates of a group of `n` atoms:</span>
@@ -99,43 +98,35 @@
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
-<span class="sd">        &gt;&gt;&gt; import cvpack</span>
-<span class="sd">        &gt;&gt;&gt; import openmm</span>
-<span class="sd">        &gt;&gt;&gt; from openmm import app, unit</span>
-<span class="sd">        &gt;&gt;&gt; from openmmtools import testsystems</span>
-<span class="sd">        &gt;&gt;&gt; model = testsystems.AlanineDipeptideImplicit()</span>
-<span class="sd">        &gt;&gt;&gt; num_atoms = model.topology.getNumAtoms()</span>
-<span class="sd">        &gt;&gt;&gt; group = list(range(num_atoms))</span>
-<span class="sd">        &gt;&gt;&gt; rmsd = cvpack.RMSD(model.positions, group, num_atoms)</span>
-<span class="sd">        &gt;&gt;&gt; rmsd.addToSystem(model.system)</span>
-<span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; integrator = openmm.VerletIntegrator(2*unit.femtoseconds)</span>
-<span class="sd">        &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
-<span class="sd">        &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">        &gt;&gt;&gt; integrator.step(1000)</span>
-<span class="sd">        &gt;&gt;&gt; value = rmsd.getValue(context)</span>
-<span class="sd">        &gt;&gt;&gt; round(value/value.unit, 7)</span>
-<span class="sd">        0.1231383</span>
+<span class="sd">    &gt;&gt;&gt; import cvpack</span>
+<span class="sd">    &gt;&gt;&gt; import openmm</span>
+<span class="sd">    &gt;&gt;&gt; from openmm import app, unit</span>
+<span class="sd">    &gt;&gt;&gt; from openmmtools import testsystems</span>
+<span class="sd">    &gt;&gt;&gt; model = testsystems.AlanineDipeptideImplicit()</span>
+<span class="sd">    &gt;&gt;&gt; num_atoms = model.topology.getNumAtoms()</span>
+<span class="sd">    &gt;&gt;&gt; group = list(range(num_atoms))</span>
+<span class="sd">    &gt;&gt;&gt; rmsd = cvpack.RMSD(model.positions, group, num_atoms)</span>
+<span class="sd">    &gt;&gt;&gt; rmsd.addToSystem(model.system)</span>
+<span class="sd">    &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; integrator = openmm.VerletIntegrator(2*unit.femtoseconds)</span>
+<span class="sd">    &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
+<span class="sd">    &gt;&gt;&gt; context.setPositions(model.positions)</span>
+<span class="sd">    &gt;&gt;&gt; integrator.step(1000)</span>
+<span class="sd">    &gt;&gt;&gt; print(rmsd.getValue(context))</span>
+<span class="sd">    0.123138... nm</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="nd">@mmunit</span><span class="o">.</span><span class="n">convert_quantities</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">referencePositions</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
-            <span class="n">mmunit</span><span class="o">.</span><span class="n">MatrixQuantity</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">VectorQuantity</span><span class="p">]</span>
-        <span class="p">],</span>
+        <span class="n">referencePositions</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">MatrixQuantity</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">VectorQuantity</span><span class="p">]],</span>
         <span class="n">group</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
         <span class="n">numAtoms</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">group</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">group</span><span class="p">))</span>
         <span class="n">num_atoms</span> <span class="o">=</span> <span class="n">numAtoms</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">referencePositions</span><span class="p">)</span>
-        <span class="n">defined_coords</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">atom</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">referencePositions</span><span class="p">[</span><span class="n">atom</span><span class="p">]))</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">group</span>
-        <span class="p">}</span>
-        <span class="n">all_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_atoms</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">atom</span><span class="p">,</span> <span class="n">coords</span> <span class="ow">in</span> <span class="n">defined_coords</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">all_coords</span><span class="p">[</span><span class="n">atom</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">coords</span>
+        <span class="n">defined_coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getDefinedCoords</span><span class="p">(</span><span class="n">referencePositions</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
+        <span class="n">all_coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getAllCoords</span><span class="p">(</span><span class="n">defined_coords</span><span class="p">,</span> <span class="n">num_atoms</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">all_coords</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span><span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span><span class="p">,</span> <span class="n">defined_coords</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">num_atoms</span><span class="p">)</span>
 
@@ -148,35 +139,36 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">            force</span>
+<span class="sd">        openmm.HarmonicBondForce</span>
+<span class="sd">            The null bond force.</span>
 
 <span class="sd">        Example</span>
 <span class="sd">        -------</span>
-<span class="sd">            &gt;&gt;&gt; import cvpack</span>
-<span class="sd">            &gt;&gt;&gt; import openmm</span>
-<span class="sd">            &gt;&gt;&gt; from openmm import app, unit</span>
-<span class="sd">            &gt;&gt;&gt; from openmmtools import testsystems</span>
-<span class="sd">            &gt;&gt;&gt; model = testsystems.WaterBox(</span>
-<span class="sd">            ...     box_edge=10*unit.angstroms,</span>
-<span class="sd">            ...     cutoff=5*unit.angstroms,</span>
-<span class="sd">            ... )</span>
-<span class="sd">            &gt;&gt;&gt; group = [</span>
-<span class="sd">            ...     atom.index</span>
-<span class="sd">            ...     for atom in model.topology.atoms()</span>
-<span class="sd">            ...     if atom.residue.index &lt; 3</span>
-<span class="sd">            ... ]</span>
-<span class="sd">            &gt;&gt;&gt; rmsd = cvpack.RMSD(</span>
-<span class="sd">            ...     model.positions, group, model.topology.getNumAtoms()</span>
-<span class="sd">            ... )</span>
-<span class="sd">            &gt;&gt;&gt; rmsd.addToSystem(model.system)</span>
-<span class="sd">            &gt;&gt;&gt; _ = model.system.addForce(rmsd.getNullBondForce())</span>
-<span class="sd">            &gt;&gt;&gt; integrator = openmm.VerletIntegrator(2*unit.femtoseconds)</span>
-<span class="sd">            &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
-<span class="sd">            &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
-<span class="sd">            &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">            &gt;&gt;&gt; integrator.step(100)</span>
-<span class="sd">            &gt;&gt;&gt; print(rmsd.getValue(context))</span>
-<span class="sd">            0.10436... nm</span>
+<span class="sd">        &gt;&gt;&gt; import cvpack</span>
+<span class="sd">        &gt;&gt;&gt; import openmm</span>
+<span class="sd">        &gt;&gt;&gt; from openmm import app, unit</span>
+<span class="sd">        &gt;&gt;&gt; from openmmtools import testsystems</span>
+<span class="sd">        &gt;&gt;&gt; model = testsystems.WaterBox(</span>
+<span class="sd">        ...     box_edge=10*unit.angstroms,</span>
+<span class="sd">        ...     cutoff=5*unit.angstroms,</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; group = [</span>
+<span class="sd">        ...     atom.index</span>
+<span class="sd">        ...     for atom in model.topology.atoms()</span>
+<span class="sd">        ...     if atom.residue.index &lt; 3</span>
+<span class="sd">        ... ]</span>
+<span class="sd">        &gt;&gt;&gt; rmsd = cvpack.RMSD(</span>
+<span class="sd">        ...     model.positions, group, model.topology.getNumAtoms()</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; rmsd.addToSystem(model.system)</span>
+<span class="sd">        &gt;&gt;&gt; _ = model.system.addForce(rmsd.getNullBondForce())</span>
+<span class="sd">        &gt;&gt;&gt; integrator = openmm.VerletIntegrator(2*unit.femtoseconds)</span>
+<span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
+<span class="sd">        &gt;&gt;&gt; context.setPositions(model.positions)</span>
+<span class="sd">        &gt;&gt;&gt; integrator.step(100)</span>
+<span class="sd">        &gt;&gt;&gt; print(rmsd.getValue(context))</span>
+<span class="sd">        0.10436... nm</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">force</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">HarmonicBondForce</span><span class="p">()</span>

@@ -46,11 +46,11 @@
 <span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">t</span>
 
 <span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">app</span> <span class="k">as</span> <span class="n">mmapp</span>
-
-<span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
+<span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
 <span class="kn">from</span> <span class="nn">.base_rmsd_content</span> <span class="kn">import</span> <span class="n">BaseRMSDContent</span>
 <span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">SerializableResidue</span>
+<span class="kn">from</span> <span class="nn">.units</span> <span class="kn">import</span> <span class="n">ScalarQuantity</span>
 
 <span class="c1"># pylint: disable=protected-access</span>
 <span class="n">ALPHA_POSITIONS</span> <span class="o">=</span> <span class="n">BaseRMSDContent</span><span class="o">.</span><span class="n">_loadPositions</span><span class="p">(</span><span class="s2">&quot;ideal_alpha_helix.csv&quot;</span><span class="p">)</span>
@@ -121,49 +121,48 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">        residues</span>
-<span class="sd">            The residue sequence to be used in the calculation.</span>
-<span class="sd">        numAtoms</span>
-<span class="sd">            The total number of atoms in the system (required by OpenMM).</span>
-<span class="sd">        thresholdRMSD</span>
-<span class="sd">            The threshold RMSD value for considering a group of residues as a close</span>
-<span class="sd">            match to an ideal alpha-helix.</span>
-<span class="sd">        stepFunction</span>
-<span class="sd">            The form of the step function :math:`S(x)`.</span>
-<span class="sd">        normalize</span>
-<span class="sd">            Whether to normalize the collective variable to the range :math:`[0, 1]`.</span>
+<span class="sd">    residues</span>
+<span class="sd">        The residue sequence to be used in the calculation.</span>
+<span class="sd">    numAtoms</span>
+<span class="sd">        The total number of atoms in the system (required by OpenMM).</span>
+<span class="sd">    thresholdRMSD</span>
+<span class="sd">        The threshold RMSD value for considering a group of residues as a close</span>
+<span class="sd">        match to an ideal alpha-helix.</span>
+<span class="sd">    stepFunction</span>
+<span class="sd">        The form of the step function :math:`S(x)`.</span>
+<span class="sd">    normalize</span>
+<span class="sd">        Whether to normalize the collective variable to the range :math:`[0, 1]`.</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
-<span class="sd">        &gt;&gt;&gt; import itertools as it</span>
-<span class="sd">        &gt;&gt;&gt; import cvpack</span>
-<span class="sd">        &gt;&gt;&gt; import openmm</span>
-<span class="sd">        &gt;&gt;&gt; from openmm import app, unit</span>
-<span class="sd">        &gt;&gt;&gt; from openmmtools import testsystems</span>
-<span class="sd">        &gt;&gt;&gt; model = testsystems.LysozymeImplicit()</span>
-<span class="sd">        &gt;&gt;&gt; residues = list(it.islice(model.topology.residues(), 59, 80))</span>
-<span class="sd">        &gt;&gt;&gt; print(*[r.name for r in residues])</span>
-<span class="sd">        LYS ASP GLU ... ILE LEU ARG</span>
-<span class="sd">        &gt;&gt;&gt; helix_content = cvpack.HelixRMSDContent(</span>
-<span class="sd">        ...     residues, model.system.getNumParticles()</span>
-<span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; helix_content.getNumResidueBlocks()</span>
-<span class="sd">        16</span>
-<span class="sd">        &gt;&gt;&gt; helix_content.addToSystem(model.system)</span>
-<span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
-<span class="sd">        &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
-<span class="sd">        &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">        &gt;&gt;&gt; print(helix_content.getValue(context))</span>
-<span class="sd">        15.98... dimensionless</span>
+<span class="sd">    &gt;&gt;&gt; import itertools as it</span>
+<span class="sd">    &gt;&gt;&gt; import cvpack</span>
+<span class="sd">    &gt;&gt;&gt; import openmm</span>
+<span class="sd">    &gt;&gt;&gt; from openmm import app, unit</span>
+<span class="sd">    &gt;&gt;&gt; from openmmtools import testsystems</span>
+<span class="sd">    &gt;&gt;&gt; model = testsystems.LysozymeImplicit()</span>
+<span class="sd">    &gt;&gt;&gt; residues = list(it.islice(model.topology.residues(), 59, 80))</span>
+<span class="sd">    &gt;&gt;&gt; print(*[r.name for r in residues])</span>
+<span class="sd">    LYS ASP GLU ... ILE LEU ARG</span>
+<span class="sd">    &gt;&gt;&gt; helix_content = cvpack.HelixRMSDContent(</span>
+<span class="sd">    ...     residues, model.system.getNumParticles()</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; helix_content.getNumResidueBlocks()</span>
+<span class="sd">    16</span>
+<span class="sd">    &gt;&gt;&gt; helix_content.addToSystem(model.system)</span>
+<span class="sd">    &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
+<span class="sd">    &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
+<span class="sd">    &gt;&gt;&gt; context.setPositions(model.positions)</span>
+<span class="sd">    &gt;&gt;&gt; print(helix_content.getValue(context))</span>
+<span class="sd">    15.98... dimensionless</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="nd">@mmunit</span><span class="o">.</span><span class="n">convert_quantities</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">residues</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">mmapp</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">Residue</span><span class="p">],</span>
         <span class="n">numAtoms</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">thresholdRMSD</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="mf">0.08</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span><span class="p">),</span>
+        <span class="n">thresholdRMSD</span><span class="p">:</span> <span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="mf">0.08</span> <span class="o">*</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span><span class="p">,</span>
         <span class="n">stepFunction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;(1+x^4)/(1+x^4+x^8)&quot;</span><span class="p">,</span>
         <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>

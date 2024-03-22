@@ -46,10 +46,10 @@
 <span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">t</span>
 
 <span class="kn">import</span> <span class="nn">openmm</span>
-
-<span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
+<span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
 <span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">BaseCollectiveVariable</span>
+<span class="kn">from</span> <span class="nn">.units</span> <span class="kn">import</span> <span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">Unit</span>
 
 
 <div class="viewcode-block" id="OpenMMForceWrapper">
@@ -96,15 +96,15 @@
 <span class="sd">        0.00538... nm**2 Da/(rad**2)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments, super-init-not-called</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># pylint: disable=super-init-not-called</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">openmmForce</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">openmm</span><span class="o">.</span><span class="n">Force</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
         <span class="n">unit</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Unit</span><span class="p">,</span>
-        <span class="n">period</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">mmunit</span><span class="o">.</span><span class="n">ScalarQuantity</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">period</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">ScalarQuantity</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">openmmForce</span><span class="p">,</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Force</span><span class="p">):</span>
             <span class="n">openmmForce</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">XmlSerializer</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">openmmForce</span><span class="p">)</span>
-        <span class="n">unit</span> <span class="o">=</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">SerializableUnit</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
+        <span class="n">unit</span> <span class="o">=</span> <span class="n">Unit</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
         <span class="n">force_copy</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">XmlSerializer</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">openmmForce</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">this</span> <span class="o">=</span> <span class="n">force_copy</span><span class="o">.</span><span class="n">this</span>
         <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__bases__</span> <span class="o">=</span> <span class="p">(</span><span class="n">BaseCollectiveVariable</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">force_copy</span><span class="p">))</span>

@@ -92,9 +92,8 @@ contain all atoms in the system.</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="n">integrator</span><span class="p">,</span> <span class="n">platform</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">integrator</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">value</span> <span class="o">=</span> <span class="n">rmsd</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">value</span><span class="o">/</span><span class="n">value</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
-<span class="go">0.1231383</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">rmsd</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
+<span class="go">0.123138... nm</span>
 </pre></div>
 </div>
 <p class="rubric">Methods</p>
@@ -179,8 +178,11 @@ angles and the radius of gyration of an alanine dipeptide molecule in water:</p>
 <dd><p>Get a null bond force that creates a connected graph with all the atoms in the
 group.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>force</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The null bond force.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>openmm.HarmonicBondForce</p>
 </dd>
 </dl>
 <p class="rubric">Example</p>

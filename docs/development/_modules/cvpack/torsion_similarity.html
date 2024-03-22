@@ -47,8 +47,7 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">openmm</span>
-
-<span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
+<span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
 <span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">BaseCollectiveVariable</span>
 
@@ -75,43 +74,43 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">        firstList</span>
-<span class="sd">            A list of :math:`n` tuples of four atom indices defining the first torsion</span>
-<span class="sd">            angle in each pair.</span>
-<span class="sd">        secondList</span>
-<span class="sd">            A list of :math:`n` tuples of four atom indices defining the second torsion</span>
-<span class="sd">            angle in each pair.</span>
-<span class="sd">        pbc</span>
-<span class="sd">            Whether to use periodic boundary conditions</span>
+<span class="sd">    firstList</span>
+<span class="sd">        A list of :math:`n` tuples of four atom indices defining the first torsion</span>
+<span class="sd">        angle in each pair.</span>
+<span class="sd">    secondList</span>
+<span class="sd">        A list of :math:`n` tuples of four atom indices defining the second torsion</span>
+<span class="sd">        angle in each pair.</span>
+<span class="sd">    pbc</span>
+<span class="sd">        Whether to use periodic boundary conditions</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
-<span class="sd">        &gt;&gt;&gt; import cvpack</span>
-<span class="sd">        &gt;&gt;&gt; import mdtraj</span>
-<span class="sd">        &gt;&gt;&gt; import openmm</span>
-<span class="sd">        &gt;&gt;&gt; import openmm.unit as mmunit</span>
-<span class="sd">        &gt;&gt;&gt; from openmmtools import testsystems</span>
-<span class="sd">        &gt;&gt;&gt; model = testsystems.LysozymeImplicit()</span>
-<span class="sd">        &gt;&gt;&gt; traj = mdtraj.Trajectory(</span>
-<span class="sd">        ...     model.positions, mdtraj.Topology.from_openmm(model.topology)</span>
-<span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; phi_atoms, _ = mdtraj.compute_phi(traj)</span>
-<span class="sd">        &gt;&gt;&gt; valid_atoms = traj.top.select(&quot;resid 59 to 79 and backbone&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; phi_atoms = [</span>
-<span class="sd">        ...     phi</span>
-<span class="sd">        ...     for phi in phi_atoms</span>
-<span class="sd">        ...     if all(atom in valid_atoms for atom in phi)</span>
-<span class="sd">        ... ]</span>
-<span class="sd">        &gt;&gt;&gt; torsion_similarity = cvpack.TorsionSimilarity(</span>
-<span class="sd">        ...     phi_atoms[1:], phi_atoms[:-1]</span>
-<span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; torsion_similarity.addToSystem(model.system)</span>
-<span class="sd">        &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
-<span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&quot;Reference&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
-<span class="sd">        &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">        &gt;&gt;&gt; print(torsion_similarity.getValue(context))</span>
-<span class="sd">        18.659... dimensionless</span>
+<span class="sd">    &gt;&gt;&gt; import cvpack</span>
+<span class="sd">    &gt;&gt;&gt; import mdtraj</span>
+<span class="sd">    &gt;&gt;&gt; import openmm</span>
+<span class="sd">    &gt;&gt;&gt; import openmm.unit as mmunit</span>
+<span class="sd">    &gt;&gt;&gt; from openmmtools import testsystems</span>
+<span class="sd">    &gt;&gt;&gt; model = testsystems.LysozymeImplicit()</span>
+<span class="sd">    &gt;&gt;&gt; traj = mdtraj.Trajectory(</span>
+<span class="sd">    ...     model.positions, mdtraj.Topology.from_openmm(model.topology)</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; phi_atoms, _ = mdtraj.compute_phi(traj)</span>
+<span class="sd">    &gt;&gt;&gt; valid_atoms = traj.top.select(&quot;resid 59 to 79 and backbone&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; phi_atoms = [</span>
+<span class="sd">    ...     phi</span>
+<span class="sd">    ...     for phi in phi_atoms</span>
+<span class="sd">    ...     if all(atom in valid_atoms for atom in phi)</span>
+<span class="sd">    ... ]</span>
+<span class="sd">    &gt;&gt;&gt; torsion_similarity = cvpack.TorsionSimilarity(</span>
+<span class="sd">    ...     phi_atoms[1:], phi_atoms[:-1]</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; torsion_similarity.addToSystem(model.system)</span>
+<span class="sd">    &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
+<span class="sd">    &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&quot;Reference&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
+<span class="sd">    &gt;&gt;&gt; context.setPositions(model.positions)</span>
+<span class="sd">    &gt;&gt;&gt; print(torsion_similarity.getValue(context))</span>
+<span class="sd">    18.659... dimensionless</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>

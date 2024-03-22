@@ -46,7 +46,7 @@
 
 <span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">t</span>
 
-<span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
+<span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
 <span class="kn">from</span> <span class="nn">.base_radius_of_gyration</span> <span class="kn">import</span> <span class="n">BaseRadiusOfGyration</span>
 
@@ -86,29 +86,28 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">        group</span>
-<span class="sd">            The indices of the atoms in the group</span>
-<span class="sd">        pbc</span>
-<span class="sd">            Whether to use periodic boundary conditions</span>
-<span class="sd">        weighByMass</span>
-<span class="sd">            Whether to use the center of mass of the group instead of its geometric</span>
-<span class="sd">            center</span>
+<span class="sd">    group</span>
+<span class="sd">        The indices of the atoms in the group</span>
+<span class="sd">    pbc</span>
+<span class="sd">        Whether to use periodic boundary conditions</span>
+<span class="sd">    weighByMass</span>
+<span class="sd">        Whether to use the center of mass of the group instead of its geometric center</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
-<span class="sd">        &gt;&gt;&gt; import cvpack</span>
-<span class="sd">        &gt;&gt;&gt; import openmm</span>
-<span class="sd">        &gt;&gt;&gt; from openmmtools import testsystems</span>
-<span class="sd">        &gt;&gt;&gt; model = testsystems.AlanineDipeptideVacuum()</span>
-<span class="sd">        &gt;&gt;&gt; num_atoms = model.system.getNumParticles()</span>
-<span class="sd">        &gt;&gt;&gt; rgsq = cvpack.RadiusOfGyrationSq(list(range(num_atoms)))</span>
-<span class="sd">        &gt;&gt;&gt; rgsq.addToSystem(model.system)</span>
-<span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
-<span class="sd">        &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
-<span class="sd">        &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">        &gt;&gt;&gt; print(rgsq.getValue(context))  # doctest: +ELLIPSIS</span>
-<span class="sd">        0.0871... nm**2</span>
+<span class="sd">    &gt;&gt;&gt; import cvpack</span>
+<span class="sd">    &gt;&gt;&gt; import openmm</span>
+<span class="sd">    &gt;&gt;&gt; from openmmtools import testsystems</span>
+<span class="sd">    &gt;&gt;&gt; model = testsystems.AlanineDipeptideVacuum()</span>
+<span class="sd">    &gt;&gt;&gt; num_atoms = model.system.getNumParticles()</span>
+<span class="sd">    &gt;&gt;&gt; rgsq = cvpack.RadiusOfGyrationSq(list(range(num_atoms)))</span>
+<span class="sd">    &gt;&gt;&gt; rgsq.addToSystem(model.system)</span>
+<span class="sd">    &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
+<span class="sd">    &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
+<span class="sd">    &gt;&gt;&gt; context.setPositions(model.positions)</span>
+<span class="sd">    &gt;&gt;&gt; print(rgsq.getValue(context))  # doctest: +ELLIPSIS</span>
+<span class="sd">    0.0871... nm**2</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 

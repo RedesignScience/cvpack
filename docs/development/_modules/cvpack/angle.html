@@ -46,8 +46,7 @@
 <span class="kn">import</span> <span class="nn">math</span>
 
 <span class="kn">import</span> <span class="nn">openmm</span>
-
-<span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
+<span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
 <span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">BaseCollectiveVariable</span>
 
@@ -70,31 +69,32 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">        atom1</span>
-<span class="sd">            The index of the first atom</span>
-<span class="sd">        atom2</span>
-<span class="sd">            The index of the second atom</span>
-<span class="sd">        atom3</span>
-<span class="sd">            The index of the third atom</span>
-<span class="sd">        pbc</span>
-<span class="sd">            Whether to use periodic boundary conditions</span>
+<span class="sd">    atom1</span>
+<span class="sd">        The index of the first atom</span>
+<span class="sd">    atom2</span>
+<span class="sd">        The index of the second atom</span>
+<span class="sd">    atom3</span>
+<span class="sd">        The index of the third atom</span>
+<span class="sd">    pbc</span>
+<span class="sd">        Whether to use periodic boundary conditions</span>
 
-<span class="sd">    Example:</span>
-<span class="sd">        &gt;&gt;&gt; import cvpack</span>
-<span class="sd">        &gt;&gt;&gt; import openmm</span>
-<span class="sd">        &gt;&gt;&gt; system = openmm.System()</span>
-<span class="sd">        &gt;&gt;&gt; [system.addParticle(1) for i in range(3)]</span>
-<span class="sd">        [0, 1, 2]</span>
-<span class="sd">        &gt;&gt;&gt; angle = cvpack.Angle(0, 1, 2)</span>
-<span class="sd">        &gt;&gt;&gt; system.addForce(angle)</span>
-<span class="sd">        0</span>
-<span class="sd">        &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
-<span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; context = openmm.Context(system, integrator, platform)</span>
-<span class="sd">        &gt;&gt;&gt; positions = [[0, 0, 0], [1, 0, 0], [1, 1, 0]]</span>
-<span class="sd">        &gt;&gt;&gt; context.setPositions([openmm.Vec3(*pos) for pos in positions])</span>
-<span class="sd">        &gt;&gt;&gt; print(angle.getValue(context))</span>
-<span class="sd">        1.570796... rad</span>
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; import cvpack</span>
+<span class="sd">    &gt;&gt;&gt; import openmm</span>
+<span class="sd">    &gt;&gt;&gt; system = openmm.System()</span>
+<span class="sd">    &gt;&gt;&gt; [system.addParticle(1) for i in range(3)]</span>
+<span class="sd">    [0, 1, 2]</span>
+<span class="sd">    &gt;&gt;&gt; angle = cvpack.Angle(0, 1, 2)</span>
+<span class="sd">    &gt;&gt;&gt; system.addForce(angle)</span>
+<span class="sd">    0</span>
+<span class="sd">    &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
+<span class="sd">    &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; context = openmm.Context(system, integrator, platform)</span>
+<span class="sd">    &gt;&gt;&gt; positions = [[0, 0, 0], [1, 0, 0], [1, 1, 0]]</span>
+<span class="sd">    &gt;&gt;&gt; context.setPositions([openmm.Vec3(*pos) for pos in positions])</span>
+<span class="sd">    &gt;&gt;&gt; print(angle.getValue(context))</span>
+<span class="sd">    1.570796... rad</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
