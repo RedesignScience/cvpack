@@ -129,15 +129,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         self._addParameters(overalls, perbonds, groups, pbc, unit)
         groups = [[int(atom) for atom in group] for group in groups]
         self._registerCV(
-            name,
-            unit,
-            function,
-            unit,
-            groups,
-            period,
-            pbc,
-            **overalls,
-            **perbonds,
+            name, unit, function, unit, groups, period, pbc, **overalls, **perbonds
         )
         if period is not None:
             self._registerPeriod(period)

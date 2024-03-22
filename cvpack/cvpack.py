@@ -17,7 +17,7 @@ from openmm import app as mmapp
 from openmm import unit as mmunit
 
 from .serializer import Serializable
-from .units import Quantity, preprocess_units, value_in_md_units
+from .units import Quantity, Unit, preprocess_units, value_in_md_units
 from .utils import compute_effective_mass, get_single_force_state
 
 
@@ -86,7 +86,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
     An abstract class with common attributes and method for all CVs.
     """
 
-    _unit: mmunit.Unit = mmunit.dimensionless
+    _unit: mmunit.Unit = None
     _mass_unit: mmunit.Unit = mmunit.dalton * mmunit.nanometers**2
     _args: t.Dict[str, t.Any] = {}
     _period: t.Optional[float] = None
@@ -107,7 +107,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
     def _registerCV(
         self,
         name: str,
-        unit: mmunit.Unit,
+        unit: t.Optional[mmunit.Unit],
         *args: t.Any,
         **kwargs: t.Any,
     ) -> None:
@@ -130,8 +130,8 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
             The keyword arguments needed to construct this collective variable
         """
         self.setName(name)
-        self._unit = unit
-        self._mass_unit = mmunit.dalton * (mmunit.nanometers / self.getUnit()) ** 2
+        self._unit = Unit("dimensionless") if unit is None else unit
+        self._mass_unit = mmunit.dalton * (mmunit.nanometers / self._unit) ** 2
         arguments, _ = self._getArguments()
         self._args = dict(zip(arguments, args))
         self._args.update(kwargs)

@@ -185,12 +185,11 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
         if contrasting:
             contrastGroup = list(contrastGroup)
         nonbondedForce = NonbondedForceSurrogate(nonbondedForce)
-        cutoff = nonbondedForce.getCutoffDistance()
         expression = (
             f"-(lj + coul){'*sign1*sign2' if contrasting else ''}/ref"
             "; lj = 4*epsilon*(1/y^2 - 1/y)"
             f"; coul = {ONE_4PI_EPS0}*q1q2*(1/x + (x^2 - 3)/2)"
-            f"; x = r/{cutoff}"
+            f"; x = r/{nonbondedForce.getCutoffDistance()}"
             "; y = abs((r/sigma)^6 - 2) + 2"
             "; q1q2 = min(0, charge1*charge2)"
             "; epsilon = sqrt(epsilon1*epsilon2)"
@@ -198,11 +197,12 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
             "; ref = 1"
         )
         super().__init__(expression)
-        if nonbondedForce.usesPeriodicBoundaryConditions():
-            self.setNonbondedMethod(self.CutoffPeriodic)
-        else:
-            self.setNonbondedMethod(self.CutoffNonPeriodic)
-        self.setCutoffDistance(cutoff)
+        self.setNonbondedMethod(
+            self.CutoffPeriodic
+            if nonbondedForce.usesPeriodicBoundaryConditions()
+            else self.CutoffNonPeriodic
+        )
+        self.setCutoffDistance(nonbondedForce.getCutoffDistance())
         for parameter in ("charge", "sigma", "epsilon") + ("sign",) * contrasting:
             self.addPerParticleParameter(parameter)
         for atom in range(nonbondedForce.getNumParticles()):
@@ -227,10 +227,10 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
         self.setEnergyFunction(expression.replace("ref = 1", f"ref = {reference}"))
         if contrasting:
             self.addInteractionGroup(group1, contrastGroup)
-        # pylint: disable=duplicate-code
+
         self._registerCV(
             name,
-            mmunit.dimensionless,
+            None,
             group1,
             group2,
             nonbondedForce,

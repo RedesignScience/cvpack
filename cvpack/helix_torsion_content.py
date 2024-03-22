@@ -144,10 +144,11 @@ class HelixTorsionContent(openmm.CustomTorsionForce, BaseCollectiveVariable):
                 [psiReference],
             )
         self.setUsesPeriodicBoundaryConditions(pbc)
+        residues = list(map(SerializableResidue, residues))
         self._registerCV(
-            name,  # pylint: disable=duplicate-code
-            mmunit.dimensionless,
-            list(map(SerializableResidue, residues)),
+            name,
+            None,
+            residues,
             pbc,
             phiReference,
             psiReference,

@@ -134,7 +134,7 @@ class HelixRMSDContent(BaseRMSDContent):
         residue_blocks = [
             list(range(index, index + 6)) for index in range(len(residues) - 5)
         ]
-        # pylint: disable=duplicate-code
+
         super().__init__(
             residue_blocks,
             ALPHA_POSITIONS,
@@ -144,14 +144,9 @@ class HelixRMSDContent(BaseRMSDContent):
             stepFunction,
             normalize,
         )
+        residues = list(map(SerializableResidue, residues))
         self._registerCV(
-            name,
-            mmunit.dimensionless,
-            list(map(SerializableResidue, residues)),
-            numAtoms,
-            thresholdRMSD,
-            stepFunction,
-            normalize,
+            name, None, residues, numAtoms, thresholdRMSD, stepFunction, normalize
         )
 
 

@@ -12,7 +12,6 @@ from collections import OrderedDict
 from copy import deepcopy
 
 import openmm
-from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
 from .path import Metric, deviation, progress
@@ -137,10 +136,7 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
         if name is None:
             name = f"path_{metric.name}_in_cv_space"
         variables = list(variables)
-        if scales is None:
-            cv_scales = [1.0] * len(variables)
-        else:
-            cv_scales = list(scales)
+        cv_scales = [1.0] * len(variables) if scales is None else list(scales)
         milestones, n, numvars = convert_to_matrix(milestones)
         if numvars != len(variables):
             raise ValueError("Wrong number of columns in the milestones matrix.")
@@ -177,7 +173,7 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
             self.addCollectiveVariable(f"cv{i}", deepcopy(variable))
         self._registerCV(
             name,
-            mmunit.dimensionless,
+            None,
             metric,
             variables,
             milestones.tolist(),

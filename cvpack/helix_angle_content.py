@@ -127,10 +127,11 @@ class HelixAngleContent(openmm.CustomAngleForce, BaseCollectiveVariable):
                 [],
             )
         self.setUsesPeriodicBoundaryConditions(pbc)
+        residues = list(map(SerializableResidue, residues))
         self._registerCV(
-            name,  # pylint: disable=duplicate-code
-            mmunit.dimensionless,
-            list(map(SerializableResidue, residues)),
+            name,
+            None,
+            residues,
             pbc,
             thetaReference,
             tolerance,

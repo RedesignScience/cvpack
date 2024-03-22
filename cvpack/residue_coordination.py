@@ -143,7 +143,7 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable
                 self.addBond([idx1, idx2], [])
         self._registerCV(
             name,
-            mmunit.dimensionless,
+            None,
             residueGroup1,
             residueGroup2,
             pbc,

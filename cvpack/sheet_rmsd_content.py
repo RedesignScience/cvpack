@@ -209,7 +209,6 @@ class SheetRMSDContent(BaseRMSDContent):
                 f"number of residues ({len(residues)}) must be equal."
             )
 
-        # pylint: disable=duplicate-code
         super().__init__(
             residue_groups,
             PARABETA_POSITIONS if parallel else ANTIBETA_POSITIONS,
@@ -221,7 +220,7 @@ class SheetRMSDContent(BaseRMSDContent):
         )
         self._registerCV(
             name,
-            mmunit.dimensionless,
+            None,
             list(map(SerializableResidue, residues)),
             numAtoms,
             parallel,
