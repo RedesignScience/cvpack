@@ -114,12 +114,18 @@ class HelixRMSDContent(BaseRMSDContent):
     >>> helix_content.getNumResidueBlocks()
     16
     >>> helix_content.addToSystem(model.system)
+    >>> normalized_helix_content = cvpack.HelixRMSDContent(
+    ...     residues, model.system.getNumParticles(), normalize=True
+    ... )
+    >>> normalized_helix_content.addToSystem(model.system)
     >>> platform = openmm.Platform.getPlatformByName('Reference')
     >>> integrator = openmm.VerletIntegrator(0)
     >>> context = openmm.Context(model.system, integrator, platform)
     >>> context.setPositions(model.positions)
     >>> print(helix_content.getValue(context))
     15.98... dimensionless
+    >>> print(normalized_helix_content.getValue(context))
+    0.998... dimensionless
     """
 
     def __init__(
