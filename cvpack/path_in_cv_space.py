@@ -16,7 +16,7 @@ from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
 from .path import Metric, deviation, progress
-from .units import MatrixQuantity, ScalarQuantity, convert_quantities
+from .units import MatrixQuantity, ScalarQuantity
 from .utils import convert_to_matrix
 
 
@@ -117,7 +117,6 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
     z = 0.25... dimensionless
     """
 
-    @convert_quantities
     def __init__(
         self,
         metric: Metric,
@@ -131,7 +130,10 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
                 "Invalid metric. Use 'cvpack.path.progress' or 'cvpack.path.deviation'."
             )
         variables = list(variables)
-        scales = [1.0] * len(variables) if scales is None else list(scales)
+        if scales is None:
+            cv_scales = [1.0] * len(variables)
+        else:
+            cv_scales = list(scales)
         milestones, n, numvars = convert_to_matrix(milestones)
         if numvars != len(variables):
             raise ValueError("Wrong number of columns in the milestones matrix.")
@@ -149,7 +151,7 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
                 deltas[j] = f"min(abs{deltas[j]},{period}-abs{deltas[j]})"
             definitions[f"x{i}"] = "+".join(
                 f"{delta}^2" if scale == 1.0 else f"({delta}/{scale})^2"
-                for delta, scale in zip(deltas, scales)
+                for delta, scale in zip(deltas, cv_scales)
             )
         definitions["xmin0"] = "min(x0,x1)"
         for i in range(n - 2):
