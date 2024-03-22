@@ -6,7 +6,7 @@ Collective Variable Package
 [![GitHub Actions Build Status](https://github.com/RedesignScience/cvpack/workflows/MacOS/badge.svg)](https://github.com/RedesignScience/cvpack/actions?query=workflow%3AMacOS)
 [![GitHub Actions Build Status](https://github.com/RedesignScience/cvpack/workflows/Windows/badge.svg)](https://github.com/RedesignScience/cvpack/actions?query=workflow%3AWindows)
 [![GitHub Actions Build Status](https://github.com/RedesignScience/cvpack/workflows/Linter/badge.svg)](https://github.com/RedesignScience/cvpack/actions?query=workflow%3ALinter)
-[![Documentation Status](https://github.com/RedesignScience/cvpack/workflows/Docs/badge.svg)](https://github.com/RedesignScience/cvpack/actions?query=workflow%3ADocs)
+[![Documentation Status](https://github.com/RedesignScience/cvpack/workflows/Docs/badge.svg)](https://redesignscience.github.io/cvpack/development)
 [![Coverage Report](https://redesignscience.github.io/cvpack/development/coverage/coverage.svg)](https://redesignscience.github.io/cvpack/development/coverage)
 
 [![Conda version](https://img.shields.io/conda/v/mdtools/cvpack.svg)](https://anaconda.org/mdtools/cvpack)
@@ -48,6 +48,7 @@ The CVs implemented in CVPack are listed in the table below.
 | [Helix H-bond content]  | alpha-helix hydrogen-bond content of a sequence of residues      |
 | [Helix RMSD content]    | alpha-helix RMSD content of a sequence of residues               |
 | [Helix torsion content] | alpha-helix Ramachandran content of a sequence of residues       |
+| [Meta CV]               | a function of other collective variables                         |
 | [Number of contacts]    | number of contacts between two groups of atoms                   |
 | [OpenMM Force wrapper]  | converts an OpenMM Force object into a CVPack CV                 |
 | [Path in CV space]      | progress along (or deviation from) a predefined path in CV space |
@@ -82,7 +83,7 @@ To use CVPack in your own Python script or Jupyter notebook, simply import it as
 
 ### Documentation
 
-Documentation for the latest CVPack version is available at [Github Pages](https://redesignscience.github.io/cvpack/latest).
+Documentation for the latest CVPack version is available on [Github Pages](https://redesignscience.github.io/cvpack/latest).
 
 ### Copyright
 
@@ -112,6 +113,7 @@ Initial project based on the [CMS Cookiecutter] version 1.1.
 [Helix H-bond content]:   https://redesignscience.github.io/cvpack/latest/api/HelixHBondContent.html
 [Helix RMSD content]:     https://redesignscience.github.io/cvpack/latest/api/HelixRMSDContent.html
 [Helix torsion content]:  https://redesignscience.github.io/cvpack/latest/api/HelixTorsionContent.html
+[Meta CV]:                https://redesignscience.github.io/cvpack/latest/api/MetaCollectiveVariable.html
 [Number of contacts]:     https://redesignscience.github.io/cvpack/latest/api/NumberOfContacts.html
 [OpenMM Force wrapper]:   https://redesignscience.github.io/cvpack/latest/api/OpenMMForceWrapper.html
 [Path in CV space]:       https://redesignscience.github.io/cvpack/latest/api/PathInCVSpace.html
