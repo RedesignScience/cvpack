@@ -24,11 +24,13 @@ class Distance(openmm.CustomBondForce, BaseCollectiveVariable):
     Parameters
     ----------
     atom1
-        The index of the first atom
+        The index of the first atom.
     atom2
-        The index of the second atom
+        The index of the second atom.
     pbc
-        Whether to use periodic boundary conditions
+        Whether to use periodic boundary conditions.
+    name
+        The name of the collective variable.
 
     Example
     -------

@@ -49,11 +49,13 @@ class RadiusOfGyrationSq(BaseRadiusOfGyration):
     Parameters
     ----------
     group
-        The indices of the atoms in the group
+        The indices of the atoms in the group.
     pbc
-        Whether to use periodic boundary conditions
+        Whether to use periodic boundary conditions.
     weighByMass
-        Whether to use the center of mass of the group instead of its geometric center
+        Whether to use the center of mass of the group instead of its geometric center.
+    name
+        The name of the collective variable.
 
     Example
     -------

@@ -37,15 +37,17 @@ class Torsion(openmm.CustomTorsionForce, BaseCollectiveVariable):
     Parameters
     ----------
     atom1
-        The index of the first atom
+        The index of the first atom.
     atom2
-        The index of the second atom
+        The index of the second atom.
     atom3
-        The index of the third atom
+        The index of the third atom.
     atom4
-        The index of the fourth atom
+        The index of the fourth atom.
     pbc
-        Whether to use periodic boundary conditions
+        Whether to use periodic boundary conditions in distance calculations.
+    name
+        The name of the collective variable.
 
     Example
     -------

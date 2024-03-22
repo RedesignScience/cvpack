@@ -49,13 +49,15 @@ class HelixHBondContent(openmm.CustomBondForce, BaseCollectiveVariable):
     Parameters
     ----------
     residues
-        The residues in the sequence
+        The residues in the sequence.
     pbc
-        Whether to use periodic boundary conditions
+        Whether to use periodic boundary conditions.
     thresholdDistance
-        The threshold distance for a hydrogen bond
+        The threshold distance for a hydrogen bond.
     halfExponent
         The parameter :math:`m` of the step function.
+    name
+        The name of the collective variable.
 
     Example
     -------

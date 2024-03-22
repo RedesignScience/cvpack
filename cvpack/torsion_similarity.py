@@ -42,7 +42,9 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, BaseCollectiveVariable):
         A list of :math:`n` tuples of four atom indices defining the second torsion
         angle in each pair.
     pbc
-        Whether to use periodic boundary conditions
+        Whether to use periodic boundary conditions in distance calculations.
+    name
+        The name of the collective variable.
 
     Example
     -------

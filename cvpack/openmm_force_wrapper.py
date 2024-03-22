@@ -35,6 +35,8 @@ class OpenMMForceWrapper(BaseCollectiveVariable):
         `dimensionless`.
     period
         The period of the collective variable if it is periodic, or `None` if it is not.
+    name
+        The name of the collective variable.
 
     Example:
         >>> import cvpack

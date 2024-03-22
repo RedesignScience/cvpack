@@ -57,30 +57,32 @@ class NumberOfContacts(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     Parameters
     ----------
     group1
-        The indices of the atoms in the first group
+        The indices of the atoms in the first group.
     group2
-        The indices of the atoms in the second group
+        The indices of the atoms in the second group.
     nonbondedForce
         The :class:`openmm.NonbondedForce` object from which the total number of
         atoms, the exclusions, and whether to use periodic boundary conditions are
-        taken
+        taken.
     reference
         A dimensionless reference value to which the collective variable should be
         normalized. One can also provide an :OpenMM:`Context` object from which to
         obtain the reference number of contacts.
     stepFunction
         The function "step(1-x)" (for analysis only) or a continuous approximation
-        thereof
+        thereof.
     thresholdDistance
         The threshold distance (:math:`r_0`) for considering two atoms as being in
-        contact
+        contact.
     cutoffFactor
         The factor :math:`x_c` that multiplies the threshold distance to define
-        the cutoff distance
+        the cutoff distance.
     switchFactor
         The factor :math:`x_s` that multiplies the threshold distance to define
         the distance at which the step function starts switching off smoothly.
         If None, it switches off abruptly at the cutoff distance.
+    name
+        The name of the collective variable.
 
     Example
     -------

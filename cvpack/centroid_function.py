@@ -64,28 +64,30 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
     ----------
     function
         The function to be evaluated. It must be a valid
-        :OpenMM:`CustomCentroidBondForce` expression
+        :OpenMM:`CustomCentroidBondForce` expression.
     unit
         The unit of measurement of the collective variable. It must be compatible
         with the MD unit system (mass in `daltons`, distance in `nanometers`, time
         in `picoseconds`, temperature in `kelvin`, energy in `kilojoules_per_mol`,
         angle in `radians`). If the collective variables does not have a unit, use
-        `dimensionless`
+        `dimensionless`.
     groups
         The groups of atoms to be used in the function. Each group must be specified
-        as a list of atom indices with arbitrary length
+        as a list of atom indices with arbitrary length.
     collections
         The indices of the groups in each collection, passed as a 2D array-like object
         of shape `(m, n)`, where `m` is the number of collections and `n` is the number
         groups per collection. If a 1D object is passed, it is assumed that `m` is 1 and
         `n` is the length of the object.
     period
-        The period of the collective variable if it is periodic, or `None` if it is not
+        The period of the collective variable if it is periodic, or `None` if it is not.
     pbc
-        Whether to use periodic boundary conditions
+        Whether to use periodic boundary conditions.
     weighByMass
         Whether to define the centroid as the center of mass of the group instead of
-        the geometric center
+        the geometric center.
+    name
+        The name of the collective variable.
 
 
     Keyword Args
@@ -99,11 +101,12 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
     Raises
     ------
     ValueError
-        If the collections are not specified as a 1D or 2D array-like object
+        If the collections are not specified as a 1D or 2D array-like object.
     ValueError
-        If group indices are out of bounds
+        If group indices are out of bounds.
     ValueError
-        If the unit of the collective variable is not compatible with the MD unit system
+        If the unit of the collective variable is not compatible with the MD unit
+        system.
 
     Example
     -------

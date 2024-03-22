@@ -57,6 +57,8 @@ class RMSD(openmm.RMSDForce, BaseRMSD):
         The total number of atoms in the system, including those that are not in
         ``group``. This argument is necessary only if ``referencePositions`` does not
         contain all atoms in the system.
+    name
+        The name of the collective variable.
 
     Example
     -------

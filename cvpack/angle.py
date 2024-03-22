@@ -40,7 +40,7 @@ class Angle(openmm.CustomAngleForce, BaseCollectiveVariable):
     pbc
         Whether to use periodic boundary conditions.
     name
-        The name of the collective variable. Must be a valid Python name.
+        The name of the collective variable.
 
     Example
     -------

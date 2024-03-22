@@ -50,19 +50,21 @@ class HelixAngleContent(openmm.CustomAngleForce, BaseCollectiveVariable):
     Parameters
     ----------
     residues
-        The residues in the sequence
+        The residues in the sequence.
     pbc
-        Whether to use periodic boundary conditions
+        Whether to use periodic boundary conditions.
     thetaReference
         The reference value of the
         :math:`{\rm C}_\alpha{\rm -C}_\alpha{\rm -C}_\alpha` angle in an alpha
-        helix
+        helix.
     tolerance
-        The threshold tolerance around the reference values
+        The threshold tolerance around the reference values.
     halfExponent
-        The parameter :math:`m` of the boxcar function
+        The parameter :math:`m` of the boxcar function.
     normalize
-        Whether to normalize the collective variable to the range :math:`[0, 1]`
+        Whether to normalize the collective variable to the range :math:`[0, 1]`.
+    name
+        The name of the collective variable.
 
     Raises
     ------

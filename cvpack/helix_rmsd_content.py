@@ -94,6 +94,8 @@ class HelixRMSDContent(BaseRMSDContent):
         The form of the step function :math:`S(x)`.
     normalize
         Whether to normalize the collective variable to the range :math:`[0, 1]`.
+    name
+        The name of the collective variable.
 
     Example
     -------

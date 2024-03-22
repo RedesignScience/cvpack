@@ -60,24 +60,26 @@ class HelixTorsionContent(openmm.CustomTorsionForce, BaseCollectiveVariable):
     Parameters
     ----------
     residues
-        The residues in the sequence
+        The residues in the sequence.
     pbc
-        Whether to use periodic boundary conditions
+        Whether to use periodic boundary conditions.
     phiReference
-        The reference value of the phi dihedral angle in an alpha helix
+        The reference value of the phi dihedral angle in an alpha helix.
     psiReference
-        The reference value of the psi dihedral angle in an alpha helix
+        The reference value of the psi dihedral angle in an alpha helix.
     tolerance
-        The threshold tolerance around the reference values
+        The threshold tolerance around the reference values.
     halfExponent
-        The parameter :math:`m` of the boxcar function
+        The parameter :math:`m` of the boxcar function.
     normalize
-        Whether to normalize the collective variable to the range :math:`[0, 1]`
+        Whether to normalize the collective variable to the range :math:`[0, 1]`.
+    name
+        The name of the collective variable.
 
     Raises
     ------
     ValueError
-        If some residue does not contain a :math:`\phi` or :math:`\psi` angle
+        If some residue does not contain a :math:`\phi` or :math:`\psi` angle.
 
     Example
     -------

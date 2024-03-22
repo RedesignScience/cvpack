@@ -69,20 +69,20 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
         computing :math:`s({\bf r})` or ``cvpack.path.deviation`` for computing
         :math:`z({\bf r})`.
     variables
-        The collective variables that define the space
+        The collective variables that define the space.
     milestones
         The milestones in the collective variable space. The number of rows must be
         equal to the number of milestones and the number of columns must be equal to
-        the number of collective variables
+        the number of collective variables.
     sigma
         The width of the Gaussian kernels.
     scales
         The characteristic scales for the collective variables. If not provided, the
-        scales are assumed to be 1 (in standard MD units) for each collective variable
+        scales are assumed to be 1 (in standard MD units) for each collective variable.
     name
         The name of the collective variable. If not provided, it is set to
         "path_progress_in_cv_space" or "path_deviation_in_cv_space" depending on the
-        metric
+        metric.
 
     Raises
     ------
