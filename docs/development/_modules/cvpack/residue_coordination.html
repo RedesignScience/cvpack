@@ -134,11 +134,11 @@
 <span class="sd">    ...     model.system, openmm.CustomIntegrator(0), platform</span>
 <span class="sd">    ... )</span>
 <span class="sd">    &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">    &gt;&gt;&gt; print(residue_coordination.getValue(context))</span>
+<span class="sd">    &gt;&gt;&gt; residue_coordination.getValue(context)</span>
 <span class="sd">    26.0 dimensionless</span>
 <span class="sd">    &gt;&gt;&gt; residue_coordination.setReferenceValue(26 * unit.dimensionless)</span>
 <span class="sd">    &gt;&gt;&gt; context.reinitialize(preserveState=True)</span>
-<span class="sd">    &gt;&gt;&gt; print(residue_coordination.getValue(context))</span>
+<span class="sd">    &gt;&gt;&gt; residue_coordination.getValue(context)</span>
 <span class="sd">    0.99999... dimensionless</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 

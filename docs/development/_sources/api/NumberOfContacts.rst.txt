@@ -9,6 +9,7 @@ NumberOfContacts
 
     .. automethod:: addToSystem
     .. automethod:: getEffectiveMass
+    .. automethod:: getMassUnit
     .. automethod:: getPeriod
     .. automethod:: getUnit
     .. automethod:: getValue

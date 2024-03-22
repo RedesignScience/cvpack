@@ -152,10 +152,10 @@
 <span class="sd">    ...     path_vars.append(var)</span>
 <span class="sd">    &gt;&gt;&gt; context = openmm.Context(model.system, openmm.VerletIntegrator(1.0))</span>
 <span class="sd">    &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">    &gt;&gt;&gt; print(f&quot;s = {path_vars[0].getValue(context)}&quot;)</span>
-<span class="sd">    s = 0.50... dimensionless</span>
-<span class="sd">    &gt;&gt;&gt; print(f&quot;z = {path_vars[1].getValue(context)}&quot;)</span>
-<span class="sd">    z = 0.25... dimensionless</span>
+<span class="sd">    &gt;&gt;&gt; path_vars[0].getValue(context)</span>
+<span class="sd">    0.50... dimensionless</span>
+<span class="sd">    &gt;&gt;&gt; path_vars[1].getValue(context)</span>
+<span class="sd">    0.25... dimensionless</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>

@@ -176,20 +176,20 @@
 <span class="sd">    &gt;&gt;&gt; integrator = openmm.VerletIntegrator(1.0 * mmunit.femtoseconds)</span>
 <span class="sd">    &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
 <span class="sd">    &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">    &gt;&gt;&gt; print(cv1.getValue(context))</span>
+<span class="sd">    &gt;&gt;&gt; cv1.getValue(context)</span>
 <span class="sd">    4912.5... dimensionless</span>
 
 <span class="sd">    &gt;&gt;&gt; water = [a.index for a in model.topology.atoms() if a.residue.name == &quot;HOH&quot;]</span>
 <span class="sd">    &gt;&gt;&gt; cv2 = cvpack.AttractionStrength(guest, water, forces[&quot;NonbondedForce&quot;])</span>
 <span class="sd">    &gt;&gt;&gt; cv2.addToSystem(model.system)</span>
 <span class="sd">    &gt;&gt;&gt; context.reinitialize(preserveState=True)</span>
-<span class="sd">    &gt;&gt;&gt; print(cv2.getValue(context))</span>
+<span class="sd">    &gt;&gt;&gt; cv2.getValue(context)</span>
 <span class="sd">    2063.3... dimensionless</span>
 
 <span class="sd">    &gt;&gt;&gt; cv3 = cvpack.AttractionStrength(guest, host, forces[&quot;NonbondedForce&quot;], water)</span>
 <span class="sd">    &gt;&gt;&gt; cv3.addToSystem(model.system)</span>
 <span class="sd">    &gt;&gt;&gt; context.reinitialize(preserveState=True)</span>
-<span class="sd">    &gt;&gt;&gt; print(cv3.getValue(context))</span>
+<span class="sd">    &gt;&gt;&gt; cv3.getValue(context)</span>
 <span class="sd">    2849.17... dimensionless</span>
 <span class="sd">    &gt;&gt;&gt; print(cv1.getValue(context) - cv2.getValue(context))</span>
 <span class="sd">    2849.17... dimensionless</span>
@@ -199,9 +199,9 @@
 <span class="sd">    ... )</span>
 <span class="sd">    &gt;&gt;&gt; cv4.addToSystem(model.system)</span>
 <span class="sd">    &gt;&gt;&gt; context.reinitialize(preserveState=True)</span>
-<span class="sd">    &gt;&gt;&gt; print(cv4.getValue(context))</span>
+<span class="sd">    &gt;&gt;&gt; cv4.getValue(context)</span>
 <span class="sd">    3880.8... dimensionless</span>
-<span class="sd">    &gt;&gt;&gt; print(1 * cv1.getValue(context) - 0.5 * cv2.getValue(context))</span>
+<span class="sd">    &gt;&gt;&gt; 1 * cv1.getValue(context) - 0.5 * cv2.getValue(context)</span>
 <span class="sd">    3880.8...</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 

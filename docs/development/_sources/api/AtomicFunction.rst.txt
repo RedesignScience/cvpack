@@ -10,6 +10,7 @@ AtomicFunction
     .. automethod:: addToSystem
     .. automethod:: fromOpenMMForce
     .. automethod:: getEffectiveMass
+    .. automethod:: getMassUnit
     .. automethod:: getPeriod
     .. automethod:: getUnit
     .. automethod:: getValue

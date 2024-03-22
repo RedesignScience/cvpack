@@ -200,7 +200,7 @@
 <span class="sd">    &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
 <span class="sd">    &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
 <span class="sd">    &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">    &gt;&gt;&gt; print(sheet_content.getValue(context))</span>
+<span class="sd">    &gt;&gt;&gt; sheet_content.getValue(context)</span>
 <span class="sd">    1.0465... dimensionless</span>
 <span class="sd">    &gt;&gt;&gt; blockwise_sheet_content = cvpack.SheetRMSDContent(</span>
 <span class="sd">    ...     residues[:5] + residues[-5:],</span>
@@ -211,7 +211,7 @@
 <span class="sd">    9</span>
 <span class="sd">    &gt;&gt;&gt; blockwise_sheet_content.addToSystem(model.system)</span>
 <span class="sd">    &gt;&gt;&gt; context.reinitialize(preserveState=True)</span>
-<span class="sd">    &gt;&gt;&gt; print(blockwise_sheet_content.getValue(context))</span>
+<span class="sd">    &gt;&gt;&gt; blockwise_sheet_content.getValue(context)</span>
 <span class="sd">    0.9859... dimensionless</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 

@@ -145,7 +145,7 @@
 <span class="sd">    &gt;&gt;&gt; integrator = openmm.VerletIntegrator(1.0 * mmunit.femtoseconds)</span>
 <span class="sd">    &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
 <span class="sd">    &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">    &gt;&gt;&gt; print(nc.getValue(context))</span>
+<span class="sd">    &gt;&gt;&gt; nc.getValue(context)</span>
 <span class="sd">    30.0... dimensionless</span>
 <span class="sd">    &gt;&gt;&gt; nc_normalized = cvpack.NumberOfContacts(</span>
 <span class="sd">    ...     group1,</span>
@@ -156,7 +156,7 @@
 <span class="sd">    ... )</span>
 <span class="sd">    &gt;&gt;&gt; nc_normalized.addToSystem(model.system)</span>
 <span class="sd">    &gt;&gt;&gt; context.reinitialize(preserveState=True)</span>
-<span class="sd">    &gt;&gt;&gt; print(nc_normalized.getValue(context))</span>
+<span class="sd">    &gt;&gt;&gt; nc_normalized.getValue(context)</span>
 <span class="sd">    0.99999... dimensionless</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 

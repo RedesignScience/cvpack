@@ -114,7 +114,7 @@
 <span class="sd">    &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
 <span class="sd">    &gt;&gt;&gt; context.setPositions(model.positions)</span>
 <span class="sd">    &gt;&gt;&gt; integrator.step(1000)</span>
-<span class="sd">    &gt;&gt;&gt; print(rmsd.getValue(context))</span>
+<span class="sd">    &gt;&gt;&gt; rmsd.getValue(context)</span>
 <span class="sd">    0.123138... nm</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -170,7 +170,7 @@
 <span class="sd">        &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
 <span class="sd">        &gt;&gt;&gt; context.setPositions(model.positions)</span>
 <span class="sd">        &gt;&gt;&gt; integrator.step(100)</span>
-<span class="sd">        &gt;&gt;&gt; print(rmsd.getValue(context))</span>
+<span class="sd">        &gt;&gt;&gt; rmsd.getValue(context)</span>
 <span class="sd">        0.10436... nm</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>

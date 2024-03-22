@@ -140,7 +140,7 @@ interactions. The default is 1.0.</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">integrator</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">VerletIntegrator</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">femtoseconds</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="n">integrator</span><span class="p">,</span> <span class="n">platform</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">cv1</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cv1</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 <span class="go">4912.5... dimensionless</span>
 </pre></div>
 </div>
@@ -148,14 +148,14 @@ interactions. The default is 1.0.</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cv2</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">AttractionStrength</span><span class="p">(</span><span class="n">guest</span><span class="p">,</span> <span class="n">water</span><span class="p">,</span> <span class="n">forces</span><span class="p">[</span><span class="s2">&quot;NonbondedForce&quot;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cv2</span><span class="o">.</span><span class="n">addToSystem</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">reinitialize</span><span class="p">(</span><span class="n">preserveState</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cv2</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 <span class="go">2063.3... dimensionless</span>
 </pre></div>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cv3</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">AttractionStrength</span><span class="p">(</span><span class="n">guest</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">forces</span><span class="p">[</span><span class="s2">&quot;NonbondedForce&quot;</span><span class="p">],</span> <span class="n">water</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cv3</span><span class="o">.</span><span class="n">addToSystem</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">reinitialize</span><span class="p">(</span><span class="n">preserveState</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">cv3</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cv3</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 <span class="go">2849.17... dimensionless</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">cv1</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">)</span> <span class="o">-</span> <span class="n">cv2</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
 <span class="go">2849.17... dimensionless</span>
@@ -166,9 +166,9 @@ interactions. The default is 1.0.</p></li>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cv4</span><span class="o">.</span><span class="n">addToSystem</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">reinitialize</span><span class="p">(</span><span class="n">preserveState</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">cv4</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cv4</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 <span class="go">3880.8... dimensionless</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="mi">1</span> <span class="o">*</span> <span class="n">cv1</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">cv2</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="mi">1</span> <span class="o">*</span> <span class="n">cv1</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">cv2</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 <span class="go">3880.8...</span>
 </pre></div>
 </div>
@@ -238,14 +238,25 @@ angles and the radius of gyration of an alanine dipeptide molecule in water:</p>
 <span class="gp">... </span>    <span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="n">openmm</span><span class="o">.</span><span class="n">VerletIntegrator</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">phi</span><span class="o">.</span><span class="n">getEffectiveMass</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phi</span><span class="o">.</span><span class="n">getEffectiveMass</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 <span class="go">0.05119... nm**2 Da/(rad**2)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">psi</span><span class="o">.</span><span class="n">getEffectiveMass</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">psi</span><span class="o">.</span><span class="n">getEffectiveMass</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 <span class="go">0.05186... nm**2 Da/(rad**2)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">radius_of_gyration</span><span class="o">.</span><span class="n">getEffectiveMass</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">radius_of_gyration</span><span class="o">.</span><span class="n">getEffectiveMass</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 <span class="go">30.946... Da</span>
 </pre></div>
 </div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cvpack.AttractionStrength.getMassUnit">
+<span class="sig-name descname"><span class="pre">getMassUnit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.AttractionStrength.getMassUnit" title="Link to this definition">¶</a></dt>
+<dd><p>Get the unit of measurement of the effective mass of this collective variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Unit</em></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -310,11 +321,11 @@ the radius of gyration of an alanine dipeptide molecule in water:</p>
 <span class="gp">... </span>    <span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="n">openmm</span><span class="o">.</span><span class="n">VerletIntegrator</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">phi</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phi</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 <span class="go">3.1415... rad</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">psi</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">psi</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 <span class="go">3.1415... rad</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">radius_of_gyration</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">radius_of_gyration</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 <span class="go">0.29514... nm</span>
 </pre></div>
 </div>

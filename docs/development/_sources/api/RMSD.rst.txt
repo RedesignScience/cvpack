@@ -9,6 +9,7 @@ RMSD
 
     .. automethod:: addToSystem
     .. automethod:: getEffectiveMass
+    .. automethod:: getMassUnit
     .. automethod:: getNullBondForce
     .. automethod:: getPeriod
     .. automethod:: getUnit

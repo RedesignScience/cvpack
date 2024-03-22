@@ -168,7 +168,7 @@
 <span class="sd">    &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
 <span class="sd">    &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
 <span class="sd">    &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">    &gt;&gt;&gt; print(res_coord.getValue(context))</span>
+<span class="sd">    &gt;&gt;&gt; res_coord.getValue(context)</span>
 <span class="sd">    33.0 dimensionless</span>
 
 <span class="sd">    Recompute the residue coordination using the centroid function:</span>
@@ -183,7 +183,7 @@
 <span class="sd">    ... )</span>
 <span class="sd">    &gt;&gt;&gt; colvar.addToSystem(model.system)</span>
 <span class="sd">    &gt;&gt;&gt; context.reinitialize(preserveState=True)</span>
-<span class="sd">    &gt;&gt;&gt; print(colvar.getValue(context))</span>
+<span class="sd">    &gt;&gt;&gt; colvar.getValue(context)</span>
 <span class="sd">    33.0 dimensionless</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
