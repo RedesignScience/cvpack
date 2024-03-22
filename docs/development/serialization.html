@@ -39,8 +39,8 @@
   <section id="serialization">
 <h1>Serialization<a class="headerlink" href="#serialization" title="Link to this heading">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="cvpack.serializer.serialize">
-<span class="sig-prename descclassname"><span class="pre">cvpack.serializer.</span></span><span class="sig-name descname"><span class="pre">serialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iostream</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cvpack/serializer/serializer.html#serialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.serializer.serialize" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="cvpack.serialization.serialize">
+<span class="sig-prename descclassname"><span class="pre">cvpack.serialization.</span></span><span class="sig-name descname"><span class="pre">serialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iostream</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cvpack/serialization/serialization.html#serialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.serialization.serialize" title="Link to this definition">¶</a></dt>
 <dd><p>Serializes a cvpack object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -53,10 +53,10 @@
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cvpack</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">io</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">serializer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">serialization</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">radius_of_gyration</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">RadiusOfGyration</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">iostream</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">serializer</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">radius_of_gyration</span><span class="p">,</span> <span class="n">iostream</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">serialization</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">radius_of_gyration</span><span class="p">,</span> <span class="n">iostream</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">iostream</span><span class="o">.</span><span class="n">getvalue</span><span class="p">())</span>
 <span class="go">!cvpack.RadiusOfGyration</span>
 <span class="go">group:</span>
@@ -70,27 +70,30 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="cvpack.serializer.deserialize">
-<span class="sig-prename descclassname"><span class="pre">cvpack.serializer.</span></span><span class="sig-name descname"><span class="pre">deserialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iostream</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cvpack/serializer/serializer.html#deserialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.serializer.deserialize" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="cvpack.serialization.deserialize">
+<span class="sig-prename descclassname"><span class="pre">cvpack.serialization.</span></span><span class="sig-name descname"><span class="pre">deserialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iostream</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cvpack/serialization/serialization.html#deserialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.serialization.deserialize" title="Link to this definition">¶</a></dt>
 <dd><p>Deserializes a cvpack object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>iostream</strong> (<em>IO</em>) – A text stream in read mode containing the object to be deserialized</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>An instance of any cvpack class</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>t.Any</p>
 </dd>
 </dl>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cvpack</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">io</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">serializer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">serialization</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">radius_of_gyration</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">RadiusOfGyration</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">iostream</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">serializer</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">radius_of_gyration</span><span class="p">,</span> <span class="n">iostream</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">serialization</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">radius_of_gyration</span><span class="p">,</span> <span class="n">iostream</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">iostream</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="go">0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">new_object</span> <span class="o">=</span> <span class="n">serializer</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">iostream</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_object</span> <span class="o">=</span> <span class="n">serialization</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">iostream</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">new_object</span><span class="p">)</span>
 <span class="go">&lt;class &#39;cvpack.radius_of_gyration.RadiusOfGyration&#39;&gt;</span>
 </pre></div>
@@ -123,8 +126,8 @@
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/index.html">Python API</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Serialization</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#cvpack.serializer.serialize"><code class="docutils literal notranslate"><span class="pre">serialize()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#cvpack.serializer.deserialize"><code class="docutils literal notranslate"><span class="pre">deserialize()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cvpack.serialization.serialize"><code class="docutils literal notranslate"><span class="pre">serialize()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cvpack.serialization.deserialize"><code class="docutils literal notranslate"><span class="pre">deserialize()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">Bibliography</a></li>

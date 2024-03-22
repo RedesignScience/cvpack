@@ -1,7 +1,7 @@
 Serialization
 =============
 
-.. currentmodule:: cvpack.serializer
+.. currentmodule:: cvpack.serialization
 .. autofunction:: serialize
 
 .. autofunction:: deserialize
