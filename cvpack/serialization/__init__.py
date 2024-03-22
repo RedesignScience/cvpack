@@ -3,7 +3,7 @@ Serializer submodule of CVPack
 
 """
 
-from .serializer import (  # noqa: F401
+from .serialization import (  # noqa: F401
     Serializable,
     SerializableAtom,
     SerializableResidue,

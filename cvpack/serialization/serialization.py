@@ -1,5 +1,5 @@
 """
-.. module:: serializer
+.. module:: serialization
    :platform: Linux, MacOS, Windows
    :synopsis: Collective Variable Serialization
 
@@ -108,10 +108,10 @@ def serialize(obj: t.Any, iostream: t.IO) -> None:
     =======
     >>> import cvpack
     >>> import io
-    >>> from cvpack import serializer
+    >>> from cvpack import serialization
     >>> radius_of_gyration = cvpack.RadiusOfGyration([0, 1, 2])
     >>> iostream = io.StringIO()
-    >>> serializer.serialize(radius_of_gyration, iostream)
+    >>> serialization.serialize(radius_of_gyration, iostream)
     >>> print(iostream.getvalue())
     !cvpack.RadiusOfGyration
     group:
@@ -143,13 +143,13 @@ def deserialize(iostream: t.IO) -> t.Any:
     -------
     >>> import cvpack
     >>> import io
-    >>> from cvpack import serializer
+    >>> from cvpack import serialization
     >>> radius_of_gyration = cvpack.RadiusOfGyration([0, 1, 2])
     >>> iostream = io.StringIO()
-    >>> serializer.serialize(radius_of_gyration, iostream)
+    >>> serialization.serialize(radius_of_gyration, iostream)
     >>> iostream.seek(0)
     0
-    >>> new_object = serializer.deserialize(iostream)
+    >>> new_object = serialization.deserialize(iostream)
     >>> type(new_object)
     <class 'cvpack.radius_of_gyration.RadiusOfGyration'>
     """

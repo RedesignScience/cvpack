@@ -14,7 +14,7 @@ from openmm import unit as mmunit
 from openmm.app.topology import Residue
 
 from .cvpack import BaseCollectiveVariable
-from .serializer import SerializableResidue
+from .serialization import SerializableResidue
 from .units import ScalarQuantity, value_in_md_units
 
 

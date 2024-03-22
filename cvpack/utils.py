@@ -16,7 +16,7 @@ from numpy import typing as npt
 from openmm import XmlSerializer
 from openmm import unit as mmunit
 
-from .serializer import Serializable
+from .serialization import Serializable
 from .units import value_in_md_units
 
 # pylint: disable=protected-access,c-extension-no-member

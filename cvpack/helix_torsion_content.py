@@ -14,7 +14,7 @@ from openmm import app as mmapp
 from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
-from .serializer import SerializableResidue
+from .serialization import SerializableResidue
 from .units import ScalarQuantity
 
 

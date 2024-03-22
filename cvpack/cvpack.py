@@ -15,7 +15,7 @@ import openmm
 import yaml
 from openmm import unit as mmunit
 
-from .serializer import Serializable
+from .serialization import Serializable
 from .units import Quantity, Unit, preprocess_units, value_in_md_units
 from .utils import compute_effective_mass, get_single_force_state
 
