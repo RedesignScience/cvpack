@@ -146,7 +146,7 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
     """
 
     @convert_quantities
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(
         self,
         function: str,
         unit: mmunit.Unit,

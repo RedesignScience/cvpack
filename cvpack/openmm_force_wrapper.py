@@ -58,7 +58,7 @@ class OpenMMForceWrapper(BaseCollectiveVariable):
         0.00538... nm**2 Da/(rad**2)
     """
 
-    def __init__(  # pylint: disable=too-many-arguments, super-init-not-called
+    def __init__(, super-init-not-called
         self,
         openmmForce: t.Union[openmm.Force, str],
         unit: mmunit.Unit,

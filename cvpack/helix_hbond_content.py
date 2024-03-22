@@ -15,7 +15,7 @@ from openmm import app as mmapp
 from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable, SerializableResidue
-from .units import ScalarQuantity, convert_quantities
+from .units import ScalarQuantity
 
 
 class HelixHBondContent(openmm.CustomBondForce, BaseCollectiveVariable):
@@ -77,7 +77,7 @@ class HelixHBondContent(openmm.CustomBondForce, BaseCollectiveVariable):
     15.880... dimensionless
     """
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(
         self,
         residues: t.Sequence[mmapp.topology.Residue],
         pbc: bool = False,

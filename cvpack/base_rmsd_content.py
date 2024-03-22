@@ -23,7 +23,7 @@ class BaseRMSDContent(openmm.CustomCVForce, BaseCollectiveVariable):
     Abstract class for secondary-structure RMSD content of a sequence of `n` residues.
     """
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(
         self,
         residue_blocks: t.List[int],
         ideal_positions: t.List[openmm.Vec3],

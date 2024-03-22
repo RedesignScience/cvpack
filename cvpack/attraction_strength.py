@@ -163,7 +163,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     """
 
     @convert_quantities
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(
         self,
         group1: t.Iterable[int],
         group2: t.Iterable[int],

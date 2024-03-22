@@ -121,7 +121,7 @@ class HelixRMSDContent(BaseRMSDContent):
     """
 
     @convert_quantities
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(
         self,
         residues: t.Sequence[mmapp.topology.Residue],
         numAtoms: int,

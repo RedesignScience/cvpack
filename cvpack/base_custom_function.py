@@ -35,7 +35,7 @@ class BaseCustomFunction(BaseCollectiveVariable):
                 global_parameters[name] = data
         return global_parameters, perbond_parameters
 
-    def _addParameters(  # pylint: disable=too-many-arguments
+    def _addParameters(
         self,
         overalls: t.Dict[str, float],
         perbonds: t.Dict[str, t.List[float]],

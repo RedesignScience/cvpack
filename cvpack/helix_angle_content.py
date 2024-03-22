@@ -89,7 +89,7 @@ class HelixAngleContent(openmm.CustomAngleForce, BaseCollectiveVariable):
     18.7605... dimensionless
     """
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(
         self,
         residues: t.Sequence[mmapp.topology.Residue],
         pbc: bool = False,

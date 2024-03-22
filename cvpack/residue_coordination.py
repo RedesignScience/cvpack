@@ -103,7 +103,7 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable
     """
 
     @convert_quantities
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(
         self,
         residueGroup1: t.Iterable[Residue],
         residueGroup2: t.Iterable[Residue],

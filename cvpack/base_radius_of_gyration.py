@@ -19,7 +19,7 @@ class BaseRadiusOfGyration(openmm.CustomCentroidBondForce, BaseCollectiveVariabl
     Abstract class for the radius of gyration of a group of `n` atoms.
     """
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(
         self,
         num_groups: int,
         expression: str,

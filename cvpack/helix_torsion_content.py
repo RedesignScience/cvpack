@@ -100,7 +100,7 @@ class HelixTorsionContent(openmm.CustomTorsionForce, BaseCollectiveVariable):
     """
 
     @convert_quantities
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(
         self,
         residues: t.Sequence[mmapp.topology.Residue],
         pbc: bool = False,
