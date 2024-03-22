@@ -16,7 +16,7 @@ from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
 from .path import Metric, deviation, progress
-from .units import MatrixQuantity, ScalarQuantity
+from .units import MatrixQuantity, ScalarQuantity, value_in_md_units
 from .utils import convert_to_matrix
 
 
@@ -141,7 +141,7 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
             raise ValueError("At least two rows are required in the milestones matrix.")
         definitions = OrderedDict({"lambda": 1 / (2 * sigma**2)})
         periods = {
-            j: var.getPeriod().value_in_md_units()
+            j: value_in_md_units(var.getPeriod())
             for j, var in enumerate(variables)
             if var.getPeriod() is not None
         }
