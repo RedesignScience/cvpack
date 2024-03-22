@@ -14,7 +14,7 @@ from openmm import unit as mmunit
 
 from .base_rmsd_content import BaseRMSDContent
 from .cvpack import SerializableResidue
-from .units import ScalarQuantity, convert_quantities
+from .units import ScalarQuantity
 
 # pylint: disable=protected-access
 ALPHA_POSITIONS = BaseRMSDContent._loadPositions("ideal_alpha_helix.csv")
@@ -83,49 +83,48 @@ class HelixRMSDContent(BaseRMSDContent):
 
     Parameters
     ----------
-        residues
-            The residue sequence to be used in the calculation.
-        numAtoms
-            The total number of atoms in the system (required by OpenMM).
-        thresholdRMSD
-            The threshold RMSD value for considering a group of residues as a close
-            match to an ideal alpha-helix.
-        stepFunction
-            The form of the step function :math:`S(x)`.
-        normalize
-            Whether to normalize the collective variable to the range :math:`[0, 1]`.
+    residues
+        The residue sequence to be used in the calculation.
+    numAtoms
+        The total number of atoms in the system (required by OpenMM).
+    thresholdRMSD
+        The threshold RMSD value for considering a group of residues as a close
+        match to an ideal alpha-helix.
+    stepFunction
+        The form of the step function :math:`S(x)`.
+    normalize
+        Whether to normalize the collective variable to the range :math:`[0, 1]`.
 
     Example
     -------
-        >>> import itertools as it
-        >>> import cvpack
-        >>> import openmm
-        >>> from openmm import app, unit
-        >>> from openmmtools import testsystems
-        >>> model = testsystems.LysozymeImplicit()
-        >>> residues = list(it.islice(model.topology.residues(), 59, 80))
-        >>> print(*[r.name for r in residues])
-        LYS ASP GLU ... ILE LEU ARG
-        >>> helix_content = cvpack.HelixRMSDContent(
-        ...     residues, model.system.getNumParticles()
-        ... )
-        >>> helix_content.getNumResidueBlocks()
-        16
-        >>> helix_content.addToSystem(model.system)
-        >>> platform = openmm.Platform.getPlatformByName('Reference')
-        >>> integrator = openmm.VerletIntegrator(0)
-        >>> context = openmm.Context(model.system, integrator, platform)
-        >>> context.setPositions(model.positions)
-        >>> print(helix_content.getValue(context))
-        15.98... dimensionless
+    >>> import itertools as it
+    >>> import cvpack
+    >>> import openmm
+    >>> from openmm import app, unit
+    >>> from openmmtools import testsystems
+    >>> model = testsystems.LysozymeImplicit()
+    >>> residues = list(it.islice(model.topology.residues(), 59, 80))
+    >>> print(*[r.name for r in residues])
+    LYS ASP GLU ... ILE LEU ARG
+    >>> helix_content = cvpack.HelixRMSDContent(
+    ...     residues, model.system.getNumParticles()
+    ... )
+    >>> helix_content.getNumResidueBlocks()
+    16
+    >>> helix_content.addToSystem(model.system)
+    >>> platform = openmm.Platform.getPlatformByName('Reference')
+    >>> integrator = openmm.VerletIntegrator(0)
+    >>> context = openmm.Context(model.system, integrator, platform)
+    >>> context.setPositions(model.positions)
+    >>> print(helix_content.getValue(context))
+    15.98... dimensionless
     """
 
-    @convert_quantities
     def __init__(
         self,
         residues: t.Sequence[mmapp.topology.Residue],
         numAtoms: int,
-        thresholdRMSD: ScalarQuantity = mmunit.Quantity(0.08, mmunit.nanometers),
+        thresholdRMSD: ScalarQuantity = 0.08 * mmunit.nanometers,
         stepFunction: str = "(1+x^4)/(1+x^4+x^8)",
         normalize: bool = False,
     ) -> None:

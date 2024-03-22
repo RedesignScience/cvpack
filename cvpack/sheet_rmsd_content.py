@@ -15,7 +15,7 @@ from openmm import unit as mmunit
 
 from .base_rmsd_content import BaseRMSDContent
 from .cvpack import SerializableResidue
-from .units import ScalarQuantity, convert_quantities
+from .units import ScalarQuantity
 
 # pylint: disable=protected-access
 PARABETA_POSITIONS = BaseRMSDContent._loadPositions("ideal_parallel_beta_sheet.csv")
@@ -122,67 +122,66 @@ class SheetRMSDContent(BaseRMSDContent):
 
     Parameters
     ----------
-        residues
-            The residue sequence or residue blocks to be used in the calculation.
-        numAtoms
-            The total number of atoms in the system (required by OpenMM).
-        parallel
-            Whether to consider a parallel beta sheet instead of an antiparallel one.
-        blockSizes
-            The number of residues in each block. If ``None``, a single contiguous
-            sequence of residues is assumed.
-        thresholdRMSD
-            The threshold RMSD value for considering a group of residues as a close
-            match to an ideal beta sheet.
-        stepFunction
-            The form of the step function :math:`S(x)`.
-        normalize
-            Whether to normalize the collective variable to the range :math:`[0, 1]`.
+    residues
+        The residue sequence or residue blocks to be used in the calculation.
+    numAtoms
+        The total number of atoms in the system (required by OpenMM).
+    parallel
+        Whether to consider a parallel beta sheet instead of an antiparallel one.
+    blockSizes
+        The number of residues in each block. If ``None``, a single contiguous
+        sequence of residues is assumed.
+    thresholdRMSD
+        The threshold RMSD value for considering a group of residues as a close
+        match to an ideal beta sheet.
+    stepFunction
+        The form of the step function :math:`S(x)`.
+    normalize
+        Whether to normalize the collective variable to the range :math:`[0, 1]`.
 
     Example
     -------
-        >>> import itertools as it
-        >>> import cvpack
-        >>> import openmm
-        >>> from openmm import app, unit
-        >>> from openmmtools import testsystems
-        >>> model = testsystems.SrcImplicit()
-        >>> residues = list(it.islice(model.topology.residues(), 68, 82))
-        >>> print(*[r.name for r in residues])
-        TYR ALA VAL ... VAL THR GLU
-        >>> sheet_content = cvpack.SheetRMSDContent(
-        ...     residues, model.system.getNumParticles()
-        ... )
-        >>> sheet_content.getNumResidueBlocks()
-        28
-        >>> sheet_content.addToSystem(model.system)
-        >>> platform = openmm.Platform.getPlatformByName('Reference')
-        >>> integrator = openmm.VerletIntegrator(0)
-        >>> context = openmm.Context(model.system, integrator, platform)
-        >>> context.setPositions(model.positions)
-        >>> print(sheet_content.getValue(context))
-        1.0465... dimensionless
-        >>> blockwise_sheet_content = cvpack.SheetRMSDContent(
-        ...     residues[:5] + residues[-5:],
-        ...     model.system.getNumParticles(),
-        ...     blockSizes=[5, 5],
-        ... )
-        >>> blockwise_sheet_content.getNumResidueBlocks()
-        9
-        >>> blockwise_sheet_content.addToSystem(model.system)
-        >>> context.reinitialize(preserveState=True)
-        >>> print(blockwise_sheet_content.getValue(context))
-        0.9859... dimensionless
+    >>> import itertools as it
+    >>> import cvpack
+    >>> import openmm
+    >>> from openmm import app, unit
+    >>> from openmmtools import testsystems
+    >>> model = testsystems.SrcImplicit()
+    >>> residues = list(it.islice(model.topology.residues(), 68, 82))
+    >>> print(*[r.name for r in residues])
+    TYR ALA VAL ... VAL THR GLU
+    >>> sheet_content = cvpack.SheetRMSDContent(
+    ...     residues, model.system.getNumParticles()
+    ... )
+    >>> sheet_content.getNumResidueBlocks()
+    28
+    >>> sheet_content.addToSystem(model.system)
+    >>> platform = openmm.Platform.getPlatformByName('Reference')
+    >>> integrator = openmm.VerletIntegrator(0)
+    >>> context = openmm.Context(model.system, integrator, platform)
+    >>> context.setPositions(model.positions)
+    >>> print(sheet_content.getValue(context))
+    1.0465... dimensionless
+    >>> blockwise_sheet_content = cvpack.SheetRMSDContent(
+    ...     residues[:5] + residues[-5:],
+    ...     model.system.getNumParticles(),
+    ...     blockSizes=[5, 5],
+    ... )
+    >>> blockwise_sheet_content.getNumResidueBlocks()
+    9
+    >>> blockwise_sheet_content.addToSystem(model.system)
+    >>> context.reinitialize(preserveState=True)
+    >>> print(blockwise_sheet_content.getValue(context))
+    0.9859... dimensionless
     """
 
-    @convert_quantities
     def __init__(
         self,
         residues: t.Sequence[mmapp.topology.Residue],
         numAtoms: int,
         parallel: bool = False,
         blockSizes: t.Optional[t.Sequence[int]] = None,
-        thresholdRMSD: ScalarQuantity = mmunit.Quantity(0.08, mmunit.nanometers),
+        thresholdRMSD: ScalarQuantity = 0.08 * mmunit.nanometers,
         stepFunction: str = "(1+x^4)/(1+x^4+x^8)",
         normalize: bool = False,
     ) -> None:
