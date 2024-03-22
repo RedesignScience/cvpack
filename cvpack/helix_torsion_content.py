@@ -14,7 +14,7 @@ from openmm import app as mmapp
 from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable, SerializableResidue
-from .units import ScalarQuantity, convert_quantities
+from .units import ScalarQuantity
 
 
 class HelixTorsionContent(openmm.CustomTorsionForce, BaseCollectiveVariable):
@@ -99,7 +99,6 @@ class HelixTorsionContent(openmm.CustomTorsionForce, BaseCollectiveVariable):
     17.452... dimensionless
     """
 
-    @convert_quantities
     def __init__(
         self,
         residues: t.Sequence[mmapp.topology.Residue],
