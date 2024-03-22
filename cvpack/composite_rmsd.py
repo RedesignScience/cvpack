@@ -9,11 +9,10 @@
 
 import typing as t
 
-import numpy as np
 from openmm import unit as mmunit
 
-from .cvpack import BaseCollectiveVariable
-from .units import MatrixQuantity, VectorQuantity, convert_quantities
+from .base_rmsd import BaseRMSD
+from .units import MatrixQuantity, VectorQuantity
 
 
 class _Stub:  # pylint: disable=too-few-public-methods
@@ -29,7 +28,7 @@ except ImportError:
     CompositeRMSDForce = _Stub
 
 
-class CompositeRMSD(CompositeRMSDForce, BaseCollectiveVariable):
+class CompositeRMSD(CompositeRMSDForce, BaseRMSD):
     r"""
     The composite root-mean-square deviation (RMSD) between the current and reference
     coordinates of :math:`m` groups of atoms:
@@ -120,7 +119,6 @@ class CompositeRMSD(CompositeRMSDForce, BaseCollectiveVariable):
     0.0 nm
     """
 
-    @convert_quantities
     def __init__(
         self,
         referencePositions: t.Union[MatrixQuantity, t.Dict[int, VectorQuantity]],
@@ -128,16 +126,9 @@ class CompositeRMSD(CompositeRMSDForce, BaseCollectiveVariable):
         numAtoms: t.Optional[int] = None,
     ) -> None:
         num_atoms = numAtoms or len(referencePositions)
-        groups = [list(map(int, group)) for group in groups]
-        all_atoms = sum(groups, [])
-        if len(set(all_atoms)) != len(all_atoms):
-            raise ValueError("Atom groups must be disjoint")
-        defined_coords = {
-            atom: list(map(float, referencePositions[atom])) for atom in all_atoms
-        }
-        all_coords = np.zeros((num_atoms, 3))
-        for atom, coords in defined_coords.items():
-            all_coords[atom, :] = coords
+        groups = [[int(atom) for atom in group] for group in groups]
+        defined_coords = self._getDefinedCoords(referencePositions, sum(groups, []))
+        all_coords = self._getAllCoords(defined_coords, num_atoms)
         super().__init__(all_coords)
         for group in groups:
             self.addGroup(group)

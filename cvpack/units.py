@@ -98,7 +98,7 @@ class Quantity(mmunit.Quantity, Serializable):
         """The value of the quantity."""
         return self._value
 
-    def value_in_md_units(self) -> t.Any:  # pylint: disable=invalid-name
+    def in_md_units(self) -> t.Any:  # pylint: disable=invalid-name
         """The value of the quantity in MD units."""
         return self.value_in_unit_system(mmunit.md_unit_system)
 
@@ -161,7 +161,30 @@ def preprocess_units(func: t.Callable) -> t.Callable:
     return wrapper
 
 
-def value_in_md_units(  # pylint: disable=redefined-outer-name
+def value_in_md_units(
+    quantity: t.Union[ScalarQuantity, VectorQuantity, MatrixQuantity]
+) -> t.Any:
+    """
+    Return the value of a quantity in the MD unit system (e.g. mass in Da, distance in
+    nm, time in ps, temperature in K, energy in kJ/mol, angle in rad).
+
+    Parameters
+    ----------
+    quantity
+        The quantity to be converted.
+
+    Returns
+    -------
+    Any
+        The value of the quantity in the MD unit system.
+
+    """
+    if mmunit.is_quantity(quantity):
+        return quantity.value_in_unit_system(mmunit.md_unit_system)
+    return quantity
+
+
+def in_md_units(  # pylint: disable=redefined-outer-name
     quantity: t.Union[ScalarQuantity, VectorQuantity, MatrixQuantity]
 ) -> t.Union[float, np.ndarray, openmm.Vec3, t.List[openmm.Vec3], t.List[np.ndarray]]:
     """
@@ -184,22 +207,22 @@ def value_in_md_units(  # pylint: disable=redefined-outer-name
 
     Examples
     --------
-        >>> from cvpack.units import value_in_md_units
+        >>> from cvpack.units import in_md_units
         >>> from openmm import Vec3
         >>> from openmm.unit import angstrom, femtosecond, degree
         >>> from numpy import array
-        >>> value_in_md_units(1.0)
+        >>> in_md_units(1.0)
         1.0
-        >>> value_in_md_units(1.0*femtosecond)
+        >>> in_md_units(1.0*femtosecond)
         0.001
-        >>> value_in_md_units(1.0*degree)
+        >>> in_md_units(1.0*degree)
         0.017453292519943295
-        >>> value_in_md_units(array([1, 2, 3])*angstrom)
+        >>> in_md_units(array([1, 2, 3])*angstrom)
         array([0.1, 0.2, 0.3])
-        >>> value_in_md_units([Vec3(1, 2, 4), Vec3(5, 8, 9)]*angstrom)
+        >>> in_md_units([Vec3(1, 2, 4), Vec3(5, 8, 9)]*angstrom)
         [Vec3(x=0.1, y=0.2, z=0.4), Vec3(x=0.5, y=0.8, z=0.9)]
         >>> try:
-        ...     value_in_md_units([1, 2, 3]*angstrom)
+        ...     in_md_units([1, 2, 3]*angstrom)
         ... except TypeError as error:
         ...     print(error)
         Cannot convert [1, 2, 3] A to MD units

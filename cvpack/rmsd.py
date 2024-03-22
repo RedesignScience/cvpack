@@ -9,15 +9,14 @@
 
 import typing as t
 
-import numpy as np
 import openmm
 from openmm import unit as mmunit
 
-from .cvpack import BaseCollectiveVariable
-from .units import MatrixQuantity, VectorQuantity, convert_quantities
+from .base_rmsd import BaseRMSD
+from .units import MatrixQuantity, VectorQuantity
 
 
-class RMSD(openmm.RMSDForce, BaseCollectiveVariable):
+class RMSD(openmm.RMSDForce, BaseRMSD):
     r"""
     The root-mean-square deviation (RMSD) between the current and reference
     coordinates of a group of `n` atoms:
@@ -61,27 +60,25 @@ class RMSD(openmm.RMSDForce, BaseCollectiveVariable):
 
     Example
     -------
-        >>> import cvpack
-        >>> import openmm
-        >>> from openmm import app, unit
-        >>> from openmmtools import testsystems
-        >>> model = testsystems.AlanineDipeptideImplicit()
-        >>> num_atoms = model.topology.getNumAtoms()
-        >>> group = list(range(num_atoms))
-        >>> rmsd = cvpack.RMSD(model.positions, group, num_atoms)
-        >>> rmsd.addToSystem(model.system)
-        >>> platform = openmm.Platform.getPlatformByName('Reference')
-        >>> integrator = openmm.VerletIntegrator(2*unit.femtoseconds)
-        >>> context = openmm.Context(model.system, integrator, platform)
-        >>> context.setPositions(model.positions)
-        >>> integrator.step(1000)
-        >>> value = rmsd.getValue(context)
-        >>> round(value/value.unit, 7)
-        0.1231383
+    >>> import cvpack
+    >>> import openmm
+    >>> from openmm import app, unit
+    >>> from openmmtools import testsystems
+    >>> model = testsystems.AlanineDipeptideImplicit()
+    >>> num_atoms = model.topology.getNumAtoms()
+    >>> group = list(range(num_atoms))
+    >>> rmsd = cvpack.RMSD(model.positions, group, num_atoms)
+    >>> rmsd.addToSystem(model.system)
+    >>> platform = openmm.Platform.getPlatformByName('Reference')
+    >>> integrator = openmm.VerletIntegrator(2*unit.femtoseconds)
+    >>> context = openmm.Context(model.system, integrator, platform)
+    >>> context.setPositions(model.positions)
+    >>> integrator.step(1000)
+    >>> print(rmsd.getValue(context))
+    0.123138... nm
 
     """
 
-    @convert_quantities
     def __init__(
         self,
         referencePositions: t.Union[MatrixQuantity, t.Dict[int, VectorQuantity]],
@@ -90,12 +87,8 @@ class RMSD(openmm.RMSDForce, BaseCollectiveVariable):
     ) -> None:
         group = list(map(int, group))
         num_atoms = numAtoms or len(referencePositions)
-        defined_coords = {
-            atom: list(map(float, referencePositions[atom])) for atom in group
-        }
-        all_coords = np.zeros((num_atoms, 3))
-        for atom, coords in defined_coords.items():
-            all_coords[atom, :] = coords
+        defined_coords = self._getDefinedCoords(referencePositions, group)
+        all_coords = self._getAllCoords(defined_coords, num_atoms)
         super().__init__(all_coords, group)
         self._registerCV(mmunit.nanometers, defined_coords, group, num_atoms)
 
@@ -106,35 +99,36 @@ class RMSD(openmm.RMSDForce, BaseCollectiveVariable):
 
         Returns
         -------
-            force
+        openmm.HarmonicBondForce
+            The null bond force.
 
         Example
         -------
-            >>> import cvpack
-            >>> import openmm
-            >>> from openmm import app, unit
-            >>> from openmmtools import testsystems
-            >>> model = testsystems.WaterBox(
-            ...     box_edge=10*unit.angstroms,
-            ...     cutoff=5*unit.angstroms,
-            ... )
-            >>> group = [
-            ...     atom.index
-            ...     for atom in model.topology.atoms()
-            ...     if atom.residue.index < 3
-            ... ]
-            >>> rmsd = cvpack.RMSD(
-            ...     model.positions, group, model.topology.getNumAtoms()
-            ... )
-            >>> rmsd.addToSystem(model.system)
-            >>> _ = model.system.addForce(rmsd.getNullBondForce())
-            >>> integrator = openmm.VerletIntegrator(2*unit.femtoseconds)
-            >>> platform = openmm.Platform.getPlatformByName('Reference')
-            >>> context = openmm.Context(model.system, integrator, platform)
-            >>> context.setPositions(model.positions)
-            >>> integrator.step(100)
-            >>> print(rmsd.getValue(context))
-            0.10436... nm
+        >>> import cvpack
+        >>> import openmm
+        >>> from openmm import app, unit
+        >>> from openmmtools import testsystems
+        >>> model = testsystems.WaterBox(
+        ...     box_edge=10*unit.angstroms,
+        ...     cutoff=5*unit.angstroms,
+        ... )
+        >>> group = [
+        ...     atom.index
+        ...     for atom in model.topology.atoms()
+        ...     if atom.residue.index < 3
+        ... ]
+        >>> rmsd = cvpack.RMSD(
+        ...     model.positions, group, model.topology.getNumAtoms()
+        ... )
+        >>> rmsd.addToSystem(model.system)
+        >>> _ = model.system.addForce(rmsd.getNullBondForce())
+        >>> integrator = openmm.VerletIntegrator(2*unit.femtoseconds)
+        >>> platform = openmm.Platform.getPlatformByName('Reference')
+        >>> context = openmm.Context(model.system, integrator, platform)
+        >>> context.setPositions(model.positions)
+        >>> integrator.step(100)
+        >>> print(rmsd.getValue(context))
+        0.10436... nm
 
         """
         force = openmm.HarmonicBondForce()
