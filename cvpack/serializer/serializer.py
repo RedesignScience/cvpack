@@ -90,7 +90,7 @@ def deserialize(iostream: t.IO) -> t.Any:
         >>> iostream.seek(0)
         0
         >>> new_object = serializer.deserialize(iostream)
-        >>> print(type(new_object))
+        >>> type(new_object)
         <class 'cvpack.radius_of_gyration.RadiusOfGyration'>
 
     """

@@ -87,7 +87,7 @@ class HelixAngleContent(openmm.CustomAngleForce, BaseCollectiveVariable):
     >>> integrator = openmm.VerletIntegrator(0)
     >>> context = openmm.Context(model.system, integrator, platform)
     >>> context.setPositions(model.positions)
-    >>> print(helix_content.getValue(context))
+    >>> helix_content.getValue(context)
     18.7605... dimensionless
     """
 

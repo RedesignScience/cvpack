@@ -54,9 +54,9 @@ class OpenMMForceWrapper(BaseCollectiveVariable):
         >>> platform = openmm.Platform.getPlatformByName("Reference")
         >>> context = openmm.Context(model.system, integrator, platform)
         >>> context.setPositions(model.positions)
-        >>> print(cv.getValue(context))
+        >>> cv.getValue(context)
         1.911... rad
-        >>> print(cv.getEffectiveMass(context))
+        >>> cv.getEffectiveMass(context)
         0.00538... nm**2 Da/(rad**2)
     """
 

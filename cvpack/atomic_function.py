@@ -104,9 +104,9 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
     >>> context.setPositions(model.positions)
     >>> theta1 = angle1.getValue(context) / openmm.unit.radian
     >>> theta2 = angle2.getValue(context) / openmm.unit.radian
-    >>> print(500*((theta1 - np.pi/2)**2 + (theta2 - np.pi/3)**2))
+    >>> 500*((theta1 - np.pi/2)**2 + (theta2 - np.pi/3)**2)
     429.479...
-    >>> print(colvar.getValue(context))
+    >>> colvar.getValue(context)
     429.479... kJ/mol
     """
 

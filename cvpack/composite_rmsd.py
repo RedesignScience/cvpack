@@ -113,11 +113,11 @@ class CompositeRMSD(CompositeRMSDForce, BaseRMSD):
     ...     mm.Platform.getPlatformByName('Reference'),
     ... )
     >>> context.setPositions(model.positions)
-    >>> print(composite_rmsd.getValue(context))
+    >>> composite_rmsd.getValue(context)
     0.0 nm
     >>> model.positions[guest_atoms] += 1.0 * unit.nanometers
     >>> context.setPositions(model.positions)
-    >>> print(composite_rmsd.getValue(context))
+    >>> composite_rmsd.getValue(context)
     0.0 nm
     """
 

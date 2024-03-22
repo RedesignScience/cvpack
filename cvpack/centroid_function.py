@@ -130,7 +130,7 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
     >>> platform = openmm.Platform.getPlatformByName('Reference')
     >>> context = openmm.Context(model.system, integrator, platform)
     >>> context.setPositions(model.positions)
-    >>> print(res_coord.getValue(context))
+    >>> res_coord.getValue(context)
     33.0 dimensionless
 
     Recompute the residue coordination using the centroid function:
@@ -145,7 +145,7 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
     ... )
     >>> colvar.addToSystem(model.system)
     >>> context.reinitialize(preserveState=True)
-    >>> print(colvar.getValue(context))
+    >>> colvar.getValue(context)
     33.0 dimensionless
     """
 
