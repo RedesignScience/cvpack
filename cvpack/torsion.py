@@ -10,8 +10,7 @@
 import math
 
 import openmm
-
-from cvpack import unit as mmunit
+from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
 
@@ -37,37 +36,38 @@ class Torsion(openmm.CustomTorsionForce, BaseCollectiveVariable):
 
     Parameters
     ----------
-        atom1
-            The index of the first atom
-        atom2
-            The index of the second atom
-        atom3
-            The index of the third atom
-        atom4
-            The index of the fourth atom
-        pbc
-            Whether to use periodic boundary conditions
+    atom1
+        The index of the first atom
+    atom2
+        The index of the second atom
+    atom3
+        The index of the third atom
+    atom4
+        The index of the fourth atom
+    pbc
+        Whether to use periodic boundary conditions
 
-    Example:
-        >>> import cvpack
-        >>> import openmm
-        >>> system = openmm.System()
-        >>> [system.addParticle(1) for i in range(4)]
-        [0, 1, 2, 3]
-        >>> torsion = cvpack.Torsion(0, 1, 2, 3, pbc=False)
-        >>> system.addForce(torsion)
-        0
-        >>> integrator = openmm.VerletIntegrator(0)
-        >>> platform = openmm.Platform.getPlatformByName('Reference')
-        >>> context = openmm.Context(system, integrator, platform)
-        >>> positions = [[0, 0, 0], [1, 0, 0], [1, 1, 0], [1, 1, 1]]
-        >>> context.setPositions([openmm.Vec3(*pos) for pos in positions])
-        >>> print(torsion.getValue(context))
-        1.5707... rad
+    Example
+    -------
+    >>> import cvpack
+    >>> import openmm
+    >>> system = openmm.System()
+    >>> [system.addParticle(1) for i in range(4)]
+    [0, 1, 2, 3]
+    >>> torsion = cvpack.Torsion(0, 1, 2, 3, pbc=False)
+    >>> system.addForce(torsion)
+    0
+    >>> integrator = openmm.VerletIntegrator(0)
+    >>> platform = openmm.Platform.getPlatformByName('Reference')
+    >>> context = openmm.Context(system, integrator, platform)
+    >>> positions = [[0, 0, 0], [1, 0, 0], [1, 1, 0], [1, 1, 1]]
+    >>> context.setPositions([openmm.Vec3(*pos) for pos in positions])
+    >>> print(torsion.getValue(context))
+    1.5707... rad
 
     """
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(
         self, atom1: int, atom2: int, atom3: int, atom4: int, pbc: bool = False
     ) -> None:
         super().__init__("theta")

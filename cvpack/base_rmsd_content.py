@@ -16,6 +16,7 @@ from openmm import app as mmapp
 
 from .cvpack import BaseCollectiveVariable
 from .rmsd import RMSD
+from .units import ScalarQuantity, value_in_md_units
 
 
 class BaseRMSDContent(openmm.CustomCVForce, BaseCollectiveVariable):
@@ -23,13 +24,13 @@ class BaseRMSDContent(openmm.CustomCVForce, BaseCollectiveVariable):
     Abstract class for secondary-structure RMSD content of a sequence of `n` residues.
     """
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(
         self,
         residue_blocks: t.List[int],
         ideal_positions: t.List[openmm.Vec3],
         residues: t.List[mmapp.topology.Residue],
         numAtoms: int,
-        thresholdRMSD: float,
+        thresholdRMSD: ScalarQuantity,
         stepFunction: str = "(1+x^4)/(1+x^4+x^8)",
         normalize: bool = False,
     ):
@@ -50,7 +51,7 @@ class BaseRMSDContent(openmm.CustomCVForce, BaseCollectiveVariable):
             definitions = []
             for i in range(start, min(start + 32, num_residue_blocks)):
                 summands.append(stepFunction.replace("x", f"x{i}"))
-                definitions.append(f"x{i}=rmsd{i}/{thresholdRMSD}")
+                definitions.append(f"x{i}=rmsd{i}/{value_in_md_units(thresholdRMSD)}")
             return ";".join(["+".join(summands)] + definitions)
 
         if num_residue_blocks <= 32:

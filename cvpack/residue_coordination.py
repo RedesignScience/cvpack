@@ -10,11 +10,11 @@
 import typing as t
 
 import openmm
+from openmm import unit as mmunit
 from openmm.app.topology import Residue
 
-from cvpack import unit as mmunit
-
 from .cvpack import BaseCollectiveVariable, SerializableResidue
+from .units import ScalarQuantity, value_in_md_units
 
 
 class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable):
@@ -42,76 +42,73 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable
 
     Parameters
     ----------
-        residueGroup1
-            The residues in the first group
-        residueGroup2
-            The residues in the second group
-        pbc
-            Whether the system has periodic boundary conditions
-        stepFunction
-            The function "step(1-x)" (for analysis only) or a continuous approximation
-            thereof
-        thresholdDistance
-            The threshold distance (:math:`r_0`) for considering two residues as being
-            in contact
-        normalize
-            Whether the number of contacts should be normalized by the total number of
-            possible contacts
-        weighByMass
-            Whether the centroid of each residue should be weighted by the mass of the
-            atoms in the residue
-        includeHydrogens
-            Whether hydrogen atoms should be included in the centroid calculations
+    residueGroup1
+        The residues in the first group
+    residueGroup2
+        The residues in the second group
+    pbc
+        Whether the system has periodic boundary conditions
+    stepFunction
+        The function "step(1-x)" (for analysis only) or a continuous approximation
+        thereof
+    thresholdDistance
+        The threshold distance (:math:`r_0`) for considering two residues as being
+        in contact
+    normalize
+        Whether the number of contacts should be normalized by the total number of
+        possible contacts
+    weighByMass
+        Whether the centroid of each residue should be weighted by the mass of the
+        atoms in the residue
+    includeHydrogens
+        Whether hydrogen atoms should be included in the centroid calculations
 
     Raises
     ------
-        ValueError
-            If the two groups of residues are not disjoint
+    ValueError
+        If the two groups of residues are not disjoint
 
     Example
     -------
-        >>> import cvpack
-        >>> import itertools as it
-        >>> import openmm
-        >>> from openmm import app, unit
-        >>> from openmmtools import testsystems
-        >>> model = testsystems.LysozymeImplicit()
-        >>> group1 = list(it.islice(model.topology.residues(), 125, 142))
-        >>> print(*[r.name for r in group1])  # doctest: +ELLIPSIS
-        TRP ASP GLU ... ASN GLN THR
-        >>> group2 = list(it.islice(model.topology.residues(), 142, 156))
-        >>> print(*[r.name for r in group2])  # doctest: +ELLIPSIS
-        PRO ASN ARG ... ARG THR GLY
-        >>> residue_coordination = cvpack.ResidueCoordination(
-        ...     group1,
-        ...     group2,
-        ...     stepFunction="step(1-x)",
-        ...     thresholdDistance=0.6*unit.nanometers,
-        ... )
-        >>> residue_coordination.addToSystem(model.system)
-        >>> platform = openmm.Platform.getPlatformByName('Reference')
-        >>> context = openmm.Context(
-        ...     model.system, openmm.CustomIntegrator(0), platform
-        ... )
-        >>> context.setPositions(model.positions)
-        >>> print(residue_coordination.getValue(context))
-        26.0 dimensionless
-        >>> residue_coordination.setReferenceValue(26 * unit.dimensionless)
-        >>> context.reinitialize(preserveState=True)
-        >>> print(residue_coordination.getValue(context))
-        0.99999... dimensionless
+    >>> import cvpack
+    >>> import itertools as it
+    >>> import openmm
+    >>> from openmm import app, unit
+    >>> from openmmtools import testsystems
+    >>> model = testsystems.LysozymeImplicit()
+    >>> group1 = list(it.islice(model.topology.residues(), 125, 142))
+    >>> print(*[r.name for r in group1])  # doctest: +ELLIPSIS
+    TRP ASP GLU ... ASN GLN THR
+    >>> group2 = list(it.islice(model.topology.residues(), 142, 156))
+    >>> print(*[r.name for r in group2])  # doctest: +ELLIPSIS
+    PRO ASN ARG ... ARG THR GLY
+    >>> residue_coordination = cvpack.ResidueCoordination(
+    ...     group1,
+    ...     group2,
+    ...     stepFunction="step(1-x)",
+    ...     thresholdDistance=0.6*unit.nanometers,
+    ... )
+    >>> residue_coordination.addToSystem(model.system)
+    >>> platform = openmm.Platform.getPlatformByName('Reference')
+    >>> context = openmm.Context(
+    ...     model.system, openmm.CustomIntegrator(0), platform
+    ... )
+    >>> context.setPositions(model.positions)
+    >>> print(residue_coordination.getValue(context))
+    26.0 dimensionless
+    >>> residue_coordination.setReferenceValue(26 * unit.dimensionless)
+    >>> context.reinitialize(preserveState=True)
+    >>> print(residue_coordination.getValue(context))
+    0.99999... dimensionless
     """
 
-    @mmunit.convert_quantities
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(
         self,
         residueGroup1: t.Iterable[Residue],
         residueGroup2: t.Iterable[Residue],
         pbc: bool = True,
         stepFunction: str = "1/(1+x^6)",
-        thresholdDistance: mmunit.ScalarQuantity = mmunit.Quantity(
-            1.0, mmunit.nanometers
-        ),
+        thresholdDistance: ScalarQuantity = 1.0 * mmunit.nanometers,
         normalize: bool = False,
         weighByMass: bool = True,
         includeHydrogens: bool = True,
@@ -123,7 +120,7 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable
         self._ref_val = nr1 * nr2 if normalize else 1.0
         expression = (
             f"({stepFunction})/refval"
-            f"; x=distance(g1,g2)/{thresholdDistance}"
+            f"; x=distance(g1,g2)/{value_in_md_units(thresholdDistance)}"
             f"; refval={self._ref_val}"
         )
         super().__init__(2, expression)
@@ -164,8 +161,7 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable
         """
         return self._ref_val * self.getUnit()
 
-    @mmunit.convert_quantities
-    def setReferenceValue(self, value: mmunit.ScalarQuantity) -> None:
+    def setReferenceValue(self, value: ScalarQuantity) -> None:
         """
         Set the reference value used for normalizing the residue coordination.
 
@@ -175,6 +171,7 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable
                 The reference value.
         """
         expression = self.getEnergyFunction()
+        value = value_in_md_units(value)
         self.setEnergyFunction(
             expression.replace(f"refval={self._ref_val}", f"refval={value}")
         )

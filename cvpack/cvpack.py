@@ -14,11 +14,10 @@ import typing as t
 import openmm
 import yaml
 from openmm import app as mmapp
-
-from cvpack import unit as mmunit
+from openmm import unit as mmunit
 
 from .serializer import Serializable
-from .unit import value_in_md_units
+from .units import Quantity, preprocess_units, value_in_md_units
 from .utils import compute_effective_mass, get_single_force_state
 
 
@@ -104,6 +103,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
     def __deepcopy__(self, memo):
         return yaml.safe_load(yaml.safe_dump(self))
 
+    @preprocess_units
     def _registerCV(
         self,
         unit: mmunit.Unit,
@@ -117,14 +117,14 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
 
         Parameters
         ----------
-            unit
-                The unit of measurement of this collective variable. It must be a unit
-                in the MD unit system (mass in Da, distance in nm, time in ps,
-                temperature in K, energy in kJ/mol, angle in rad).
-            args
-                The arguments needed to construct this collective variable
-            kwargs
-                The keyword arguments needed to construct this collective variable
+        unit
+            The unit of measurement of this collective variable. It must be a unit
+            in the MD unit system (mass in Da, distance in nm, time in ps,
+            temperature in K, energy in kJ/mol, angle in rad).
+        args
+            The arguments needed to construct this collective variable
+        kwargs
+            The keyword arguments needed to construct this collective variable
         """
         cls = self.__class__
         self.setName(cls.__name__)
@@ -143,8 +143,8 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
 
         Parameters
         ----------
-            period
-                The period of this collective variable
+        period
+            The period of this collective variable
         """
         self._period = period
 
@@ -163,15 +163,15 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
 
         Example
         -------
-            >>> import cvpack
-            >>> args, defaults = cvpack.RadiusOfGyration._getArguments()
-            >>> for name, annotation in args.items():
-            ...     print(f"{name}: {annotation}")
-            group: typing.Iterable[int]
-            pbc: <class 'bool'>
-            weighByMass: <class 'bool'>
-            >>> print(*defaults.items())
-            ('pbc', False) ('weighByMass', False)
+        >>> import cvpack
+        >>> args, defaults = cvpack.RadiusOfGyration._getArguments()
+        >>> for name, annotation in args.items():
+        ...     print(f"{name}: {annotation}")
+        group: typing.Iterable[int]
+        pbc: <class 'bool'>
+        weighByMass: <class 'bool'>
+        >>> print(*defaults.items())
+        ('pbc', False) ('weighByMass', False)
         """
         arguments = collections.OrderedDict()
         defaults = collections.OrderedDict()
@@ -194,13 +194,13 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
 
         Parameters
         ----------
-            system
-                The system to search for unused force groups
+        system
+            The system to search for unused force groups
 
         Raises
         ------
-            RuntimeError
-                If all force groups are already in use
+        RuntimeError
+            If all force groups are already in use
         """
         used_groups = {force.getForceGroup() for force in system.getForces()}
         new_group = next(filter(lambda i: i not in used_groups, range(32)), None)
@@ -214,7 +214,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         """
         return self._unit
 
-    def getPeriod(self) -> t.Optional[mmunit.SerializableQuantity]:
+    def getPeriod(self) -> t.Optional[Quantity]:
         """
         Get the period of this collective variable.
 
@@ -224,7 +224,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         """
         if self._period is None:
             return None
-        return mmunit.SerializableQuantity(self._period, self.getUnit())
+        return Quantity(self._period, self.getUnit())
 
     def addToSystem(
         self, system: openmm.System, setUnusedForceGroup: bool = True
@@ -331,31 +331,31 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
 
         Example
         -------
-            In this example, we compute the effective masses of the backbone dihedral
-            angles and the radius of gyration of an alanine dipeptide molecule in water:
+        In this example, we compute the effective masses of the backbone dihedral
+        angles and the radius of gyration of an alanine dipeptide molecule in water:
 
-            >>> import cvpack
-            >>> import openmm
-            >>> from openmmtools import testsystems
-            >>> model = testsystems.AlanineDipeptideExplicit()
-            >>> top = model.mdtraj_topology
-            >>> backbone_atoms = top.select("name N C CA and resid 1 2")
-            >>> phi = cvpack.Torsion(*backbone_atoms[0:4])
-            >>> psi = cvpack.Torsion(*backbone_atoms[1:5])
-            >>> radius_of_gyration = cvpack.RadiusOfGyration(
-            ...     top.select('not water')
-            ... )
-            >>> for cv in [phi, psi, radius_of_gyration]:
-            ...     cv.addToSystem(model.system)
-            >>> context = openmm.Context(
-            ...     model.system, openmm.VerletIntegrator(0)
-            ... )
-            >>> context.setPositions(model.positions)
-            >>> print(phi.getEffectiveMass(context))
-            0.05119... nm**2 Da/(rad**2)
-            >>> print(psi.getEffectiveMass(context))
-            0.05186... nm**2 Da/(rad**2)
-            >>> print(radius_of_gyration.getEffectiveMass(context))
-            30.946... Da
+        >>> import cvpack
+        >>> import openmm
+        >>> from openmmtools import testsystems
+        >>> model = testsystems.AlanineDipeptideExplicit()
+        >>> top = model.mdtraj_topology
+        >>> backbone_atoms = top.select("name N C CA and resid 1 2")
+        >>> phi = cvpack.Torsion(*backbone_atoms[0:4])
+        >>> psi = cvpack.Torsion(*backbone_atoms[1:5])
+        >>> radius_of_gyration = cvpack.RadiusOfGyration(
+        ...     top.select('not water')
+        ... )
+        >>> for cv in [phi, psi, radius_of_gyration]:
+        ...     cv.addToSystem(model.system)
+        >>> context = openmm.Context(
+        ...     model.system, openmm.VerletIntegrator(0)
+        ... )
+        >>> context.setPositions(model.positions)
+        >>> print(phi.getEffectiveMass(context))
+        0.05119... nm**2 Da/(rad**2)
+        >>> print(psi.getEffectiveMass(context))
+        0.05186... nm**2 Da/(rad**2)
+        >>> print(radius_of_gyration.getEffectiveMass(context))
+        30.946... Da
         """
         return mmunit.Quantity(compute_effective_mass(self, context), self._mass_unit)

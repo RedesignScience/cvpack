@@ -10,10 +10,10 @@
 import typing as t
 
 import openmm
-
-from cvpack import unit as mmunit
+from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
+from .units import ScalarQuantity, Unit
 
 
 class OpenMMForceWrapper(BaseCollectiveVariable):
@@ -58,15 +58,15 @@ class OpenMMForceWrapper(BaseCollectiveVariable):
         0.00538... nm**2 Da/(rad**2)
     """
 
-    def __init__(  # pylint: disable=too-many-arguments, super-init-not-called
+    def __init__(  # pylint: disable=super-init-not-called
         self,
         openmmForce: t.Union[openmm.Force, str],
         unit: mmunit.Unit,
-        period: t.Optional[mmunit.ScalarQuantity] = None,
+        period: t.Optional[ScalarQuantity] = None,
     ) -> None:
         if isinstance(openmmForce, openmm.Force):
             openmmForce = openmm.XmlSerializer.serialize(openmmForce)
-        unit = mmunit.SerializableUnit(unit)
+        unit = Unit(unit)
         force_copy = openmm.XmlSerializer.deserialize(openmmForce)
         self.this = force_copy.this
         self.__class__.__bases__ = (BaseCollectiveVariable, type(force_copy))

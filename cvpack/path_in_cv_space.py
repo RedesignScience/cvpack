@@ -12,11 +12,11 @@ from collections import OrderedDict
 from copy import deepcopy
 
 import openmm
-
-from cvpack import unit as mmunit
+from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
 from .path import Metric, deviation, progress
+from .units import MatrixQuantity, ScalarQuantity, value_in_md_units
 from .utils import convert_to_matrix
 
 
@@ -117,21 +117,23 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
     z = 0.25... dimensionless
     """
 
-    @mmunit.convert_quantities
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(
         self,
         metric: Metric,
         variables: t.Iterable[BaseCollectiveVariable],
-        milestones: mmunit.MatrixQuantity,
+        milestones: MatrixQuantity,
         sigma: float,
-        scales: t.Optional[t.Iterable[mmunit.ScalarQuantity]] = None,
+        scales: t.Optional[t.Iterable[ScalarQuantity]] = None,
     ) -> None:
         if metric not in (progress, deviation):
             raise ValueError(
                 "Invalid metric. Use 'cvpack.path.progress' or 'cvpack.path.deviation'."
             )
         variables = list(variables)
-        scales = [1.0] * len(variables) if scales is None else list(scales)
+        if scales is None:
+            cv_scales = [1.0] * len(variables)
+        else:
+            cv_scales = list(scales)
         milestones, n, numvars = convert_to_matrix(milestones)
         if numvars != len(variables):
             raise ValueError("Wrong number of columns in the milestones matrix.")
@@ -139,7 +141,7 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
             raise ValueError("At least two rows are required in the milestones matrix.")
         definitions = OrderedDict({"lambda": 1 / (2 * sigma**2)})
         periods = {
-            j: var.getPeriod().value_in_md_units()
+            j: value_in_md_units(var.getPeriod())
             for j, var in enumerate(variables)
             if var.getPeriod() is not None
         }
@@ -149,7 +151,7 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
                 deltas[j] = f"min(abs{deltas[j]},{period}-abs{deltas[j]})"
             definitions[f"x{i}"] = "+".join(
                 f"{delta}^2" if scale == 1.0 else f"({delta}/{scale})^2"
-                for delta, scale in zip(deltas, scales)
+                for delta, scale in zip(deltas, cv_scales)
             )
         definitions["xmin0"] = "min(x0,x1)"
         for i in range(n - 2):

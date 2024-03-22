@@ -11,8 +11,7 @@ import typing as t
 
 import numpy as np
 import openmm
-
-from cvpack import unit as mmunit
+from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
 
@@ -37,43 +36,43 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, BaseCollectiveVariable):
 
     Parameters
     ----------
-        firstList
-            A list of :math:`n` tuples of four atom indices defining the first torsion
-            angle in each pair.
-        secondList
-            A list of :math:`n` tuples of four atom indices defining the second torsion
-            angle in each pair.
-        pbc
-            Whether to use periodic boundary conditions
+    firstList
+        A list of :math:`n` tuples of four atom indices defining the first torsion
+        angle in each pair.
+    secondList
+        A list of :math:`n` tuples of four atom indices defining the second torsion
+        angle in each pair.
+    pbc
+        Whether to use periodic boundary conditions
 
     Example
     -------
-        >>> import cvpack
-        >>> import mdtraj
-        >>> import openmm
-        >>> import openmm.unit as mmunit
-        >>> from openmmtools import testsystems
-        >>> model = testsystems.LysozymeImplicit()
-        >>> traj = mdtraj.Trajectory(
-        ...     model.positions, mdtraj.Topology.from_openmm(model.topology)
-        ... )
-        >>> phi_atoms, _ = mdtraj.compute_phi(traj)
-        >>> valid_atoms = traj.top.select("resid 59 to 79 and backbone")
-        >>> phi_atoms = [
-        ...     phi
-        ...     for phi in phi_atoms
-        ...     if all(atom in valid_atoms for atom in phi)
-        ... ]
-        >>> torsion_similarity = cvpack.TorsionSimilarity(
-        ...     phi_atoms[1:], phi_atoms[:-1]
-        ... )
-        >>> torsion_similarity.addToSystem(model.system)
-        >>> integrator = openmm.VerletIntegrator(0)
-        >>> platform = openmm.Platform.getPlatformByName("Reference")
-        >>> context = openmm.Context(model.system, integrator, platform)
-        >>> context.setPositions(model.positions)
-        >>> print(torsion_similarity.getValue(context))
-        18.659... dimensionless
+    >>> import cvpack
+    >>> import mdtraj
+    >>> import openmm
+    >>> import openmm.unit as mmunit
+    >>> from openmmtools import testsystems
+    >>> model = testsystems.LysozymeImplicit()
+    >>> traj = mdtraj.Trajectory(
+    ...     model.positions, mdtraj.Topology.from_openmm(model.topology)
+    ... )
+    >>> phi_atoms, _ = mdtraj.compute_phi(traj)
+    >>> valid_atoms = traj.top.select("resid 59 to 79 and backbone")
+    >>> phi_atoms = [
+    ...     phi
+    ...     for phi in phi_atoms
+    ...     if all(atom in valid_atoms for atom in phi)
+    ... ]
+    >>> torsion_similarity = cvpack.TorsionSimilarity(
+    ...     phi_atoms[1:], phi_atoms[:-1]
+    ... )
+    >>> torsion_similarity.addToSystem(model.system)
+    >>> integrator = openmm.VerletIntegrator(0)
+    >>> platform = openmm.Platform.getPlatformByName("Reference")
+    >>> context = openmm.Context(model.system, integrator, platform)
+    >>> context.setPositions(model.positions)
+    >>> print(torsion_similarity.getValue(context))
+    18.659... dimensionless
     """
 
     def __init__(

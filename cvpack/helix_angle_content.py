@@ -11,10 +11,10 @@ import typing as t
 
 import openmm
 from openmm import app as mmapp
-
-from cvpack import unit as mmunit
+from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable, SerializableResidue
+from .units import ScalarQuantity
 
 
 class HelixAngleContent(openmm.CustomAngleForce, BaseCollectiveVariable):
@@ -49,57 +49,52 @@ class HelixAngleContent(openmm.CustomAngleForce, BaseCollectiveVariable):
 
     Parameters
     ----------
-        residues
-            The residues in the sequence
-        pbc
-            Whether to use periodic boundary conditions
-        thetaReference
-            The reference value of the
-            :math:`{\rm C}_\alpha{\rm -C}_\alpha{\rm -C}_\alpha` angle in an alpha
-            helix
-        tolerance
-            The threshold tolerance around the reference values
-        halfExponent
-            The parameter :math:`m` of the boxcar function
-        normalize
-            Whether to normalize the collective variable to the range :math:`[0, 1]`
+    residues
+        The residues in the sequence
+    pbc
+        Whether to use periodic boundary conditions
+    thetaReference
+        The reference value of the
+        :math:`{\rm C}_\alpha{\rm -C}_\alpha{\rm -C}_\alpha` angle in an alpha
+        helix
+    tolerance
+        The threshold tolerance around the reference values
+    halfExponent
+        The parameter :math:`m` of the boxcar function
+    normalize
+        Whether to normalize the collective variable to the range :math:`[0, 1]`
 
     Raises
     ------
-        ValueError
-            If some residue does not contain a :math:`{\rm C}_\alpha` atom
+    ValueError
+        If some residue does not contain a :math:`{\rm C}_\alpha` atom
 
     Example
     -------
-        >>> import cvpack
-        >>> import openmm
-        >>> from openmm import app, unit
-        >>> from openmmtools import testsystems
-        >>> model = testsystems.LysozymeImplicit()
-        >>> residues = [
-        ...     r
-        ...     for r in model.topology.residues()
-        ...     if 59 <= r.index <= 79
-        ... ]
-        >>> print(*[r.name for r in residues])  # doctest: +ELLIPSIS
-        LYS ASP GLU ... ILE LEU ARG
-        >>> helix_content = cvpack.HelixAngleContent(residues)
-        >>> helix_content.addToSystem(model.system)
-        >>> platform = openmm.Platform.getPlatformByName('Reference')
-        >>> integrator = openmm.VerletIntegrator(0)
-        >>> context = openmm.Context(model.system, integrator, platform)
-        >>> context.setPositions(model.positions)
-        >>> print(helix_content.getValue(context))
-        18.7605... dimensionless
+    >>> import cvpack
+    >>> import openmm
+    >>> from openmm import app, unit
+    >>> from openmmtools import testsystems
+    >>> model = testsystems.LysozymeImplicit()
+    >>> residues = list(model.topology.residues())[59:80]
+    >>> print(*[r.name for r in residues])  # doctest: +ELLIPSIS
+    LYS ASP GLU ... ILE LEU ARG
+    >>> helix_content = cvpack.HelixAngleContent(residues)
+    >>> helix_content.addToSystem(model.system)
+    >>> platform = openmm.Platform.getPlatformByName('Reference')
+    >>> integrator = openmm.VerletIntegrator(0)
+    >>> context = openmm.Context(model.system, integrator, platform)
+    >>> context.setPositions(model.positions)
+    >>> print(helix_content.getValue(context))
+    18.7605... dimensionless
     """
 
-    @mmunit.convert_quantities
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(
         self,
         residues: t.Sequence[mmapp.topology.Residue],
         pbc: bool = False,
-        thetaReference: mmunit.ScalarQuantity = mmunit.Quantity(88, mmunit.degrees),
-        tolerance: mmunit.ScalarQuantity = mmunit.Quantity(15, mmunit.degrees),
+        thetaReference: ScalarQuantity = mmunit.Quantity(88, mmunit.degrees),
+        tolerance: ScalarQuantity = mmunit.Quantity(15, mmunit.degrees),
         halfExponent: int = 3,
         normalize: bool = False,
     ) -> None:
@@ -113,9 +108,13 @@ class HelixAngleContent(openmm.CustomAngleForce, BaseCollectiveVariable):
 
         num_angles = len(residues) - 2
         numerator = 1 / num_angles if normalize else 1
+        theta0, tol = thetaReference, tolerance
+        if mmunit.is_quantity(theta0):
+            theta0 = theta0.value_in_unit(mmunit.radians)
+        if mmunit.is_quantity(tol):
+            tol = tol.value_in_unit(mmunit.radians)
         super().__init__(
-            f"{numerator}/(1+x^{2*halfExponent})"
-            f"; x=(theta-{thetaReference})/{tolerance}"
+            f"{numerator}/(1+x^{2*halfExponent}); x=(theta-{theta0})/{tol}"
         )
         for i in range(1, len(residues) - 1):
             self.addAngle(

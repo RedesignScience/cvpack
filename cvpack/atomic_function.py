@@ -14,10 +14,10 @@ import typing as t
 import numpy as np
 import openmm
 from numpy.typing import ArrayLike
-
-from cvpack import unit as mmunit
+from openmm import unit as mmunit
 
 from .base_custom_function import BaseCustomFunction
+from .units import ScalarQuantity, VectorQuantity
 
 
 class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
@@ -78,44 +78,43 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
 
     Example
     -------
-        >>> import cvpack
-        >>> import openmm
-        >>> import numpy as np
-        >>> from cvpack import unit
-        >>> from openmmtools import testsystems
-        >>> model = testsystems.AlanineDipeptideVacuum()
-        >>> angle1 = cvpack.Angle(0, 5, 10)
-        >>> angle2 = cvpack.Angle(10, 15, 20)
-        >>> colvar = cvpack.AtomicFunction(
-        ...     "(k/2)*(angle(p1, p2, p3) - theta0)^2",
-        ...     unit.kilojoules_per_mole,
-        ...     [[0, 5, 10], [10, 15, 20]],
-        ...     k = 1000 * unit.kilojoules_per_mole/unit.radian**2,
-        ...     theta0 = [np.pi/2, np.pi/3] * unit.radian,
-        ... )
-        >>> for cv in [angle1, angle2, colvar]:
-        ...     cv.addToSystem(model.system)
-        >>> integrator = openmm.VerletIntegrator(0)
-        >>> platform = openmm.Platform.getPlatformByName('Reference')
-        >>> context = openmm.Context(model.system, integrator, platform)
-        >>> context.setPositions(model.positions)
-        >>> theta1 = angle1.getValue(context).value_in_unit(openmm.unit.radian)
-        >>> theta2 = angle2.getValue(context).value_in_unit(openmm.unit.radian)
-        >>> print(500*((theta1 - np.pi/2)**2 + (theta2 - np.pi/3)**2))
-        429.479...
-        >>> print(colvar.getValue(context))
-        429.479... kJ/mol
+    >>> import cvpack
+    >>> import openmm
+    >>> import numpy as np
+    >>> from openmm import unit
+    >>> from openmmtools import testsystems
+    >>> model = testsystems.AlanineDipeptideVacuum()
+    >>> angle1 = cvpack.Angle(0, 5, 10)
+    >>> angle2 = cvpack.Angle(10, 15, 20)
+    >>> colvar = cvpack.AtomicFunction(
+    ...     "(k/2)*(angle(p1, p2, p3) - theta0)^2",
+    ...     unit.kilojoules_per_mole,
+    ...     [[0, 5, 10], [10, 15, 20]],
+    ...     k = 1000 * unit.kilojoules_per_mole/unit.radian**2,
+    ...     theta0 = [np.pi/2, np.pi/3] * unit.radian,
+    ... )
+    >>> for cv in [angle1, angle2, colvar]:
+    ...     cv.addToSystem(model.system)
+    >>> integrator = openmm.VerletIntegrator(0)
+    >>> platform = openmm.Platform.getPlatformByName('Reference')
+    >>> context = openmm.Context(model.system, integrator, platform)
+    >>> context.setPositions(model.positions)
+    >>> theta1 = angle1.getValue(context) / openmm.unit.radian
+    >>> theta2 = angle2.getValue(context) / openmm.unit.radian
+    >>> print(500*((theta1 - np.pi/2)**2 + (theta2 - np.pi/3)**2))
+    429.479...
+    >>> print(colvar.getValue(context))
+    429.479... kJ/mol
     """
 
-    @mmunit.convert_quantities
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(
         self,
         function: str,
         unit: mmunit.Unit,
         groups: ArrayLike,
-        period: t.Optional[mmunit.ScalarQuantity] = None,
+        period: t.Optional[ScalarQuantity] = None,
         pbc: bool = True,
-        **parameters: t.Union[mmunit.ScalarQuantity, mmunit.VectorQuantity],
+        **parameters: t.Union[ScalarQuantity, VectorQuantity],
     ) -> None:
         groups = np.atleast_2d(groups)
         num_groups, atoms_per_group, *other_dimensions = groups.shape
@@ -124,8 +123,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         super().__init__(atoms_per_group, function)
         overalls, perbonds = self._extractParameters(num_groups, **parameters)
         self._addParameters(overalls, perbonds, groups, pbc, unit)
-        unit = mmunit.SerializableUnit(unit)
-        groups = [list(map(int, group)) for group in groups]
+        groups = [[int(atom) for atom in group] for group in groups]
         self._registerCV(
             unit, function, unit, groups, period, pbc, **overalls, **perbonds
         )
@@ -282,7 +280,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         >>> import cvpack
         >>> import numpy as np
         >>> import openmm
-        >>> from cvpack import unit
+        >>> from openmm import unit
         >>> from openmm import app
         >>> from openmmtools import testsystems
         >>> model = testsystems.LysozymeImplicit()

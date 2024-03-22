@@ -12,10 +12,10 @@ import typing as t
 import numpy as np
 import openmm
 from numpy.typing import ArrayLike
-
-from cvpack import unit as mmunit
+from openmm import unit as mmunit
 
 from .base_custom_function import BaseCustomFunction
+from .units import ScalarQuantity, VectorQuantity
 
 
 class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
@@ -106,56 +106,55 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
 
     Example
     -------
-        >>> import cvpack
-        >>> import itertools as it
-        >>> import numpy as np
-        >>> import openmm
-        >>> from openmm import unit
-        >>> from openmmtools import testsystems
-        >>> model = testsystems.LysozymeImplicit()
-        >>> residues = list(model.topology.residues())
-        >>> atoms = [[a.index for a in r.atoms()] for r in residues]
+    >>> import cvpack
+    >>> import itertools as it
+    >>> import numpy as np
+    >>> import openmm
+    >>> from openmm import unit
+    >>> from openmmtools import testsystems
+    >>> model = testsystems.LysozymeImplicit()
+    >>> residues = list(model.topology.residues())
+    >>> atoms = [[a.index for a in r.atoms()] for r in residues]
 
-        Compute the residue coordination between two helices:
+    Compute the residue coordination between two helices:
 
-        >>> res_coord = cvpack.ResidueCoordination(
-        ...     residues[115:124], residues[126:135], stepFunction="step(1-x)"
-        ... )
-        >>> res_coord.addToSystem(model.system)
-        >>> integrator = openmm.VerletIntegrator(0)
-        >>> platform = openmm.Platform.getPlatformByName('Reference')
-        >>> context = openmm.Context(model.system, integrator, platform)
-        >>> context.setPositions(model.positions)
-        >>> print(res_coord.getValue(context))
-        33.0 dimensionless
+    >>> res_coord = cvpack.ResidueCoordination(
+    ...     residues[115:124], residues[126:135], stepFunction="step(1-x)"
+    ... )
+    >>> res_coord.addToSystem(model.system)
+    >>> integrator = openmm.VerletIntegrator(0)
+    >>> platform = openmm.Platform.getPlatformByName('Reference')
+    >>> context = openmm.Context(model.system, integrator, platform)
+    >>> context.setPositions(model.positions)
+    >>> print(res_coord.getValue(context))
+    33.0 dimensionless
 
-        Recompute the residue coordination using the centroid function:
+    Recompute the residue coordination using the centroid function:
 
-        >>> groups = [atoms[115:124], atoms[126:135]]
-        >>> collections = list(it.product(range(9), range(9, 18)))
-        >>> colvar = cvpack.CentroidFunction(
-        ...    "step(1 - distance(g1, g2))",
-        ...    unit.dimensionless,
-        ...    atoms[115:124] + atoms[126:135],
-        ...    list(it.product(range(9), range(9, 18))),
-        ... )
-        >>> colvar.addToSystem(model.system)
-        >>> context.reinitialize(preserveState=True)
-        >>> print(colvar.getValue(context))
-        33.0 dimensionless
+    >>> groups = [atoms[115:124], atoms[126:135]]
+    >>> collections = list(it.product(range(9), range(9, 18)))
+    >>> colvar = cvpack.CentroidFunction(
+    ...    "step(1 - distance(g1, g2))",
+    ...    unit.dimensionless,
+    ...    atoms[115:124] + atoms[126:135],
+    ...    list(it.product(range(9), range(9, 18))),
+    ... )
+    >>> colvar.addToSystem(model.system)
+    >>> context.reinitialize(preserveState=True)
+    >>> print(colvar.getValue(context))
+    33.0 dimensionless
     """
 
-    @mmunit.convert_quantities
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(
         self,
         function: str,
         unit: mmunit.Unit,
         groups: t.Iterable[t.Iterable[int]],
         collections: t.Optional[ArrayLike] = None,
-        period: t.Optional[mmunit.ScalarQuantity] = None,
+        period: t.Optional[ScalarQuantity] = None,
         pbc: bool = True,
         weighByMass: bool = True,
-        **parameters: t.Union[mmunit.ScalarQuantity, mmunit.VectorQuantity],
+        **parameters: t.Union[ScalarQuantity, VectorQuantity],
     ) -> None:
         groups = [list(map(int, group)) for group in groups]
         num_groups = len(groups)
@@ -172,7 +171,6 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
             self.addGroup(group, *([] if weighByMass else [[1] * len(group)]))
         overalls, perbonds = self._extractParameters(num_collections, **parameters)
         self._addParameters(overalls, perbonds, collections, pbc, unit)
-        unit = mmunit.SerializableUnit(unit)
         self._registerCV(
             unit,
             function,
