@@ -44,22 +44,24 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
     ----------
     function
         The function to be evaluated. It must be a valid
-        :OpenMM:`CustomCompoundBondForce` expression
+        :OpenMM:`CustomCompoundBondForce` expression.
     groups
         The indices of the atoms in each group, passed as a 2D array-like object of
         shape `(m, n)`, where `m` is the number of groups and `n` is the number of
         atoms per group. If a 1D object is passed, it is assumed that `m` is 1 and
-        `n` is the length of the object
+        `n` is the length of the object.
     unit
         The unit of measurement of the collective variable. It must be compatible
         with the MD unit system (mass in `daltons`, distance in `nanometers`, time
         in `picoseconds`, temperature in `kelvin`, energy in `kilojoules_per_mol`,
         angle in `radians`). If the collective variables does not have a unit, use
-        `unit.dimensionless`
+        `unit.dimensionless`.
     period
-        The period of the collective variable if it is periodic, or `None` if it is not
+        The period of the collective variable if it is periodic, or `None` if it is not.
     pbc
-        Whether to use periodic boundary conditions when computing atomic distances
+        Whether to use periodic boundary conditions when computing atomic distances.
+    name
+        The name of the collective variable.
 
     Keyword Args
     ------------
@@ -72,9 +74,10 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
     Raises
     ------
     ValueError
-        If the groups are not specified as a 1D or 2D array-like object
+        If the groups are not specified as a 1D or 2D array-like object.
     ValueError
-        If the unit of the collective variable is not compatible with the MD unit system
+        If the unit of the collective variable is not compatible with the MD unit
+        system.
 
     Example
     -------
@@ -114,6 +117,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         groups: ArrayLike,
         period: t.Optional[ScalarQuantity] = None,
         pbc: bool = True,
+        name: str = "atomic_function",
         **parameters: t.Union[ScalarQuantity, VectorQuantity],
     ) -> None:
         groups = np.atleast_2d(groups)
@@ -125,7 +129,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         self._addParameters(overalls, perbonds, groups, pbc, unit)
         groups = [[int(atom) for atom in group] for group in groups]
         self._registerCV(
-            unit, function, unit, groups, period, pbc, **overalls, **perbonds
+            name, unit, function, unit, groups, period, pbc, **overalls, **perbonds
         )
         if period is not None:
             self._registerPeriod(period)
@@ -259,21 +263,21 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
 
         Parameters
         ----------
-            force
-                The force to be converted
-            unit
-                The unit of measurement of the collective variable. It must be
-                compatible with the MD unit system (mass in `daltons`, distance in
-                `nanometers`, time in `picoseconds`, temperature in `kelvin`, energy in
-                `kilojoules_per_mol`, angle in `radians`). If the collective variables
-                does not have a unit, use `unit.dimensionless`
-            pbc
-                Whether to use periodic boundary conditions
+        force
+            The force to be converted
+        unit
+            The unit of measurement of the collective variable. It must be
+            compatible with the MD unit system (mass in `daltons`, distance in
+            `nanometers`, time in `picoseconds`, temperature in `kelvin`, energy in
+            `kilojoules_per_mol`, angle in `radians`). If the collective variables
+            does not have a unit, use `unit.dimensionless`.
+        pbc
+            Whether to use periodic boundary conditions.
 
         Raises
         ------
-            TypeError
-                If the force is not convertible to an :class:`AtomicFunction`
+        TypeError
+            If the force is not convertible to an :class:`AtomicFunction`
 
         Examples
         --------

@@ -43,25 +43,27 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable
     Parameters
     ----------
     residueGroup1
-        The residues in the first group
+        The residues in the first group.
     residueGroup2
-        The residues in the second group
+        The residues in the second group.
     pbc
-        Whether the system has periodic boundary conditions
+        Whether the system has periodic boundary conditions.
     stepFunction
         The function "step(1-x)" (for analysis only) or a continuous approximation
-        thereof
+        thereof.
     thresholdDistance
         The threshold distance (:math:`r_0`) for considering two residues as being
-        in contact
+        in contact.
     normalize
         Whether the number of contacts should be normalized by the total number of
-        possible contacts
+        possible contacts.
     weighByMass
         Whether the centroid of each residue should be weighted by the mass of the
-        atoms in the residue
+        atoms in the residue.
     includeHydrogens
-        Whether hydrogen atoms should be included in the centroid calculations
+        Whether hydrogen atoms should be included in the centroid calculations.
+    name
+        The name of the collective variable.
 
     Raises
     ------
@@ -112,6 +114,7 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable
         normalize: bool = False,
         weighByMass: bool = True,
         includeHydrogens: bool = True,
+        name: str = "residue_coordination",
     ) -> None:
         residueGroup1 = list(map(SerializableResidue, residueGroup1))
         residueGroup2 = list(map(SerializableResidue, residueGroup2))
@@ -139,7 +142,8 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable
             for idx2 in range(nr1, nr1 + nr2):
                 self.addBond([idx1, idx2], [])
         self._registerCV(
-            mmunit.dimensionless,
+            name,
+            None,
             residueGroup1,
             residueGroup2,
             pbc,

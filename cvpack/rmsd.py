@@ -57,6 +57,8 @@ class RMSD(openmm.RMSDForce, BaseRMSD):
         The total number of atoms in the system, including those that are not in
         ``group``. This argument is necessary only if ``referencePositions`` does not
         contain all atoms in the system.
+    name
+        The name of the collective variable.
 
     Example
     -------
@@ -84,13 +86,14 @@ class RMSD(openmm.RMSDForce, BaseRMSD):
         referencePositions: t.Union[MatrixQuantity, t.Dict[int, VectorQuantity]],
         group: t.Iterable[int],
         numAtoms: t.Optional[int] = None,
+        name: str = "rmsd",
     ) -> None:
         group = list(map(int, group))
         num_atoms = numAtoms or len(referencePositions)
         defined_coords = self._getDefinedCoords(referencePositions, group)
         all_coords = self._getAllCoords(defined_coords, num_atoms)
         super().__init__(all_coords, group)
-        self._registerCV(mmunit.nanometers, defined_coords, group, num_atoms)
+        self._registerCV(name, mmunit.nanometers, defined_coords, group, num_atoms)
 
     def getNullBondForce(self) -> openmm.HarmonicBondForce:
         """

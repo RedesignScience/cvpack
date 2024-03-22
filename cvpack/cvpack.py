@@ -17,7 +17,7 @@ from openmm import app as mmapp
 from openmm import unit as mmunit
 
 from .serializer import Serializable
-from .units import Quantity, preprocess_units, value_in_md_units
+from .units import Quantity, Unit, preprocess_units, value_in_md_units
 from .utils import compute_effective_mass, get_single_force_state
 
 
@@ -86,7 +86,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
     An abstract class with common attributes and method for all CVs.
     """
 
-    _unit: mmunit.Unit = mmunit.dimensionless
+    _unit: mmunit.Unit = None
     _mass_unit: mmunit.Unit = mmunit.dalton * mmunit.nanometers**2
     _args: t.Dict[str, t.Any] = {}
     _period: t.Optional[float] = None
@@ -106,7 +106,8 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
     @preprocess_units
     def _registerCV(
         self,
-        unit: mmunit.Unit,
+        name: str,
+        unit: t.Optional[mmunit.Unit],
         *args: t.Any,
         **kwargs: t.Any,
     ) -> None:
@@ -117,6 +118,8 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
 
         Parameters
         ----------
+        name
+            The name of this collective variable.
         unit
             The unit of measurement of this collective variable. It must be a unit
             in the MD unit system (mass in Da, distance in nm, time in ps,
@@ -126,10 +129,9 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         kwargs
             The keyword arguments needed to construct this collective variable
         """
-        cls = self.__class__
-        self.setName(cls.__name__)
-        self._unit = unit
-        self._mass_unit = mmunit.dalton * (mmunit.nanometers / self.getUnit()) ** 2
+        self.setName(name)
+        self._unit = Unit("dimensionless") if unit is None else unit
+        self._mass_unit = mmunit.dalton * (mmunit.nanometers / self._unit) ** 2
         arguments, _ = self._getArguments()
         self._args = dict(zip(arguments, args))
         self._args.update(kwargs)
@@ -170,8 +172,9 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         group: typing.Iterable[int]
         pbc: <class 'bool'>
         weighByMass: <class 'bool'>
+        name: <class 'str'>
         >>> print(*defaults.items())
-        ('pbc', False) ('weighByMass', False)
+        ('pbc', False) ('weighByMass', False) ('name', 'radius_of_gyration')
         """
         arguments = collections.OrderedDict()
         defaults = collections.OrderedDict()

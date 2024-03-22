@@ -47,11 +47,13 @@ class RadiusOfGyration(BaseRadiusOfGyration):
     Parameters
     ----------
     group
-        The indices of the atoms in the group
+        The indices of the atoms in the group.
     pbc
-        Whether to use periodic boundary conditions
+        Whether to use periodic boundary conditions.
     weighByMass
-        Whether to use the center of mass of the group instead of its geometric center
+        Whether to use the center of mass of the group instead of its geometric center.
+    name
+        The name of the collective variable.
 
     Example
     -------
@@ -72,7 +74,11 @@ class RadiusOfGyration(BaseRadiusOfGyration):
     """
 
     def __init__(
-        self, group: t.Iterable[int], pbc: bool = False, weighByMass: bool = False
+        self,
+        group: t.Iterable[int],
+        pbc: bool = False,
+        weighByMass: bool = False,
+        name: str = "radius_of_gyration",
     ) -> None:
         group = list(group)
         num_atoms = len(group)
@@ -84,7 +90,7 @@ class RadiusOfGyration(BaseRadiusOfGyration):
             num_groups, f"sqrt(({sum_dist_sq})/{num_atoms})", group, pbc, weighByMass
         )
         self.addBond(list(range(num_groups)))
-        self._registerCV(mmunit.nanometers, group, pbc, weighByMass)
+        self._registerCV(name, mmunit.nanometers, group, pbc, weighByMass)
 
 
 RadiusOfGyration.registerTag("!cvpack.RadiusOfGyration")

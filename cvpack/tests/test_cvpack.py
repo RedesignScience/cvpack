@@ -75,9 +75,6 @@ def perform_common_tests(
     Function to be called in every individual cv test.
 
     """
-    # Default name must match the class name
-    assert collectiveVariable.getName() == collectiveVariable.__class__.__name__
-
     # Unit must conform to the default OpenMM system
     unity = 1 * collectiveVariable.getUnit()
     assert unity.value_in_unit_system(unit.md_unit_system) == 1

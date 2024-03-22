@@ -37,15 +37,17 @@ class Torsion(openmm.CustomTorsionForce, BaseCollectiveVariable):
     Parameters
     ----------
     atom1
-        The index of the first atom
+        The index of the first atom.
     atom2
-        The index of the second atom
+        The index of the second atom.
     atom3
-        The index of the third atom
+        The index of the third atom.
     atom4
-        The index of the fourth atom
+        The index of the fourth atom.
     pbc
-        Whether to use periodic boundary conditions
+        Whether to use periodic boundary conditions in distance calculations.
+    name
+        The name of the collective variable.
 
     Example
     -------
@@ -68,12 +70,18 @@ class Torsion(openmm.CustomTorsionForce, BaseCollectiveVariable):
     """
 
     def __init__(
-        self, atom1: int, atom2: int, atom3: int, atom4: int, pbc: bool = False
+        self,
+        atom1: int,
+        atom2: int,
+        atom3: int,
+        atom4: int,
+        pbc: bool = False,
+        name: str = "torsion",
     ) -> None:
         super().__init__("theta")
         self.addTorsion(atom1, atom2, atom3, atom4, [])
         self.setUsesPeriodicBoundaryConditions(pbc)
-        self._registerCV(mmunit.radians, atom1, atom2, atom3, atom4, pbc)
+        self._registerCV(name, mmunit.radians, atom1, atom2, atom3, atom4, pbc)
         self._registerPeriod(2 * math.pi)
 
 

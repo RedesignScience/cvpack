@@ -50,19 +50,21 @@ class HelixAngleContent(openmm.CustomAngleForce, BaseCollectiveVariable):
     Parameters
     ----------
     residues
-        The residues in the sequence
+        The residues in the sequence.
     pbc
-        Whether to use periodic boundary conditions
+        Whether to use periodic boundary conditions.
     thetaReference
         The reference value of the
         :math:`{\rm C}_\alpha{\rm -C}_\alpha{\rm -C}_\alpha` angle in an alpha
-        helix
+        helix.
     tolerance
-        The threshold tolerance around the reference values
+        The threshold tolerance around the reference values.
     halfExponent
-        The parameter :math:`m` of the boxcar function
+        The parameter :math:`m` of the boxcar function.
     normalize
-        Whether to normalize the collective variable to the range :math:`[0, 1]`
+        Whether to normalize the collective variable to the range :math:`[0, 1]`.
+    name
+        The name of the collective variable.
 
     Raises
     ------
@@ -93,10 +95,11 @@ class HelixAngleContent(openmm.CustomAngleForce, BaseCollectiveVariable):
         self,
         residues: t.Sequence[mmapp.topology.Residue],
         pbc: bool = False,
-        thetaReference: ScalarQuantity = mmunit.Quantity(88, mmunit.degrees),
-        tolerance: ScalarQuantity = mmunit.Quantity(15, mmunit.degrees),
+        thetaReference: ScalarQuantity = 88 * mmunit.degrees,
+        tolerance: ScalarQuantity = 15 * mmunit.degrees,
         halfExponent: int = 3,
         normalize: bool = False,
+        name: str = "helix_angle_content",
     ) -> None:
         def find_alpha_carbon(residue: mmapp.topology.Residue) -> int:
             for atom in residue.atoms():
@@ -124,9 +127,11 @@ class HelixAngleContent(openmm.CustomAngleForce, BaseCollectiveVariable):
                 [],
             )
         self.setUsesPeriodicBoundaryConditions(pbc)
-        self._registerCV(  # pylint: disable=duplicate-code
-            mmunit.dimensionless,
-            list(map(SerializableResidue, residues)),
+        residues = list(map(SerializableResidue, residues))
+        self._registerCV(
+            name,
+            None,
+            residues,
             pbc,
             thetaReference,
             tolerance,

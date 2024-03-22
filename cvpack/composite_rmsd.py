@@ -77,6 +77,8 @@ class CompositeRMSD(CompositeRMSDForce, BaseRMSD):
         The total number of atoms in the system, including those that are not in
         ``groups``. This argument is necessary only if ``referencePositions`` does not
         contain all atoms in the system.
+    name
+        The name of the collective variable.
 
     Raises
     ------
@@ -124,6 +126,7 @@ class CompositeRMSD(CompositeRMSDForce, BaseRMSD):
         referencePositions: t.Union[MatrixQuantity, t.Dict[int, VectorQuantity]],
         groups: t.Iterable[t.Iterable[int]],
         numAtoms: t.Optional[int] = None,
+        name: str = "composite_rmsd",
     ) -> None:
         num_atoms = numAtoms or len(referencePositions)
         groups = [[int(atom) for atom in group] for group in groups]
@@ -132,7 +135,7 @@ class CompositeRMSD(CompositeRMSDForce, BaseRMSD):
         super().__init__(all_coords)
         for group in groups:
             self.addGroup(group)
-        self._registerCV(mmunit.nanometers, defined_coords, groups, num_atoms)
+        self._registerCV(name, mmunit.nanometers, defined_coords, groups, num_atoms)
 
 
 CompositeRMSD.registerTag("!cvpack.CompositeRMSD")

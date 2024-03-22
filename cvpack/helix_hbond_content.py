@@ -49,13 +49,15 @@ class HelixHBondContent(openmm.CustomBondForce, BaseCollectiveVariable):
     Parameters
     ----------
     residues
-        The residues in the sequence
+        The residues in the sequence.
     pbc
-        Whether to use periodic boundary conditions
+        Whether to use periodic boundary conditions.
     thresholdDistance
-        The threshold distance for a hydrogen bond
+        The threshold distance for a hydrogen bond.
     halfExponent
         The parameter :math:`m` of the step function.
+    name
+        The name of the collective variable.
 
     Example
     -------
@@ -84,6 +86,7 @@ class HelixHBondContent(openmm.CustomBondForce, BaseCollectiveVariable):
         thresholdDistance: ScalarQuantity = 0.33 * mmunit.nanometers,
         halfExponent: int = 3,
         normalize: bool = False,
+        name: str = "helix_hbond_content",
     ) -> None:
         def find_atom(residue: mmapp.topology.Residue, pattern: t.Pattern) -> int:
             for atom in residue.atoms():
@@ -109,13 +112,9 @@ class HelixHBondContent(openmm.CustomBondForce, BaseCollectiveVariable):
                 [],
             )
         self.setUsesPeriodicBoundaryConditions(pbc)
-        self._registerCV(  # pylint: disable=duplicate-code
-            mmunit.dimensionless,
-            list(map(SerializableResidue, residues)),
-            pbc,
-            thresholdDistance,
-            halfExponent,
-            normalize,
+        residues = list(map(SerializableResidue, residues))
+        self._registerCV(
+            name, None, residues, pbc, thresholdDistance, halfExponent, normalize
         )
 
 

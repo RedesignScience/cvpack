@@ -94,6 +94,8 @@ class HelixRMSDContent(BaseRMSDContent):
         The form of the step function :math:`S(x)`.
     normalize
         Whether to normalize the collective variable to the range :math:`[0, 1]`.
+    name
+        The name of the collective variable.
 
     Example
     -------
@@ -127,11 +129,12 @@ class HelixRMSDContent(BaseRMSDContent):
         thresholdRMSD: ScalarQuantity = 0.08 * mmunit.nanometers,
         stepFunction: str = "(1+x^4)/(1+x^4+x^8)",
         normalize: bool = False,
+        name: str = "helix_rmsd_content",
     ) -> None:
         residue_blocks = [
             list(range(index, index + 6)) for index in range(len(residues) - 5)
         ]
-        # pylint: disable=duplicate-code
+
         super().__init__(
             residue_blocks,
             ALPHA_POSITIONS,
@@ -141,13 +144,9 @@ class HelixRMSDContent(BaseRMSDContent):
             stepFunction,
             normalize,
         )
+        residues = list(map(SerializableResidue, residues))
         self._registerCV(
-            mmunit.dimensionless,
-            list(map(SerializableResidue, residues)),
-            numAtoms,
-            thresholdRMSD,
-            stepFunction,
-            normalize,
+            name, None, residues, numAtoms, thresholdRMSD, stepFunction, normalize
         )
 
 
