@@ -16,8 +16,8 @@ import yaml
 from openmm import unit as mmunit
 
 from .serialization import Serializable
-from .units import Quantity, ScalarQuantity, Unit, preprocess_units, value_in_md_units
-from .utils import compute_effective_mass, get_single_force_state
+from .units import Quantity, ScalarQuantity, Unit, value_in_md_units
+from .utils import compute_effective_mass, get_single_force_state, preprocess_units
 
 
 class BaseCollectiveVariable(openmm.Force, Serializable):

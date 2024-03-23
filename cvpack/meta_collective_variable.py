@@ -16,7 +16,7 @@ import openmm
 from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
-from .units import Quantity, ScalarQuantity, VectorQuantity, preprocess_units
+from .units import Quantity, ScalarQuantity, VectorQuantity
 from .utils import compute_effective_mass
 
 
@@ -92,7 +92,6 @@ class MetaCollectiveVariable(openmm.CustomCVForce, BaseCollectiveVariable):
     {'phi': 0.05119... nm**2 Da/(rad**2)}
     """
 
-    @preprocess_units
     def __init__(
         self,
         function: str,

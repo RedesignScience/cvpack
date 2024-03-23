@@ -8,8 +8,6 @@
 """
 
 import ast
-import functools
-import inspect
 import typing as t
 from numbers import Real
 
@@ -104,61 +102,6 @@ class Quantity(mmunit.Quantity, Serializable):
 
 
 Quantity.registerTag("!cvpack.Quantity")
-
-
-def preprocess_units(func: t.Callable) -> t.Callable:
-    """
-    A decorator that converts instances of openmm.unit.Unit and openmm.unit.Quantity
-    into openxps.units.Unit and openxps.units.Quantity, respectively.
-
-    Parameters
-    ----------
-        func
-            The function to be decorated.
-
-    Returns
-    -------
-        The decorated function.
-
-    Example
-    -------
-    >>> from cvpack import units
-    >>> from openmm import unit as mmunit
-    >>> @units.preprocess_units
-    ... def function(data):
-    ...     return data
-    >>> assert isinstance(function(mmunit.angstrom), units.Unit)
-    >>> assert isinstance(function(5 * mmunit.angstrom), units.Quantity)
-    >>> seq = [mmunit.angstrom, mmunit.nanometer]
-    >>> assert isinstance(function(seq), list)
-    >>> assert all(isinstance(item, units.Unit) for item in function(seq))
-    >>> dct = {"length": 3 * mmunit.angstrom, "time": 2 * mmunit.picosecond}
-    >>> assert isinstance(function(dct), dict)
-    >>> assert all(isinstance(item, units.Quantity) for item in function(dct).values())
-    """
-    signature = inspect.signature(func)
-
-    def convert(data: t.Any) -> t.Any:
-        if isinstance(data, mmunit.Quantity):
-            return Quantity(data)
-        if isinstance(data, mmunit.Unit):
-            return Unit(data)
-        if isinstance(data, str):
-            return data
-        if isinstance(data, t.Sequence):
-            return type(data)(map(convert, data))
-        if isinstance(data, t.Dict):
-            return type(data)((key, convert(value)) for key, value in data.items())
-        return data
-
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        bound = signature.bind(*args, **kwargs)
-        for name, data in bound.arguments.items():
-            bound.arguments[name] = convert(data)
-        return func(*bound.args, **bound.kwargs)
-
-    return wrapper
 
 
 def value_in_md_units(
