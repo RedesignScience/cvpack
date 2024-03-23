@@ -7,16 +7,16 @@
 
 """
 
-import collections
 import inspect
 import typing as t
+from collections import OrderedDict
 
 import openmm
 import yaml
 from openmm import unit as mmunit
 
 from .serialization import Serializable
-from .units import Quantity, Unit, preprocess_units, value_in_md_units
+from .units import Quantity, ScalarQuantity, Unit, preprocess_units, value_in_md_units
 from .utils import compute_effective_mass, get_single_force_state
 
 
@@ -28,7 +28,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
     _unit: Unit = Unit("dimensionless")
     _mass_unit: Unit = Unit("dalton")
     _args: t.Dict[str, t.Any] = {}
-    _period: t.Optional[float] = None
+    _periodic_bounds: t.Optional[Quantity] = None
 
     def __getstate__(self) -> t.Dict[str, t.Any]:
         return self._args
@@ -75,22 +75,30 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         self._args = dict(zip(arguments, args))
         self._args.update(kwargs)
 
-    def _registerPeriod(self, period: float) -> None:
+    def _registerPeriodicBounds(
+        self, lower: ScalarQuantity, upper: ScalarQuantity
+    ) -> None:
         """
-        Register the period of this collective variable.
+        Register the periodic bounds of this collective variable.
 
         This method must called from Subclass.__init__ if the collective variable is
         periodic.
 
         Parameters
         ----------
-        period
-            The period of this collective variable
+        lower
+            The lower bound of this collective variable
+        upper
+            The upper bound of this collective variable
         """
-        self._period = period
+        if mmunit.is_quantity(lower):
+            lower = lower.value_in_unit(self.getUnit())
+        if mmunit.is_quantity(upper):
+            upper = upper.value_in_unit(self.getUnit())
+        self._periodic_bounds = Quantity((lower, upper), self.getUnit())
 
     @classmethod
-    def _getArguments(cls) -> t.Tuple[collections.OrderedDict, collections.OrderedDict]:
+    def _getArguments(cls) -> t.Tuple[OrderedDict, OrderedDict]:
         """
         Inspect the arguments needed for constructing an instance of this collective
         variable.
@@ -115,8 +123,8 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         >>> print(*defaults.items())
         ('pbc', False) ('weighByMass', False) ('name', 'radius_of_gyration')
         """
-        arguments = collections.OrderedDict()
-        defaults = collections.OrderedDict()
+        arguments = OrderedDict()
+        defaults = OrderedDict()
         for name, parameter in inspect.signature(cls).parameters.items():
             arguments[name] = parameter.annotation
             if parameter.default is not inspect.Parameter.empty:
@@ -162,17 +170,17 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         """
         return self._mass_unit
 
-    def getPeriod(self) -> t.Optional[Quantity]:
+    def getPeriodicBounds(self) -> t.Union[Quantity, None]:
         """
-        Get the period of this collective variable.
+        Get the periodic bounds of this collective variable.
 
         Returns
         -------
-            The period of this collective variable or None if it is not periodic
+        Union[unit.Quantity, None]
+            The periodic bounds of this collective variable or None if it is not
+            periodic
         """
-        if self._period is None:
-            return None
-        return Quantity(self._period, self.getUnit())
+        return self._periodic_bounds
 
     def addToSystem(
         self, system: openmm.System, setUnusedForceGroup: bool = True

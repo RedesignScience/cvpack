@@ -15,7 +15,7 @@ import openmm
 
 from .cvpack import BaseCollectiveVariable
 from .path import Metric, deviation, progress
-from .units import MatrixQuantity, ScalarQuantity, value_in_md_units
+from .units.units import MatrixQuantity, ScalarQuantity, value_in_md_units
 from .utils import convert_to_matrix
 
 
@@ -120,7 +120,7 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
     0.25... dimensionless
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-branches
         self,
         metric: Metric,
         variables: t.Iterable[BaseCollectiveVariable],
@@ -143,11 +143,11 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
         if n < 2:
             raise ValueError("At least two rows are required in the milestones matrix.")
         definitions = OrderedDict({"lambda": 1 / (2 * sigma**2)})
-        periods = {
-            j: value_in_md_units(var.getPeriod())
-            for j, var in enumerate(variables)
-            if var.getPeriod() is not None
-        }
+        periods = {}
+        for i, variable in enumerate(variables):
+            values = variable.getPeriodicBounds()
+            if values is not None:
+                periods[i] = value_in_md_units(values[1] - values[0])
         for i, values in enumerate(milestones):
             deltas = [f"({value}-cv{j})" for j, value in enumerate(values)]
             for j, period in periods.items():

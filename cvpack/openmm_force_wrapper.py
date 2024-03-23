@@ -13,7 +13,7 @@ import openmm
 from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
-from .units import ScalarQuantity, Unit
+from .units import Unit, VectorQuantity
 
 
 class OpenMMForceWrapper(BaseCollectiveVariable):
@@ -33,8 +33,9 @@ class OpenMMForceWrapper(BaseCollectiveVariable):
         in `picoseconds`, temperature in `kelvin`, energy in `kilojoules_per_mol`,
         angle in `radians`). If the collective variables does not have a unit, use
         `dimensionless`.
-    period
-        The period of the collective variable if it is periodic, or `None` if it is not.
+    periodicBounds
+        The periodic bounds of the collective variable if it is periodic, or `None` if
+        it is not.
     name
         The name of the collective variable.
 
@@ -47,7 +48,11 @@ class OpenMMForceWrapper(BaseCollectiveVariable):
         >>> model = testsystems.AlanineDipeptideVacuum()
         >>> angle = openmm.CustomAngleForce("theta")
         >>> _ = angle.addAngle(0, 1, 2)
-        >>> cv = cvpack.OpenMMForceWrapper(angle, unit.radian, period=2*np.pi)
+        >>> cv = cvpack.OpenMMForceWrapper(
+        ...     angle,
+        ...     unit.radian,
+        ...     periodicBounds=[-np.pi, np.pi] * unit.radian,
+        ... )
         >>> assert isinstance(cv, openmm.CustomAngleForce)
         >>> cv.addToSystem(model.system)
         >>> integrator = openmm.VerletIntegrator(0)
@@ -64,7 +69,7 @@ class OpenMMForceWrapper(BaseCollectiveVariable):
         self,
         openmmForce: t.Union[openmm.Force, str],
         unit: mmunit.Unit,
-        period: t.Optional[ScalarQuantity] = None,
+        periodicBounds: t.Optional[VectorQuantity] = None,
         name: str = "openmm_force_wrapper",
     ) -> None:
         if isinstance(openmmForce, openmm.Force):
@@ -73,9 +78,9 @@ class OpenMMForceWrapper(BaseCollectiveVariable):
         force_copy = openmm.XmlSerializer.deserialize(openmmForce)
         self.this = force_copy.this
         self.__class__.__bases__ = (BaseCollectiveVariable, type(force_copy))
-        self._registerCV(name, unit, openmmForce, unit, period)
-        if period is not None:
-            self._registerPeriod(period)
+        self._registerCV(name, unit, openmmForce, unit, periodicBounds)
+        if periodicBounds is not None:
+            self._registerPeriodicBounds(*periodicBounds)
 
 
 OpenMMForceWrapper.registerTag("!cvpack.OpenMMForceWrapper")

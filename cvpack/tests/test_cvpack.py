@@ -833,7 +833,9 @@ def test_openmm_force_wrapper():
     model = testsystems.AlanineDipeptideVacuum()
     angle = openmm.CustomAngleForce("theta")
     angle.addAngle(0, 1, 2)
-    cv = cvpack.OpenMMForceWrapper(angle, unit.radian, period=2 * np.pi)
+    cv = cvpack.OpenMMForceWrapper(
+        angle, unit.radian, periodicBounds=[-np.pi, np.pi] * unit.radian
+    )
     assert isinstance(cv, openmm.CustomAngleForce)
     cv.addToSystem(model.system)
     angle.setForceGroup(cv.getForceGroup() + 1)

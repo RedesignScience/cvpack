@@ -56,8 +56,9 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         in `picoseconds`, temperature in `kelvin`, energy in `kilojoules_per_mol`,
         angle in `radians`). If the collective variables does not have a unit, use
         `unit.dimensionless`.
-    period
-        The period of the collective variable if it is periodic, or `None` if it is not.
+    periodicBounds
+        The lower and upper bounds of the collective variable if it is periodic, or
+        ``None`` if it is not.
     pbc
         Whether to use periodic boundary conditions when computing atomic distances.
     name
@@ -115,7 +116,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         function: str,
         unit: mmunit.Unit,
         groups: ArrayLike,
-        period: t.Optional[ScalarQuantity] = None,
+        periodicBounds: t.Optional[VectorQuantity] = None,
         pbc: bool = True,
         name: str = "atomic_function",
         **parameters: t.Union[ScalarQuantity, VectorQuantity],
@@ -129,10 +130,18 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         self._addParameters(overalls, perbonds, groups, pbc, unit)
         groups = [[int(atom) for atom in group] for group in groups]
         self._registerCV(
-            name, unit, function, unit, groups, period, pbc, **overalls, **perbonds
+            name,
+            unit,
+            function,
+            unit,
+            groups,
+            periodicBounds,
+            pbc,
+            **overalls,
+            **perbonds,
         )
-        if period is not None:
-            self._registerPeriod(period)
+        if periodicBounds is not None:
+            self._registerPeriodicBounds(*periodicBounds)
 
     @classmethod
     def _fromCustomForce(
@@ -145,6 +154,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
             openmm.CustomTorsionForce,
         ],
         unit: mmunit.Unit,
+        periodicBounds: t.Optional[VectorQuantity] = None,
         pbc: bool = False,
     ) -> "AtomicFunction":
         """
@@ -188,7 +198,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
             for name, value in zip(per_item_parameter_names, per_item_parameters):
                 parameters[name].append(value)
         atoms = np.asarray(atoms).reshape(-1, number)
-        return cls(function, unit, atoms, pbc, **parameters)
+        return cls(function, unit, atoms, periodicBounds, pbc, **parameters)
 
     @classmethod
     def _fromHarmonicBondForce(
@@ -207,7 +217,14 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
             atoms.append(indices)
             parameters["r0"].append(length)
             parameters["k"].append(k)
-        return cls("(k/2)*(distance(p1, p2)-r0)^2", unit, atoms, pbc, **parameters)
+        return cls(
+            "(k/2)*(distance(p1, p2)-r0)^2",
+            unit,
+            atoms,
+            None,
+            pbc,
+            **parameters,
+        )
 
     @classmethod
     def _fromHarmonicAngleForce(
@@ -226,7 +243,14 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
             atoms.append(indices)
             parameters["theta0"].append(angle)
             parameters["k"].append(k)
-        return cls("(k/2)*(angle(p1, p2, p3)-theta0)^2", unit, atoms, pbc, **parameters)
+        return cls(
+            "(k/2)*(angle(p1, p2, p3)-theta0)^2",
+            unit,
+            atoms,
+            (-np.pi, np.pi),
+            pbc,
+            **parameters,
+        )
 
     @classmethod
     def _fromPeriodicTorsionForce(
@@ -250,13 +274,18 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
             "k*(1 + cos(periodicity*dihedral(p1, p2, p3, p4) - phase))",
             unit,
             atoms,
+            (-np.pi, np.pi),
             pbc,
             **parameters,
         )
 
     @classmethod
     def fromOpenMMForce(
-        cls, force: openmm.Force, unit: mmunit.Unit, pbc: bool = False
+        cls,
+        force: openmm.Force,
+        unit: mmunit.Unit,
+        periodicBounds: t.Optional[VectorQuantity] = None,
+        pbc: bool = False,
     ) -> "AtomicFunction":
         """
         Create an :class:`AtomicFunction` from an :OpenMM:`Force`.
@@ -271,8 +300,13 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
             `nanometers`, time in `picoseconds`, temperature in `kelvin`, energy in
             `kilojoules_per_mol`, angle in `radians`). If the collective variables
             does not have a unit, use `unit.dimensionless`.
+        periodicBounds
+            The lower and upper bounds of the collective variable if it is periodic,
+            or ``None`` if it is not. This parameter is considered only if `force` is
+            a custom :OpenMM:`Force`.
         pbc
-            Whether to use periodic boundary conditions.
+            Whether to use periodic boundary conditions when computing atomic
+            distances.
 
         Raises
         ------
@@ -346,7 +380,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
                 openmm.CustomTorsionForce,
             ),
         ):
-            return cls._fromCustomForce(force, unit, pbc)
+            return cls._fromCustomForce(force, unit, periodicBounds, pbc)
         if isinstance(force, openmm.HarmonicBondForce):
             return cls._fromHarmonicBondForce(force, unit, pbc)
         if isinstance(force, openmm.HarmonicAngleForce):
