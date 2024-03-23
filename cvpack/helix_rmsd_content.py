@@ -13,7 +13,6 @@ from openmm import app as mmapp
 from openmm import unit as mmunit
 
 from .base_rmsd_content import BaseRMSDContent
-from .serialization import SerializableResidue
 from .units import ScalarQuantity
 
 # pylint: disable=protected-access
@@ -150,7 +149,6 @@ class HelixRMSDContent(BaseRMSDContent):
             stepFunction,
             normalize,
         )
-        residues = list(map(SerializableResidue, residues))
         self._registerCV(
             name, None, residues, numAtoms, thresholdRMSD, stepFunction, normalize
         )

@@ -11,10 +11,10 @@ import typing as t
 
 import openmm
 from openmm import unit as mmunit
+from openmm.app.element import hydrogen
 from openmm.app.topology import Residue
 
 from .cvpack import BaseCollectiveVariable
-from .serialization import SerializableResidue
 from .units import ScalarQuantity, value_in_md_units
 
 
@@ -117,14 +117,17 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable
         includeHydrogens: bool = True,
         name: str = "residue_coordination",
     ) -> None:
-        residueGroup1 = list(map(SerializableResidue, residueGroup1))
-        residueGroup2 = list(map(SerializableResidue, residueGroup2))
+        residueGroup1 = list(residueGroup1)
+        residueGroup2 = list(residueGroup2)
         nr1 = len(residueGroup1)
         nr2 = len(residueGroup2)
         self._ref_val = nr1 * nr2 if normalize else 1.0
+        threshold = thresholdDistance
+        if mmunit.is_quantity(threshold):
+            threshold = threshold.value_in_unit(mmunit.nanometers)
         expression = (
             f"({stepFunction})/refval"
-            f"; x=distance(g1,g2)/{value_in_md_units(thresholdDistance)}"
+            f"; x=distance(g1,g2)/{threshold}"
             f"; refval={self._ref_val}"
         )
         super().__init__(2, expression)
@@ -133,12 +136,9 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable
             atoms = [
                 atom.index
                 for atom in res.atoms()
-                if includeHydrogens or atom.element != "H"
+                if includeHydrogens or atom.element is not hydrogen
             ]
-            self.addGroup(
-                atoms,
-                *([] if weighByMass else [[1] * len(atoms)]),
-            )
+            self.addGroup(atoms, *([] if weighByMass else [[1] * len(atoms)]))
         for idx1 in range(nr1):
             for idx2 in range(nr1, nr1 + nr2):
                 self.addBond([idx1, idx2], [])

@@ -101,6 +101,8 @@ def perform_common_tests(
     mass1 = collectiveVariable.getEffectiveMass(context)
     mass2 = new_cv.getEffectiveMass(context)
     assert mass1 / mass1.unit == mass2 / mass2.unit
+    assert collectiveVariable.getName() == new_cv.getName()
+    assert collectiveVariable.getPeriodicBounds() == new_cv.getPeriodicBounds()
 
 
 def test_cv_is_in_context():

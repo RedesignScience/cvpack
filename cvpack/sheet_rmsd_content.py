@@ -14,7 +14,6 @@ from openmm import app as mmapp
 from openmm import unit as mmunit
 
 from .base_rmsd_content import BaseRMSDContent
-from .serialization import SerializableResidue
 from .units import ScalarQuantity
 
 # pylint: disable=protected-access
@@ -221,7 +220,7 @@ class SheetRMSDContent(BaseRMSDContent):
         self._registerCV(
             name,
             None,
-            list(map(SerializableResidue, residues)),
+            residues,
             numAtoms,
             parallel,
             blockSizes,

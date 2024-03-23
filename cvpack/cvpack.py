@@ -16,8 +16,8 @@ import yaml
 from openmm import unit as mmunit
 
 from .serialization import Serializable
-from .units import Quantity, ScalarQuantity, Unit, preprocess_units, value_in_md_units
-from .utils import compute_effective_mass, get_single_force_state
+from .units import Quantity, ScalarQuantity, Unit, value_in_md_units
+from .utils import compute_effective_mass, get_single_force_state, preprocess_args
 
 
 class BaseCollectiveVariable(openmm.Force, Serializable):
@@ -42,7 +42,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
     def __deepcopy__(self, memo):
         return yaml.safe_load(yaml.safe_dump(self))
 
-    @preprocess_units
+    @preprocess_args
     def _registerCV(
         self,
         name: str,
@@ -218,7 +218,6 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         -------
         unit.Quantity
             The value of this collective variable at the given context
-
 
         Example
         -------

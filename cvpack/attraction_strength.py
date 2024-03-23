@@ -13,8 +13,8 @@ import openmm
 from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
-from .units import ScalarQuantity, value_in_md_units
-from .utils import NonbondedForceSurrogate, evaluate_in_context
+from .units import ScalarQuantity
+from .utils import evaluate_in_context
 
 ONE_4PI_EPS0 = 138.93545764438198
 
@@ -167,7 +167,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
     3880.8...
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-locals
         self,
         group1: t.Iterable[int],
         group2: t.Iterable[int],
@@ -184,12 +184,12 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
         contrasting = contrastGroup is not None
         if contrasting:
             contrastGroup = list(contrastGroup)
-        nonbondedForce = NonbondedForceSurrogate(nonbondedForce)
+        cutoff = nonbondedForce.getCutoffDistance().value_in_unit(mmunit.nanometers)
         expression = (
             f"-(lj + coul){'*sign1*sign2' if contrasting else ''}/ref"
             "; lj = 4*epsilon*(1/y^2 - 1/y)"
             f"; coul = {ONE_4PI_EPS0}*q1q2*(1/x + (x^2 - 3)/2)"
-            f"; x = r/{nonbondedForce.getCutoffDistance()}"
+            f"; x = r/{cutoff}"
             "; y = abs((r/sigma)^6 - 2) + 2"
             "; q1q2 = min(0, charge1*charge2)"
             "; epsilon = sqrt(epsilon1*epsilon2)"
@@ -202,7 +202,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
             if nonbondedForce.usesPeriodicBoundaryConditions()
             else self.CutoffNonPeriodic
         )
-        self.setCutoffDistance(nonbondedForce.getCutoffDistance())
+        self.setCutoffDistance(cutoff)
         for parameter in ("charge", "sigma", "epsilon") + ("sign",) * contrasting:
             self.addPerParticleParameter(parameter)
         for atom in range(nonbondedForce.getNumParticles()):
@@ -222,8 +222,8 @@ class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
         self.addInteractionGroup(group1, group2)
         if isinstance(reference, openmm.Context):
             reference = evaluate_in_context(self, reference)
-        else:
-            reference = value_in_md_units(reference)
+        elif mmunit.is_quantity(reference):
+            reference = reference.value_in_unit(mmunit.kilojoule_per_mole)
         self.setEnergyFunction(expression.replace("ref = 1", f"ref = {reference}"))
         if contrasting:
             self.addInteractionGroup(group1, contrastGroup)

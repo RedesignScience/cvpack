@@ -14,7 +14,6 @@ from openmm import app as mmapp
 from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
-from .serialization import SerializableResidue
 from .units import ScalarQuantity
 
 
@@ -128,7 +127,6 @@ class HelixAngleContent(openmm.CustomAngleForce, BaseCollectiveVariable):
                 [],
             )
         self.setUsesPeriodicBoundaryConditions(pbc)
-        residues = list(map(SerializableResidue, residues))
         self._registerCV(
             name,
             None,
