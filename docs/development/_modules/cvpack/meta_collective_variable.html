@@ -80,7 +80,7 @@
 <span class="sd">    function</span>
 <span class="sd">        The function to be evaluated. It must be a valid :OpenMM:`CustomCVForce`</span>
 <span class="sd">        expression.</span>
-<span class="sd">    collective_variables</span>
+<span class="sd">    variables</span>
 <span class="sd">        A sequence of :class:`BaseCollectiveVariable` instances that represent the</span>
 <span class="sd">        collective variables on which the meta-collective variable depends. The name</span>
 <span class="sd">        of each collective variable must be unique and match a symbol used in the</span>
@@ -91,8 +91,9 @@
 <span class="sd">        in `picoseconds`, temperature in `kelvin`, energy in `kilojoules_per_mol`,</span>
 <span class="sd">        angle in `radians`). If the collective variables does not have a unit, use</span>
 <span class="sd">        `unit.dimensionless`</span>
-<span class="sd">    period</span>
-<span class="sd">        The period of the collective variable if it is periodic, or `None` if it is not</span>
+<span class="sd">    periodicBounds</span>
+<span class="sd">        The periodic bounds of the collective variable if it is periodic, or `None` if</span>
+<span class="sd">        it is not</span>
 
 <span class="sd">    Keyword Args</span>
 <span class="sd">    ------------</span>
@@ -133,22 +134,29 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">function</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">collective_variables</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">variables</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">unit</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Unit</span><span class="p">,</span>
-        <span class="n">period</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">ScalarQuantity</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">periodicBounds</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">VectorQuantity</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;meta_collective_variable&quot;</span><span class="p">,</span>
         <span class="o">**</span><span class="n">parameters</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">VectorQuantity</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cvs</span> <span class="o">=</span> <span class="p">{</span><span class="n">cv</span><span class="o">.</span><span class="n">getName</span><span class="p">():</span> <span class="n">copy</span><span class="p">(</span><span class="n">cv</span><span class="p">)</span> <span class="k">for</span> <span class="n">cv</span> <span class="ow">in</span> <span class="n">collective_variables</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cvs</span> <span class="o">=</span> <span class="p">{</span><span class="n">cv</span><span class="o">.</span><span class="n">getName</span><span class="p">():</span> <span class="n">copy</span><span class="p">(</span><span class="n">cv</span><span class="p">)</span> <span class="k">for</span> <span class="n">cv</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">}</span>
         <span class="k">for</span> <span class="n">cvname</span><span class="p">,</span> <span class="n">cv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cvs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">addCollectiveVariable</span><span class="p">(</span><span class="n">cvname</span><span class="p">,</span> <span class="n">cv</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span>
-            <span class="n">name</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">collective_variables</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">period</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="n">unit</span><span class="p">,</span>
+            <span class="n">function</span><span class="p">,</span>
+            <span class="n">variables</span><span class="p">,</span>
+            <span class="n">unit</span><span class="p">,</span>
+            <span class="n">periodicBounds</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">parameters</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_registerPeriod</span><span class="p">(</span><span class="n">period</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">periodicBounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_registerPeriodicBounds</span><span class="p">(</span><span class="o">*</span><span class="n">periodicBounds</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MetaCollectiveVariable.getInnerValues">
 <a class="viewcode-back" href="../../api/MetaCollectiveVariable.html#cvpack.MetaCollectiveVariable.getInnerValues">[docs]</a>

@@ -49,7 +49,7 @@
 <span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
 <span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">BaseCollectiveVariable</span>
-<span class="kn">from</span> <span class="nn">.units</span> <span class="kn">import</span> <span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">Unit</span>
+<span class="kn">from</span> <span class="nn">.units</span> <span class="kn">import</span> <span class="n">Unit</span><span class="p">,</span> <span class="n">VectorQuantity</span>
 
 
 <div class="viewcode-block" id="OpenMMForceWrapper">
@@ -71,8 +71,9 @@
 <span class="sd">        in `picoseconds`, temperature in `kelvin`, energy in `kilojoules_per_mol`,</span>
 <span class="sd">        angle in `radians`). If the collective variables does not have a unit, use</span>
 <span class="sd">        `dimensionless`.</span>
-<span class="sd">    period</span>
-<span class="sd">        The period of the collective variable if it is periodic, or `None` if it is not.</span>
+<span class="sd">    periodicBounds</span>
+<span class="sd">        The periodic bounds of the collective variable if it is periodic, or `None` if</span>
+<span class="sd">        it is not.</span>
 <span class="sd">    name</span>
 <span class="sd">        The name of the collective variable.</span>
 
@@ -85,7 +86,11 @@
 <span class="sd">        &gt;&gt;&gt; model = testsystems.AlanineDipeptideVacuum()</span>
 <span class="sd">        &gt;&gt;&gt; angle = openmm.CustomAngleForce(&quot;theta&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; _ = angle.addAngle(0, 1, 2)</span>
-<span class="sd">        &gt;&gt;&gt; cv = cvpack.OpenMMForceWrapper(angle, unit.radian, period=2*np.pi)</span>
+<span class="sd">        &gt;&gt;&gt; cv = cvpack.OpenMMForceWrapper(</span>
+<span class="sd">        ...     angle,</span>
+<span class="sd">        ...     unit.radian,</span>
+<span class="sd">        ...     periodicBounds=[-np.pi, np.pi] * unit.radian,</span>
+<span class="sd">        ... )</span>
 <span class="sd">        &gt;&gt;&gt; assert isinstance(cv, openmm.CustomAngleForce)</span>
 <span class="sd">        &gt;&gt;&gt; cv.addToSystem(model.system)</span>
 <span class="sd">        &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
@@ -102,7 +107,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">openmmForce</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">openmm</span><span class="o">.</span><span class="n">Force</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
         <span class="n">unit</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Unit</span><span class="p">,</span>
-        <span class="n">period</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">ScalarQuantity</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">periodicBounds</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">VectorQuantity</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;openmm_force_wrapper&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">openmmForce</span><span class="p">,</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Force</span><span class="p">):</span>
@@ -111,9 +116,9 @@
         <span class="n">force_copy</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">XmlSerializer</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">openmmForce</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">this</span> <span class="o">=</span> <span class="n">force_copy</span><span class="o">.</span><span class="n">this</span>
         <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__bases__</span> <span class="o">=</span> <span class="p">(</span><span class="n">BaseCollectiveVariable</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">force_copy</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">openmmForce</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">period</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">period</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_registerPeriod</span><span class="p">(</span><span class="n">period</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">openmmForce</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">periodicBounds</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">periodicBounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_registerPeriodicBounds</span><span class="p">(</span><span class="o">*</span><span class="n">periodicBounds</span><span class="p">)</span></div>
 
 
 

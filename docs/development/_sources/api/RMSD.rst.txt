@@ -11,6 +11,6 @@ RMSD
     .. automethod:: getEffectiveMass
     .. automethod:: getMassUnit
     .. automethod:: getNullBondForce
-    .. automethod:: getPeriod
+    .. automethod:: getPeriodicBounds
     .. automethod:: getUnit
     .. automethod:: getValue

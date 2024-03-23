@@ -41,7 +41,7 @@
 <h1>CentroidFunction<a class="headerlink" href="#centroidfunction" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="cvpack.CentroidFunction">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">CentroidFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighByMass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'centroid_function'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/centroid_function.html#CentroidFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.CentroidFunction" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">CentroidFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periodicBounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighByMass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'centroid_function'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/centroid_function.html#CentroidFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.CentroidFunction" title="Link to this definition">¶</a></dt>
 <dd><p>A generic function of the centroids of <span class="math notranslate nohighlight">\(m \times n\)</span> atoms groups split
 into <cite>m</cite> collections of <cite>n</cite> groups each:</p>
 <div class="math notranslate nohighlight">
@@ -86,7 +86,8 @@ as a list of atom indices with arbitrary length.</p></li>
 of shape <cite>(m, n)</cite>, where <cite>m</cite> is the number of collections and <cite>n</cite> is the number
 groups per collection. If a 1D object is passed, it is assumed that <cite>m</cite> is 1 and
 <cite>n</cite> is the length of the object.</p></li>
-<li><p><strong>period</strong> (<em>Quantity</em><em> | </em><em>Real</em><em> | </em><em>None</em>) – The period of the collective variable if it is periodic, or <cite>None</cite> if it is not.</p></li>
+<li><p><strong>periodicBounds</strong> (<em>Quantity</em><em> | </em><em>ndarray</em><em> | </em><em>Vec3</em><em> | </em><em>None</em>) – The periodic bounds of the collective variable if it is periodic, or <cite>None</cite> if
+it is not.</p></li>
 <li><p><strong>pbc</strong> (<em>bool</em>) – Whether to use periodic boundary conditions.</p></li>
 <li><p><strong>weighByMass</strong> (<em>bool</em>) – Whether to define the centroid as the center of mass of the group instead of
 the geometric center.</p></li>
@@ -135,7 +136,6 @@ the corresponding collection of groups.</p>
 </div>
 <p>Recompute the residue coordination using the centroid function:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">groups</span> <span class="o">=</span> <span class="p">[</span><span class="n">atoms</span><span class="p">[</span><span class="mi">115</span><span class="p">:</span><span class="mi">124</span><span class="p">],</span> <span class="n">atoms</span><span class="p">[</span><span class="mi">126</span><span class="p">:</span><span class="mi">135</span><span class="p">]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">collections</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">18</span><span class="p">)))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">colvar</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">CentroidFunction</span><span class="p">(</span>
 <span class="gp">... </span>   <span class="s2">&quot;step(1 - distance(g1, g2))&quot;</span><span class="p">,</span>
 <span class="gp">... </span>   <span class="n">unit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">,</span>
@@ -236,12 +236,16 @@ angles and the radius of gyration of an alanine dipeptide molecule in water:</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cvpack.CentroidFunction.getPeriod">
-<span class="sig-name descname"><span class="pre">getPeriod</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.CentroidFunction.getPeriod" title="Link to this definition">¶</a></dt>
-<dd><p>Get the period of this collective variable.</p>
+<dt class="sig sig-object py" id="cvpack.CentroidFunction.getPeriodicBounds">
+<span class="sig-name descname"><span class="pre">getPeriodicBounds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.CentroidFunction.getPeriodicBounds" title="Link to this definition">¶</a></dt>
+<dd><p>Get the periodic bounds of this collective variable.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The period of this collective variable or None if it is not periodic</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The periodic bounds of this collective variable or None if it is not
+periodic</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Union[unit.Quantity, None]</p>
 </dd>
 </dl>
 </dd></dl>

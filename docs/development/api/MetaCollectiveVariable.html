@@ -41,7 +41,7 @@
 <h1>MetaCollectiveVariable<a class="headerlink" href="#metacollectivevariable" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="cvpack.MetaCollectiveVariable">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">MetaCollectiveVariable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collective_variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'meta_collective_variable'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/meta_collective_variable.html#MetaCollectiveVariable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.MetaCollectiveVariable" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">MetaCollectiveVariable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periodicBounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'meta_collective_variable'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/meta_collective_variable.html#MetaCollectiveVariable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.MetaCollectiveVariable" title="Link to this definition">¶</a></dt>
 <dd><p>A collective variable that is a function of other collective variables:</p>
 <div class="math notranslate nohighlight">
 \[f({\bf r}) = F\left(c_1({\bf r}), c_2({\bf r}), \ldots, c_n({\bf r})\right)\]</div>
@@ -57,7 +57,7 @@ constructor. Only scalar parameters are supported.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>function</strong> (<em>str</em>) – The function to be evaluated. It must be a valid <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.CustomCVForce.html">openmm.CustomCVForce</a>
 expression.</p></li>
-<li><p><strong>collective_variables</strong> (<em>t.Iterable</em><em>[</em><em>str</em><em>]</em>) – A sequence of <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCollectiveVariable</span></code> instances that represent the
+<li><p><strong>variables</strong> (<em>t.Iterable</em><em>[</em><em>str</em><em>]</em>) – A sequence of <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCollectiveVariable</span></code> instances that represent the
 collective variables on which the meta-collective variable depends. The name
 of each collective variable must be unique and match a symbol used in the
 function.</p></li>
@@ -66,7 +66,8 @@ with the MD unit system (mass in <cite>daltons</cite>, distance in <cite>nanomet
 in <cite>picoseconds</cite>, temperature in <cite>kelvin</cite>, energy in <cite>kilojoules_per_mol</cite>,
 angle in <cite>radians</cite>). If the collective variables does not have a unit, use
 <cite>unit.dimensionless</cite></p></li>
-<li><p><strong>period</strong> (<em>t.Optional</em><em>[</em><em>ScalarQuantity</em><em>]</em>) – The period of the collective variable if it is periodic, or <cite>None</cite> if it is not</p></li>
+<li><p><strong>periodicBounds</strong> (<em>t.Optional</em><em>[</em><em>VectorQuantity</em><em>]</em>) – The periodic bounds of the collective variable if it is periodic, or <cite>None</cite> if
+it is not</p></li>
 </ul>
 </dd>
 <dt class="field-even">Keyword Arguments<span class="colon">:</span></dt>
@@ -230,12 +231,16 @@ values as values.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cvpack.MetaCollectiveVariable.getPeriod">
-<span class="sig-name descname"><span class="pre">getPeriod</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.MetaCollectiveVariable.getPeriod" title="Link to this definition">¶</a></dt>
-<dd><p>Get the period of this collective variable.</p>
+<dt class="sig sig-object py" id="cvpack.MetaCollectiveVariable.getPeriodicBounds">
+<span class="sig-name descname"><span class="pre">getPeriodicBounds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.MetaCollectiveVariable.getPeriodicBounds" title="Link to this definition">¶</a></dt>
+<dd><p>Get the periodic bounds of this collective variable.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The period of this collective variable or None if it is not periodic</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The periodic bounds of this collective variable or None if it is not
+periodic</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Union[unit.Quantity, None]</p>
 </dd>
 </dl>
 </dd></dl>

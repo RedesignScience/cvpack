@@ -10,7 +10,7 @@ ResidueCoordination
     .. automethod:: addToSystem
     .. automethod:: getEffectiveMass
     .. automethod:: getMassUnit
-    .. automethod:: getPeriod
+    .. automethod:: getPeriodicBounds
     .. automethod:: getReferenceValue
     .. automethod:: getUnit
     .. automethod:: getValue

@@ -10,6 +10,6 @@ SheetRMSDContent
     .. automethod:: addToSystem
     .. automethod:: getEffectiveMass
     .. automethod:: getMassUnit
-    .. automethod:: getPeriod
+    .. automethod:: getPeriodicBounds
     .. automethod:: getUnit
     .. automethod:: getValue

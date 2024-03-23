@@ -209,12 +209,16 @@ angles and the radius of gyration of an alanine dipeptide molecule in water:</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cvpack.CompositeRMSD.getPeriod">
-<span class="sig-name descname"><span class="pre">getPeriod</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.CompositeRMSD.getPeriod" title="Link to this definition">¶</a></dt>
-<dd><p>Get the period of this collective variable.</p>
+<dt class="sig sig-object py" id="cvpack.CompositeRMSD.getPeriodicBounds">
+<span class="sig-name descname"><span class="pre">getPeriodicBounds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.CompositeRMSD.getPeriodicBounds" title="Link to this definition">¶</a></dt>
+<dd><p>Get the periodic bounds of this collective variable.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The period of this collective variable or None if it is not periodic</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The periodic bounds of this collective variable or None if it is not
+periodic</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Union[unit.Quantity, None]</p>
 </dd>
 </dl>
 </dd></dl>
