@@ -14,7 +14,6 @@ from openmm import app as mmapp
 from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
-from .serialization import SerializableResidue
 from .units import ScalarQuantity
 
 
@@ -145,7 +144,6 @@ class HelixTorsionContent(openmm.CustomTorsionForce, BaseCollectiveVariable):
                 [psiReference],
             )
         self.setUsesPeriodicBoundaryConditions(pbc)
-        residues = list(map(SerializableResidue, residues))
         self._registerCV(
             name,
             None,

@@ -15,9 +15,9 @@ import numpy as np
 import openmm
 from numpy import typing as npt
 from openmm import XmlSerializer
-from openmm import unit as mmunit
+from openmm import unit as mmunit, app as mmapp
 
-from .serialization import Serializable
+from .serialization import Serializable, SerializableAtom, SerializableResidue
 from .units import Quantity, Unit, value_in_md_units
 
 # pylint: disable=protected-access,c-extension-no-member
@@ -252,10 +252,10 @@ def compute_effective_mass(force: openmm.Force, context: openmm.Context) -> floa
     return 1.0 / np.sum(squared_forces[nonzeros] / mass_values)
 
 
-def preprocess_units(func: t.Callable) -> t.Callable:
+def preprocess_args(func: t.Callable) -> t.Callable:
     """
-    A decorator that converts instances of openmm.unit.Unit and openmm.unit.Quantity
-    into openxps.units.Unit and openxps.units.Quantity, respectively.
+    A decorator that converts instances of unserializable classes to their
+    serializable counterparts.
 
     Parameters
     ----------
@@ -289,6 +289,10 @@ def preprocess_units(func: t.Callable) -> t.Callable:
             return Quantity(data)
         if isinstance(data, mmunit.Unit):
             return Unit(data)
+        if isinstance(data, mmapp.Atom):
+            return SerializableAtom(data)
+        if isinstance(data, mmapp.Residue):
+            return SerializableResidue(data)
         if isinstance(data, str):
             return data
         if isinstance(data, t.Sequence):

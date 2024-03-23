@@ -14,7 +14,6 @@ from openmm import unit as mmunit
 from openmm.app.topology import Residue
 
 from .cvpack import BaseCollectiveVariable
-from .serialization import SerializableResidue
 from .units import ScalarQuantity, value_in_md_units
 
 
@@ -117,8 +116,8 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable
         includeHydrogens: bool = True,
         name: str = "residue_coordination",
     ) -> None:
-        residueGroup1 = list(map(SerializableResidue, residueGroup1))
-        residueGroup2 = list(map(SerializableResidue, residueGroup2))
+        residueGroup1 = list(residueGroup1)
+        residueGroup2 = list(residueGroup2)
         nr1 = len(residueGroup1)
         nr2 = len(residueGroup2)
         self._ref_val = nr1 * nr2 if normalize else 1.0
