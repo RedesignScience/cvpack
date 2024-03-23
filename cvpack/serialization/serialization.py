@@ -9,6 +9,7 @@
 
 import typing as t
 
+import openmm
 import yaml
 from openmm import app as mmapp
 
@@ -44,11 +45,11 @@ class SerializableAtom(Serializable):
         self.name = atom.name
         self.index = atom.index
         if isinstance(atom, mmapp.topology.Atom):
-            self.element = atom.element.symbol
-            self.residue = atom.residue.index
+            self._element_symbol = atom.element.symbol
+            self._residue_index = atom.residue.index
         else:
-            self.element = atom.element
-            self.residue = atom.residue
+            self._element_symbol = atom._element_symbol
+            self._residue_index = atom._residue_index
         self.id = atom.id
 
     def __getstate__(self) -> t.Dict[str, t.Any]:
@@ -56,6 +57,11 @@ class SerializableAtom(Serializable):
 
     def __setstate__(self, keywords: t.Dict[str, t.Any]) -> None:
         self.__dict__.update(keywords)
+
+    @property
+    def element(self) -> mmapp.Element:
+        """Return the Element of the Atom."""
+        return mmapp.Element.getBySymbol(self._element_symbol)
 
 
 SerializableAtom.registerTag("!cvpack.Atom")
@@ -70,9 +76,9 @@ class SerializableResidue(Serializable):
         self.name = residue.name
         self.index = residue.index
         if isinstance(residue, mmapp.topology.Residue):
-            self.chain = residue.chain.index
+            self._chain_index = residue.chain.index
         else:
-            self.chain = residue.chain
+            self._chain_index = residue._chain_index
         self.id = residue.id
         self._atoms = list(map(SerializableAtom, residue.atoms()))
 
@@ -91,6 +97,26 @@ class SerializableResidue(Serializable):
 
 
 SerializableResidue.registerTag("!cvpack.Residue")
+
+
+class SerializableForce(openmm.Force, Serializable):
+    """A serializable version of OpenMM's Force class."""
+
+    def __init__(  # pylint: disable=super-init-not-called
+        self,
+        force: openmm.Force,
+    ) -> None:
+        self.__class__.__bases__ = (force.__class__, Serializable)
+        self.this = force.this
+
+    def __getstate__(self) -> t.Dict[str, str]:
+        return {"xml_code": openmm.XmlSerializer.serialize(self)}
+
+    def __setstate__(self, keywords: t.Dict[str, str]) -> None:
+        self.__init__(openmm.XmlSerializer.deserialize(keywords["xml_code"]))
+
+
+SerializableForce.registerTag("!cvpack.Force")
 
 
 def serialize(obj: t.Any, iostream: t.IO) -> None:

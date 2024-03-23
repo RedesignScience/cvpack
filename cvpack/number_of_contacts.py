@@ -8,13 +8,14 @@
 """
 
 import typing as t
+from numbers import Real
 
 import openmm
 from openmm import unit as mmunit
 
 from .cvpack import BaseCollectiveVariable
 from .units import ScalarQuantity
-from .utils import NonbondedForceSurrogate, evaluate_in_context
+from .utils import evaluate_in_context
 
 
 class NumberOfContacts(openmm.CustomNonbondedForce, BaseCollectiveVariable):
@@ -127,19 +128,19 @@ class NumberOfContacts(openmm.CustomNonbondedForce, BaseCollectiveVariable):
         group1: t.Sequence[int],
         group2: t.Sequence[int],
         nonbondedForce: openmm.NonbondedForce,
-        reference: t.Union[ScalarQuantity, openmm.Context] = 1.0,
+        reference: t.Union[Real, openmm.Context] = 1.0,
         stepFunction: str = "1/(1+x^6)",
         thresholdDistance: ScalarQuantity = 0.3 * mmunit.nanometers,
         cutoffFactor: float = 2.0,
         switchFactor: t.Optional[float] = 1.5,
         name: str = "number_of_contacts",
     ) -> None:
-        nonbondedForce = NonbondedForceSurrogate(nonbondedForce)
+        # nonbondedForce = NonbondedForceSurrogate(nonbondedForce)
         num_atoms = nonbondedForce.getNumParticles()
         pbc = nonbondedForce.usesPeriodicBoundaryConditions()
         threshold = thresholdDistance
         if mmunit.is_quantity(threshold):
-            threshold = threshold.value_in_unit_system(mmunit.md_unit_system)
+            threshold = threshold.value_in_unit(mmunit.nanometers)
         expression = f"({stepFunction})/1; x=r/{threshold}"
         super().__init__(expression)
         nonbonded_method = self.CutoffPeriodic if pbc else self.CutoffNonPeriodic
