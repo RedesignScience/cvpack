@@ -79,8 +79,9 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
         of shape `(m, n)`, where `m` is the number of collections and `n` is the number
         groups per collection. If a 1D object is passed, it is assumed that `m` is 1 and
         `n` is the length of the object.
-    period
-        The period of the collective variable if it is periodic, or `None` if it is not.
+    periodicBounds
+        The periodic bounds of the collective variable if it is periodic, or `None` if
+        it is not.
     pbc
         Whether to use periodic boundary conditions.
     weighByMass
@@ -136,7 +137,6 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
     Recompute the residue coordination using the centroid function:
 
     >>> groups = [atoms[115:124], atoms[126:135]]
-    >>> collections = list(it.product(range(9), range(9, 18)))
     >>> colvar = cvpack.CentroidFunction(
     ...    "step(1 - distance(g1, g2))",
     ...    unit.dimensionless,
@@ -155,7 +155,7 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
         unit: mmunit.Unit,
         groups: t.Iterable[t.Iterable[int]],
         collections: t.Optional[ArrayLike] = None,
-        period: t.Optional[ScalarQuantity] = None,
+        periodicBounds: t.Optional[VectorQuantity] = None,
         pbc: bool = True,
         weighByMass: bool = True,
         name: str = "centroid_function",
@@ -184,14 +184,14 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
             unit,
             groups,
             collections,
-            period,
+            periodicBounds,
             pbc,
             weighByMass,
             **overalls,
             **perbonds,
         )
-        if period is not None:
-            self._registerPeriod(period)
+        if periodicBounds is not None:
+            self._registerPeriodicBounds(*periodicBounds)
 
 
 CentroidFunction.registerTag("!cvpack.CentroidFunction")

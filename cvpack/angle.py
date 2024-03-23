@@ -7,8 +7,7 @@
 
 """
 
-import math
-
+import numpy as np
 import openmm
 from openmm import unit as mmunit
 
@@ -74,7 +73,7 @@ class Angle(openmm.CustomAngleForce, BaseCollectiveVariable):
         self.addAngle(atom1, atom2, atom3, [])
         self.setUsesPeriodicBoundaryConditions(pbc)
         self._registerCV(name, mmunit.radians, atom1, atom2, atom3, pbc)
-        self._registerPeriod(2 * math.pi)
+        self._registerPeriodicBounds(-np.pi, np.pi)
 
 
 Angle.registerTag("!cvpack.Angle")

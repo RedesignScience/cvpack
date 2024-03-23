@@ -42,7 +42,7 @@ class MetaCollectiveVariable(openmm.CustomCVForce, BaseCollectiveVariable):
     function
         The function to be evaluated. It must be a valid :OpenMM:`CustomCVForce`
         expression.
-    collective_variables
+    variables
         A sequence of :class:`BaseCollectiveVariable` instances that represent the
         collective variables on which the meta-collective variable depends. The name
         of each collective variable must be unique and match a symbol used in the
@@ -53,8 +53,9 @@ class MetaCollectiveVariable(openmm.CustomCVForce, BaseCollectiveVariable):
         in `picoseconds`, temperature in `kelvin`, energy in `kilojoules_per_mol`,
         angle in `radians`). If the collective variables does not have a unit, use
         `unit.dimensionless`
-    period
-        The period of the collective variable if it is periodic, or `None` if it is not
+    periodicBounds
+        The periodic bounds of the collective variable if it is periodic, or `None` if
+        it is not
 
     Keyword Args
     ------------
@@ -95,22 +96,29 @@ class MetaCollectiveVariable(openmm.CustomCVForce, BaseCollectiveVariable):
     def __init__(
         self,
         function: str,
-        collective_variables: t.Iterable[str],
+        variables: t.Iterable[str],
         unit: mmunit.Unit,
-        period: t.Optional[ScalarQuantity] = None,
+        periodicBounds: t.Optional[VectorQuantity] = None,
         name: str = "meta_collective_variable",
         **parameters: t.Union[ScalarQuantity, VectorQuantity],
     ) -> None:
         super().__init__(function)
-        self._cvs = {cv.getName(): copy(cv) for cv in collective_variables}
+        self._cvs = {cv.getName(): copy(cv) for cv in variables}
         for cvname, cv in self._cvs.items():
             self.addCollectiveVariable(cvname, cv)
         for parameter, value in parameters.items():
             self.addGlobalParameter(parameter, value)
         self._registerCV(
-            name, unit, function, collective_variables, unit, period, **parameters
+            name,
+            unit,
+            function,
+            variables,
+            unit,
+            periodicBounds,
+            **parameters,
         )
-        self._registerPeriod(period)
+        if periodicBounds is not None:
+            self._registerPeriodicBounds(*periodicBounds)
 
     def getInnerValues(self, context: openmm.Context) -> t.Dict[str, Quantity]:
         """
