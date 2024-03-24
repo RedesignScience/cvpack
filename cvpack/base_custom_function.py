@@ -44,8 +44,8 @@ class BaseCustomFunction(BaseCollectiveVariable):
         unit: t.Optional[mmunit.Unit] = None,
     ) -> None:
         # pylint: disable=no-member
-        definitions = "; ".join(f"{name}={value}" for name, value in overalls.items())
-        self.setEnergyFunction(f"{self.getEnergyFunction()}; {definitions}")
+        for name, value in overalls.items():
+            self.addGlobalParameter(name, value)
         for name in perbonds:
             self.addPerBondParameter(name)
         for group, *values in zip(groups, *perbonds.values()):
