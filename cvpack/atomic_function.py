@@ -38,7 +38,7 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
     the value of each parameter can be passed in one of three ways:
 
     #. By a semicolon-separated definition in the function string, such as described
-       in the :OpenMM:`CustomCompoundBondForce` documentation. In this case, wa
+       in the :OpenMM:`CustomCompoundBondForce` documentation. In this case, the
        parameter value will be the same for all groups of atoms.
 
     #. By a 1D array or list of length :math:`m` passed as a keyword argument to
