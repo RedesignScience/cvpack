@@ -22,8 +22,7 @@ from .units import ScalarQuantity, VectorQuantity
 
 class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
     r"""
-    A generic function of the coordinates of atoms split into `m` groups of `n`
-    atoms each:
+    A generic function of the coordinates of :math:`m` groups of :math:`n` atoms:
 
     .. math::
 
@@ -34,11 +33,24 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
     where :math:`F` is a user-defined function and :math:`{\bf r}_{i,j}` is the
     coordinate of the :math:`j`-th atom of the :math:`i`-th group.
 
-    The function :math:`F` is defined as a string and can be any expression supported by
-    :OpenMM:`CustomCompoundBondForce`. If it contains named parameters, they must be
-    passed as keyword arguments to the :class:`AtomicFunction` constructor. The
-    parameters can be scalars or arrays of length :math:`m`. In the latter case, each
-    value will be assigned to the corresponding group of atoms.
+    The function :math:`F` is defined as a string and can be any expression supported
+    by :OpenMM:`CustomCompoundBondForce`. If the expression contains named parameters,
+    the value of each parameter can be passed in one of three ways:
+
+    #. By a semicolon-separated definition in the function string, such as described
+       in the :OpenMM:`CustomCompoundBondForce` documentation. In this case, the
+       parameter value will be the same for all groups of atoms.
+
+    #. By a 1D array or list of length :math:`m` passed as a keyword argument to
+       the :class:`AtomicFunction` constructor. In this case, each value will be
+       assigned to a different group of atoms.
+
+    #. By a scalar passed as a keyword argument to the :class:`AtomicFunction`
+       constructor. In this case, the parameter will apply to all atom groups and will
+       become available for on-the-fly modification during a simulation via the
+       ``setParameter`` method of an :OpenMM:`Context` object. **Warning**: other
+       collective variables or :OpenMM:`Force` objects in the same system will share
+       the same values of equal-named parameters.
 
     Parameters
     ----------
@@ -67,10 +79,10 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
     Keyword Args
     ------------
     **parameters
-        The named parameters of the function. Each parameter can be a scalar
-        quantity or a 1D array-like object of length `m`, where `m` is the number of
-        groups. In the latter case, each entry of the array is used for the
-        corresponding group of atoms.
+        The named parameters of the function. Each parameter can be a 1D array-like
+        object or a scalar. In the former case, the array must have length :math:`m`
+        and each entry will be assigned to a different group of atoms. In the latter
+        case, it will define a global :OpenMM:`Context` parameter.
 
     Raises
     ------
@@ -91,10 +103,10 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
     >>> angle1 = cvpack.Angle(0, 5, 10)
     >>> angle2 = cvpack.Angle(10, 15, 20)
     >>> colvar = cvpack.AtomicFunction(
-    ...     "(k/2)*(angle(p1, p2, p3) - theta0)^2",
+    ...     "(kappa/2)*(angle(p1, p2, p3) - theta0)^2",
     ...     unit.kilojoules_per_mole,
     ...     [[0, 5, 10], [10, 15, 20]],
-    ...     k = 1000 * unit.kilojoules_per_mole/unit.radian**2,
+    ...     kappa = 1000 * unit.kilojoules_per_mole/unit.radian**2,
     ...     theta0 = [np.pi/2, np.pi/3] * unit.radian,
     ... )
     >>> for cv in [angle1, angle2, colvar]:
@@ -109,6 +121,12 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
     429.479...
     >>> colvar.getValue(context)
     429.479... kJ/mol
+    >>> context.setParameter(
+    ...     "kappa",
+    ...     2000 * unit.kilojoules_per_mole/unit.radian**2
+    ... )
+    >>> colvar.getValue(context)
+    858.958... kJ/mol
     """
 
     def __init__(

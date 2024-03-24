@@ -21,7 +21,7 @@ from .units import ScalarQuantity, VectorQuantity
 class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
     r"""
     A generic function of the centroids of :math:`m \times n` atoms groups split
-    into `m` collections of `n` groups each:
+    into `m` collections of `n` groups:
 
     .. math::
 
@@ -35,12 +35,6 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
     where :math:`F` is a user-defined function and :math:`{\bf g}^i_1({\bf r})` is the
     centroid of the :math:`j`-th group of atoms of the :math:`i`-th collection of
     groups.
-
-    The function :math:`F` is defined as a string and can be any expression supported
-    by :OpenMM:`CustomCentroidBondForce`. If it contains named parameters, they must
-    be passed as keyword arguments to the :class:`CentroidFunction` constructor. The
-    parameters can be scalars or arrays of length :math:`m`. In the latter case, each
-    value will be assigned to the corresponding collection of atom groups.
 
     The centroid of a group of atoms is defined as:
 
@@ -59,6 +53,25 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
 
     where :math:`M_j` is the total mass of atom group :math:`j` and :math:`m_{k,j}` is
     the mass of the :math:`k`-th atom in group :math:`j`.
+
+    The function :math:`F` is defined as a string and can be any expression supported
+    by :OpenMM:`CustomCompoundBondForce`. If the expression contains named parameters,
+    the value of each parameter can be passed in one of three ways:
+
+    #. By a semicolon-separated definition in the function string, such as described
+       in the :OpenMM:`CustomCompoundBondForce` documentation. In this case, the
+       parameter value will be the same for all collections of atom groups.
+
+    #. By a 1D array or list of length :math:`m` passed as a keyword argument to
+       the :class:`AtomicFunction` constructor. In this case, each value will be
+       assigned to a different collection of atom groups.
+
+    #. By a scalar passed as a keyword argument to the :class:`AtomicFunction`
+       constructor. In this case, the parameter will apply to all collections of atom
+       groups and will become available for on-the-fly modification during a simulation
+       via the ``setParameter`` method of an :OpenMM:`Context` object. **Warning**:
+       other collective variables or :OpenMM:`Force` objects in the same system will
+       share the same values of equal-named parameters.
 
     Parameters
     ----------
@@ -90,14 +103,13 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
     name
         The name of the collective variable.
 
-
     Keyword Args
     ------------
     **parameters
-        The named parameters of the function. Each parameter can be a scalar
-        quantity or a 1D array-like object of length `m`, where `m` is the number of
-        group collections. In the latter case, each entry of the array is used for
-        the corresponding collection of groups.
+        The named parameters of the function. Each parameter can be a 1D array-like
+        object or a scalar. In the former case, the array must have length :math:`m`
+        and each entry will be assigned to a different collection of atom groups. In
+        the latter case, it will define a global :OpenMM:`Context` parameter.
 
     Raises
     ------
@@ -112,7 +124,6 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
     Example
     -------
     >>> import cvpack
-    >>> import itertools as it
     >>> import numpy as np
     >>> import openmm
     >>> from openmm import unit
@@ -124,7 +135,9 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
     Compute the residue coordination between two helices:
 
     >>> res_coord = cvpack.ResidueCoordination(
-    ...     residues[115:124], residues[126:135], stepFunction="step(1-x)"
+    ...     residues[115:124],
+    ...     residues[126:135],
+    ...     stepFunction="step(1-x)",
     ... )
     >>> res_coord.addToSystem(model.system)
     >>> integrator = openmm.VerletIntegrator(0)
@@ -141,7 +154,7 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
     ...    "step(1 - distance(g1, g2))",
     ...    unit.dimensionless,
     ...    atoms[115:124] + atoms[126:135],
-    ...    list(it.product(range(9), range(9, 18))),
+    ...    [[i, j] for i in range(9) for j in range(9, 18)],
     ... )
     >>> colvar.addToSystem(model.system)
     >>> context.reinitialize(preserveState=True)
@@ -161,7 +174,7 @@ class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
         name: str = "centroid_function",
         **parameters: t.Union[ScalarQuantity, VectorQuantity],
     ) -> None:
-        groups = [list(map(int, group)) for group in groups]
+        groups = [[int(atom) for atom in group] for group in groups]
         num_groups = len(groups)
         collections = np.atleast_2d(
             np.arange(num_groups) if collections is None else collections

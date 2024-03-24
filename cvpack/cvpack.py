@@ -233,7 +233,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         >>> phi = cvpack.Torsion(*backbone_atoms[0:4])
         >>> psi = cvpack.Torsion(*backbone_atoms[1:5])
         >>> radius_of_gyration = cvpack.RadiusOfGyration(
-        ...     top.select('not water')
+        ...     top.select("not water")
         ... )
         >>> for cv in [phi, psi, radius_of_gyration]:
         ...     cv.addToSystem(model.system)
@@ -298,7 +298,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         >>> phi = cvpack.Torsion(*backbone_atoms[0:4])
         >>> psi = cvpack.Torsion(*backbone_atoms[1:5])
         >>> radius_of_gyration = cvpack.RadiusOfGyration(
-        ...     top.select('not water')
+        ...     top.select("not water")
         ... )
         >>> for cv in [phi, psi, radius_of_gyration]:
         ...     cv.addToSystem(model.system)
