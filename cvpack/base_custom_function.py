@@ -24,7 +24,7 @@ class BaseCustomFunction(BaseCollectiveVariable):
         self,
         size: int,
         **parameters: t.Union[ScalarQuantity, VectorQuantity],
-    ) -> t.Tuple[t.Dict[str, float], t.Dict[str, t.List[float]]]:
+    ) -> t.Tuple[t.Dict[str, ScalarQuantity], t.Dict[str, t.List[ScalarQuantity]]]:
         global_parameters = {}
         perbond_parameters = {}
         for name, data in parameters.items():
@@ -37,11 +37,11 @@ class BaseCustomFunction(BaseCollectiveVariable):
 
     def _addParameters(
         self,
-        overalls: t.Dict[str, float],
-        perbonds: t.Dict[str, t.List[float]],
+        overalls: t.Dict[str, ScalarQuantity],
+        perbonds: t.Dict[str, t.List[ScalarQuantity]],
         groups: t.List[t.Tuple[int, ...]],
-        pbc: bool = False,
-        unit: t.Optional[mmunit.Unit] = None,
+        pbc: bool,
+        unit: mmunit.Unit,
     ) -> None:
         # pylint: disable=no-member
         for name, value in overalls.items():
