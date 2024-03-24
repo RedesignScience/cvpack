@@ -42,19 +42,30 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="cvpack.AtomicFunction">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">AtomicFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periodicBounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'atomic_function'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/atomic_function.html#AtomicFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.AtomicFunction" title="Link to this definition">¶</a></dt>
-<dd><p>A generic function of the coordinates of atoms split into <cite>m</cite> groups of <cite>n</cite>
-atoms each:</p>
+<dd><p>A generic function of the coordinates of <span class="math notranslate nohighlight">\(m\)</span> groups of <span class="math notranslate nohighlight">\(n\)</span> atoms:</p>
 <div class="math notranslate nohighlight">
 \[f({\bf r}) = \sum_{i=1}^m F\left(
     {\bf r}_{i,1}, {\bf r}_{i,2}, \dots, {\bf r}_{i,n}
 \right)\]</div>
 <p>where <span class="math notranslate nohighlight">\(F\)</span> is a user-defined function and <span class="math notranslate nohighlight">\({\bf r}_{i,j}\)</span> is the
 coordinate of the <span class="math notranslate nohighlight">\(j\)</span>-th atom of the <span class="math notranslate nohighlight">\(i\)</span>-th group.</p>
-<p>The function <span class="math notranslate nohighlight">\(F\)</span> is defined as a string and can be any expression supported by
-<a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.CustomCompoundBondForce.html">openmm.CustomCompoundBondForce</a>. If it contains named parameters, they must be
-passed as keyword arguments to the <a class="reference internal" href="#cvpack.AtomicFunction" title="cvpack.AtomicFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">AtomicFunction</span></code></a> constructor. The
-parameters can be scalars or arrays of length <span class="math notranslate nohighlight">\(m\)</span>. In the latter case, each
-value will be assigned to the corresponding group of atoms.</p>
+<p>The function <span class="math notranslate nohighlight">\(F\)</span> is defined as a string and can be any expression supported
+by <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.CustomCompoundBondForce.html">openmm.CustomCompoundBondForce</a>. If the expression contains named parameters,
+the value of each parameter can be passed in one of three ways:</p>
+<ol class="arabic simple">
+<li><p>By a semicolon-separated definition in the function string, such as described
+in the <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.CustomCompoundBondForce.html">openmm.CustomCompoundBondForce</a> documentation. In this case, the
+parameter value will be the same for all groups of atoms.</p></li>
+<li><p>By a 1D array or list of length <span class="math notranslate nohighlight">\(m\)</span> passed as a keyword argument to
+the <a class="reference internal" href="#cvpack.AtomicFunction" title="cvpack.AtomicFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">AtomicFunction</span></code></a> constructor. In this case, each value will be
+assigned to a different group of atoms.</p></li>
+<li><p>By a scalar passed as a keyword argument to the <a class="reference internal" href="#cvpack.AtomicFunction" title="cvpack.AtomicFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">AtomicFunction</span></code></a>
+constructor. In this case, the parameter will apply to all atom groups and will
+become available for on-the-fly modification during a simulation via the
+<code class="docutils literal notranslate"><span class="pre">setParameter</span></code> method of an <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html">openmm.Context</a> object. <strong>Warning</strong>: other
+collective variables or <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Force.html">openmm.Force</a> objects in the same system will share
+the same values of equal-named parameters.</p></li>
+</ol>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -76,10 +87,10 @@ angle in <cite>radians</cite>). If the collective variables does not have a unit
 </ul>
 </dd>
 <dt class="field-even">Keyword Arguments<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>**parameters</strong> – The named parameters of the function. Each parameter can be a scalar
-quantity or a 1D array-like object of length <cite>m</cite>, where <cite>m</cite> is the number of
-groups. In the latter case, each entry of the array is used for the
-corresponding group of atoms.</p>
+<dd class="field-even"><p><strong>**parameters</strong> – The named parameters of the function. Each parameter can be a 1D array-like
+object or a scalar. In the former case, the array must have length <span class="math notranslate nohighlight">\(m\)</span>
+and each entry will be assigned to a different group of atoms. In the latter
+case, it will define a global <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html">openmm.Context</a> parameter.</p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -99,10 +110,10 @@ corresponding group of atoms.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">angle1</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">Angle</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">angle2</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">Angle</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">colvar</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">AtomicFunction</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="s2">&quot;(k/2)*(angle(p1, p2, p3) - theta0)^2&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;(kappa/2)*(angle(p1, p2, p3) - theta0)^2&quot;</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">unit</span><span class="o">.</span><span class="n">kilojoules_per_mole</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">]],</span>
-<span class="gp">... </span>    <span class="n">k</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">kilojoules_per_mole</span><span class="o">/</span><span class="n">unit</span><span class="o">.</span><span class="n">radian</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">kappa</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">kilojoules_per_mole</span><span class="o">/</span><span class="n">unit</span><span class="o">.</span><span class="n">radian</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">theta0</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">radian</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">cv</span> <span class="ow">in</span> <span class="p">[</span><span class="n">angle1</span><span class="p">,</span> <span class="n">angle2</span><span class="p">,</span> <span class="n">colvar</span><span class="p">]:</span>
@@ -117,6 +128,12 @@ corresponding group of atoms.</p>
 <span class="go">429.479...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">colvar</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 <span class="go">429.479... kJ/mol</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">setParameter</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s2">&quot;kappa&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="mi">2000</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">kilojoules_per_mole</span><span class="o">/</span><span class="n">unit</span><span class="o">.</span><span class="n">radian</span><span class="o">**</span><span class="mi">2</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">colvar</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+<span class="go">858.958... kJ/mol</span>
 </pre></div>
 </div>
 <p class="rubric">Methods</p>
@@ -263,7 +280,7 @@ angles and the radius of gyration of an alanine dipeptide molecule in water:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">phi</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">Torsion</span><span class="p">(</span><span class="o">*</span><span class="n">backbone_atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">psi</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">Torsion</span><span class="p">(</span><span class="o">*</span><span class="n">backbone_atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">radius_of_gyration</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">RadiusOfGyration</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">top</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;not water&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">top</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;not water&quot;</span><span class="p">)</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">cv</span> <span class="ow">in</span> <span class="p">[</span><span class="n">phi</span><span class="p">,</span> <span class="n">psi</span><span class="p">,</span> <span class="n">radius_of_gyration</span><span class="p">]:</span>
 <span class="gp">... </span>    <span class="n">cv</span><span class="o">.</span><span class="n">addToSystem</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">)</span>
@@ -350,7 +367,7 @@ the radius of gyration of an alanine dipeptide molecule in water:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">phi</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">Torsion</span><span class="p">(</span><span class="o">*</span><span class="n">backbone_atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">psi</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">Torsion</span><span class="p">(</span><span class="o">*</span><span class="n">backbone_atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">radius_of_gyration</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">RadiusOfGyration</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">top</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;not water&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">top</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;not water&quot;</span><span class="p">)</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">cv</span> <span class="ow">in</span> <span class="p">[</span><span class="n">phi</span><span class="p">,</span> <span class="n">psi</span><span class="p">,</span> <span class="n">radius_of_gyration</span><span class="p">]:</span>
 <span class="gp">... </span>    <span class="n">cv</span><span class="o">.</span><span class="n">addToSystem</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">)</span>

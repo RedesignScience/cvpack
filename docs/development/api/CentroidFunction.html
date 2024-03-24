@@ -43,7 +43,7 @@
 <dt class="sig sig-object py" id="cvpack.CentroidFunction">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">CentroidFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periodicBounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighByMass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'centroid_function'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/centroid_function.html#CentroidFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.CentroidFunction" title="Link to this definition">¶</a></dt>
 <dd><p>A generic function of the centroids of <span class="math notranslate nohighlight">\(m \times n\)</span> atoms groups split
-into <cite>m</cite> collections of <cite>n</cite> groups each:</p>
+into <cite>m</cite> collections of <cite>n</cite> groups:</p>
 <div class="math notranslate nohighlight">
 \[f({\bf r}) = \sum_{i=1}^m F\Big(
     {\bf g}^i_1({\bf r}),
@@ -54,11 +54,6 @@ into <cite>m</cite> collections of <cite>n</cite> groups each:</p>
 <p>where <span class="math notranslate nohighlight">\(F\)</span> is a user-defined function and <span class="math notranslate nohighlight">\({\bf g}^i_1({\bf r})\)</span> is the
 centroid of the <span class="math notranslate nohighlight">\(j\)</span>-th group of atoms of the <span class="math notranslate nohighlight">\(i\)</span>-th collection of
 groups.</p>
-<p>The function <span class="math notranslate nohighlight">\(F\)</span> is defined as a string and can be any expression supported
-by <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.CustomCentroidBondForce.html">openmm.CustomCentroidBondForce</a>. If it contains named parameters, they must
-be passed as keyword arguments to the <a class="reference internal" href="#cvpack.CentroidFunction" title="cvpack.CentroidFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">CentroidFunction</span></code></a> constructor. The
-parameters can be scalars or arrays of length <span class="math notranslate nohighlight">\(m\)</span>. In the latter case, each
-value will be assigned to the corresponding collection of atom groups.</p>
 <p>The centroid of a group of atoms is defined as:</p>
 <div class="math notranslate nohighlight">
 \[{\bf g}_j({\bf r}) = \frac{1}{N_j} \sum_{k=1}^{N_j} {\bf r}_{k,j}\]</div>
@@ -70,6 +65,23 @@ in the group. In this case, it is redefined as:</p>
 \[{\bf g}_j({\bf r}) = \frac{1}{M_j} \sum_{k=1}^{N_j} m_{k,j} {\bf r}_{k,j}\]</div>
 <p>where <span class="math notranslate nohighlight">\(M_j\)</span> is the total mass of atom group <span class="math notranslate nohighlight">\(j\)</span> and <span class="math notranslate nohighlight">\(m_{k,j}\)</span> is
 the mass of the <span class="math notranslate nohighlight">\(k\)</span>-th atom in group <span class="math notranslate nohighlight">\(j\)</span>.</p>
+<p>The function <span class="math notranslate nohighlight">\(F\)</span> is defined as a string and can be any expression supported
+by <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.CustomCompoundBondForce.html">openmm.CustomCompoundBondForce</a>. If the expression contains named parameters,
+the value of each parameter can be passed in one of three ways:</p>
+<ol class="arabic simple">
+<li><p>By a semicolon-separated definition in the function string, such as described
+in the <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.CustomCompoundBondForce.html">openmm.CustomCompoundBondForce</a> documentation. In this case, the
+parameter value will be the same for all collections of atom groups.</p></li>
+<li><p>By a 1D array or list of length <span class="math notranslate nohighlight">\(m\)</span> passed as a keyword argument to
+the <a class="reference internal" href="AtomicFunction.html#cvpack.AtomicFunction" title="cvpack.AtomicFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">AtomicFunction</span></code></a> constructor. In this case, each value will be
+assigned to a different collection of atom groups.</p></li>
+<li><p>By a scalar passed as a keyword argument to the <a class="reference internal" href="AtomicFunction.html#cvpack.AtomicFunction" title="cvpack.AtomicFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">AtomicFunction</span></code></a>
+constructor. In this case, the parameter will apply to all collections of atom
+groups and will become available for on-the-fly modification during a simulation
+via the <code class="docutils literal notranslate"><span class="pre">setParameter</span></code> method of an <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html">openmm.Context</a> object. <strong>Warning</strong>:
+other collective variables or <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Force.html">openmm.Force</a> objects in the same system will
+share the same values of equal-named parameters.</p></li>
+</ol>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -95,10 +107,10 @@ the geometric center.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Keyword Arguments<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>**parameters</strong> – The named parameters of the function. Each parameter can be a scalar
-quantity or a 1D array-like object of length <cite>m</cite>, where <cite>m</cite> is the number of
-group collections. In the latter case, each entry of the array is used for
-the corresponding collection of groups.</p>
+<dd class="field-even"><p><strong>**parameters</strong> – The named parameters of the function. Each parameter can be a 1D array-like
+object or a scalar. In the former case, the array must have length <span class="math notranslate nohighlight">\(m\)</span>
+and each entry will be assigned to a different collection of atom groups. In
+the latter case, it will define a global <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html">openmm.Context</a> parameter.</p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -111,7 +123,6 @@ the corresponding collection of groups.</p>
 </dl>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cvpack</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">it</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">openmm</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span>
@@ -123,7 +134,9 @@ the corresponding collection of groups.</p>
 </div>
 <p>Compute the residue coordination between two helices:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">res_coord</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">ResidueCoordination</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">residues</span><span class="p">[</span><span class="mi">115</span><span class="p">:</span><span class="mi">124</span><span class="p">],</span> <span class="n">residues</span><span class="p">[</span><span class="mi">126</span><span class="p">:</span><span class="mi">135</span><span class="p">],</span> <span class="n">stepFunction</span><span class="o">=</span><span class="s2">&quot;step(1-x)&quot;</span>
+<span class="gp">... </span>    <span class="n">residues</span><span class="p">[</span><span class="mi">115</span><span class="p">:</span><span class="mi">124</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">residues</span><span class="p">[</span><span class="mi">126</span><span class="p">:</span><span class="mi">135</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">stepFunction</span><span class="o">=</span><span class="s2">&quot;step(1-x)&quot;</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res_coord</span><span class="o">.</span><span class="n">addToSystem</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">integrator</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">VerletIntegrator</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -140,7 +153,7 @@ the corresponding collection of groups.</p>
 <span class="gp">... </span>   <span class="s2">&quot;step(1 - distance(g1, g2))&quot;</span><span class="p">,</span>
 <span class="gp">... </span>   <span class="n">unit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">,</span>
 <span class="gp">... </span>   <span class="n">atoms</span><span class="p">[</span><span class="mi">115</span><span class="p">:</span><span class="mi">124</span><span class="p">]</span> <span class="o">+</span> <span class="n">atoms</span><span class="p">[</span><span class="mi">126</span><span class="p">:</span><span class="mi">135</span><span class="p">],</span>
-<span class="gp">... </span>   <span class="nb">list</span><span class="p">(</span><span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">18</span><span class="p">))),</span>
+<span class="gp">... </span>   <span class="p">[[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">18</span><span class="p">)],</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">colvar</span><span class="o">.</span><span class="n">addToSystem</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">reinitialize</span><span class="p">(</span><span class="n">preserveState</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -206,7 +219,7 @@ angles and the radius of gyration of an alanine dipeptide molecule in water:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">phi</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">Torsion</span><span class="p">(</span><span class="o">*</span><span class="n">backbone_atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">psi</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">Torsion</span><span class="p">(</span><span class="o">*</span><span class="n">backbone_atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">radius_of_gyration</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">RadiusOfGyration</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">top</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;not water&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">top</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;not water&quot;</span><span class="p">)</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">cv</span> <span class="ow">in</span> <span class="p">[</span><span class="n">phi</span><span class="p">,</span> <span class="n">psi</span><span class="p">,</span> <span class="n">radius_of_gyration</span><span class="p">]:</span>
 <span class="gp">... </span>    <span class="n">cv</span><span class="o">.</span><span class="n">addToSystem</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">)</span>
@@ -293,7 +306,7 @@ the radius of gyration of an alanine dipeptide molecule in water:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">phi</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">Torsion</span><span class="p">(</span><span class="o">*</span><span class="n">backbone_atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">psi</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">Torsion</span><span class="p">(</span><span class="o">*</span><span class="n">backbone_atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">radius_of_gyration</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">RadiusOfGyration</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">top</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;not water&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">top</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;not water&quot;</span><span class="p">)</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">cv</span> <span class="ow">in</span> <span class="p">[</span><span class="n">phi</span><span class="p">,</span> <span class="n">psi</span><span class="p">,</span> <span class="n">radius_of_gyration</span><span class="p">]:</span>
 <span class="gp">... </span>    <span class="n">cv</span><span class="o">.</span><span class="n">addToSystem</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">)</span>

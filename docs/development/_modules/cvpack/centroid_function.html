@@ -59,7 +59,7 @@
 <span class="k">class</span> <span class="nc">CentroidFunction</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomCentroidBondForce</span><span class="p">,</span> <span class="n">BaseCustomFunction</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A generic function of the centroids of :math:`m \times n` atoms groups split</span>
-<span class="sd">    into `m` collections of `n` groups each:</span>
+<span class="sd">    into `m` collections of `n` groups:</span>
 
 <span class="sd">    .. math::</span>
 
@@ -73,12 +73,6 @@
 <span class="sd">    where :math:`F` is a user-defined function and :math:`{\bf g}^i_1({\bf r})` is the</span>
 <span class="sd">    centroid of the :math:`j`-th group of atoms of the :math:`i`-th collection of</span>
 <span class="sd">    groups.</span>
-
-<span class="sd">    The function :math:`F` is defined as a string and can be any expression supported</span>
-<span class="sd">    by :OpenMM:`CustomCentroidBondForce`. If it contains named parameters, they must</span>
-<span class="sd">    be passed as keyword arguments to the :class:`CentroidFunction` constructor. The</span>
-<span class="sd">    parameters can be scalars or arrays of length :math:`m`. In the latter case, each</span>
-<span class="sd">    value will be assigned to the corresponding collection of atom groups.</span>
 
 <span class="sd">    The centroid of a group of atoms is defined as:</span>
 
@@ -97,6 +91,25 @@
 
 <span class="sd">    where :math:`M_j` is the total mass of atom group :math:`j` and :math:`m_{k,j}` is</span>
 <span class="sd">    the mass of the :math:`k`-th atom in group :math:`j`.</span>
+
+<span class="sd">    The function :math:`F` is defined as a string and can be any expression supported</span>
+<span class="sd">    by :OpenMM:`CustomCompoundBondForce`. If the expression contains named parameters,</span>
+<span class="sd">    the value of each parameter can be passed in one of three ways:</span>
+
+<span class="sd">    #. By a semicolon-separated definition in the function string, such as described</span>
+<span class="sd">       in the :OpenMM:`CustomCompoundBondForce` documentation. In this case, the</span>
+<span class="sd">       parameter value will be the same for all collections of atom groups.</span>
+
+<span class="sd">    #. By a 1D array or list of length :math:`m` passed as a keyword argument to</span>
+<span class="sd">       the :class:`AtomicFunction` constructor. In this case, each value will be</span>
+<span class="sd">       assigned to a different collection of atom groups.</span>
+
+<span class="sd">    #. By a scalar passed as a keyword argument to the :class:`AtomicFunction`</span>
+<span class="sd">       constructor. In this case, the parameter will apply to all collections of atom</span>
+<span class="sd">       groups and will become available for on-the-fly modification during a simulation</span>
+<span class="sd">       via the ``setParameter`` method of an :OpenMM:`Context` object. **Warning**:</span>
+<span class="sd">       other collective variables or :OpenMM:`Force` objects in the same system will</span>
+<span class="sd">       share the same values of equal-named parameters.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -128,14 +141,13 @@
 <span class="sd">    name</span>
 <span class="sd">        The name of the collective variable.</span>
 
-
 <span class="sd">    Keyword Args</span>
 <span class="sd">    ------------</span>
 <span class="sd">    **parameters</span>
-<span class="sd">        The named parameters of the function. Each parameter can be a scalar</span>
-<span class="sd">        quantity or a 1D array-like object of length `m`, where `m` is the number of</span>
-<span class="sd">        group collections. In the latter case, each entry of the array is used for</span>
-<span class="sd">        the corresponding collection of groups.</span>
+<span class="sd">        The named parameters of the function. Each parameter can be a 1D array-like</span>
+<span class="sd">        object or a scalar. In the former case, the array must have length :math:`m`</span>
+<span class="sd">        and each entry will be assigned to a different collection of atom groups. In</span>
+<span class="sd">        the latter case, it will define a global :OpenMM:`Context` parameter.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -150,7 +162,6 @@
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
 <span class="sd">    &gt;&gt;&gt; import cvpack</span>
-<span class="sd">    &gt;&gt;&gt; import itertools as it</span>
 <span class="sd">    &gt;&gt;&gt; import numpy as np</span>
 <span class="sd">    &gt;&gt;&gt; import openmm</span>
 <span class="sd">    &gt;&gt;&gt; from openmm import unit</span>
@@ -162,7 +173,9 @@
 <span class="sd">    Compute the residue coordination between two helices:</span>
 
 <span class="sd">    &gt;&gt;&gt; res_coord = cvpack.ResidueCoordination(</span>
-<span class="sd">    ...     residues[115:124], residues[126:135], stepFunction=&quot;step(1-x)&quot;</span>
+<span class="sd">    ...     residues[115:124],</span>
+<span class="sd">    ...     residues[126:135],</span>
+<span class="sd">    ...     stepFunction=&quot;step(1-x)&quot;,</span>
 <span class="sd">    ... )</span>
 <span class="sd">    &gt;&gt;&gt; res_coord.addToSystem(model.system)</span>
 <span class="sd">    &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
@@ -179,7 +192,7 @@
 <span class="sd">    ...    &quot;step(1 - distance(g1, g2))&quot;,</span>
 <span class="sd">    ...    unit.dimensionless,</span>
 <span class="sd">    ...    atoms[115:124] + atoms[126:135],</span>
-<span class="sd">    ...    list(it.product(range(9), range(9, 18))),</span>
+<span class="sd">    ...    [[i, j] for i in range(9) for j in range(9, 18)],</span>
 <span class="sd">    ... )</span>
 <span class="sd">    &gt;&gt;&gt; colvar.addToSystem(model.system)</span>
 <span class="sd">    &gt;&gt;&gt; context.reinitialize(preserveState=True)</span>
@@ -199,7 +212,7 @@
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;centroid_function&quot;</span><span class="p">,</span>
         <span class="o">**</span><span class="n">parameters</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">VectorQuantity</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">groups</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">group</span><span class="p">))</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">]</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">int</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">group</span><span class="p">]</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">]</span>
         <span class="n">num_groups</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
         <span class="n">collections</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span>
             <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_groups</span><span class="p">)</span> <span class="k">if</span> <span class="n">collections</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">collections</span>
