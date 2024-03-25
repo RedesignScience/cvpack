@@ -144,6 +144,7 @@ def serialize(obj: t.Any, iostream: t.IO) -> None:
     - 0
     - 1
     - 2
+    name: radius_of_gyration
     pbc: false
     weighByMass: false
     <BLANKLINE>

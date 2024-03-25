@@ -186,9 +186,7 @@ class CollectiveVariableReporter(mmapp.StateDataReporter):
             if self._values:
                 headers.append(f"{cv.getName()} ({cv.getUnit().get_symbol()})")
             if self._effective_masses:
-                headers.append(
-                    f"{cv.getName()} mass ({cv.getMassUnit().get_symbol()})"
-                )
+                headers.append(f"{cv.getName()} mass ({cv.getMassUnit().get_symbol()})")
 
         for variable in self._variables:
             add_headers(variable)
