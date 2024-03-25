@@ -113,9 +113,9 @@ class MetaCollectiveVariable(openmm.CustomCVForce, CollectiveVariable):
         **parameters: ScalarQuantity,
     ) -> None:
         super().__init__(function)
-        self._cvs = {cv.getName(): copy(cv) for cv in variables}
-        for cvname, cv in self._cvs.items():
-            self.addCollectiveVariable(cvname, cv)
+        self._cvs = tuple(map(copy, variables))
+        for cv in self._cvs:
+            self.addCollectiveVariable(cv.getName(), cv)
         for parameter, value in parameters.items():
             self.addGlobalParameter(parameter, value)
         self._registerCV(
@@ -129,6 +129,17 @@ class MetaCollectiveVariable(openmm.CustomCVForce, CollectiveVariable):
         )
         if periodicBounds is not None:
             self._registerPeriodicBounds(*periodicBounds)
+
+    def getInnerVariables(self) -> t.Tuple[CollectiveVariable]:
+        """
+        Get the collective variables on which the meta-collective variable depends.
+
+        Returns
+        -------
+        Tuple[CollectiveVariable]
+            A tuple with the collective variables.
+        """
+        return self._cvs
 
     def getInnerValues(self, context: openmm.Context) -> t.Dict[str, Quantity]:
         """
@@ -149,8 +160,8 @@ class MetaCollectiveVariable(openmm.CustomCVForce, CollectiveVariable):
         """
         values = self.getCollectiveVariableValues(context)
         return {
-            name: Quantity(value, cv.getUnit())
-            for (name, cv), value in zip(self._cvs.items(), values)
+            cv.getName(): Quantity(value, cv.getUnit())
+            for cv, value in zip(self._cvs, values)
         }
 
     def getInnerEffectiveMasses(self, context: openmm.Context) -> t.Dict[str, Quantity]:
@@ -176,8 +187,8 @@ class MetaCollectiveVariable(openmm.CustomCVForce, CollectiveVariable):
             for force in inner_context.getSystem().getForces()
         ]
         return {
-            name: Quantity(mass, cv.getMassUnit())
-            for (name, cv), mass in zip(self._cvs.items(), masses)
+            cv.getName(): Quantity(mass, cv.getMassUnit())
+            for cv, mass in zip(self._cvs, masses)
         }
 
 
