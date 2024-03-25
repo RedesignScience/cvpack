@@ -61,6 +61,47 @@ class CollectiveVariableReporter(mmapp.StateDataReporter):
         If `variables` is empty.
     ValueError
         If `values` and `effectiveMasses` are both `False`.
+
+    Examples
+    --------
+    >>> import cvpack
+    >>> import openmm
+    >>> import openmm.app as mmapp
+    >>> from math import pi
+    >>> from sys import stdout
+    >>> from openmmtools import testsystems
+    >>> model = testsystems.AlanineDipeptideVacuum()
+    >>> phi = cvpack.Torsion(6, 8, 14, 16, name="phi")
+    >>> umbrella = cvpack.MetaCollectiveVariable(
+    ...     f"50*min(delta,2*pi-delta)^2; delta=abs(phi-5*pi/6); pi={pi}",
+    ...     [phi],
+    ...     mmunit.kilojoules_per_mole,
+    ...     name="umbrella"
+    ... )
+    >>> reporter = cvpack.reporting.CollectiveVariableReporter(
+    ...     stdout, 1, [umbrella], step=True, values=True, effectiveMasses=True
+    ... )
+    >>> integrator = openmm.LangevinIntegrator(
+    ...     300 * mmunit.kelvin, 1 / mmunit.picosecond, 2 * mmunit.femtosecond,
+    ... )
+    >>> integrator.setRandomNumberSeed(1234)
+    >>> umbrella.addToSystem(model.system)
+    >>> simulation = mmapp.Simulation(model.topology, model.system, integrator)
+    >>> simulation.context.setPositions(model.positions)
+    >>> simulation.context.setVelocitiesToTemperature(300 * mmunit.kelvin, 5678)
+    >>> simulation.reporters.append(reporter)
+    >>> simulation.step(10)
+    #"Step","umbrella (kJ/mol)",...,"phi mass (nm**2 Da/(rad**2))"
+    1,13.049...,1.885...e-05,3.1288...,0.04920...
+    2,12.247...,1.962...e-05,3.1129...,0.04807...
+    3,11.420...,2.093...e-05,3.0959...,0.04782...
+    4,10.612...,2.287...e-05,3.0786...,0.04854...
+    5,9.7988...,2.550...e-05,3.0606...,0.04999...
+    6,9.0313...,2.852...e-05,3.0429...,0.05153...
+    7,8.3753...,3.141...e-05,3.0272...,0.05262...
+    8,7.7821...,3.415...e-05,3.0125...,0.05316...
+    9,7.2126...,3.665...e-05,2.9978...,0.05287...
+    10,6.563...,3.967...e-05,2.9803...,0.05208...
     """
 
     def __init__(
@@ -134,13 +175,15 @@ class CollectiveVariableReporter(mmapp.StateDataReporter):
 
         def add_headers(cv: CollectiveVariable) -> None:
             if self._values:
-                headers.append(f"{cv.getName()} ({cv.getUnit()})")
+                headers.append(f"{cv.getName()} ({cv.getUnit().get_symbol()})")
             if self._effective_masses:
-                headers.append(f"mass[{cv.getName}] ({cv.getMassUnit()})")
+                headers.append(
+                    f"{cv.getName()} mass ({cv.getMassUnit().get_symbol()})"
+                )
 
         for variable in self._variables:
             add_headers(variable)
             if isinstance(variable, MetaCV) and not self._exclude_inner_cvs:
-                for inner in variable.getInnerCollectiveVariables():
+                for inner in variable.getInnerVariables():
                     add_headers(inner)
         return headers
