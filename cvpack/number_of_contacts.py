@@ -13,12 +13,12 @@ from numbers import Real
 import openmm
 from openmm import unit as mmunit
 
-from .cvpack import BaseCollectiveVariable
+from .collective_variable import CollectiveVariable
 from .units import ScalarQuantity
 from .utils import evaluate_in_context
 
 
-class NumberOfContacts(openmm.CustomNonbondedForce, BaseCollectiveVariable):
+class NumberOfContacts(openmm.CustomNonbondedForce, CollectiveVariable):
     r"""
     The number of contacts between two atom groups:
 

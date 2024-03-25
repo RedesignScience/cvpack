@@ -11,10 +11,10 @@ import typing as t
 
 import openmm
 
-from .cvpack import BaseCollectiveVariable
+from .collective_variable import CollectiveVariable
 
 
-class BaseRadiusOfGyration(openmm.CustomCentroidBondForce, BaseCollectiveVariable):
+class BaseRadiusOfGyration(openmm.CustomCentroidBondForce, CollectiveVariable):
     """
     Abstract class for the radius of gyration of a group of `n` atoms.
     """

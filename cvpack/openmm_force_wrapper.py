@@ -12,11 +12,11 @@ import typing as t
 import openmm
 from openmm import unit as mmunit
 
-from .cvpack import BaseCollectiveVariable
+from .collective_variable import CollectiveVariable
 from .units import Unit, VectorQuantity
 
 
-class OpenMMForceWrapper(BaseCollectiveVariable):
+class OpenMMForceWrapper(CollectiveVariable):
     r"""
     A collective variable whose numerical value is computed from the potential energy,
     in kJ/mol, of an OpenMM force object.
@@ -39,30 +39,31 @@ class OpenMMForceWrapper(BaseCollectiveVariable):
     name
         The name of the collective variable.
 
-    Example:
-        >>> import cvpack
-        >>> import numpy as np
-        >>> import openmm
-        >>> from openmm import unit
-        >>> from openmmtools import testsystems
-        >>> model = testsystems.AlanineDipeptideVacuum()
-        >>> angle = openmm.CustomAngleForce("theta")
-        >>> _ = angle.addAngle(0, 1, 2)
-        >>> cv = cvpack.OpenMMForceWrapper(
-        ...     angle,
-        ...     unit.radian,
-        ...     periodicBounds=[-np.pi, np.pi] * unit.radian,
-        ... )
-        >>> assert isinstance(cv, openmm.CustomAngleForce)
-        >>> cv.addToSystem(model.system)
-        >>> integrator = openmm.VerletIntegrator(0)
-        >>> platform = openmm.Platform.getPlatformByName("Reference")
-        >>> context = openmm.Context(model.system, integrator, platform)
-        >>> context.setPositions(model.positions)
-        >>> cv.getValue(context)
-        1.911... rad
-        >>> cv.getEffectiveMass(context)
-        0.00538... nm**2 Da/(rad**2)
+    Example
+    -------
+    >>> import cvpack
+    >>> import numpy as np
+    >>> import openmm
+    >>> from openmm import unit
+    >>> from openmmtools import testsystems
+    >>> model = testsystems.AlanineDipeptideVacuum()
+    >>> angle = openmm.CustomAngleForce("theta")
+    >>> _ = angle.addAngle(0, 1, 2)
+    >>> cv = cvpack.OpenMMForceWrapper(
+    ...     angle,
+    ...     unit.radian,
+    ...     periodicBounds=[-np.pi, np.pi] * unit.radian,
+    ... )
+    >>> assert isinstance(cv, openmm.CustomAngleForce)
+    >>> cv.addToSystem(model.system)
+    >>> integrator = openmm.VerletIntegrator(0)
+    >>> platform = openmm.Platform.getPlatformByName("Reference")
+    >>> context = openmm.Context(model.system, integrator, platform)
+    >>> context.setPositions(model.positions)
+    >>> cv.getValue(context)
+    1.911... rad
+    >>> cv.getEffectiveMass(context)
+    0.00538... nm**2 Da/(rad**2)
     """
 
     def __init__(  # pylint: disable=super-init-not-called
@@ -77,7 +78,7 @@ class OpenMMForceWrapper(BaseCollectiveVariable):
         unit = Unit(unit)
         force_copy = openmm.XmlSerializer.deserialize(openmmForce)
         self.this = force_copy.this
-        self.__class__.__bases__ = (BaseCollectiveVariable, type(force_copy))
+        self.__class__.__bases__ = (CollectiveVariable, type(force_copy))
         self._registerCV(name, unit, openmmForce, unit, periodicBounds)
         if periodicBounds is not None:
             self._registerPeriodicBounds(*periodicBounds)

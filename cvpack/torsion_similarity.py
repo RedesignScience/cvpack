@@ -11,10 +11,10 @@ import numpy as np
 import openmm
 from numpy.typing import ArrayLike
 
-from .cvpack import BaseCollectiveVariable
+from .collective_variable import CollectiveVariable
 
 
-class TorsionSimilarity(openmm.CustomCompoundBondForce, BaseCollectiveVariable):
+class TorsionSimilarity(openmm.CustomCompoundBondForce, CollectiveVariable):
     r"""
     The degree of similarity between `n` pairs of torsion angles:
 

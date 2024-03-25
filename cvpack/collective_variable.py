@@ -1,5 +1,5 @@
 """
-.. module:: cvpack
+.. module:: collective_variable
    :platform: Linux, MacOS, Windows
    :synopsis: Useful Collective Variables for OpenMM
 
@@ -16,11 +16,11 @@ import yaml
 from openmm import unit as mmunit
 
 from .serialization import Serializable
-from .units import Quantity, ScalarQuantity, Unit, value_in_md_units
+from .units import Quantity, ScalarQuantity, Unit
 from .utils import compute_effective_mass, get_single_force_state, preprocess_args
 
 
-class BaseCollectiveVariable(openmm.Force, Serializable):
+class CollectiveVariable(openmm.Force, Serializable):
     r"""
     An abstract class with common attributes and method for all CVs.
     """
@@ -51,7 +51,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         **kwargs: t.Any,
     ) -> None:
         """
-        Register the newly created BaseCollectiveVariable subclass instance.
+        Register the newly created CollectiveVariable subclass instance.
 
         This method must always be called from Subclass.__init__.
 
@@ -158,6 +158,12 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
             raise RuntimeError("All force groups are already in use.")
         self.setForceGroup(new_group)
 
+    def getName(self) -> str:  # pylint: disable=useless-parent-delegation
+        """
+        Get the name of this collective variable.
+        """
+        return super().getName()
+
     def getUnit(self) -> Unit:
         """
         Get the unit of measurement of this collective variable.
@@ -176,7 +182,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
 
         Returns
         -------
-        Union[unit.Quantity, None]
+        Union[Quantity, None]
             The periodic bounds of this collective variable or None if it is not
             periodic
         """
@@ -200,24 +206,34 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
             self._setUnusedForceGroup(system)
         system.addForce(self)
 
-    def getValue(self, context: openmm.Context) -> Quantity:
+    def getValue(
+        self, context: openmm.Context, allowReinitialization: bool = False
+    ) -> Quantity:
         """
         Evaluate this collective variable at a given :OpenMM:`Context`.
 
+        If this collective variable share the force group with other forces, then its
+        evaluation requires reinitializing the :OpenMM:`Context` twice at each call.
+        This is inefficient and should be avoided. To allow this behavior, the
+        ``allowReinitialization`` parameter must be set to True.
+
         .. note::
 
-            This method will be more efficient if the collective variable is the only
-            force in its force group (see :OpenMM:`Force`).
+            By adding this collective variable to the system using the
+            :meth:`addToSystem` method, the force group of this collective variable
+            is set to an available force group in the system by default.
 
         Parameters
         ----------
         context
-            The context at which this collective variable should be evaluated
+            The context at which this collective variable should be evaluated.
+        allowReinitialization
+            If True, the context will be reinitialized if necessary.
 
         Returns
         -------
-        unit.Quantity
-            The value of this collective variable at the given context
+        Quantity
+            The value of this collective variable at the given context.
 
         Example
         -------
@@ -248,11 +264,18 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         >>> radius_of_gyration.getValue(context)
         0.29514... nm
         """
-        state = get_single_force_state(self, context, getEnergy=True)
-        value = value_in_md_units(state.getPotentialEnergy())
+        state = get_single_force_state(
+            self,
+            context,
+            allowReinitialization,
+            getEnergy=True,
+        )
+        value = state.getPotentialEnergy().value_in_unit(mmunit.kilojoules_per_mole)
         return Quantity(value, self.getUnit())
 
-    def getEffectiveMass(self, context: openmm.Context) -> Quantity:
+    def getEffectiveMass(
+        self, context: openmm.Context, allowReinitialization: bool = False
+    ) -> Quantity:
         r"""
         Compute the effective mass of this collective variable at a given
         :OpenMM:`Context`.
@@ -263,26 +286,32 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         .. math::
 
             m_\mathrm{eff}({\bf r}) = \left(
-                \sum_{i=1}^N \frac{1}{m_i} \left\|
-                    \frac{dq}{d{\bf r}_i}
-                \right\|^2
+                \sum_{i=1}^N \frac{1}{m_i} \left\| \frac{dq}{d{\bf r}_i} \right\|^2
             \right)^{-1}
+
+        If this collective variable share the force group with other forces, then
+        evaluating its effective mass requires reinitializing the :OpenMM:`Context`
+        twice at each call. This is inefficient and should be avoided. To allow this
+        behavior, the ``allowReinitialization`` parameter must be set to True.
 
         .. note::
 
-            This method will be more efficient if the collective variable is the only
-            force in its force group (see :OpenMM:`Force`).
+            By adding this collective variable to the system using the
+            :meth:`addToSystem` method, the force group of this collective variable
+            is set to an available force group in the system by default.
 
         Parameters
         ----------
         context
             The context at which this collective variable's effective mass should be
-            evaluated
+            evaluated.
+        allowReinitialization
+            If True, the context will be reinitialized if necessary.
 
         Returns
         -------
-        unit.Quantity
-            The effective mass of this collective variable at the given context
+        Quantity
+            The effective mass of this collective variable at the given context.
 
         Example
         -------
@@ -313,4 +342,7 @@ class BaseCollectiveVariable(openmm.Force, Serializable):
         >>> radius_of_gyration.getEffectiveMass(context)
         30.946... Da
         """
-        return Quantity(compute_effective_mass(self, context), self._mass_unit)
+        return Quantity(
+            compute_effective_mass(self, context, allowReinitialization),
+            self._mass_unit,
+        )

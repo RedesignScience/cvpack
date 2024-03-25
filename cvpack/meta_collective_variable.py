@@ -15,12 +15,12 @@ from copy import copy
 import openmm
 from openmm import unit as mmunit
 
-from .cvpack import BaseCollectiveVariable
+from .collective_variable import CollectiveVariable
 from .units import Quantity, ScalarQuantity, VectorQuantity
 from .utils import compute_effective_mass
 
 
-class MetaCollectiveVariable(openmm.CustomCVForce, BaseCollectiveVariable):
+class MetaCollectiveVariable(openmm.CustomCVForce, CollectiveVariable):
     r"""
     A collective variable that is a function of other collective variables:
 
@@ -34,8 +34,18 @@ class MetaCollectiveVariable(openmm.CustomCVForce, BaseCollectiveVariable):
 
     The function :math:`F` is defined as a string and can be any expression supported
     by the :OpenMM:`CustomCVForce` class. If the expression contains named parameters,
-    these must be passed as keyword arguments to the :class:`MetaCollectiveVariable`
-    constructor. Only scalar parameters are supported.
+    the value of each parameter can be passed in one of two ways:
+
+    #. By a semicolon-separated definition in the function string, such as described
+       in the :OpenMM:`CustomCompoundBondForce` documentation. In this case, the
+       parameter value will be the same for all groups of atoms.
+
+    #. By a scalar passed as a keyword argument to the :class:`AtomicFunction`
+       constructor. In this case, the parameter will apply to all atom groups and will
+       become available for on-the-fly modification during a simulation via the
+       ``setParameter`` method of an :OpenMM:`Context` object. **Warning**: other
+       collective variables or :OpenMM:`Force` objects in the same system will share
+       the same values of equal-named parameters.
 
     Parameters
     ----------
@@ -43,7 +53,7 @@ class MetaCollectiveVariable(openmm.CustomCVForce, BaseCollectiveVariable):
         The function to be evaluated. It must be a valid :OpenMM:`CustomCVForce`
         expression.
     variables
-        A sequence of :class:`BaseCollectiveVariable` instances that represent the
+        A sequence of :class:`CollectiveVariable` instances that represent the
         collective variables on which the meta-collective variable depends. The name
         of each collective variable must be unique and match a symbol used in the
         function.
@@ -73,7 +83,8 @@ class MetaCollectiveVariable(openmm.CustomCVForce, BaseCollectiveVariable):
     >>> model = testsystems.AlanineDipeptideVacuum()
     >>> phi = cvpack.Torsion(6, 8, 14, 16, name="phi")
     >>> driving_force = cvpack.MetaCollectiveVariable(
-    ...     f"0.5*kappa*min(delta,{2*math.pi}-delta)^2; delta=abs(phi-phi0)",
+    ...     f"0.5*kappa*min(delta,{2*math.pi}-delta)^2"
+    ...     "; delta=abs(phi-phi0)",
     ...     [phi],
     ...     unit.kilojoules_per_mole,
     ...     kappa = 1000 * unit.kilojoules_per_mole/unit.radian**2,
@@ -99,7 +110,7 @@ class MetaCollectiveVariable(openmm.CustomCVForce, BaseCollectiveVariable):
         unit: mmunit.Unit,
         periodicBounds: t.Optional[VectorQuantity] = None,
         name: str = "meta_collective_variable",
-        **parameters: t.Union[ScalarQuantity, VectorQuantity],
+        **parameters: ScalarQuantity,
     ) -> None:
         super().__init__(function)
         self._cvs = {cv.getName(): copy(cv) for cv in variables}

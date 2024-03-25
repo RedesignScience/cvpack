@@ -13,13 +13,13 @@ from copy import deepcopy
 
 import openmm
 
-from .cvpack import BaseCollectiveVariable
+from .collective_variable import CollectiveVariable
 from .path import Metric, deviation, progress
 from .units.units import MatrixQuantity, ScalarQuantity, value_in_md_units
 from .utils import convert_to_matrix
 
 
-class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
+class PathInCVSpace(openmm.CustomCVForce, CollectiveVariable):
     r"""
     A metric of the system's progress (:math:`s`) or deviation (:math:`z`) with
     respect to a path defined by a sequence of :math:`n` milestones positioned in a
@@ -123,7 +123,7 @@ class PathInCVSpace(openmm.CustomCVForce, BaseCollectiveVariable):
     def __init__(  # pylint: disable=too-many-branches
         self,
         metric: Metric,
-        variables: t.Iterable[BaseCollectiveVariable],
+        variables: t.Iterable[CollectiveVariable],
         milestones: MatrixQuantity,
         sigma: float,
         scales: t.Optional[t.Iterable[ScalarQuantity]] = None,

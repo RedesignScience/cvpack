@@ -14,11 +14,11 @@ from openmm import unit as mmunit
 from openmm.app.element import hydrogen
 from openmm.app.topology import Residue
 
-from .cvpack import BaseCollectiveVariable
+from .collective_variable import CollectiveVariable
 from .units import ScalarQuantity, value_in_md_units
 
 
-class ResidueCoordination(openmm.CustomCentroidBondForce, BaseCollectiveVariable):
+class ResidueCoordination(openmm.CustomCentroidBondForce, CollectiveVariable):
     r"""
     The number of contacts between two disjoint groups of residues:
 

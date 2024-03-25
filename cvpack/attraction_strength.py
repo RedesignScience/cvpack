@@ -12,14 +12,14 @@ import typing as t
 import openmm
 from openmm import unit as mmunit
 
-from .cvpack import BaseCollectiveVariable
+from .collective_variable import CollectiveVariable
 from .units import ScalarQuantity
 from .utils import evaluate_in_context
 
 ONE_4PI_EPS0 = 138.93545764438198
 
 
-class AttractionStrength(openmm.CustomNonbondedForce, BaseCollectiveVariable):
+class AttractionStrength(openmm.CustomNonbondedForce, CollectiveVariable):
     r"""
     The strength of the attraction between two atom groups:
 
