@@ -96,6 +96,7 @@ def convert_to_matrix(array: npt.ArrayLike) -> t.Tuple[np.ndarray, int, int]:
 def get_single_force_state(
     force: openmm.Force,
     context: openmm.Context,
+    allowReinitialization: bool = False,
     getEnergy: bool = False,
     getForces: bool = False,
 ) -> openmm.State:
@@ -106,23 +107,26 @@ def get_single_force_state(
     Parameters
     ----------
     force
-        The force object from which the state should be extracted
+        The force object from which the state should be extracted.
     context
-        The context from which the state should be extracted
+        The context from which the state should be extracted.
+    allowReinitialization
+        If True, the force group of the given force will be temporarily changed to a
+        group that is not used by any other force in the system, if necessary.
     getEnergy
-        If True, the potential energy will be computed
+        If True, the potential energy will be computed.
     getForces
-        If True, the forces will be computed
+        If True, the forces will be computed.
 
     Returns
     -------
     openmm.State
-        The state containing the requested values
+        The state containing the requested values.
 
     Raises
     ------
     ValueError
-        If this force is not present in the given context
+        If this force is not present in the given context.
     """
     forces_and_groups = [
         (f, f.getForceGroup()) for f in context.getSystem().getForces()
@@ -135,6 +139,8 @@ def get_single_force_state(
         return context.getState(
             getEnergy=getEnergy, getForces=getForces, groups=1 << self_group
         )
+    if not allowReinitialization:
+        raise ValueError("Context reinitialization required, but not allowed.")
     new_group = force._setUnusedForceGroup(context.getSystem())
     context.reinitialize(preserveState=True)
     state = context.getState(
@@ -145,7 +151,9 @@ def get_single_force_state(
     return state
 
 
-def compute_effective_mass(force: openmm.Force, context: openmm.Context) -> float:
+def compute_effective_mass(
+    force: openmm.Force, context: openmm.Context, allowReinitialization: bool = False
+) -> float:
     r"""
     Compute the effective mass of an :OpenMM:`Force` at a given :OpenMM:`Context`.
 
@@ -155,13 +163,18 @@ def compute_effective_mass(force: openmm.Force, context: openmm.Context) -> floa
         The force object from which the effective mass should be computed
     context
         The context at which the force's effective mass should be evaluated
+    allowReinitialization
+        If True, the force group of the given force will be temporarily changed to a
+        group that is not used by any other force in the system, if necessary.
 
     Returns
     -------
     float
         The effective mass of the force at the given context
     """
-    state = get_single_force_state(force, context, getForces=True)
+    state = get_single_force_state(
+        force, context, allowReinitialization, getForces=True
+    )
     get_mass = functools.partial(
         openmm._openmm.System_getParticleMass, context.getSystem()
     )

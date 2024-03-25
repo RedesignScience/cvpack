@@ -14,12 +14,12 @@ import numpy as np
 import openmm
 from openmm import app as mmapp
 
-from .cvpack import BaseCollectiveVariable
+from .collective_variable import CollectiveVariable
 from .rmsd import RMSD
 from .units import ScalarQuantity, value_in_md_units
 
 
-class BaseRMSDContent(openmm.CustomCVForce, BaseCollectiveVariable):
+class BaseRMSDContent(openmm.CustomCVForce, CollectiveVariable):
     """
     Abstract class for secondary-structure RMSD content of a sequence of `n` residues.
     """

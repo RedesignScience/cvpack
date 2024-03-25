@@ -11,11 +11,11 @@ import typing as t
 
 import numpy as np
 
-from .cvpack import BaseCollectiveVariable
+from .collective_variable import CollectiveVariable
 from .units import MatrixQuantity, VectorQuantity, value_in_md_units
 
 
-class BaseRMSD(BaseCollectiveVariable):
+class BaseRMSD(CollectiveVariable):
     r"""
     A base class for root-mean-square deviation (RMSD) collective variables.
     """

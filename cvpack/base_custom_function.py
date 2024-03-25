@@ -11,11 +11,11 @@ import typing as t
 
 from openmm import unit as mmunit
 
-from .cvpack import BaseCollectiveVariable
+from .collective_variable import CollectiveVariable
 from .units import ScalarQuantity, VectorQuantity, value_in_md_units
 
 
-class BaseCustomFunction(BaseCollectiveVariable):
+class BaseCustomFunction(CollectiveVariable):
     """
     Abstract class for collective variables defined by a custom function.
     """

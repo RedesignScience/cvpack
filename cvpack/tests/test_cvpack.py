@@ -49,12 +49,12 @@ def test_effective_mass():
 
 def test_argument_inspection():
     """
-    Test argument inspection of a arbitrary BaseCollectiveVariable subclass
+    Test argument inspection of a arbitrary CollectiveVariable subclass
 
     """
 
     # pylint: disable=missing-class-docstring, unused-argument
-    class Test(cvpack.cvpack.BaseCollectiveVariable):
+    class Test(cvpack.CollectiveVariable):
         def __init__(self, first: int, second: float, third: str = "3"):
             super().__init__(self)
 
@@ -68,7 +68,7 @@ def test_argument_inspection():
 
 
 def perform_common_tests(
-    collectiveVariable: cvpack.cvpack.BaseCollectiveVariable,
+    collectiveVariable: cvpack.CollectiveVariable,
     context: openmm.Context,
 ) -> None:
     """

@@ -13,11 +13,11 @@ import openmm
 from openmm import app as mmapp
 from openmm import unit as mmunit
 
-from .cvpack import BaseCollectiveVariable
+from .collective_variable import CollectiveVariable
 from .units import ScalarQuantity
 
 
-class HelixTorsionContent(openmm.CustomTorsionForce, BaseCollectiveVariable):
+class HelixTorsionContent(openmm.CustomTorsionForce, CollectiveVariable):
     r"""
     The alpha-helix Ramachandran content of a sequence of `n` residues:
 
