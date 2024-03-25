@@ -50,14 +50,24 @@
 given configuration <span class="math notranslate nohighlight">\({\bf r}\)</span>.</p>
 <p>The function <span class="math notranslate nohighlight">\(F\)</span> is defined as a string and can be any expression supported
 by the <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.CustomCVForce.html">openmm.CustomCVForce</a> class. If the expression contains named parameters,
-these must be passed as keyword arguments to the <a class="reference internal" href="#cvpack.MetaCollectiveVariable" title="cvpack.MetaCollectiveVariable"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetaCollectiveVariable</span></code></a>
-constructor. Only scalar parameters are supported.</p>
+the value of each parameter can be passed in one of two ways:</p>
+<ol class="arabic simple">
+<li><p>By a semicolon-separated definition in the function string, such as described
+in the <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.CustomCompoundBondForce.html">openmm.CustomCompoundBondForce</a> documentation. In this case, the
+parameter value will be the same for all groups of atoms.</p></li>
+<li><p>By a scalar passed as a keyword argument to the <a class="reference internal" href="AtomicFunction.html#cvpack.AtomicFunction" title="cvpack.AtomicFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">AtomicFunction</span></code></a>
+constructor. In this case, the parameter will apply to all atom groups and will
+become available for on-the-fly modification during a simulation via the
+<code class="docutils literal notranslate"><span class="pre">setParameter</span></code> method of an <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html">openmm.Context</a> object. <strong>Warning</strong>: other
+collective variables or <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Force.html">openmm.Force</a> objects in the same system will share
+the same values of equal-named parameters.</p></li>
+</ol>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>function</strong> (<em>str</em>) – The function to be evaluated. It must be a valid <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.CustomCVForce.html">openmm.CustomCVForce</a>
 expression.</p></li>
-<li><p><strong>variables</strong> (<em>t.Iterable</em><em>[</em><em>str</em><em>]</em>) – A sequence of <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCollectiveVariable</span></code> instances that represent the
+<li><p><strong>variables</strong> (<em>t.Iterable</em><em>[</em><em>str</em><em>]</em>) – A sequence of <code class="xref py py-class docutils literal notranslate"><span class="pre">CollectiveVariable</span></code> instances that represent the
 collective variables on which the meta-collective variable depends. The name
 of each collective variable must be unique and match a symbol used in the
 function.</p></li>
@@ -84,7 +94,8 @@ parameters if this collective variable is added to an <a class="reference extern
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">testsystems</span><span class="o">.</span><span class="n">AlanineDipeptideVacuum</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">phi</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">Torsion</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;phi&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">driving_force</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">MetaCollectiveVariable</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="sa">f</span><span class="s2">&quot;0.5*kappa*min(delta,</span><span class="si">{</span><span class="mi">2</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="si">}</span><span class="s2">-delta)^2; delta=abs(phi-phi0)&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="sa">f</span><span class="s2">&quot;0.5*kappa*min(delta,</span><span class="si">{</span><span class="mi">2</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="si">}</span><span class="s2">-delta)^2&quot;</span>
+<span class="gp">... </span>    <span class="s2">&quot;; delta=abs(phi-phi0)&quot;</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="p">[</span><span class="n">phi</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="n">unit</span><span class="o">.</span><span class="n">kilojoules_per_mole</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">kappa</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">kilojoules_per_mole</span><span class="o">/</span><span class="n">unit</span><span class="o">.</span><span class="n">radian</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
@@ -121,32 +132,38 @@ first available force group in the system</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cvpack.MetaCollectiveVariable.getEffectiveMass">
-<span class="sig-name descname"><span class="pre">getEffectiveMass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.MetaCollectiveVariable.getEffectiveMass" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getEffectiveMass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowReinitialization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.MetaCollectiveVariable.getEffectiveMass" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the effective mass of this collective variable at a given
 <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html">openmm.Context</a>.</p>
 <p>The effective mass of a collective variable <span class="math notranslate nohighlight">\(q({\bf r})\)</span> is defined as
 <span id="id1">[<a class="reference internal" href="../references.html#id3" title="Christophe Chipot and Andrew Pohorille, editors. Free Energy Calculations. Springer Berlin Heidelberg, 2007. URL: https://doi.org/10.1007/978-3-540-38448-9, doi:10.1007/978-3-540-38448-9.">1</a>]</span>:</p>
 <div class="math notranslate nohighlight">
 \[m_\mathrm{eff}({\bf r}) = \left(
-    \sum_{i=1}^N \frac{1}{m_i} \left\|
-        \frac{dq}{d{\bf r}_i}
-    \right\|^2
+    \sum_{i=1}^N \frac{1}{m_i} \left\| \frac{dq}{d{\bf r}_i} \right\|^2
 \right)^{-1}\]</div>
+<p>If this collective variable share the force group with other forces, then
+evaluating its effective mass requires reinitializing the <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html">openmm.Context</a>
+twice at each call. This is inefficient and should be avoided. To allow this
+behavior, the <code class="docutils literal notranslate"><span class="pre">allowReinitialization</span></code> parameter must be set to True.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This method will be more efficient if the collective variable is the only
-force in its force group (see <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Force.html">openmm.Force</a>).</p>
+<p>By adding this collective variable to the system using the
+<a class="reference internal" href="#cvpack.MetaCollectiveVariable.addToSystem" title="cvpack.MetaCollectiveVariable.addToSystem"><code class="xref py py-meth docutils literal notranslate"><span class="pre">addToSystem()</span></code></a> method, the force group of this collective variable
+is set to an available force group in the system by default.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>context</strong> (<em>Context</em>) – The context at which this collective variable’s effective mass should be
-evaluated</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> (<em>Context</em>) – The context at which this collective variable’s effective mass should be
+evaluated.</p></li>
+<li><p><strong>allowReinitialization</strong> (<em>bool</em>) – If True, the context will be reinitialized if necessary.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The effective mass of this collective variable at the given context</p>
+<dd class="field-even"><p>The effective mass of this collective variable at the given context.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>unit.Quantity</p>
+<dd class="field-odd"><p>Quantity</p>
 </dd>
 </dl>
 <p class="rubric">Example</p>
@@ -231,6 +248,17 @@ values as values.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cvpack.MetaCollectiveVariable.getName">
+<span class="sig-name descname"><span class="pre">getName</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.MetaCollectiveVariable.getName" title="Link to this definition">¶</a></dt>
+<dd><p>Get the name of this collective variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cvpack.MetaCollectiveVariable.getPeriodicBounds">
 <span class="sig-name descname"><span class="pre">getPeriodicBounds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.MetaCollectiveVariable.getPeriodicBounds" title="Link to this definition">¶</a></dt>
 <dd><p>Get the periodic bounds of this collective variable.</p>
@@ -240,7 +268,7 @@ values as values.</p>
 periodic</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Union[unit.Quantity, None]</p>
+<dd class="field-even"><p>Union[Quantity, None]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -258,22 +286,30 @@ periodic</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cvpack.MetaCollectiveVariable.getValue">
-<span class="sig-name descname"><span class="pre">getValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.MetaCollectiveVariable.getValue" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowReinitialization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvpack.MetaCollectiveVariable.getValue" title="Link to this definition">¶</a></dt>
 <dd><p>Evaluate this collective variable at a given <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html">openmm.Context</a>.</p>
+<p>If this collective variable share the force group with other forces, then its
+evaluation requires reinitializing the <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html">openmm.Context</a> twice at each call.
+This is inefficient and should be avoided. To allow this behavior, the
+<code class="docutils literal notranslate"><span class="pre">allowReinitialization</span></code> parameter must be set to True.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This method will be more efficient if the collective variable is the only
-force in its force group (see <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Force.html">openmm.Force</a>).</p>
+<p>By adding this collective variable to the system using the
+<a class="reference internal" href="#cvpack.MetaCollectiveVariable.addToSystem" title="cvpack.MetaCollectiveVariable.addToSystem"><code class="xref py py-meth docutils literal notranslate"><span class="pre">addToSystem()</span></code></a> method, the force group of this collective variable
+is set to an available force group in the system by default.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>context</strong> (<em>Context</em>) – The context at which this collective variable should be evaluated</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> (<em>Context</em>) – The context at which this collective variable should be evaluated.</p></li>
+<li><p><strong>allowReinitialization</strong> (<em>bool</em>) – If True, the context will be reinitialized if necessary.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The value of this collective variable at the given context</p>
+<dd class="field-even"><p>The value of this collective variable at the given context.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>unit.Quantity</p>
+<dd class="field-odd"><p>Quantity</p>
 </dd>
 </dl>
 <p class="rubric">Example</p>

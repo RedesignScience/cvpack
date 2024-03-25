@@ -48,13 +48,13 @@
 <span class="kn">import</span> <span class="nn">openmm</span>
 <span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
-<span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">BaseCollectiveVariable</span>
+<span class="kn">from</span> <span class="nn">.collective_variable</span> <span class="kn">import</span> <span class="n">CollectiveVariable</span>
 <span class="kn">from</span> <span class="nn">.units</span> <span class="kn">import</span> <span class="n">Unit</span><span class="p">,</span> <span class="n">VectorQuantity</span>
 
 
 <div class="viewcode-block" id="OpenMMForceWrapper">
 <a class="viewcode-back" href="../../api/OpenMMForceWrapper.html#cvpack.OpenMMForceWrapper">[docs]</a>
-<span class="k">class</span> <span class="nc">OpenMMForceWrapper</span><span class="p">(</span><span class="n">BaseCollectiveVariable</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">OpenMMForceWrapper</span><span class="p">(</span><span class="n">CollectiveVariable</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A collective variable whose numerical value is computed from the potential energy,</span>
 <span class="sd">    in kJ/mol, of an OpenMM force object.</span>
@@ -77,30 +77,31 @@
 <span class="sd">    name</span>
 <span class="sd">        The name of the collective variable.</span>
 
-<span class="sd">    Example:</span>
-<span class="sd">        &gt;&gt;&gt; import cvpack</span>
-<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
-<span class="sd">        &gt;&gt;&gt; import openmm</span>
-<span class="sd">        &gt;&gt;&gt; from openmm import unit</span>
-<span class="sd">        &gt;&gt;&gt; from openmmtools import testsystems</span>
-<span class="sd">        &gt;&gt;&gt; model = testsystems.AlanineDipeptideVacuum()</span>
-<span class="sd">        &gt;&gt;&gt; angle = openmm.CustomAngleForce(&quot;theta&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; _ = angle.addAngle(0, 1, 2)</span>
-<span class="sd">        &gt;&gt;&gt; cv = cvpack.OpenMMForceWrapper(</span>
-<span class="sd">        ...     angle,</span>
-<span class="sd">        ...     unit.radian,</span>
-<span class="sd">        ...     periodicBounds=[-np.pi, np.pi] * unit.radian,</span>
-<span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; assert isinstance(cv, openmm.CustomAngleForce)</span>
-<span class="sd">        &gt;&gt;&gt; cv.addToSystem(model.system)</span>
-<span class="sd">        &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
-<span class="sd">        &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&quot;Reference&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
-<span class="sd">        &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">        &gt;&gt;&gt; cv.getValue(context)</span>
-<span class="sd">        1.911... rad</span>
-<span class="sd">        &gt;&gt;&gt; cv.getEffectiveMass(context)</span>
-<span class="sd">        0.00538... nm**2 Da/(rad**2)</span>
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; import cvpack</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; import openmm</span>
+<span class="sd">    &gt;&gt;&gt; from openmm import unit</span>
+<span class="sd">    &gt;&gt;&gt; from openmmtools import testsystems</span>
+<span class="sd">    &gt;&gt;&gt; model = testsystems.AlanineDipeptideVacuum()</span>
+<span class="sd">    &gt;&gt;&gt; angle = openmm.CustomAngleForce(&quot;theta&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; _ = angle.addAngle(0, 1, 2)</span>
+<span class="sd">    &gt;&gt;&gt; cv = cvpack.OpenMMForceWrapper(</span>
+<span class="sd">    ...     angle,</span>
+<span class="sd">    ...     unit.radian,</span>
+<span class="sd">    ...     periodicBounds=[-np.pi, np.pi] * unit.radian,</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; assert isinstance(cv, openmm.CustomAngleForce)</span>
+<span class="sd">    &gt;&gt;&gt; cv.addToSystem(model.system)</span>
+<span class="sd">    &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
+<span class="sd">    &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&quot;Reference&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
+<span class="sd">    &gt;&gt;&gt; context.setPositions(model.positions)</span>
+<span class="sd">    &gt;&gt;&gt; cv.getValue(context)</span>
+<span class="sd">    1.911... rad</span>
+<span class="sd">    &gt;&gt;&gt; cv.getEffectiveMass(context)</span>
+<span class="sd">    0.00538... nm**2 Da/(rad**2)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># pylint: disable=super-init-not-called</span>
@@ -115,7 +116,7 @@
         <span class="n">unit</span> <span class="o">=</span> <span class="n">Unit</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
         <span class="n">force_copy</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">XmlSerializer</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">openmmForce</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">this</span> <span class="o">=</span> <span class="n">force_copy</span><span class="o">.</span><span class="n">this</span>
-        <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__bases__</span> <span class="o">=</span> <span class="p">(</span><span class="n">BaseCollectiveVariable</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">force_copy</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__bases__</span> <span class="o">=</span> <span class="p">(</span><span class="n">CollectiveVariable</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">force_copy</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">openmmForce</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">periodicBounds</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">periodicBounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_registerPeriodicBounds</span><span class="p">(</span><span class="o">*</span><span class="n">periodicBounds</span><span class="p">)</span></div>

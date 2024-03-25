@@ -10,6 +10,7 @@ Angle
     .. automethod:: addToSystem
     .. automethod:: getEffectiveMass
     .. automethod:: getMassUnit
+    .. automethod:: getName
     .. automethod:: getPeriodicBounds
     .. automethod:: getUnit
     .. automethod:: getValue

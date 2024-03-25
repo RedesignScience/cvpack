@@ -48,7 +48,7 @@
 <span class="kn">import</span> <span class="nn">openmm</span>
 <span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
-<span class="kn">from</span> <span class="nn">.cvpack</span> <span class="kn">import</span> <span class="n">BaseCollectiveVariable</span>
+<span class="kn">from</span> <span class="nn">.collective_variable</span> <span class="kn">import</span> <span class="n">CollectiveVariable</span>
 <span class="kn">from</span> <span class="nn">.units</span> <span class="kn">import</span> <span class="n">ScalarQuantity</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">evaluate_in_context</span>
 
@@ -57,7 +57,7 @@
 
 <div class="viewcode-block" id="AttractionStrength">
 <a class="viewcode-back" href="../../api/AttractionStrength.html#cvpack.AttractionStrength">[docs]</a>
-<span class="k">class</span> <span class="nc">AttractionStrength</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomNonbondedForce</span><span class="p">,</span> <span class="n">BaseCollectiveVariable</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">AttractionStrength</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">CustomNonbondedForce</span><span class="p">,</span> <span class="n">CollectiveVariable</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The strength of the attraction between two atom groups:</span>
 
