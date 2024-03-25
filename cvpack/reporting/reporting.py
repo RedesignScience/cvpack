@@ -24,8 +24,8 @@ class CollectiveVariableReporter(mmapp.StateDataReporter):
     Reports values and effective masses of collective variables during a simulation.
 
     To use it, create a :class:`CollectiveVariableReporter`, then add it to the
-    :class:`~openmm.app.Simulation`'s list of reporters. The set of data to write is
-    configurable using boolean flags passed to the constructor.
+    simulation's list of reporters. The set of data to write is configurable using
+    boolean flags passed to the constructor.
 
     By default the data is written in comma-separated-value (CSV) format, but you can
     specify a different separator to use.
@@ -73,16 +73,25 @@ class CollectiveVariableReporter(mmapp.StateDataReporter):
     >>> model = testsystems.AlanineDipeptideVacuum()
     >>> phi = cvpack.Torsion(6, 8, 14, 16, name="phi")
     >>> umbrella = cvpack.MetaCollectiveVariable(
-    ...     f"50*min(delta,2*pi-delta)^2; delta=abs(phi-5*pi/6); pi={pi}",
+    ...     f"50*min(delta,2*pi-delta)^2"
+    ...     "; delta=abs(phi-5*pi/6)"
+    ...     f"; pi={pi}",
     ...     [phi],
     ...     mmunit.kilojoules_per_mole,
     ...     name="umbrella"
     ... )
     >>> reporter = cvpack.reporting.CollectiveVariableReporter(
-    ...     stdout, 1, [umbrella], step=True, values=True, effectiveMasses=True
+    ...     stdout,
+    ...     1,
+    ...     [umbrella],
+    ...     step=True,
+    ...     values=True,
+    ...     effectiveMasses=True
     ... )
     >>> integrator = openmm.LangevinIntegrator(
-    ...     300 * mmunit.kelvin, 1 / mmunit.picosecond, 2 * mmunit.femtosecond,
+    ...     300 * mmunit.kelvin,
+    ...     1 / mmunit.picosecond,
+    ...     2 * mmunit.femtosecond,
     ... )
     >>> integrator.setRandomNumberSeed(1234)
     >>> umbrella.addToSystem(model.system)
