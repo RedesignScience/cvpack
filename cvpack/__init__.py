@@ -12,7 +12,6 @@ from .centroid_function import CentroidFunction  # noqa: F401
 from .collective_variable import CollectiveVariable  # noqa: F401
 from .composite_rmsd import CompositeRMSD  # noqa: F401
 from .distance import Distance  # noqa: F401
-from .global_parameter import GlobalParameter  # noqa: F401
 from .helix_angle_content import HelixAngleContent  # noqa: F401
 from .helix_hbond_content import HelixHBondContent  # noqa: F401
 from .helix_rmsd_content import HelixRMSDContent  # noqa: F401
