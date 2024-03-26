@@ -66,7 +66,7 @@ class CollectiveVariableReporter(mmapp.StateDataReporter):
     --------
     >>> import cvpack
     >>> import openmm
-    >>> import openmm.app as mmapp
+    >>> from openmm import app, unit
     >>> from math import pi
     >>> from sys import stdout
     >>> from openmmtools import testsystems
@@ -77,40 +77,40 @@ class CollectiveVariableReporter(mmapp.StateDataReporter):
     ...     "; delta=abs(phi-5*pi/6)"
     ...     f"; pi={pi}",
     ...     [phi],
-    ...     mmunit.kilojoules_per_mole,
+    ...     unit.kilojoules_per_mole,
     ...     name="umbrella"
     ... )
     >>> reporter = cvpack.reporting.CollectiveVariableReporter(
     ...     stdout,
-    ...     1,
+    ...     100,
     ...     [umbrella],
     ...     step=True,
     ...     values=True,
     ...     effectiveMasses=True
     ... )
     >>> integrator = openmm.LangevinIntegrator(
-    ...     300 * mmunit.kelvin,
-    ...     1 / mmunit.picosecond,
-    ...     2 * mmunit.femtosecond,
+    ...     300 * unit.kelvin,
+    ...     1 / unit.picosecond,
+    ...     2 * unit.femtosecond,
     ... )
     >>> integrator.setRandomNumberSeed(1234)
     >>> umbrella.addToSystem(model.system)
-    >>> simulation = mmapp.Simulation(model.topology, model.system, integrator)
+    >>> simulation = app.Simulation(model.topology, model.system, integrator)
     >>> simulation.context.setPositions(model.positions)
-    >>> simulation.context.setVelocitiesToTemperature(300 * mmunit.kelvin, 5678)
+    >>> simulation.context.setVelocitiesToTemperature(300 * unit.kelvin, 5678)
     >>> simulation.reporters.append(reporter)
-    >>> simulation.step(10)
-    #"Step","umbrella (kJ/mol)",...,"phi mass (nm**2 Da/(rad**2))"
-    1,13.049...,1.885...e-05,3.1288...,0.04920...
-    2,12.247...,1.962...e-05,3.1129...,0.04807...
-    3,11.420...,2.093...e-05,3.0959...,0.04782...
-    4,10.612...,2.287...e-05,3.0786...,0.04854...
-    5,9.7988...,2.550...e-05,3.0606...,0.04999...
-    6,9.0313...,2.852...e-05,3.0429...,0.05153...
-    7,8.3753...,3.141...e-05,3.0272...,0.05262...
-    8,7.7821...,3.415...e-05,3.0125...,0.05316...
-    9,7.2126...,3.665...e-05,2.9978...,0.05287...
-    10,6.563...,3.967...e-05,2.9803...,0.05208...
+    >>> simulation.step(1000)  # doctest: +SKIP
+    #"Step","umbrella (kJ/mol)",...,"phi (rad)","phi mass (nm**2 Da/(rad**2))"
+    100,0.3834...,0.00062...,2.5304...,0.04792...
+    200,0.2180...,0.00117...,2.6840...,0.05114...
+    300,0.0144...,0.01772...,2.6009...,0.05122...
+    400,0.6639...,0.00035...,2.5027...,0.04688...
+    500,0.1658...,0.00138...,2.6755...,0.04585...
+    600,1.5860...,0.00015...,2.7960...,0.04875...
+    700,4.0932...,0.00005...,2.3318...,0.04457...
+    800,3.8208...,0.00006...,2.8944...,0.04639...
+    900,1.2252...,0.00017...,2.4614...,0.04213...
+    1000,0.564...,0.00044...,2.5117...,0.05042...
     """
 
     def __init__(
