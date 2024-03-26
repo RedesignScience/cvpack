@@ -36,9 +36,10 @@ def test_collective_variable_reporter():
                 file,
                 1,
                 [umbrella],
+                [umbrella],
                 step=True,
                 values=True,
-                effectiveMasses=True,
+                masses=True,
             )
             simulation.reporters.append(reporter)
             simulation.step(10)
