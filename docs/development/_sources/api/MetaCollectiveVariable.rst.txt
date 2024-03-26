@@ -11,6 +11,7 @@ MetaCollectiveVariable
     .. automethod:: getEffectiveMass
     .. automethod:: getInnerEffectiveMasses
     .. automethod:: getInnerValues
+    .. automethod:: getInnerVariables
     .. automethod:: getMassUnit
     .. automethod:: getName
     .. automethod:: getPeriodicBounds
