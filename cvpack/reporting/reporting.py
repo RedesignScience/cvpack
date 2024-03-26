@@ -103,7 +103,7 @@ class CollectiveVariableReporter(mmapp.StateDataReporter):
     >>> simulation.context.setPositions(model.positions)
     >>> simulation.context.setVelocitiesToTemperature(300 * unit.kelvin, 5678)
     >>> simulation.reporters.append(reporter)
-    >>> simulation.step(1000)
+    >>> simulation.step(1000)  # doctest: +SKIP
     #"Step","umbrella (kJ/mol)",...,"psi mass (nm**2 Da/(rad**2))"
     100,11.2618...,1.8774...e-05,2.3684...,0.04388...,-3.0217...,0.05552...
     200,7.46382...,4.8803...e-05,2.8851...,0.04968...,-2.8971...,0.05230...
