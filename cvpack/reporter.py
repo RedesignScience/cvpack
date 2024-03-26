@@ -67,7 +67,6 @@ class Reporter(mmapp.StateDataReporter):
     Examples
     --------
     >>> import cvpack
-    >>> from cvpack import reporting
     >>> import openmm
     >>> from openmm import app, unit
     >>> from sys import stdout
@@ -83,7 +82,7 @@ class Reporter(mmapp.StateDataReporter):
     ...     name="umbrella",
     ...     pi=3.141592653589793,
     ... )
-    >>> reporter = reporting.Reporter(
+    >>> reporter = cvpack.Reporter(
     ...     stdout,
     ...     100,
     ...     variables=[umbrella],

@@ -6,10 +6,10 @@ import copy
 import inspect
 import io
 import itertools as it
+import os
 import sys
-import typing as t
-
 import tempfile
+import typing as t
 
 import mdtraj
 import numpy as np
@@ -857,11 +857,14 @@ def test_openmm_force_wrapper():
     perform_common_tests(cv, context)
 
 
-def test_collective_variable_reporter():
+def test_reporter():
+    """
+    Test whether a reporter works as expected.
+    """
     model = testsystems.AlanineDipeptideVacuum()
     phi = cvpack.Torsion(6, 8, 14, 16, name="phi")
     umbrella = cvpack.MetaCollectiveVariable(
-        f"50*min(delta,2*pi-delta)^2" "; delta=abs(phi-5*pi/6)" f"; pi={pi}",
+        f"50*min(delta,2*pi-delta)^2" "; delta=abs(phi-5*pi/6)" f"; pi={np.pi}",
         [phi],
         unit.kilojoules_per_mole,
         name="umbrella",
@@ -875,8 +878,8 @@ def test_collective_variable_reporter():
         simulation = app.Simulation(model.topology, model.system, integrator)
         simulation.context.setPositions(model.positions)
         simulation.context.setVelocitiesToTemperature(300 * unit.kelvin, 5678)
-        with open(os.path.join(dirpath, "report.csv"), "w") as file:
-            reporter = cvpack.reporting.Reporter(
+        with open(os.path.join(dirpath, "report.csv"), "w", encoding="utf-8") as file:
+            reporter = cvpack.Reporter(
                 file,
                 1,
                 [umbrella],
@@ -887,7 +890,7 @@ def test_collective_variable_reporter():
             )
             simulation.reporters.append(reporter)
             simulation.step(10)
-        with open(os.path.join(dirpath, "report.csv"), "r") as file:
+        with open(os.path.join(dirpath, "report.csv"), "r", encoding="utf-8") as file:
             assert file.readline() == ",".join(
                 [
                     '#"Step"',
