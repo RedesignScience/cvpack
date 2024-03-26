@@ -23,28 +23,27 @@ def test_collective_variable_reporter():
         name="umbrella",
     )
     with tempfile.TemporaryDirectory() as dirpath:
-        reporter = cvpack.reporting.CollectiveVariableReporter(
-            os.path.join(dirpath, "report.csv"),
-            1,
-            [umbrella],
-            step=True,
-            values=True,
-            effectiveMasses=True,
-        )
         integrator = openmm.LangevinIntegrator(
-            300 * unit.kelvin,
-            1 / unit.picosecond,
-            2 * unit.femtosecond,
+            300 * unit.kelvin, 1 / unit.picosecond, 2 * unit.femtosecond
         )
         integrator.setRandomNumberSeed(1234)
         umbrella.addToSystem(model.system)
         simulation = app.Simulation(model.topology, model.system, integrator)
         simulation.context.setPositions(model.positions)
         simulation.context.setVelocitiesToTemperature(300 * unit.kelvin, 5678)
-        simulation.reporters.append(reporter)
-        simulation.step(10)
-        with open(os.path.join(dirpath, "report.csv"), "r") as f:
-            assert f.readline() == ",".join(
+        with open(os.path.join(dirpath, "report.csv"), "w") as file:
+            reporter = cvpack.reporting.CollectiveVariableReporter(
+                file,
+                1,
+                [umbrella],
+                step=True,
+                values=True,
+                effectiveMasses=True,
+            )
+            simulation.reporters.append(reporter)
+            simulation.step(10)
+        with open(os.path.join(dirpath, "report.csv"), "r") as file:
+            assert file.readline() == ",".join(
                 [
                     '#"Step"',
                     '"umbrella (kJ/mol)"',
