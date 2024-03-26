@@ -1,5 +1,5 @@
 """
-.. module:: reporting
+.. class:: Reporter
    :platform: Linux, MacOS, Windows
    :synopsis: This module provides classes for reporting simulation data
 
@@ -14,16 +14,16 @@ import openmm
 from openmm import app as mmapp
 from openmm import unit as mmunit
 
-from ..collective_variable import CollectiveVariable
-from ..meta_collective_variable import MetaCollectiveVariable
+from .collective_variable import CollectiveVariable
+from .meta_collective_variable import MetaCollectiveVariable
 
 
-class CollectiveVariableReporter(mmapp.StateDataReporter):
+class Reporter(mmapp.StateDataReporter):
     """
     Reports values and/or effective masses of collective variables during an OpenMM
     `Simulation`_.
 
-    Create a :class:`CollectiveVariableReporter` add it to the `Simulation`_'s list
+    Create a :class:`Reporter` add it to the `Simulation`_'s list
     of reporters (see example below). The reporter writes data to a file or file-like
     object at regular intervals. The set of data to write is configurable using boolean
     flags passed to the constructor. The data is written in comma-separated-value (CSV)
@@ -83,7 +83,7 @@ class CollectiveVariableReporter(mmapp.StateDataReporter):
     ...     name="umbrella",
     ...     pi=3.141592653589793,
     ... )
-    >>> reporter = reporting.CollectiveVariableReporter(
+    >>> reporter = reporting.Reporter(
     ...     stdout,
     ...     100,
     ...     variables=[umbrella],
