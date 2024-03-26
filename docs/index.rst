@@ -22,7 +22,6 @@ Contents
    getting_started
    api/index
    serialization
-   reporting
    references
 
 
