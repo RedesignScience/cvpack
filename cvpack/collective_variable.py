@@ -36,10 +36,10 @@ class CollectiveVariable(openmm.Force, Serializable):
     def __setstate__(self, keywords: t.Dict[str, t.Any]) -> None:
         self.__init__(**keywords)
 
-    def __copy__(self):
+    def __copy__(self) -> "CollectiveVariable":
         return yaml.safe_load(yaml.safe_dump(self))
 
-    def __deepcopy__(self, memo):
+    def __deepcopy__(self, _) -> "CollectiveVariable":
         return yaml.safe_load(yaml.safe_dump(self))
 
     @preprocess_args
@@ -72,7 +72,9 @@ class CollectiveVariable(openmm.Force, Serializable):
         self._unit = Unit("dimensionless") if unit is None else unit
         self._mass_unit = Unit(mmunit.dalton * (mmunit.nanometers / self._unit) ** 2)
         arguments, _ = self._getArguments()
+        arguments.pop("name")
         self._args = dict(zip(arguments, args))
+        self._args["name"] = name
         self._args.update(kwargs)
 
     def _registerPeriodicBounds(

@@ -1,5 +1,5 @@
 """
-Serializer submodule of CVPack
+Serialization subpackage of CVPack
 
 """
 
