@@ -1,0 +1,9 @@
+Reporter
+========
+
+.. currentmodule:: cvpack
+.. autoclass:: Reporter
+    :member-order: alphabetical
+
+    .. rubric:: Methods
+

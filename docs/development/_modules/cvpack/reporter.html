@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 
-<html lang="en" data-content_root="../../../">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cvpack.reporting.reporting &#8212; CVPack dev  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=12dfc556" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=572d9513" />
-    <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
-    <script src="../../../_static/copybutton.js?v=ccdb6887"></script>
-    <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" />
+    <title>cvpack.reporter &#8212; CVPack dev  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=572d9513" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
    
-  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
   
 
   
@@ -33,9 +33,9 @@
 
           <div class="body" role="main">
             
-  <h1>Source code for cvpack.reporting.reporting</h1><div class="highlight"><pre>
+  <h1>Source code for cvpack.reporter</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">.. module:: reporting</span>
+<span class="sd">.. class:: Reporter</span>
 <span class="sd">   :platform: Linux, MacOS, Windows</span>
 <span class="sd">   :synopsis: This module provides classes for reporting simulation data</span>
 
@@ -50,18 +50,18 @@
 <span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">app</span> <span class="k">as</span> <span class="n">mmapp</span>
 <span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
-<span class="kn">from</span> <span class="nn">..collective_variable</span> <span class="kn">import</span> <span class="n">CollectiveVariable</span>
-<span class="kn">from</span> <span class="nn">..meta_collective_variable</span> <span class="kn">import</span> <span class="n">MetaCollectiveVariable</span>
+<span class="kn">from</span> <span class="nn">.collective_variable</span> <span class="kn">import</span> <span class="n">CollectiveVariable</span>
+<span class="kn">from</span> <span class="nn">.meta_collective_variable</span> <span class="kn">import</span> <span class="n">MetaCollectiveVariable</span>
 
 
-<div class="viewcode-block" id="CollectiveVariableReporter">
-<a class="viewcode-back" href="../../../reporting.html#cvpack.reporting.CollectiveVariableReporter">[docs]</a>
-<span class="k">class</span> <span class="nc">CollectiveVariableReporter</span><span class="p">(</span><span class="n">mmapp</span><span class="o">.</span><span class="n">StateDataReporter</span><span class="p">):</span>
+<div class="viewcode-block" id="Reporter">
+<a class="viewcode-back" href="../../api/Reporter.html#cvpack.Reporter">[docs]</a>
+<span class="k">class</span> <span class="nc">Reporter</span><span class="p">(</span><span class="n">mmapp</span><span class="o">.</span><span class="n">StateDataReporter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reports values and/or effective masses of collective variables during an OpenMM</span>
 <span class="sd">    `Simulation`_.</span>
 
-<span class="sd">    Create a :class:`CollectiveVariableReporter` add it to the `Simulation`_&#39;s list</span>
+<span class="sd">    Create a :class:`Reporter` add it to the `Simulation`_&#39;s list</span>
 <span class="sd">    of reporters (see example below). The reporter writes data to a file or file-like</span>
 <span class="sd">    object at regular intervals. The set of data to write is configurable using boolean</span>
 <span class="sd">    flags passed to the constructor. The data is written in comma-separated-value (CSV)</span>
@@ -105,7 +105,6 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; import cvpack</span>
-<span class="sd">    &gt;&gt;&gt; from cvpack import reporting</span>
 <span class="sd">    &gt;&gt;&gt; import openmm</span>
 <span class="sd">    &gt;&gt;&gt; from openmm import app, unit</span>
 <span class="sd">    &gt;&gt;&gt; from sys import stdout</span>
@@ -121,7 +120,7 @@
 <span class="sd">    ...     name=&quot;umbrella&quot;,</span>
 <span class="sd">    ...     pi=3.141592653589793,</span>
 <span class="sd">    ... )</span>
-<span class="sd">    &gt;&gt;&gt; reporter = reporting.CollectiveVariableReporter(</span>
+<span class="sd">    &gt;&gt;&gt; reporter = cvpack.Reporter(</span>
 <span class="sd">    ...     stdout,</span>
 <span class="sd">    ...     100,</span>
 <span class="sd">    ...     variables=[umbrella],</span>
@@ -237,7 +236,7 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../../../index.html">CVPack dev</a></h1>
+<h1 class="logo"><a href="../../index.html">CVPack dev</a></h1>
 
 
 
@@ -249,19 +248,19 @@
 
 
 
-<h3><a href="../../../index.html">Table of Contents</a></h3>
+<h3><a href="../../index.html">Table of Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">Python API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../serialization.html">Serialization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../reporting.html">Reporting</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../references.html">Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">Collective Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html#other-classes">Other Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../serialization.html">Serialization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../references.html">Bibliography</a></li>
 </ul>
 
 <div id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
-    <form class="search" action="../../../search.html" method="get">
+    <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
