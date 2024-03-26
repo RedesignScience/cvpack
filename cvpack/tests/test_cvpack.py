@@ -864,9 +864,10 @@ def test_reporter():
     model = testsystems.AlanineDipeptideVacuum()
     phi = cvpack.Torsion(6, 8, 14, 16, name="phi")
     umbrella = cvpack.MetaCollectiveVariable(
-        f"50*min(delta,2*pi-delta)^2" "; delta=abs(phi-5*pi/6)" f"; pi={np.pi}",
+        f"0.5*kappa*min(delta,2*pi-delta)^2" "; delta=abs(phi-5*pi/6)" f"; pi={np.pi}",
         [phi],
         unit.kilojoules_per_mole,
+        kappa=100,
         name="umbrella",
     )
     with tempfile.TemporaryDirectory() as dirpath:
@@ -884,6 +885,7 @@ def test_reporter():
                 1,
                 [umbrella],
                 [umbrella],
+                {"kappa": unit.kilojoules_per_mole / unit.radian**2},
                 step=True,
                 values=True,
                 masses=True,
@@ -897,6 +899,7 @@ def test_reporter():
                     '"umbrella (kJ/mol)"',
                     '"umbrella mass (nm**2 mol**2 Da/(kJ**2))"',
                     '"phi (rad)"',
-                    '"phi mass (nm**2 Da/(rad**2))"\n',
+                    '"phi mass (nm**2 Da/(rad**2))"',
+                    '"kappa (kJ/(mol rad**2))"\n',
                 ]
             )
