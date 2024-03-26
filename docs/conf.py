@@ -27,7 +27,11 @@ sys.path.insert(0, os.path.abspath(".."))
 
 def create_rst_file(cls):
     name = cls.__name__
-    methods = list(CollectiveVariable.__dict__.keys()) + list(cls.__dict__.keys())
+    if issubclass(cls, CollectiveVariable):
+        methods = list(CollectiveVariable.__dict__.keys())
+    else:
+        methods = []
+    methods += list(cls.__dict__.keys())
     excluded = ["yaml_tag"]
     with open(f"api/{name}.rst", "w") as f:
         f.writelines(
@@ -48,7 +52,11 @@ def create_rst_file(cls):
 
 
 with open("api/index.rst", "w") as f:
-    f.write("Python API\n==========\n\n.. toctree::\n    :titlesonly:\n\n")
+    f.write(
+        "Collective Variables\n"
+        "====================\n\n"
+        ".. toctree::\n    :titlesonly:\n\n"
+    )
     for item in cvpack.__dict__.values():
         if (
             inspect.isclass(item)
@@ -57,7 +65,22 @@ with open("api/index.rst", "w") as f:
         ):
             f.write(f"    {item.__name__}\n")
             create_rst_file(item)
+    f.write(
+        "\n\n"
+        "Other Classes\n"
+        "=============\n\n"
+        ".. toctree::\n    :titlesonly:\n\n"
+    )
+    for item in cvpack.__dict__.values():
+        if (
+            inspect.isclass(item)
+            and item is not CollectiveVariable
+            and not issubclass(item, CollectiveVariable)
+        ):
+            f.write(f"    {item.__name__}\n")
+            create_rst_file(item)
     f.write("\n.. testsetup::\n\n    from cvpack import *")
+
 
 # -- Project information -----------------------------------------------------
 

@@ -1,7 +1,7 @@
 """
-.. module:: collective_variable
+.. class:: CollectiveVariable
    :platform: Linux, MacOS, Windows
-   :synopsis: Useful Collective Variables for OpenMM
+   :synopsis: An abstract class with common attributes and method for all CVs
 
 .. moduleauthor:: Charlles Abreu <craabreu@gmail.com>
 
