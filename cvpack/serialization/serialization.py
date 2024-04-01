@@ -106,8 +106,11 @@ class SerializableForce(openmm.Force, Serializable):
         self,
         force: openmm.Force,
     ) -> None:
-        self.__class__.__bases__ = (force.__class__, Serializable)
+        self.force = force
         self.this = force.this
+
+    def __getattr__(self, name: str) -> t.Any:
+        return getattr(self.force, name)
 
     def __getstate__(self) -> t.Dict[str, str]:
         return {"xml_code": openmm.XmlSerializer.serialize(self)}

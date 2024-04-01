@@ -54,7 +54,6 @@ class OpenMMForceWrapper(CollectiveVariable):
     ...     unit.radian,
     ...     periodicBounds=[-np.pi, np.pi] * unit.radian,
     ... )
-    >>> assert isinstance(cv, openmm.CustomAngleForce)
     >>> cv.addToSystem(model.system)
     >>> integrator = openmm.VerletIntegrator(0)
     >>> platform = openmm.Platform.getPlatformByName("Reference")
@@ -76,9 +75,7 @@ class OpenMMForceWrapper(CollectiveVariable):
         if isinstance(openmmForce, openmm.Force):
             openmmForce = openmm.XmlSerializer.serialize(openmmForce)
         unit = Unit(unit)
-        force_copy = openmm.XmlSerializer.deserialize(openmmForce)
-        self.this = force_copy.this
-        self.__class__.__bases__ = (CollectiveVariable, type(force_copy))
+        self.this = openmm.XmlSerializer.deserialize(openmmForce).this
         self._registerCV(name, unit, openmmForce, unit, periodicBounds)
         if periodicBounds is not None:
             self._registerPeriodicBounds(*periodicBounds)
