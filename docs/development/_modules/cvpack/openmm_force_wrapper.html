@@ -92,7 +92,6 @@
 <span class="sd">    ...     unit.radian,</span>
 <span class="sd">    ...     periodicBounds=[-np.pi, np.pi] * unit.radian,</span>
 <span class="sd">    ... )</span>
-<span class="sd">    &gt;&gt;&gt; assert isinstance(cv, openmm.CustomAngleForce)</span>
 <span class="sd">    &gt;&gt;&gt; cv.addToSystem(model.system)</span>
 <span class="sd">    &gt;&gt;&gt; integrator = openmm.VerletIntegrator(0)</span>
 <span class="sd">    &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&quot;Reference&quot;)</span>
@@ -114,9 +113,7 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">openmmForce</span><span class="p">,</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Force</span><span class="p">):</span>
             <span class="n">openmmForce</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">XmlSerializer</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">openmmForce</span><span class="p">)</span>
         <span class="n">unit</span> <span class="o">=</span> <span class="n">Unit</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
-        <span class="n">force_copy</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">XmlSerializer</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">openmmForce</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">this</span> <span class="o">=</span> <span class="n">force_copy</span><span class="o">.</span><span class="n">this</span>
-        <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__bases__</span> <span class="o">=</span> <span class="p">(</span><span class="n">CollectiveVariable</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">force_copy</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">this</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">XmlSerializer</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">openmmForce</span><span class="p">)</span><span class="o">.</span><span class="n">this</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">openmmForce</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">periodicBounds</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">periodicBounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_registerPeriodicBounds</span><span class="p">(</span><span class="o">*</span><span class="n">periodicBounds</span><span class="p">)</span></div>
