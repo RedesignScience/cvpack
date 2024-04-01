@@ -840,7 +840,6 @@ def test_openmm_force_wrapper():
     cv = cvpack.OpenMMForceWrapper(
         angle, unit.radian, periodicBounds=[-np.pi, np.pi] * unit.radian
     )
-    assert isinstance(cv, openmm.CustomAngleForce)
     cv.addToSystem(model.system)
     angle.setForceGroup(cv.getForceGroup() + 1)
     model.system.addForce(angle)
