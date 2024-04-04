@@ -220,6 +220,10 @@ def preprocess_args(func: t.Callable) -> t.Callable:
     signature = inspect.signature(func)
 
     def convert(data: t.Any) -> t.Any:  # pylint: disable=too-many-return-statements
+        if isinstance(data, np.integer):
+            return int(data)
+        if isinstance(data, np.floating):
+            return float(data)
         if isinstance(data, mmunit.Quantity):
             return Quantity(data)
         if isinstance(data, mmunit.Unit):
