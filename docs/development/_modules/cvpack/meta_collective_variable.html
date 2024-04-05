@@ -52,7 +52,7 @@
 <span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
 <span class="kn">from</span> <span class="nn">.collective_variable</span> <span class="kn">import</span> <span class="n">CollectiveVariable</span>
-<span class="kn">from</span> <span class="nn">.units</span> <span class="kn">import</span> <span class="n">Quantity</span><span class="p">,</span> <span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">VectorQuantity</span>
+<span class="kn">from</span> <span class="nn">.units</span> <span class="kn">import</span> <span class="n">Quantity</span><span class="p">,</span> <span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">Unit</span><span class="p">,</span> <span class="n">VectorQuantity</span><span class="p">,</span> <span class="n">in_md_units</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">compute_effective_mass</span>
 
 
@@ -103,13 +103,15 @@
 <span class="sd">        `unit.dimensionless`</span>
 <span class="sd">    periodicBounds</span>
 <span class="sd">        The periodic bounds of the collective variable if it is periodic, or `None` if</span>
-<span class="sd">        it is not</span>
+<span class="sd">        it is not periodic.</span>
 
 <span class="sd">    Keyword Args</span>
 <span class="sd">    ------------</span>
 <span class="sd">    **parameters</span>
-<span class="sd">        The named parameters of the function. They will become :OpenMM:`Context`</span>
-<span class="sd">        parameters if this collective variable is added to an :OpenMM:`System`.</span>
+<span class="sd">        The named parameters of the function, if any. They will become settable context</span>
+<span class="sd">        parameters when this meta-collective variable is added to an :OpenMM:`System`.</span>
+<span class="sd">        The passed objects must be scalar quantities. Their values will be converted to</span>
+<span class="sd">        OpenMM&#39;s MD unit system to serve as default values for the context parameters.</span>
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
@@ -133,6 +135,12 @@
 <span class="sd">    &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
 <span class="sd">    &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
 <span class="sd">    &gt;&gt;&gt; context.setPositions(model.positions)</span>
+<span class="sd">    &gt;&gt;&gt; driving_force.getParameterNames()</span>
+<span class="sd">    (&#39;kappa&#39;, &#39;phi0&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; driving_force.getParameterUnits()</span>
+<span class="sd">    {&#39;kappa&#39;: kJ/(mol rad**2), &#39;phi0&#39;: rad}</span>
+<span class="sd">    &gt;&gt;&gt; driving_force.getParameterValues(context)</span>
+<span class="sd">    {&#39;kappa&#39;: 1000.0 kJ/(mol rad**2), &#39;phi0&#39;: 2.094... rad}</span>
 <span class="sd">    &gt;&gt;&gt; driving_force.getValue(context)</span>
 <span class="sd">    548.3... kJ/mol</span>
 <span class="sd">    &gt;&gt;&gt; driving_force.getInnerValues(context)</span>
@@ -152,10 +160,11 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cvs</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">copy</span><span class="p">,</span> <span class="n">variables</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">in_md_units</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
         <span class="k">for</span> <span class="n">cv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cvs</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">addCollectiveVariable</span><span class="p">(</span><span class="n">cv</span><span class="o">.</span><span class="n">getName</span><span class="p">(),</span> <span class="n">cv</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">value</span> <span class="o">/</span> <span class="n">value</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span>
             <span class="n">name</span><span class="p">,</span>
             <span class="n">unit</span><span class="p">,</span>
@@ -163,7 +172,7 @@
             <span class="n">variables</span><span class="p">,</span>
             <span class="n">unit</span><span class="p">,</span>
             <span class="n">periodicBounds</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">parameters</span><span class="p">,</span>
+            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">periodicBounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_registerPeriodicBounds</span><span class="p">(</span><span class="o">*</span><span class="n">periodicBounds</span><span class="p">)</span>
@@ -235,6 +244,61 @@
         <span class="k">return</span> <span class="p">{</span>
             <span class="n">cv</span><span class="o">.</span><span class="n">getName</span><span class="p">():</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">mass</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">getMassUnit</span><span class="p">())</span>
             <span class="k">for</span> <span class="n">cv</span><span class="p">,</span> <span class="n">mass</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cvs</span><span class="p">,</span> <span class="n">masses</span><span class="p">)</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="MetaCollectiveVariable.getParameterNames">
+<a class="viewcode-back" href="../../api/MetaCollectiveVariable.html#cvpack.MetaCollectiveVariable.getParameterNames">[docs]</a>
+    <span class="k">def</span> <span class="nf">getParameterNames</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the names of the parameters of this meta-collective variable.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Tuple[str]</span>
+<span class="sd">            A tuple with the names of the named parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="MetaCollectiveVariable.getParameterUnits">
+<a class="viewcode-back" href="../../api/MetaCollectiveVariable.html#cvpack.MetaCollectiveVariable.getParameterUnits">[docs]</a>
+    <span class="k">def</span> <span class="nf">getParameterUnits</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Unit</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the units of measurement of the named parameters of this meta-collective</span>
+<span class="sd">        variable. The units are returned as a dictionary with the names of the</span>
+<span class="sd">        parameters as keys.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Dict[str, Unit]</span>
+<span class="sd">            A dictionary with the names of the named parameters as keys and their units</span>
+<span class="sd">            as values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">parameter</span><span class="o">.</span><span class="n">unit</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span></div>
+
+
+<div class="viewcode-block" id="MetaCollectiveVariable.getParameterValues">
+<a class="viewcode-back" href="../../api/MetaCollectiveVariable.html#cvpack.MetaCollectiveVariable.getParameterValues">[docs]</a>
+    <span class="k">def</span> <span class="nf">getParameterValues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Quantity</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the values of the named parameters of this meta-collective variable. The</span>
+<span class="sd">        values are returned as a dictionary with the names of the parameters as keys.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        context</span>
+<span class="sd">            The context in which the named parameters will be evaluated.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Dict[str, Quantity]</span>
+<span class="sd">            A dictionary with the names of the named parameters as keys and their values</span>
+<span class="sd">            as values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">name</span><span class="p">:</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">getParameter</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="n">parameter</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
         <span class="p">}</span></div>
 </div>
 

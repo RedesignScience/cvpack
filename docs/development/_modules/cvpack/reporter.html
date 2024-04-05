@@ -82,9 +82,6 @@
 <span class="sd">    metaCVs</span>
 <span class="sd">        The meta-collective variables whose inner variables will be reported. These must</span>
 <span class="sd">        be the same objects added to the simulation&#39;s :OpenMM:`System`.</span>
-<span class="sd">    contextParameters</span>
-<span class="sd">        Global :OpenMM:`Context` parameters to be reported along with their units of</span>
-<span class="sd">        measurement. Use `unit.dimensionless` for parameters without units.</span>
 <span class="sd">    step</span>
 <span class="sd">        Whether to report the current step index.</span>
 <span class="sd">    time</span>
@@ -93,6 +90,8 @@
 <span class="sd">        Whether to report the current values of the collective variables.</span>
 <span class="sd">    masses</span>
 <span class="sd">        Whether to report the current effective masses of the collective variables.</span>
+<span class="sd">    parameters</span>
+<span class="sd">        The names of metaCV parameters to report.</span>
 <span class="sd">    separator</span>
 <span class="sd">        The separator to use between columns in the file.</span>
 <span class="sd">    append</span>
@@ -131,10 +130,10 @@
 <span class="sd">    ...     100,</span>
 <span class="sd">    ...     variables=[umbrella],</span>
 <span class="sd">    ...     metaCVs=[umbrella],</span>
-<span class="sd">    ...     contextParameters={&quot;kappa&quot;: unit.kilojoules_per_mole/unit.radian**2},</span>
 <span class="sd">    ...     step=True,</span>
 <span class="sd">    ...     values=True,</span>
-<span class="sd">    ...     masses=True</span>
+<span class="sd">    ...     masses=True,</span>
+<span class="sd">    ...     parameters=[&quot;kappa&quot;],</span>
 <span class="sd">    ... )</span>
 <span class="sd">    &gt;&gt;&gt; integrator = openmm.LangevinIntegrator(</span>
 <span class="sd">    ...     300 * unit.kelvin,</span>
@@ -167,21 +166,14 @@
         <span class="n">reportInterval</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">variables</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">CollectiveVariable</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
         <span class="n">metaCVs</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">MetaCollectiveVariable</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
-        <span class="n">contextParameters</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Unit</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span>
         <span class="n">step</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">time</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">values</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">masses</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">parameters</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
         <span class="n">separator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="p">,</span>
         <span class="n">append</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">variables</span> <span class="ow">or</span> <span class="n">metaCVs</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Arguments &#39;variables&#39; and &#39;metaCVs&#39; cannot be both empty&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">values</span> <span class="ow">or</span> <span class="n">masses</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Arguments &#39;values&#39; and &#39;masses&#39; cannot be both False&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">unit</span> <span class="ow">in</span> <span class="n">contextParameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">is_unit</span><span class="p">(</span><span class="n">unit</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid unit &#39;</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&#39; for parameter &#39;</span><span class="si">{</span><span class="n">parameter</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">file</span><span class="p">,</span>
             <span class="n">reportInterval</span><span class="p">,</span>
@@ -194,7 +186,34 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_meta_cvs</span> <span class="o">=</span> <span class="n">metaCVs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_values</span> <span class="o">=</span> <span class="n">values</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_masses</span> <span class="o">=</span> <span class="n">masses</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span> <span class="o">=</span> <span class="n">contextParameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameter_unit_pairs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">metacv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meta_cvs</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">unit</span> <span class="ow">in</span> <span class="n">metacv</span><span class="o">.</span><span class="n">getParameterUnits</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">parameters</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameter_units</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parameter_unit_pairs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_variables</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meta_cvs</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Arguments &#39;variables&#39; and &#39;metaCVs&#39; cannot be both empty&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_values</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_masses</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Arguments &#39;values&#39; and &#39;masses&#39; cannot be both False&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">cv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cv</span><span class="p">,</span> <span class="n">CollectiveVariable</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="s2">&quot;All items in &#39;variables&#39; must be instances of CollectiveVariable&quot;</span>
+                <span class="p">)</span>
+        <span class="k">for</span> <span class="n">metacv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meta_cvs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">metacv</span><span class="p">,</span> <span class="n">MetaCollectiveVariable</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="s2">&quot;All items in &#39;metaCVs&#39; must be instances of MetaCollectiveVariable&quot;</span>
+                <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parameter_unit_pairs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parameter_units</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;All items in &#39;parameters&#39; must be present in &#39;metaCVs&#39;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parameter_unit_pairs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parameter_units</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameters must have consistent units across &#39;metaCVs&#39;&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_constructReportValues</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-branches</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">:</span> <span class="n">mmapp</span><span class="o">.</span><span class="n">Simulation</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">openmm</span><span class="o">.</span><span class="n">State</span>
@@ -218,7 +237,7 @@
                     <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cv_values</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">/</span> <span class="n">cv_values</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">cv_masses</span><span class="p">:</span>
                     <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cv_masses</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">/</span> <span class="n">cv_masses</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameter_units</span><span class="p">:</span>
             <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">getParameter</span><span class="p">(</span><span class="n">parameter</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">values</span>
 
@@ -240,7 +259,7 @@
         <span class="k">for</span> <span class="n">cv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meta_cvs</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">inner_cv</span> <span class="ow">in</span> <span class="n">cv</span><span class="o">.</span><span class="n">getInnerVariables</span><span class="p">():</span>
                 <span class="n">add_headers</span><span class="p">(</span><span class="n">inner_cv</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">unit</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">unit</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameter_units</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">headers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">parameter</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">unit</span><span class="o">.</span><span class="n">get_symbol</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">headers</span></div>
 

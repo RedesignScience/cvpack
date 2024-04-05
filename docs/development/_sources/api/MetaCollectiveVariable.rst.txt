@@ -14,6 +14,9 @@ MetaCollectiveVariable
     .. automethod:: getInnerVariables
     .. automethod:: getMassUnit
     .. automethod:: getName
+    .. automethod:: getParameterNames
+    .. automethod:: getParameterUnits
+    .. automethod:: getParameterValues
     .. automethod:: getPeriodicBounds
     .. automethod:: getUnit
     .. automethod:: getValue
