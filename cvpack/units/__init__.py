@@ -9,5 +9,6 @@ from .units import (  # noqa: F401
     ScalarQuantity,
     Unit,
     VectorQuantity,
+    in_md_units,
     value_in_md_units,
 )
