@@ -16,7 +16,7 @@ import openmm
 from openmm import unit as mmunit
 
 from .collective_variable import CollectiveVariable
-from .units import Quantity, ScalarQuantity, Unit, VectorQuantity, in_md_units
+from .units import Quantity, ScalarQuantity, VectorQuantity, in_md_units
 from .utils import compute_effective_mass
 
 
@@ -89,7 +89,7 @@ class MetaCollectiveVariable(openmm.CustomCVForce, CollectiveVariable):
     ...     "; delta=abs(phi-phi0)",
     ...     [phi],
     ...     unit.kilojoules_per_mole,
-    ...     kappa = 1000 * unit.kilojoules_per_mole/unit.radian**2,
+    ...     kappa = 1e3 * unit.kilojoules_per_mole/unit.radian**2,
     ...     phi0 = 120 * unit.degrees
     ... )
     >>> driving_force.addToSystem(model.system)
@@ -97,10 +97,8 @@ class MetaCollectiveVariable(openmm.CustomCVForce, CollectiveVariable):
     >>> platform = openmm.Platform.getPlatformByName('Reference')
     >>> context = openmm.Context(model.system, integrator, platform)
     >>> context.setPositions(model.positions)
-    >>> driving_force.getParameterNames()
-    ('kappa', 'phi0')
-    >>> driving_force.getParameterUnits()
-    {'kappa': kJ/(mol rad**2), 'phi0': rad}
+    >>> driving_force.getParameterDefaultValues()
+    {'kappa': 1000.0 kJ/(mol rad**2), 'phi0': 2.094... rad}
     >>> driving_force.getParameterValues(context)
     {'kappa': 1000.0 kJ/(mol rad**2), 'phi0': 2.094... rad}
     >>> driving_force.getValue(context)
@@ -200,30 +198,17 @@ class MetaCollectiveVariable(openmm.CustomCVForce, CollectiveVariable):
             for cv, mass in zip(self._cvs, masses)
         }
 
-    def getParameterNames(self) -> t.Tuple[str]:
+    def getParameterDefaultValues(self) -> t.Dict[str, Quantity]:
         """
-        Get the names of the parameters of this meta-collective variable.
+        Get the default values of the named parameters of this meta-collective variable.
 
         Returns
         -------
-        Tuple[str]
-            A tuple with the names of the named parameters.
+        Dict[str, Quantity]
+            A dictionary with the names of the named parameters as keys and their
+            default values as values.
         """
-        return tuple(self._parameters.keys())
-
-    def getParameterUnits(self) -> t.Dict[str, Unit]:
-        """
-        Get the units of measurement of the named parameters of this meta-collective
-        variable. The units are returned as a dictionary with the names of the
-        parameters as keys.
-
-        Returns
-        -------
-        Dict[str, Unit]
-            A dictionary with the names of the named parameters as keys and their units
-            as values.
-        """
-        return {name: parameter.unit for name, parameter in self._parameters.items()}
+        return self._parameters
 
     def getParameterValues(self, context: openmm.Context) -> t.Dict[str, Quantity]:
         """

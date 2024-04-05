@@ -149,9 +149,9 @@ class Reporter(mmapp.StateDataReporter):
         self._values = values
         self._masses = masses
         self._parameter_unit_pairs = {
-            (name, unit)
+            (name, quantity.unit)
             for metacv in self._meta_cvs
-            for name, unit in metacv.getParameterUnits().items()
+            for name, quantity in metacv.getParameterDefaultValues().items()
             if name in parameters
         }
         self._parameter_units = dict(self._parameter_unit_pairs)
