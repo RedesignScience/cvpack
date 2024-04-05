@@ -866,7 +866,7 @@ def test_reporter():
         f"0.5*kappa*min(delta,2*pi-delta)^2" "; delta=abs(phi-5*pi/6)" f"; pi={np.pi}",
         [phi],
         unit.kilojoules_per_mole,
-        kappa=100,
+        kappa=100 * unit.kilojoules_per_mole / unit.radian**2,
         name="umbrella",
     )
     with tempfile.TemporaryDirectory() as dirpath:
@@ -884,10 +884,10 @@ def test_reporter():
                 1,
                 [umbrella],
                 [umbrella],
-                {"kappa": unit.kilojoules_per_mole / unit.radian**2},
                 step=True,
                 values=True,
                 masses=True,
+                parameters=["kappa"],
             )
             simulation.reporters.append(reporter)
             simulation.step(10)

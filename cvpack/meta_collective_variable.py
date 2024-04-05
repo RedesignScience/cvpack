@@ -16,7 +16,7 @@ import openmm
 from openmm import unit as mmunit
 
 from .collective_variable import CollectiveVariable
-from .units import Quantity, ScalarQuantity, VectorQuantity, in_md_units, Unit
+from .units import Quantity, ScalarQuantity, Unit, VectorQuantity, in_md_units
 from .utils import compute_effective_mass
 
 

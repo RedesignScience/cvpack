@@ -44,9 +44,6 @@ class Reporter(mmapp.StateDataReporter):
     metaCVs
         The meta-collective variables whose inner variables will be reported. These must
         be the same objects added to the simulation's :OpenMM:`System`.
-    contextParameters
-        Global :OpenMM:`Context` parameters to be reported along with their units of
-        measurement. Use `unit.dimensionless` for parameters without units.
     step
         Whether to report the current step index.
     time
@@ -55,6 +52,8 @@ class Reporter(mmapp.StateDataReporter):
         Whether to report the current values of the collective variables.
     masses
         Whether to report the current effective masses of the collective variables.
+    parameters
+        The names of metaCV parameters to report.
     separator
         The separator to use between columns in the file.
     append
@@ -93,10 +92,10 @@ class Reporter(mmapp.StateDataReporter):
     ...     100,
     ...     variables=[umbrella],
     ...     metaCVs=[umbrella],
-    ...     contextParameters={"kappa": unit.kilojoules_per_mole/unit.radian**2},
     ...     step=True,
     ...     values=True,
-    ...     masses=True
+    ...     masses=True,
+    ...     parameters=["kappa"],
     ... )
     >>> integrator = openmm.LangevinIntegrator(
     ...     300 * unit.kelvin,
@@ -129,21 +128,14 @@ class Reporter(mmapp.StateDataReporter):
         reportInterval: int,
         variables: t.Sequence[CollectiveVariable] = (),
         metaCVs: t.Sequence[MetaCollectiveVariable] = (),
-        contextParameters: t.Mapping[str, mmunit.Unit] = {},
         step: bool = False,
         time: bool = False,
         values: bool = False,
         masses: bool = False,
+        parameters: t.Iterable[str] = (),
         separator: str = ",",
         append: bool = False,
     ) -> None:
-        if not (variables or metaCVs):
-            raise ValueError("Arguments 'variables' and 'metaCVs' cannot be both empty")
-        if not (values or masses):
-            raise ValueError("Arguments 'values' and 'masses' cannot be both False")
-        for parameter, unit in contextParameters.items():
-            if not mmunit.is_unit(unit):
-                raise ValueError(f"Invalid unit '{unit}' for parameter '{parameter}'")
         super().__init__(
             file,
             reportInterval,
@@ -156,7 +148,34 @@ class Reporter(mmapp.StateDataReporter):
         self._meta_cvs = metaCVs
         self._values = values
         self._masses = masses
-        self._parameters = contextParameters
+        self._parameter_unit_pairs = {
+            (name, unit)
+            for metacv in self._meta_cvs
+            for name, unit in metacv.getParameterUnits().items()
+            if name in parameters
+        }
+        self._parameter_units = dict(self._parameter_unit_pairs)
+        self._validate()
+
+    def _validate(self) -> None:
+        if not (self._variables or self._meta_cvs):
+            raise ValueError("Arguments 'variables' and 'metaCVs' cannot be both empty")
+        if not (self._values or self._masses):
+            raise ValueError("Arguments 'values' and 'masses' cannot be both False")
+        for cv in self._variables:
+            if not isinstance(cv, CollectiveVariable):
+                raise TypeError(
+                    "All items in 'variables' must be instances of CollectiveVariable"
+                )
+        for metacv in self._meta_cvs:
+            if not isinstance(metacv, MetaCollectiveVariable):
+                raise TypeError(
+                    "All items in 'metaCVs' must be instances of MetaCollectiveVariable"
+                )
+        if len(self._parameter_unit_pairs) < len(self._parameter_units):
+            raise ValueError("All items in 'parameters' must be present in 'metaCVs'")
+        if len(self._parameter_unit_pairs) > len(self._parameter_units):
+            raise ValueError("Parameters must have consistent units across 'metaCVs'")
 
     def _constructReportValues(  # pylint: disable=too-many-branches
         self, simulation: mmapp.Simulation, state: openmm.State
@@ -180,7 +199,7 @@ class Reporter(mmapp.StateDataReporter):
                     values.append(cv_values[name] / cv_values[name].unit)
                 if name in cv_masses:
                     values.append(cv_masses[name] / cv_masses[name].unit)
-        for parameter in self._parameters:
+        for parameter in self._parameter_units:
             values.append(context.getParameter(parameter))
         return values
 
@@ -202,6 +221,6 @@ class Reporter(mmapp.StateDataReporter):
         for cv in self._meta_cvs:
             for inner_cv in cv.getInnerVariables():
                 add_headers(inner_cv)
-        for parameter, unit in self._parameters.items():
+        for parameter, unit in self._parameter_units.items():
             headers.append(f"{parameter} ({unit.get_symbol()})")
         return headers
