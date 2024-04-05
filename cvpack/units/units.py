@@ -104,6 +104,31 @@ class Quantity(mmunit.Quantity, Serializable):
 Quantity.registerTag("!cvpack.Quantity")
 
 
+def in_md_units(
+    quantity: t.Union[ScalarQuantity, VectorQuantity, MatrixQuantity]
+) -> Quantity:
+    """
+    Return a quantity in the MD unit system (e.g. mass in Da, distance in
+    nm, time in ps, temperature in K, energy in kJ/mol, angle in rad).
+
+    Parameters
+    ----------
+    quantity
+        The quantity to be converted.
+
+    Returns
+    -------
+    Quantity
+        The quantity in the MD unit system.
+    """
+    if mmunit.is_quantity(quantity):
+        unit_in_md_system = quantity.unit.in_unit_system(mmunit.md_unit_system)
+        if 1 * quantity.unit / unit_in_md_system == 1:
+            return Quantity(quantity)
+        return Quantity(quantity.in_units_of(unit_in_md_system))
+    return quantity * Unit("dimensionless")
+
+
 def value_in_md_units(
     quantity: t.Union[ScalarQuantity, VectorQuantity, MatrixQuantity]
 ) -> t.Any:
