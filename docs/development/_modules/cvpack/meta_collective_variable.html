@@ -52,7 +52,7 @@
 <span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
 <span class="kn">from</span> <span class="nn">.collective_variable</span> <span class="kn">import</span> <span class="n">CollectiveVariable</span>
-<span class="kn">from</span> <span class="nn">.units</span> <span class="kn">import</span> <span class="n">Quantity</span><span class="p">,</span> <span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">Unit</span><span class="p">,</span> <span class="n">VectorQuantity</span><span class="p">,</span> <span class="n">in_md_units</span>
+<span class="kn">from</span> <span class="nn">.units</span> <span class="kn">import</span> <span class="n">Quantity</span><span class="p">,</span> <span class="n">ScalarQuantity</span><span class="p">,</span> <span class="n">VectorQuantity</span><span class="p">,</span> <span class="n">in_md_units</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">compute_effective_mass</span>
 
 
@@ -127,7 +127,7 @@
 <span class="sd">    ...     &quot;; delta=abs(phi-phi0)&quot;,</span>
 <span class="sd">    ...     [phi],</span>
 <span class="sd">    ...     unit.kilojoules_per_mole,</span>
-<span class="sd">    ...     kappa = 1000 * unit.kilojoules_per_mole/unit.radian**2,</span>
+<span class="sd">    ...     kappa = 1e3 * unit.kilojoules_per_mole/unit.radian**2,</span>
 <span class="sd">    ...     phi0 = 120 * unit.degrees</span>
 <span class="sd">    ... )</span>
 <span class="sd">    &gt;&gt;&gt; driving_force.addToSystem(model.system)</span>
@@ -135,10 +135,8 @@
 <span class="sd">    &gt;&gt;&gt; platform = openmm.Platform.getPlatformByName(&#39;Reference&#39;)</span>
 <span class="sd">    &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
 <span class="sd">    &gt;&gt;&gt; context.setPositions(model.positions)</span>
-<span class="sd">    &gt;&gt;&gt; driving_force.getParameterNames()</span>
-<span class="sd">    (&#39;kappa&#39;, &#39;phi0&#39;)</span>
-<span class="sd">    &gt;&gt;&gt; driving_force.getParameterUnits()</span>
-<span class="sd">    {&#39;kappa&#39;: kJ/(mol rad**2), &#39;phi0&#39;: rad}</span>
+<span class="sd">    &gt;&gt;&gt; driving_force.getParameterDefaultValues()</span>
+<span class="sd">    {&#39;kappa&#39;: 1000.0 kJ/(mol rad**2), &#39;phi0&#39;: 2.094... rad}</span>
 <span class="sd">    &gt;&gt;&gt; driving_force.getParameterValues(context)</span>
 <span class="sd">    {&#39;kappa&#39;: 1000.0 kJ/(mol rad**2), &#39;phi0&#39;: 2.094... rad}</span>
 <span class="sd">    &gt;&gt;&gt; driving_force.getValue(context)</span>
@@ -247,35 +245,19 @@
         <span class="p">}</span></div>
 
 
-<div class="viewcode-block" id="MetaCollectiveVariable.getParameterNames">
-<a class="viewcode-back" href="../../api/MetaCollectiveVariable.html#cvpack.MetaCollectiveVariable.getParameterNames">[docs]</a>
-    <span class="k">def</span> <span class="nf">getParameterNames</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="MetaCollectiveVariable.getParameterDefaultValues">
+<a class="viewcode-back" href="../../api/MetaCollectiveVariable.html#cvpack.MetaCollectiveVariable.getParameterDefaultValues">[docs]</a>
+    <span class="k">def</span> <span class="nf">getParameterDefaultValues</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Quantity</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the names of the parameters of this meta-collective variable.</span>
+<span class="sd">        Get the default values of the named parameters of this meta-collective variable.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Tuple[str]</span>
-<span class="sd">            A tuple with the names of the named parameters.</span>
+<span class="sd">        Dict[str, Quantity]</span>
+<span class="sd">            A dictionary with the names of the named parameters as keys and their</span>
+<span class="sd">            default values as values.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
-
-
-<div class="viewcode-block" id="MetaCollectiveVariable.getParameterUnits">
-<a class="viewcode-back" href="../../api/MetaCollectiveVariable.html#cvpack.MetaCollectiveVariable.getParameterUnits">[docs]</a>
-    <span class="k">def</span> <span class="nf">getParameterUnits</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Unit</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the units of measurement of the named parameters of this meta-collective</span>
-<span class="sd">        variable. The units are returned as a dictionary with the names of the</span>
-<span class="sd">        parameters as keys.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        Dict[str, Unit]</span>
-<span class="sd">            A dictionary with the names of the named parameters as keys and their units</span>
-<span class="sd">            as values.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">parameter</span><span class="o">.</span><span class="n">unit</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameters</span></div>
 
 
 <div class="viewcode-block" id="MetaCollectiveVariable.getParameterValues">

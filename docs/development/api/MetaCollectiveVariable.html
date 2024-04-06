@@ -100,7 +100,7 @@ OpenMM’s MD unit system to serve as default values for the context parameters.
 <span class="gp">... </span>    <span class="s2">&quot;; delta=abs(phi-phi0)&quot;</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="p">[</span><span class="n">phi</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="n">unit</span><span class="o">.</span><span class="n">kilojoules_per_mole</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">kappa</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">kilojoules_per_mole</span><span class="o">/</span><span class="n">unit</span><span class="o">.</span><span class="n">radian</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">kappa</span> <span class="o">=</span> <span class="mf">1e3</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">kilojoules_per_mole</span><span class="o">/</span><span class="n">unit</span><span class="o">.</span><span class="n">radian</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">phi0</span> <span class="o">=</span> <span class="mi">120</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">degrees</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">driving_force</span><span class="o">.</span><span class="n">addToSystem</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">)</span>
@@ -108,10 +108,8 @@ OpenMM’s MD unit system to serve as default values for the context parameters.
 <span class="gp">&gt;&gt;&gt; </span><span class="n">platform</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Platform</span><span class="o">.</span><span class="n">getPlatformByName</span><span class="p">(</span><span class="s1">&#39;Reference&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="n">integrator</span><span class="p">,</span> <span class="n">platform</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">driving_force</span><span class="o">.</span><span class="n">getParameterNames</span><span class="p">()</span>
-<span class="go">(&#39;kappa&#39;, &#39;phi0&#39;)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">driving_force</span><span class="o">.</span><span class="n">getParameterUnits</span><span class="p">()</span>
-<span class="go">{&#39;kappa&#39;: kJ/(mol rad**2), &#39;phi0&#39;: rad}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">driving_force</span><span class="o">.</span><span class="n">getParameterDefaultValues</span><span class="p">()</span>
+<span class="go">{&#39;kappa&#39;: 1000.0 kJ/(mol rad**2), &#39;phi0&#39;: 2.094... rad}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">driving_force</span><span class="o">.</span><span class="n">getParameterValues</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 <span class="go">{&#39;kappa&#39;: 1000.0 kJ/(mol rad**2), &#39;phi0&#39;: 2.094... rad}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">driving_force</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
@@ -281,32 +279,16 @@ values as values.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cvpack.MetaCollectiveVariable.getParameterNames">
-<span class="sig-name descname"><span class="pre">getParameterNames</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/meta_collective_variable.html#MetaCollectiveVariable.getParameterNames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.MetaCollectiveVariable.getParameterNames" title="Link to this definition">¶</a></dt>
-<dd><p>Get the names of the parameters of this meta-collective variable.</p>
+<dt class="sig sig-object py" id="cvpack.MetaCollectiveVariable.getParameterDefaultValues">
+<span class="sig-name descname"><span class="pre">getParameterDefaultValues</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/meta_collective_variable.html#MetaCollectiveVariable.getParameterDefaultValues"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.MetaCollectiveVariable.getParameterDefaultValues" title="Link to this definition">¶</a></dt>
+<dd><p>Get the default values of the named parameters of this meta-collective variable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A tuple with the names of the named parameters.</p>
+<dd class="field-odd"><p>A dictionary with the names of the named parameters as keys and their
+default values as values.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Tuple[str]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="cvpack.MetaCollectiveVariable.getParameterUnits">
-<span class="sig-name descname"><span class="pre">getParameterUnits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/meta_collective_variable.html#MetaCollectiveVariable.getParameterUnits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.MetaCollectiveVariable.getParameterUnits" title="Link to this definition">¶</a></dt>
-<dd><p>Get the units of measurement of the named parameters of this meta-collective
-variable. The units are returned as a dictionary with the names of the
-parameters as keys.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A dictionary with the names of the named parameters as keys and their units
-as values.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Dict[str, Unit]</p>
+<dd class="field-even"><p>Dict[str, Quantity]</p>
 </dd>
 </dl>
 </dd></dl>

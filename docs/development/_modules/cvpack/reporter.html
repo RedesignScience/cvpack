@@ -187,9 +187,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_values</span> <span class="o">=</span> <span class="n">values</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_masses</span> <span class="o">=</span> <span class="n">masses</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_parameter_unit_pairs</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
+            <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">quantity</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">metacv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meta_cvs</span>
-            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">unit</span> <span class="ow">in</span> <span class="n">metacv</span><span class="o">.</span><span class="n">getParameterUnits</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">quantity</span> <span class="ow">in</span> <span class="n">metacv</span><span class="o">.</span><span class="n">getParameterDefaultValues</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">parameters</span>
         <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_parameter_units</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parameter_unit_pairs</span><span class="p">)</span>
