@@ -21,11 +21,12 @@ import sys
 # Incase the project was not installed
 import cvpack
 from cvpack import CollectiveVariable
+from cvpack import reporters
 
 sys.path.insert(0, os.path.abspath(".."))
 
 
-def create_rst_file(cls):
+def create_rst_file(module, cls):
     name = cls.__name__
     if issubclass(cls, CollectiveVariable):
         methods = list(CollectiveVariable.__dict__.keys())
@@ -34,20 +35,24 @@ def create_rst_file(cls):
     methods += list(cls.__dict__.keys())
     excluded = ["yaml_tag"]
     with open(f"api/{name}.rst", "w") as f:
+        included_methods = [
+            f"    .. automethod:: {method}\n"
+            for method in sorted(methods)
+            if not (method.startswith("_") or method in excluded)
+        ]
         f.writelines(
             [
                 f"{name}\n",
                 "=" * len(name) + "\n\n",
-                ".. currentmodule:: cvpack\n",
+                f".. currentmodule:: {module}\n",
                 f".. autoclass:: {name}\n",
                 "    :member-order: alphabetical\n\n",
+            ]
+            + bool(included_methods)
+            * [
                 "    .. rubric:: Methods\n\n",
             ]
-            + [
-                f"    .. automethod:: {method}\n"
-                for method in sorted(methods)
-                if not (method.startswith("_") or method in excluded)
-            ]
+            + included_methods
         )
 
 
@@ -64,22 +69,17 @@ with open("api/index.rst", "w") as f:
             and issubclass(item, CollectiveVariable)
         ):
             f.write(f"    {item.__name__}\n")
-            create_rst_file(item)
-    f.write(
-        "\n\n"
-        "Other Classes\n"
-        "=============\n\n"
-        ".. toctree::\n    :titlesonly:\n\n"
-    )
-    for item in cvpack.__dict__.values():
-        if (
-            inspect.isclass(item)
-            and item is not CollectiveVariable
-            and not issubclass(item, CollectiveVariable)
-        ):
-            f.write(f"    {item.__name__}\n")
-            create_rst_file(item)
+            create_rst_file("cvpack", item)
     f.write("\n.. testsetup::\n\n    from cvpack import *")
+
+
+with open("api/reporters.rst", "w") as f:
+    f.write("Reporters\n" "=========\n\n" ".. toctree::\n    :titlesonly:\n\n")
+    for item in reporters.__dict__.values():
+        if inspect.isclass(item):
+            f.write(f"    {item.__name__}\n")
+            create_rst_file("cvpack.reporters", item)
+    f.write("\n.. testsetup::\n\n    from cvpack.reporters import *")
 
 
 # -- Project information -----------------------------------------------------
