@@ -1,5 +1,5 @@
 """
-.. class:: MetaCollectiveVariableReporter
+.. class:: MetaCVReporter
    :platform: Linux, MacOS, Windows
    :synopsis: This module provides classes for reporting simulation data
 
@@ -17,18 +17,18 @@ from openmm import unit as mmunit
 from ..meta_collective_variable import MetaCollectiveVariable
 
 
-class MetaCollectiveVariableReporter(mmapp.StateDataReporter):
+class MetaCVReporter(mmapp.StateDataReporter):
     """
     Reports values and/or effective masses of inner variables of a meta-collective
     variable during an OpenMM `Simulation`_. Also reports the values of parameters and
     derivatives of the meta-collective variable with respect to its parameters.
 
-    To use it, create a :class:`MetaCollectiveVariableReporter` object and add it to the
-    `Simulation`_'s list of reporters (see example below). The reporter writes data to
-    a file or file-like object at regular intervals. The set of data to write is
-    configurable using lists of :class:`CollectiveVariable` objects passed to the
-    constructor. The data is written in comma-separated-value (CSV) format by default,
-    but the user can specify a different separator.
+    To use it, create a :class:`MetaCVReporter` object and add it to the
+    `Simulation`_'s list of reporters (see example below). The reporter writes data
+    to a file or file-like object at regular intervals. The set of data to write is
+    configurable using lists of :class:`~cvpack.CollectiveVariable` objects passed
+    to the constructor. The data is written in comma-separated-value (CSV) format by
+    default, but the user can specify a different separator.
 
     .. _Simulation: http://docs.openmm.org/latest/api-python/generated/
         openmm.app.simulation.Simulation.html
@@ -45,27 +45,19 @@ class MetaCollectiveVariableReporter(mmapp.StateDataReporter):
         Whether to report the current step index.
     time
         Whether to report the current simulation time.
-    values
-        Whether to report the current values of the collective variables.
-    masses
-        Whether to report the current effective masses of the collective variables.
-    parameters
-        The names of metaCV parameters whose values will be reported.
-    derivatives
-        The names of
+    innerValues
+        The names of the inner variables whose values will be reported.
+    innerMasses
+        The names of the inner variables whose effective masses will be reported.
+    parameterValues
+        The names of the parameters whose values will be reported.
+    parameterDerivatives
+        The names of the parameters with respect to which the derivatives of the
+        meta-collective variable will be reported.
     separator
         The separator to use between columns in the file.
     append
         If `True`, omit the header line and append the report to an existing file.
-
-    Raises
-    ------
-    ValueError
-        If `variables` and `metaCVs` are both empty.
-    ValueError
-        If `values` and `masses` are both `False`.
-    ValueError
-        If any value `contextParameters` is not a unit of measurement.
 
     Examples
     --------
@@ -88,7 +80,7 @@ class MetaCollectiveVariableReporter(mmapp.StateDataReporter):
     ...     phi0=5*pi/6 * unit.radian,
     ...     psi0=-5*pi/6 * unit.radian,
     ... )
-    >>> reporter = cvpack.reporters.MetaCollectiveVariableReporter(
+    >>> reporter = cvpack.reporters.MetaCVReporter(
     ...     stdout,
     ...     100,
     ...     umbrella,

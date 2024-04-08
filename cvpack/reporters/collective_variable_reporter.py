@@ -1,5 +1,5 @@
 """
-.. class:: CollectiveVariableReporter
+.. class:: CVReporter
    :platform: Linux, MacOS, Windows
    :synopsis: This module provides classes for reporting simulation data
 
@@ -17,17 +17,17 @@ from openmm import unit as mmunit
 from ..collective_variable import CollectiveVariable
 
 
-class CollectiveVariableReporter(mmapp.StateDataReporter):
+class CVReporter(mmapp.StateDataReporter):
     """
     Reports values and/or effective masses of collective variables during an OpenMM
     `Simulation`_.
 
-    To use it, create a :class:`CollectiveVariableReporter` object and add it to the
-    `Simulation`_'s list of reporters (see example below). The reporter writes data to
-    a file or file-like object at regular intervals. The set of data to write is
-    configurable using lists of :class:`CollectiveVariable` objects passed to the
-    constructor. The data is written in comma-separated-value (CSV) format by default,
-    but the user can specify a different separator.
+    To use it, create a :class:`CVReporter` object and add it to the
+    `Simulation`_'s list of reporters (see example below). The reporter writes data
+    to a file or file-like object at regular intervals. The set of data to write is
+    configurable using lists of :class:`~cvpack.CollectiveVariable` objects passed
+    to the constructor. The data is written in comma-separated-value (CSV) format by
+    default, but the user can specify a different separator.
 
     .. _Simulation: http://docs.openmm.org/latest/api-python/generated/
         openmm.app.simulation.Simulation.html
@@ -50,13 +50,6 @@ class CollectiveVariableReporter(mmapp.StateDataReporter):
     append
         If `True`, omit the header line and append the report to an existing file.
 
-    Raises
-    ------
-    ValueError
-        If `values` and `masses` are both empty.
-    ValueError
-        If `values` and `masses` contain non-`CollectiveVariable` objects.
-
     Examples
     --------
     >>> import cvpack
@@ -70,7 +63,7 @@ class CollectiveVariableReporter(mmapp.StateDataReporter):
     >>> phi.addToSystem(model.system)
     >>> psi = cvpack.Torsion(8, 14, 16, 18, name="psi")
     >>> psi.addToSystem(model.system)
-    >>> reporter = cvpack.reporters.CollectiveVariableReporter(
+    >>> reporter = cvpack.reporters.CVReporter(
     ...     stdout, 100, [phi, psi], [phi, psi], step=True,
     ... )
     >>> integrator = openmm.LangevinIntegrator(
@@ -118,20 +111,6 @@ class CollectiveVariableReporter(mmapp.StateDataReporter):
         )
         self._values = values
         self._masses = masses
-        self._validate()
-
-    def _validate(self) -> None:
-        if not (self._values or self._masses):
-            raise ValueError("Arguments 'values' and 'masses' cannot be both empty")
-        for cv in self._values + self._masses:
-            if not isinstance(cv, CollectiveVariable):
-                raise TypeError(
-                    "All items in values/masses must be CollectiveVariable instances"
-                )
-        if len({cv.getName() for cv in self._values}) < len(self._values):
-            raise ValueError("All CVs in 'values' must have distinct names")
-        if len({cv.getName() for cv in self._masses}) < len(self._masses):
-            raise ValueError("All CVs in 'masses' must have distinct names")
 
     def _constructHeaders(self) -> t.List[str]:
         headers = []
