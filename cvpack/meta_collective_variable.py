@@ -17,7 +17,7 @@ from openmm import unit as mmunit
 
 from .collective_variable import CollectiveVariable
 from .units import Quantity, ScalarQuantity, VectorQuantity, in_md_units
-from .utils import compute_effective_mass
+from .utils import compute_effective_mass, get_single_force_state
 
 
 class MetaCollectiveVariable(openmm.CustomCVForce, CollectiveVariable):
@@ -107,6 +107,8 @@ class MetaCollectiveVariable(openmm.CustomCVForce, CollectiveVariable):
     {'phi': 3.14... rad}
     >>> driving_force.getInnerEffectiveMasses(context)
     {'phi': 0.05119... nm**2 Da/(rad**2)}
+    >>> driving_force.getParameterDerivatives(context)
+    {'kappa': 0.548... rad**2, 'phi0': -1047.19... kJ/(mol rad)}
     """
 
     def __init__(
@@ -125,6 +127,7 @@ class MetaCollectiveVariable(openmm.CustomCVForce, CollectiveVariable):
             self.addCollectiveVariable(cv.getName(), cv)
         for parameter, value in self._parameters.items():
             self.addGlobalParameter(parameter, value / value.unit)
+            self.addEnergyParameterDerivative(parameter)
         self._registerCV(
             name,
             unit,
@@ -228,6 +231,29 @@ class MetaCollectiveVariable(openmm.CustomCVForce, CollectiveVariable):
         """
         return {
             name: Quantity(context.getParameter(name), parameter.unit)
+            for name, parameter in self._parameters.items()
+        }
+
+    def getParameterDerivatives(
+        self,
+        context: openmm.Context,
+        allowReinitialization: bool = False,
+    ) -> t.Dict[str, Quantity]:
+        """
+        Get the derivatives of the named parameters of this meta-collective variable.
+
+        Returns
+        -------
+        Dict[str, Quantity]
+            A dictionary with the names of the named parameters as keys and their
+            derivatives as values.
+        """
+        state = get_single_force_state(
+            self, context, allowReinitialization, getParameterDerivatives=True
+        )
+        derivatives = state.getEnergyParameterDerivatives()
+        return {
+            name: Quantity(derivatives[name], self._unit / parameter.unit)
             for name, parameter in self._parameters.items()
         }
 

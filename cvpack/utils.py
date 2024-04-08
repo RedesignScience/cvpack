@@ -97,8 +97,7 @@ def get_single_force_state(
     force: openmm.Force,
     context: openmm.Context,
     allowReinitialization: bool = False,
-    getEnergy: bool = False,
-    getForces: bool = False,
+    **kwargs: bool,
 ) -> openmm.State:
     """
     Get an OpenMM State containing the potential energy and/or force values computed
@@ -113,10 +112,12 @@ def get_single_force_state(
     allowReinitialization
         If True, the force group of the given force will be temporarily changed to a
         group that is not used by any other force in the system, if necessary.
-    getEnergy
-        If True, the potential energy will be computed.
-    getForces
-        If True, the forces will be computed.
+
+    Keyword Args
+    ------------
+    **kwargs
+        Additional keyword arguments to be passed to the `getState` method, except for
+        the `groups` argument.
 
     Returns
     -------
@@ -136,16 +137,12 @@ def get_single_force_state(
     self_group = force.getForceGroup()
     other_groups = {g for f, g in forces_and_groups if f.this != force.this}
     if self_group not in other_groups:
-        return context.getState(
-            getEnergy=getEnergy, getForces=getForces, groups=1 << self_group
-        )
+        return context.getState(groups=1 << self_group, **kwargs)
     if not allowReinitialization:
         raise ValueError("Context reinitialization required, but not allowed.")
     new_group = force._setUnusedForceGroup(context.getSystem())
     context.reinitialize(preserveState=True)
-    state = context.getState(
-        getEnergy=getEnergy, getForces=getForces, groups=1 << new_group
-    )
+    state = context.getState(groups=1 << new_group, **kwargs)
     force.setForceGroup(self_group)
     context.reinitialize(preserveState=True)
     return state
