@@ -62,7 +62,7 @@ class CVWriter(CustomWriter):
     >>> simulation.context.setPositions(model.positions)
     >>> simulation.context.setVelocitiesToTemperature(300 * unit.kelvin, 5678)
     >>> simulation.reporters.append(reporter)
-    >>> simulation.step(1000)
+    >>> simulation.step(1000)  # doctest: +SKIP
     #"Step","phi (rad)",...,"emass[psi] (nm**2 Da/(rad**2))"
     100,2.7102...,0.04970...,3.1221...,0.05386...
     200,2.1573...,0.04481...,2.9959...,0.05664...

@@ -65,24 +65,38 @@ class StateDataReporter(mmapp.StateDataReporter):
     --------
     >>> import cvpack
     >>> import openmm
-    >>> from cvpack.reporting import StateDataReporter, CVWriter
     >>> from math import pi
+    >>> from cvpack import reporting
     >>> from openmm import app, unit
     >>> from sys import stdout
     >>> from openmmtools import testsystems
     >>> model = testsystems.AlanineDipeptideVacuum()
     >>> phi = cvpack.Torsion(6, 8, 14, 16, name="phi")
-    >>> phi.addToSystem(model.system)
     >>> psi = cvpack.Torsion(8, 14, 16, 18, name="psi")
-    >>> psi.addToSystem(model.system)
-    >>> reporter = StateDataReporter(
+    >>> umbrella = cvpack.MetaCollectiveVariable(
+    ...     f"0.5*kappa*(min(dphi,{2*pi}-dphi)^2+min(dpsi,{2*pi}-dpsi)^2)"
+    ...     "; dphi=abs(phi-phi0); dpsi=abs(psi-psi0)",
+    ...     [phi, psi],
+    ...     unit.kilojoules_per_mole,
+    ...     name="umbrella",
+    ...     kappa=100 * unit.kilojoules_per_mole/unit.radian**2,
+    ...     phi0=5*pi/6 * unit.radian,
+    ...     psi0=-5*pi/6 * unit.radian,
+    ... )
+    >>> reporter = reporting.StateDataReporter(
     ...     stdout,
     ...     100,
-    ...     step=True,
     ...     writers=[
-    ...         CVWriter(phi, value=True, emass=True),
-    ...         CVWriter(psi, value=True, emass=True),
+    ...         reporting.CVWriter(umbrella, value=True, emass=True),
+    ...         reporting.MetaCVWriter(
+    ...             umbrella,
+    ...             values=["phi", "psi"],
+    ...             effectiveMasses=["phi", "psi"],
+    ...             parameterValues=["phi0", "psi0"],
+    ...             parameterDerivatives=["phi0", "psi0"],
+    ...         ),
     ...     ],
+    ...     step=True,
     ... )
     >>> integrator = openmm.LangevinIntegrator(
     ...     300 * unit.kelvin,
@@ -90,22 +104,23 @@ class StateDataReporter(mmapp.StateDataReporter):
     ...     2 * unit.femtosecond,
     ... )
     >>> integrator.setRandomNumberSeed(1234)
+    >>> umbrella.addToSystem(model.system)
     >>> simulation = app.Simulation(model.topology, model.system, integrator)
     >>> simulation.context.setPositions(model.positions)
     >>> simulation.context.setVelocitiesToTemperature(300 * unit.kelvin, 5678)
     >>> simulation.reporters.append(reporter)
     >>> simulation.step(1000)  # doctest: +SKIP
-    #"Step","phi (rad)",...,"emass[psi] (nm**2 Da/(rad**2))"
-    100,2.7102...,0.04970...,3.1221...,0.05386...
-    200,2.1573...,0.04481...,2.9959...,0.05664...
-    300,2.0859...,0.04035...,-3.001...,0.04506...
-    400,2.8061...,0.05399...,3.0792...,0.04992...
-    500,-2.654...,0.04784...,3.1139...,0.05592...
-    600,3.1390...,0.05137...,-3.071...,0.05063...
-    700,2.1133...,0.04145...,3.1047...,0.04724...
-    800,1.7348...,0.04123...,-3.004...,0.05548...
-    900,1.6273...,0.03007...,3.1277...,0.05271...
-    1000,1.680...,0.03749...,2.9692...,0.04450...
+    #"Step","umbrella (kJ/mol)",...,"diff[umbrella,psi0] (kJ/(mol rad))"
+    100,11.26...,40.371...
+    200,7.463...,27.910...
+    300,2.558...,-12.74...
+    400,6.199...,3.9768...
+    500,8.827...,41.878...
+    600,3.761...,25.262...
+    700,3.388...,25.342...
+    800,1.071...,11.349...
+    900,8.586...,37.380...
+    1000,5.84...,31.159...
     """
 
     def __init__(
