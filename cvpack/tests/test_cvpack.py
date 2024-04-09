@@ -6,9 +6,7 @@ import copy
 import inspect
 import io
 import itertools as it
-import os
 import sys
-import tempfile
 import typing as t
 
 import mdtraj
