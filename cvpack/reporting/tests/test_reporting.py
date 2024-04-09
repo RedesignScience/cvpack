@@ -94,9 +94,9 @@ def test_meta_cv_writer():
                     reporting.MetaCVWriter(
                         umbrella,
                         values=["phi", "psi"],
-                        effectiveMasses=["phi", "psi"],
-                        parameterValues=["phi0", "psi0"],
-                        parameterDerivatives=["phi0", "psi0"],
+                        emasses=["phi", "psi"],
+                        parameters=["phi0", "psi0"],
+                        derivatives=["phi0", "psi0"],
                     ),
                 ],
                 step=True,
@@ -109,11 +109,11 @@ def test_meta_cv_writer():
                     '#"Step"',
                     '"phi (rad)"',
                     '"psi (rad)"',
-                    '"mass[phi] (nm**2 Da/(rad**2))"',
-                    '"mass[psi] (nm**2 Da/(rad**2))"',
+                    '"emass[phi] (nm**2 Da/(rad**2))"',
+                    '"emass[psi] (nm**2 Da/(rad**2))"',
                     '"phi0 (rad)"',
                     '"psi0 (rad)"',
-                    '"diff[umbrella,phi0] (kJ/(mol rad))"',
-                    '"diff[umbrella,psi0] (kJ/(mol rad))"\n',
+                    '"d[umbrella]/d[phi0] (kJ/(mol rad))"',
+                    '"d[umbrella]/d[psi0] (kJ/(mol rad))"\n',
                 ]
             )

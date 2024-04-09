@@ -29,9 +29,9 @@ class MetaCVWriter(CustomWriter):
         The names of the inner variables whose values will be reported.
     innerMasses
         The names of the inner variables whose effective masses will be reported.
-    parameterValues
+    parameters
         The names of the parameters whose values will be reported.
-    parameterDerivatives
+    derivatives
         The names of the parameters with respect to which the derivatives of the
         meta-collective variable will be reported.
 
@@ -64,9 +64,9 @@ class MetaCVWriter(CustomWriter):
     ...         MetaCVWriter(
     ...             umbrella,
     ...             values=["phi", "psi"],
-    ...             effectiveMasses=["phi", "psi"],
-    ...             parameterValues=["phi0", "psi0"],
-    ...             parameterDerivatives=["phi0", "psi0"],
+    ...             emasses=["phi", "psi"],
+    ...             parameters=["phi0", "psi0"],
+    ...             derivatives=["phi0", "psi0"],
     ...         ),
     ...     ],
     ...     step=True,
@@ -100,17 +100,17 @@ class MetaCVWriter(CustomWriter):
         self,
         metaCV: MetaCollectiveVariable,
         values: t.Sequence[str] = (),
-        effectiveMasses: t.Sequence[str] = (),
-        parameterValues: t.Sequence[str] = (),
-        parameterDerivatives: t.Sequence[str] = (),
+        emasses: t.Sequence[str] = (),
+        parameters: t.Sequence[str] = (),
+        derivatives: t.Sequence[str] = (),
     ) -> None:
         inner_cvs = {cv.getName(): cv for cv in metaCV.getInnerVariables()}
-        parameters = metaCV.getParameterDefaultValues()
+        all_parameters = metaCV.getParameterDefaultValues()
         self._meta_cv = metaCV
         self._values = [inner_cvs[name] for name in values]
-        self._masses = [inner_cvs[name] for name in effectiveMasses]
-        self._parameters = {name: parameters[name] for name in parameterValues}
-        self._derivatives = {name: parameters[name] for name in parameterDerivatives}
+        self._masses = [inner_cvs[name] for name in emasses]
+        self._parameters = {name: all_parameters[name] for name in parameters}
+        self._derivatives = {name: all_parameters[name] for name in derivatives}
 
     def getHeaders(self) -> t.List[str]:
         headers = []
@@ -121,12 +121,12 @@ class MetaCVWriter(CustomWriter):
         for cv in self._values:
             add_header(cv.getName(), cv.getUnit())
         for cv in self._masses:
-            add_header(f"mass[{cv.getName()}]", cv.getMassUnit())
+            add_header(f"emass[{cv.getName()}]", cv.getMassUnit())
         for name, quantity in self._parameters.items():
             add_header(name, quantity.unit)
         for name, quantity in self._derivatives.items():
             add_header(
-                f"diff[{self._meta_cv.getName()},{name}]",
+                f"d[{self._meta_cv.getName()}]/d[{name}]",
                 self._meta_cv.getUnit() / quantity.unit,
             )
         return headers

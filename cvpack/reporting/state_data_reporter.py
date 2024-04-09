@@ -91,9 +91,9 @@ class StateDataReporter(mmapp.StateDataReporter):
     ...         reporting.MetaCVWriter(
     ...             umbrella,
     ...             values=["phi", "psi"],
-    ...             effectiveMasses=["phi", "psi"],
-    ...             parameterValues=["phi0", "psi0"],
-    ...             parameterDerivatives=["phi0", "psi0"],
+    ...             emasses=["phi", "psi"],
+    ...             parameters=["phi0", "psi0"],
+    ...             derivatives=["phi0", "psi0"],
     ...         ),
     ...     ],
     ...     step=True,
