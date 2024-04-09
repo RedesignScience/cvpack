@@ -211,7 +211,7 @@ class MetaCollectiveVariable(openmm.CustomCVForce, CollectiveVariable):
             A dictionary with the names of the named parameters as keys and their
             default values as values.
         """
-        return self._parameters
+        return self._parameters.copy()
 
     def getParameterValues(self, context: openmm.Context) -> t.Dict[str, Quantity]:
         """
