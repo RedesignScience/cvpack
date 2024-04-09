@@ -21,7 +21,7 @@ import sys
 # Incase the project was not installed
 import cvpack
 from cvpack import CollectiveVariable
-from cvpack import reporters
+from cvpack import reporting
 
 sys.path.insert(0, os.path.abspath(".."))
 
@@ -73,13 +73,9 @@ with open("api/index.rst", "w") as f:
     f.write("\n.. testsetup::\n\n    from cvpack import *")
 
 
-with open("api/reporters.rst", "w") as f:
-    f.write("Reporters\n" "=========\n\n" ".. toctree::\n    :titlesonly:\n\n")
-    for item in reporters.__dict__.values():
-        if inspect.isclass(item):
-            f.write(f"    {item.__name__}\n")
-            create_rst_file("cvpack.reporters", item)
-    f.write("\n.. testsetup::\n\n    from cvpack.reporters import *")
+for item in reporting.__dict__.values():
+    if inspect.isclass(item):
+        create_rst_file("cvpack.reporting", item)
 
 
 # -- Project information -----------------------------------------------------

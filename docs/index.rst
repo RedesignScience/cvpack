@@ -21,7 +21,7 @@ Contents
 
    getting_started
    api/index
-   api/reporters
+   reporting
    serialization
    references
 

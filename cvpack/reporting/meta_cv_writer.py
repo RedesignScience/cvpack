@@ -1,13 +1,12 @@
 """
-.. class:: MetaCVReporter
+.. class:: MetaCVWriter
    :platform: Linux, MacOS, Windows
-   :synopsis: This module provides classes for reporting simulation data
+   :synopsis: A custom writer for reporting meta-collective variable data
 
 .. moduleauthor:: Charlles Abreu <craabreu@gmail.com>
 
 """
 
-import io
 import typing as t
 
 import openmm
@@ -15,36 +14,17 @@ from openmm import app as mmapp
 from openmm import unit as mmunit
 
 from ..meta_collective_variable import MetaCollectiveVariable
+from .custom_writer import CustomWriter
 
 
-class MetaCVReporter(mmapp.StateDataReporter):
+class MetaCVWriter(CustomWriter):
     """
-    Reports values and/or effective masses of inner variables of a meta-collective
-    variable during an OpenMM `Simulation`_. Also reports the values of parameters and
-    derivatives of the meta-collective variable with respect to its parameters.
-
-    To use it, create a :class:`MetaCVReporter` object and add it to the
-    `Simulation`_'s list of reporters (see example below). The reporter writes data
-    to a file or file-like object at regular intervals. The set of data to write is
-    configurable using lists of :class:`~cvpack.CollectiveVariable` objects passed
-    to the constructor. The data is written in comma-separated-value (CSV) format by
-    default, but the user can specify a different separator.
-
-    .. _Simulation: http://docs.openmm.org/latest/api-python/generated/
-        openmm.app.simulation.Simulation.html
+    A custom writer for reporting meta-collective variable data.
 
     Parameters
     ----------
-    file
-        The file to write to. This can be a file name or a file object.
-    reportInterval
-        The interval (in time steps) at which to report data.
     metaCV
         The meta-collective variable whose associated values will be reported.
-    step
-        Whether to report the current step index.
-    time
-        Whether to report the current simulation time.
     innerValues
         The names of the inner variables whose values will be reported.
     innerMasses
@@ -54,16 +34,13 @@ class MetaCVReporter(mmapp.StateDataReporter):
     parameterDerivatives
         The names of the parameters with respect to which the derivatives of the
         meta-collective variable will be reported.
-    separator
-        The separator to use between columns in the file.
-    append
-        If `True`, omit the header line and append the report to an existing file.
 
     Examples
     --------
     >>> import cvpack
     >>> import openmm
     >>> from math import pi
+    >>> from cvpack.reporting import StateDataReporter, MetaCVWriter
     >>> from openmm import app, unit
     >>> from sys import stdout
     >>> from openmmtools import testsystems
@@ -80,15 +57,19 @@ class MetaCVReporter(mmapp.StateDataReporter):
     ...     phi0=5*pi/6 * unit.radian,
     ...     psi0=-5*pi/6 * unit.radian,
     ... )
-    >>> reporter = cvpack.reporters.MetaCVReporter(
+    >>> reporter = StateDataReporter(
     ...     stdout,
     ...     100,
-    ...     umbrella,
+    ...     writers=[
+    ...         MetaCVWriter(
+    ...             umbrella,
+    ...             values=["phi", "psi"],
+    ...             effectiveMasses=["phi", "psi"],
+    ...             parameterValues=["phi0", "psi0"],
+    ...             parameterDerivatives=["phi0", "psi0"],
+    ...         ),
+    ...     ],
     ...     step=True,
-    ...     innerValues=["phi", "psi"],
-    ...     innerMasses=["phi", "psi"],
-    ...     parameterValues=["phi0", "psi0"],
-    ...     parameterDerivatives=["phi0", "psi0"],
     ... )
     >>> integrator = openmm.LangevinIntegrator(
     ...     300 * unit.kelvin,
@@ -101,7 +82,7 @@ class MetaCVReporter(mmapp.StateDataReporter):
     >>> simulation.context.setPositions(model.positions)
     >>> simulation.context.setVelocitiesToTemperature(300 * unit.kelvin, 5678)
     >>> simulation.reporters.append(reporter)
-    >>> simulation.step(1000)  # doctest: +SKIP
+    >>> simulation.step(1000)
     #"Step","phi (rad)",...,"diff[umbrella,psi0] (kJ/(mol rad))"
     100,2.36849...,40.3718...
     200,2.88515...,27.9109...
@@ -115,42 +96,24 @@ class MetaCVReporter(mmapp.StateDataReporter):
     1000,2.7584...,31.1599...
     """
 
-    def __init__(  # pylint: disable=dangerous-default-value
+    def __init__(
         self,
-        file: t.Union[str, io.TextIOBase],
-        reportInterval: int,
         metaCV: MetaCollectiveVariable,
-        innerValues: t.Sequence[str] = (),
-        innerMasses: t.Sequence[str] = (),
+        values: t.Sequence[str] = (),
+        effectiveMasses: t.Sequence[str] = (),
         parameterValues: t.Sequence[str] = (),
         parameterDerivatives: t.Sequence[str] = (),
-        step: bool = False,
-        time: bool = False,
-        separator: str = ",",
-        append: bool = False,
     ) -> None:
-        super().__init__(
-            file,
-            reportInterval,
-            step=step,
-            time=time,
-            separator=separator,
-            append=append,
-        )
         inner_cvs = {cv.getName(): cv for cv in metaCV.getInnerVariables()}
         parameters = metaCV.getParameterDefaultValues()
         self._meta_cv = metaCV
-        self._values = [inner_cvs[name] for name in innerValues]
-        self._masses = [inner_cvs[name] for name in innerMasses]
+        self._values = [inner_cvs[name] for name in values]
+        self._masses = [inner_cvs[name] for name in effectiveMasses]
         self._parameters = {name: parameters[name] for name in parameterValues}
         self._derivatives = {name: parameters[name] for name in parameterDerivatives}
 
-    def _constructHeaders(self) -> t.List[str]:
+    def getHeaders(self) -> t.List[str]:
         headers = []
-        if self._step:
-            headers.append("Step")
-        if self._time:
-            headers.append("Time (ps)")
 
         def add_header(name: str, unit: mmunit.Unit) -> None:
             headers.append(f"{name} ({unit.get_symbol()})")
@@ -168,14 +131,10 @@ class MetaCVReporter(mmapp.StateDataReporter):
             )
         return headers
 
-    def _constructReportValues(  # pylint: disable=too-many-branches
+    def getReportValues(
         self, simulation: mmapp.Simulation, state: openmm.State
     ) -> t.List[float]:
         values = []
-        if self._step:
-            values.append(simulation.currentStep)
-        if self._time:
-            values.append(state.getTime().value_in_unit(mmunit.picosecond))
         if self._values:
             inner_values = self._meta_cv.getInnerValues(simulation.context)
             for cv in self._values:

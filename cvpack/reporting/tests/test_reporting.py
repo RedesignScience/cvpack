@@ -11,10 +11,10 @@ from openmm import app, unit
 from openmmtools import testsystems
 
 import cvpack
-from cvpack import reporters
+from cvpack import reporting
 
 
-def test_cv_reporter():
+def test_cv_writer():
     """
     Test whether a reporter works as expected.
     """
@@ -34,11 +34,13 @@ def test_cv_reporter():
     simulation.context.setVelocitiesToTemperature(300 * unit.kelvin, 5678)
     with tempfile.TemporaryDirectory() as dirpath:
         with open(os.path.join(dirpath, "report.csv"), "w", encoding="utf-8") as file:
-            reporter = reporters.CVReporter(
+            reporter = reporting.StateDataReporter(
                 file,
                 1,
-                [phi, psi],
-                [phi, psi],
+                writers=[
+                    reporting.CVWriter(phi, value=True, emass=True),
+                    reporting.CVWriter(psi, value=True, emass=True),
+                ],
                 step=True,
             )
             simulation.reporters.append(reporter)
@@ -48,14 +50,14 @@ def test_cv_reporter():
                 [
                     '#"Step"',
                     '"phi (rad)"',
+                    '"emass[phi] (nm**2 Da/(rad**2))"',
                     '"psi (rad)"',
-                    '"mass[phi] (nm**2 Da/(rad**2))"',
-                    '"mass[psi] (nm**2 Da/(rad**2))"\n',
+                    '"emass[psi] (nm**2 Da/(rad**2))"\n',
                 ]
             )
 
 
-def test_meta_cv_reporter():
+def test_meta_cv_writer():
     """
     Test whether a reporter works as expected.
     """
@@ -85,15 +87,19 @@ def test_meta_cv_reporter():
 
     with tempfile.TemporaryDirectory() as dirpath:
         with open(os.path.join(dirpath, "report.csv"), "w", encoding="utf-8") as file:
-            reporter = reporters.MetaCVReporter(
+            reporter = reporting.StateDataReporter(
                 file,
                 1,
-                umbrella,
+                writers=[
+                    reporting.MetaCVWriter(
+                        umbrella,
+                        values=["phi", "psi"],
+                        effectiveMasses=["phi", "psi"],
+                        parameterValues=["phi0", "psi0"],
+                        parameterDerivatives=["phi0", "psi0"],
+                    ),
+                ],
                 step=True,
-                innerValues=["phi", "psi"],
-                innerMasses=["phi", "psi"],
-                parameterValues=["phi0", "psi0"],
-                parameterDerivatives=["phi0", "psi0"],
             )
             simulation.reporters.append(reporter)
             simulation.step(10)
