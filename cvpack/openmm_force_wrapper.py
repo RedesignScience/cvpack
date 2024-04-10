@@ -84,10 +84,13 @@ class OpenMMForceWrapper(CollectiveVariable):
     def __getattr__(self, name: str) -> t.Any:
         attr = getattr(self._wrapped_force, name)
         if callable(attr):
+
             def _wrapped_method(*args, **kwargs):
                 return attr(*args, **kwargs)
+
             return _wrapped_method
-        else:
-            return attr
+
+        return attr
+
 
 OpenMMForceWrapper.registerTag("!cvpack.OpenMMForceWrapper")
