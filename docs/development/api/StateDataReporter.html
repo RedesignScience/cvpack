@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Reporter &#8212; CVPack dev  documentation</title>
+    <title>StateDataReporter &#8212; CVPack dev  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -18,7 +18,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Serialization" href="../serialization.html" />
-    <link rel="prev" title="TorsionSimilarity" href="TorsionSimilarity.html" />
+    <link rel="prev" title="MetaCVWriter" href="MetaCVWriter.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -36,47 +36,54 @@
 
           <div class="body" role="main">
             
-  <section id="reporter">
-<h1>Reporter<a class="headerlink" href="#reporter" title="Link to this heading">¶</a></h1>
+  <section id="statedatareporter">
+<h1>StateDataReporter<a class="headerlink" href="#statedatareporter" title="Link to this heading">¶</a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="cvpack.Reporter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">Reporter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reportInterval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metaCVs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">masses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">','</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">append</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/reporter.html#Reporter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.Reporter" title="Link to this definition">¶</a></dt>
-<dd><p>Reports values and/or effective masses of collective variables during an OpenMM
-<a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.app.simulation.Simulation.html">Simulation</a>.</p>
-<p>Create a <a class="reference internal" href="#cvpack.Reporter" title="cvpack.Reporter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reporter</span></code></a> add it to the <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.app.simulation.Simulation.html">Simulation</a>’s list
-of reporters (see example below). The reporter writes data to a file or file-like
-object at regular intervals. The set of data to write is configurable using boolean
-flags passed to the constructor. The data is written in comma-separated-value (CSV)
-format by default, but the user can specify a different separator.</p>
+<dt class="sig sig-object py" id="cvpack.reporting.StateDataReporter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.reporting.</span></span><span class="sig-name descname"><span class="pre">StateDataReporter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reportInterval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/reporting/state_data_reporter.html#StateDataReporter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.reporting.StateDataReporter" title="Link to this definition">¶</a></dt>
+<dd><p>An extended version of OpenMM’s <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.app.statedatareporter.StateDataReporter.html">openmm.app.StateDataReporter</a> class that includes
+custom writers for reporting additional simulation data.</p>
+<p>A custom writer is an object that includes the following methods:</p>
+<ol class="arabic simple">
+<li><p><strong>getHeaders</strong>: returns a list of strings containing the headers to be added
+to the report. It must have the following signature:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">getHeaders</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p><strong>getValues</strong>: returns a list of floats containing the values to be added to
+the report at a given time step. It must have the following signature:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">getValues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p><strong>initialize</strong> (optional): performs any necessary setup before the first report.
+If present, it must have the following signature:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>file</strong> (<em>str</em><em> | </em><em>TextIOBase</em>) – The file to write to. This can be a file name or a file object.</p></li>
 <li><p><strong>reportInterval</strong> (<em>int</em>) – The interval (in time steps) at which to report data.</p></li>
-<li><p><strong>variables</strong> (<em>Sequence</em><em>[</em><em>CollectiveVariable</em><em>]</em>) – The collective variable whose values and/or effective masses will be reported.
-These must be the same objects added to the simulation’s <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.System.html">openmm.System</a>.</p></li>
-<li><p><strong>metaCVs</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="MetaCollectiveVariable.html#cvpack.MetaCollectiveVariable" title="cvpack.meta_collective_variable.MetaCollectiveVariable"><em>MetaCollectiveVariable</em></a><em>]</em>) – The meta-collective variables whose inner variables will be reported. These must
-be the same objects added to the simulation’s <a class="reference external" href="http://docs.openmm.org/latest/api-python/generated/openmm.openmm.System.html">openmm.System</a>.</p></li>
-<li><p><strong>step</strong> (<em>bool</em>) – Whether to report the current step index.</p></li>
-<li><p><strong>time</strong> (<em>bool</em>) – Whether to report the current simulation time.</p></li>
-<li><p><strong>values</strong> (<em>bool</em>) – Whether to report the current values of the collective variables.</p></li>
-<li><p><strong>masses</strong> (<em>bool</em>) – Whether to report the current effective masses of the collective variables.</p></li>
-<li><p><strong>parameters</strong> (<em>Iterable</em><em>[</em><em>str</em><em>]</em>) – The names of metaCV parameters to report.</p></li>
-<li><p><strong>separator</strong> (<em>str</em>) – The separator to use between columns in the file.</p></li>
-<li><p><strong>append</strong> (<em>bool</em>) – If <cite>True</cite>, omit the header line and append the report to an existing file.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If <cite>variables</cite> and <cite>metaCVs</cite> are both empty.</p></li>
-<li><p><strong>ValueError</strong> – If <cite>values</cite> and <cite>masses</cite> are both <cite>False</cite>.</p></li>
-<li><p><strong>ValueError</strong> – If any value <cite>contextParameters</cite> is not a unit of measurement.</p></li>
+<li><p><strong>writers</strong> (<em>Sequence</em><em>[</em><em>CustomWriter</em><em>]</em>) – A sequence of custom writers.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments to be passed to the <a class="reference internal" href="#statedatareporter">StateDataReporter</a>
+constructor.</p></li>
 </ul>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cvpack</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">openmm</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">pi</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cvpack</span> <span class="kn">import</span> <span class="n">reporting</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">app</span><span class="p">,</span> <span class="n">unit</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">stdout</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">openmmtools</span> <span class="kn">import</span> <span class="n">testsystems</span>
@@ -84,23 +91,29 @@ be the same objects added to the simulation’s <a class="reference external" hr
 <span class="gp">&gt;&gt;&gt; </span><span class="n">phi</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">Torsion</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;phi&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">psi</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">Torsion</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;psi&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">umbrella</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">MetaCollectiveVariable</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="s2">&quot;0.5*kappa*(min(dphi,2*pi-dphi)^2+min(dpsi,2*pi-dpsi)^2)&quot;</span>
-<span class="gp">... </span>    <span class="s2">&quot;; dphi=abs(phi-5*pi/6); dpsi=abs(psi+5*pi/6)&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="sa">f</span><span class="s2">&quot;0.5*kappa*(min(dphi,</span><span class="si">{</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="si">}</span><span class="s2">-dphi)^2+min(dpsi,</span><span class="si">{</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="si">}</span><span class="s2">-dpsi)^2)&quot;</span>
+<span class="gp">... </span>    <span class="s2">&quot;; dphi=abs(phi-phi0); dpsi=abs(psi-psi0)&quot;</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="p">[</span><span class="n">phi</span><span class="p">,</span> <span class="n">psi</span><span class="p">],</span>
 <span class="gp">... </span>    <span class="n">unit</span><span class="o">.</span><span class="n">kilojoules_per_mole</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;umbrella&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">pi</span><span class="o">=</span><span class="mf">3.141592653589793</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">kappa</span><span class="o">=</span><span class="mi">100</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">kilojoules_per_mole</span><span class="o">/</span><span class="n">unit</span><span class="o">.</span><span class="n">radian</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">phi0</span><span class="o">=</span><span class="mi">5</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="mi">6</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">radian</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">psi0</span><span class="o">=-</span><span class="mi">5</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="mi">6</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">radian</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">reporter</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">Reporter</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reporter</span> <span class="o">=</span> <span class="n">reporting</span><span class="o">.</span><span class="n">StateDataReporter</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">stdout</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="mi">100</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="n">umbrella</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="n">metaCVs</span><span class="o">=</span><span class="p">[</span><span class="n">umbrella</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">writers</span><span class="o">=</span><span class="p">[</span>
+<span class="gp">... </span>        <span class="n">reporting</span><span class="o">.</span><span class="n">CVWriter</span><span class="p">(</span><span class="n">umbrella</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">emass</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="n">reporting</span><span class="o">.</span><span class="n">MetaCVWriter</span><span class="p">(</span>
+<span class="gp">... </span>            <span class="n">umbrella</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;phi&quot;</span><span class="p">,</span> <span class="s2">&quot;psi&quot;</span><span class="p">],</span>
+<span class="gp">... </span>            <span class="n">emasses</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;phi&quot;</span><span class="p">,</span> <span class="s2">&quot;psi&quot;</span><span class="p">],</span>
+<span class="gp">... </span>            <span class="n">parameters</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;phi0&quot;</span><span class="p">,</span> <span class="s2">&quot;psi0&quot;</span><span class="p">],</span>
+<span class="gp">... </span>            <span class="n">derivatives</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;phi0&quot;</span><span class="p">,</span> <span class="s2">&quot;psi0&quot;</span><span class="p">],</span>
+<span class="gp">... </span>        <span class="p">),</span>
+<span class="gp">... </span>    <span class="p">],</span>
 <span class="gp">... </span>    <span class="n">step</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">masses</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">parameters</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;kappa&quot;</span><span class="p">],</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">integrator</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">LangevinIntegrator</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="mi">300</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">kelvin</span><span class="p">,</span>
@@ -114,20 +127,19 @@ be the same objects added to the simulation’s <a class="reference external" hr
 <span class="gp">&gt;&gt;&gt; </span><span class="n">simulation</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">setVelocitiesToTemperature</span><span class="p">(</span><span class="mi">300</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">kelvin</span><span class="p">,</span> <span class="mi">5678</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">simulation</span><span class="o">.</span><span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reporter</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">simulation</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>  
-<span class="go">#&quot;Step&quot;,&quot;umbrella (kJ/mol)&quot;,...(nm**2 Da/(rad**2))&quot;,&quot;kappa (kJ/(mol rad**2))&quot;</span>
-<span class="go">100,11.2618...,1.8774...e-05,2.3684...,0.04388...,-3.0217...,0.05552...,100.0</span>
-<span class="go">200,7.46382...,4.8803...e-05,2.8851...,0.04968...,-2.8971...,0.05230...,100.0</span>
-<span class="go">300,2.55804...,8.9086...e-05,2.4311...,0.04637...,-2.4905...,0.03721...,100.0</span>
-<span class="go">400,6.19945...,4.6824...e-05,2.9678...,0.05449...,-2.6577...,0.04840...,100.0</span>
-<span class="go">500,8.82728...,3.0253...e-05,2.5838...,0.04584...,-3.0367...,0.05485...,100.0</span>
-<span class="go">600,3.76160...,7.9099...e-05,2.7248...,0.04772...,-2.8706...,0.05212...,100.0</span>
-<span class="go">700,3.38895...,6.3273...e-05,2.5583...,0.04999...,-2.8714...,0.04674...,100.0</span>
-<span class="go">800,1.07166...,0.00028746...,2.7104...,0.05321...,-2.7314...,0.05418...,100.0</span>
-<span class="go">900,8.58602...,2.4899...e-05,2.4391...,0.04096...,-2.9917...,0.04675...,100.0</span>
-<span class="go">1000,5.8404...,5.1011...e-05,2.7584...,0.04951...,-2.9295...,0.05030...,100.0</span>
+<span class="go">#&quot;Step&quot;,&quot;umbrella (kJ/mol)&quot;,...,&quot;d[umbrella]/d[psi0] (kJ/(mol rad))&quot;</span>
+<span class="go">100,11.26...,40.371...</span>
+<span class="go">200,7.463...,27.910...</span>
+<span class="go">300,2.558...,-12.74...</span>
+<span class="go">400,6.199...,3.9768...</span>
+<span class="go">500,8.827...,41.878...</span>
+<span class="go">600,3.761...,25.262...</span>
+<span class="go">700,3.388...,25.342...</span>
+<span class="go">800,1.071...,11.349...</span>
+<span class="go">900,8.586...,37.380...</span>
+<span class="go">1000,5.84...,31.159...</span>
 </pre></div>
 </div>
-<p class="rubric">Methods</p>
 </dd></dl>
 
 </section>
@@ -155,8 +167,10 @@ be the same objects added to the simulation’s <a class="reference external" hr
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="index.html">Collective Variables</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html#other-classes">Other Classes</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Reporter</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../reporting.html">Reporting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="CVWriter.html">CVWriter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MetaCVWriter.html">MetaCVWriter</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">StateDataReporter</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../serialization.html">Serialization</a></li>
@@ -185,7 +199,7 @@ be the same objects added to the simulation’s <a class="reference external" hr
       &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
       
       |
-      <a href="../_sources/api/Reporter.rst.txt"
+      <a href="../_sources/api/StateDataReporter.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

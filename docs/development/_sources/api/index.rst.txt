@@ -26,15 +26,6 @@ Collective Variables
     Torsion
     TorsionSimilarity
 
-
-Other Classes
-=============
-
-.. toctree::
-    :titlesonly:
-
-    Reporter
-
 .. testsetup::
 
     from cvpack import *
