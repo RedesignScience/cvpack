@@ -39,7 +39,7 @@ class StateDataReporter(mmapp.StateDataReporter):
 
     .. code-block::
 
-        def getValues(self, context: openmm.Context) -> List[float]:
+        def getValues(self, simulation: openmm.app.Simulation) -> List[float]:
             pass
 
     3. **initialize** (optional): performs any necessary setup before the first report.
@@ -47,7 +47,7 @@ class StateDataReporter(mmapp.StateDataReporter):
 
     .. code-block::
 
-        def initialize(self, context: openmm.Context) -> None:
+        def initialize(self, simulation: openmm.app.Simulation) -> None:
             pass
 
     Parameters
@@ -145,7 +145,7 @@ class StateDataReporter(mmapp.StateDataReporter):
         super()._initializeConstants(simulation)
         for writer in self._writers:
             if hasattr(writer, "initialize"):
-                writer.initialize(simulation.context)
+                writer.initialize(simulation)
 
     def _constructHeaders(self) -> t.List[str]:
         return self._expand(
@@ -158,5 +158,5 @@ class StateDataReporter(mmapp.StateDataReporter):
     ) -> t.List[float]:
         return self._expand(
             super()._constructReportValues(simulation, state),
-            (w.getValues(simulation.context) for w in self._writers),
+            (w.getValues(simulation) for w in self._writers),
         )

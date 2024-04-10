@@ -99,7 +99,8 @@ class CVWriter(CustomWriter):
             )
         return headers
 
-    def getValues(self, context: mm.Context) -> t.List[float]:
+    def getValues(self, simulation: mm.app.Simulation) -> t.List[float]:
+        context = simulation.context
         values = []
         if self._value:
             values.append(self._cv.getValue(context) / self._cv.getUnit())

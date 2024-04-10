@@ -9,7 +9,7 @@
 
 import typing as t
 
-import openmm as mm
+from openmm import app as mmapp
 
 
 @t.runtime_checkable
@@ -18,15 +18,15 @@ class CustomWriter(t.Protocol):
     An abstract class for StateDataReporter writers
     """
 
-    def initialize(self, context: mm.Context) -> None:
+    def initialize(self, simulation: mmapp.Simulation) -> None:
         """
         Initializes the writer. This method is called before the first report and
         can be used to perform any necessary setup.
 
         Parameters
         ----------
-        context
-            The context object.
+        simulation
+            The simulation object.
         """
 
     def getHeaders(self) -> t.List[str]:
@@ -35,7 +35,7 @@ class CustomWriter(t.Protocol):
         """
         raise NotImplementedError("Method 'getHeaders' not implemented")
 
-    def getValues(self, context: mm.Context) -> t.List[float]:
+    def getValues(self, simulation: mmapp.Simulation) -> t.List[float]:
         """
         Gets a list of floats containing the values to be added to the report.
 
@@ -43,7 +43,5 @@ class CustomWriter(t.Protocol):
         ----------
         simulation
             The simulation object.
-        state
-            The state object.
         """
         raise NotImplementedError("Method 'getValues' not implemented")

@@ -130,7 +130,8 @@ class MetaCVWriter(CustomWriter):
             )
         return headers
 
-    def getValues(self, context: mm.Context) -> t.List[float]:
+    def getValues(self, simulation: mm.app.Simulation) -> t.List[float]:
+        context = simulation.context
         values = []
         if self._values:
             inner_values = self._meta_cv.getInnerValues(context)
