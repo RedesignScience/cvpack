@@ -9,8 +9,7 @@
 
 import typing as t
 
-import openmm
-from openmm import app as mmapp
+import openmm as mm
 from openmm import unit as mmunit
 
 from ..meta_collective_variable import MetaCollectiveVariable
@@ -131,24 +130,22 @@ class MetaCVWriter(CustomWriter):
             )
         return headers
 
-    def getReportValues(
-        self, simulation: mmapp.Simulation, state: openmm.State
-    ) -> t.List[float]:
+    def getValues(self, context: mm.Context) -> t.List[float]:
         values = []
         if self._values:
-            inner_values = self._meta_cv.getInnerValues(simulation.context)
+            inner_values = self._meta_cv.getInnerValues(context)
             for cv in self._values:
                 values.append(inner_values[cv.getName()] / cv.getUnit())
         if self._masses:
-            inner_masses = self._meta_cv.getInnerEffectiveMasses(simulation.context)
+            inner_masses = self._meta_cv.getInnerEffectiveMasses(context)
             for cv in self._masses:
                 values.append(inner_masses[cv.getName()] / cv.getMassUnit())
         if self._parameters:
-            parameters = self._meta_cv.getParameterValues(simulation.context)
+            parameters = self._meta_cv.getParameterValues(context)
             for name, quantity in self._parameters.items():
                 values.append(parameters[name] / quantity.unit)
         if self._derivatives:
-            derivatives = self._meta_cv.getParameterDerivatives(simulation.context)
+            derivatives = self._meta_cv.getParameterDerivatives(context)
             for name, quantity in self._derivatives.items():
                 values.append(
                     derivatives[name] / (self._meta_cv.getUnit() / quantity.unit)

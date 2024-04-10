@@ -10,7 +10,6 @@
 import typing as t
 
 import openmm as mm
-from openmm import app as mmapp
 
 from ..collective_variable import CollectiveVariable
 from .custom_writer import CustomWriter
@@ -100,14 +99,10 @@ class CVWriter(CustomWriter):
             )
         return headers
 
-    def getReportValues(
-        self, simulation: mmapp.Simulation, state: mm.State
-    ) -> t.List[float]:
+    def getValues(self, context: mm.Context) -> t.List[float]:
         values = []
         if self._value:
-            values.append(self._cv.getValue(simulation.context) / self._cv.getUnit())
+            values.append(self._cv.getValue(context) / self._cv.getUnit())
         if self._emass:
-            values.append(
-                self._cv.getEffectiveMass(simulation.context) / self._cv.getMassUnit()
-            )
+            values.append(self._cv.getEffectiveMass(context) / self._cv.getMassUnit())
         return values

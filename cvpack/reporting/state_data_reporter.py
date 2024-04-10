@@ -33,20 +33,13 @@ class StateDataReporter(mmapp.StateDataReporter):
         def getHeaders(self) -> List[str]:
             pass
 
-    The second method is ``getReportValues``, which accepts an `openmm.app.Simulation`_
-    and an :OpenMM:`State` as arguments and returns a list of floats containing the
-    values to be added to the report. It has the following signature:
-
-    .. _openmm.app.Simulation: http://docs.openmm.org/latest/api-python/generated/
-        openmm.app.simulation.Simulation.html
+    The second method is ``getValues``, which accepts an :OpenMM:`Context` as
+    argument and returns a list of floats containing the values to be added to the
+    report. It has the following signature:
 
     .. code-block::
 
-        def getReportValues(
-            self,
-            simulation: openmm.app.Simulation,
-            state: openmm.State,
-        ) -> List[float]:
+        def getValues(self, context: openmm.Context) -> List[float]:
             pass
 
     Parameters
@@ -151,5 +144,5 @@ class StateDataReporter(mmapp.StateDataReporter):
     ) -> t.List[float]:
         return self._expand(
             super()._constructReportValues(simulation, state),
-            (w.getReportValues(simulation, state) for w in self._writers),
+            (w.getValues(simulation.context) for w in self._writers),
         )

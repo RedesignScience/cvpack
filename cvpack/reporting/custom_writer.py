@@ -9,8 +9,7 @@
 
 import typing as t
 
-import openmm
-from openmm import app as mmapp
+import openmm as mm
 
 
 @t.runtime_checkable
@@ -25,11 +24,7 @@ class CustomWriter(t.Protocol):
         """
         raise NotImplementedError("Method getHeaders not implemented")
 
-    def getReportValues(
-        self,
-        simulation: mmapp.Simulation,
-        state: openmm.State,
-    ) -> t.List[float]:
+    def getValues(self, context: mm.Context) -> t.List[float]:
         """
         Gets a list of floats containing the values to be added to the report.
 
@@ -40,4 +35,4 @@ class CustomWriter(t.Protocol):
         state
             The state object.
         """
-        raise NotImplementedError("Method getReportValues not implemented")
+        raise NotImplementedError("Method getValues not implemented")
