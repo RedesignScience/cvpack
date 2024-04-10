@@ -18,11 +18,22 @@ class CustomWriter(t.Protocol):
     An abstract class for StateDataReporter writers
     """
 
+    def initialize(self, context: mm.Context) -> None:
+        """
+        Initializes the writer. This method is called before the first report and
+        can be used to perform any necessary setup.
+
+        Parameters
+        ----------
+        context
+            The context object.
+        """
+
     def getHeaders(self) -> t.List[str]:
         """
         Gets a list of strigs containing the headers to be added to the report.
         """
-        raise NotImplementedError("Method getHeaders not implemented")
+        raise NotImplementedError("Method 'getHeaders' not implemented")
 
     def getValues(self, context: mm.Context) -> t.List[float]:
         """
@@ -35,4 +46,4 @@ class CustomWriter(t.Protocol):
         state
             The state object.
         """
-        raise NotImplementedError("Method getValues not implemented")
+        raise NotImplementedError("Method 'getValues' not implemented")

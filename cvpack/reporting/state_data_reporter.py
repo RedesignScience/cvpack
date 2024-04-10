@@ -24,22 +24,30 @@ class StateDataReporter(mmapp.StateDataReporter):
     .. _openmm.app.StateDataReporter: http://docs.openmm.org/latest/api-python/
         generated/openmm.app.statedatareporter.StateDataReporter.html
 
-    A custom writer is an object that includes the methods two particular methods.
-    The first one is ``getHeaders``, which returns a list of strings containing the
-    headers to be added to the report. It has the following signature:
+    A custom writer is an object that includes the following methods:
+
+    1. **getHeaders**: returns a list of strings containing the headers to be added
+       to the report. It must have the following signature:
 
     .. code-block::
 
         def getHeaders(self) -> List[str]:
             pass
 
-    The second method is ``getValues``, which accepts an :OpenMM:`Context` as
-    argument and returns a list of floats containing the values to be added to the
-    report. It has the following signature:
+    2. **getValues**: returns a list of floats containing the values to be added to
+       the report at a given time step. It must have the following signature:
 
     .. code-block::
 
         def getValues(self, context: openmm.Context) -> List[float]:
+            pass
+
+    3. **initialize** (optional): performs any necessary setup before the first report.
+       If present, it must have the following signature:
+
+    .. code-block::
+
+        def initialize(self, context: openmm.Context) -> None:
             pass
 
     Parameters
@@ -132,6 +140,12 @@ class StateDataReporter(mmapp.StateDataReporter):
     def _expand(self, sequence: list, addition: t.Iterable) -> list:
         pos = len(sequence) - self._back_steps
         return sum(addition, sequence[:pos]) + sequence[pos:]
+
+    def _initializeConstants(self, simulation: mmapp.Simulation) -> None:
+        super()._initializeConstants(simulation)
+        for writer in self._writers:
+            if hasattr(writer, "initialize"):
+                writer.initialize(simulation.context)
 
     def _constructHeaders(self) -> t.List[str]:
         return self._expand(
