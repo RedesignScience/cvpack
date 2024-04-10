@@ -75,10 +75,22 @@ class OpenMMForceWrapper(CollectiveVariable):
         if isinstance(openmmForce, openmm.Force):
             openmmForce = openmm.XmlSerializer.serialize(openmmForce)
         unit = Unit(unit)
-        self.this = openmm.XmlSerializer.deserialize(openmmForce).this
+        self._wrapped_force = openmm.XmlSerializer.deserialize(openmmForce)
+        self.this = self._wrapped_force.this
         self._registerCV(name, unit, openmmForce, unit, periodicBounds)
         if periodicBounds is not None:
             self._registerPeriodicBounds(*periodicBounds)
+
+    def __getattr__(self, name: str) -> t.Any:
+        attr = getattr(self._wrapped_force, name)
+        if callable(attr):
+
+            def _wrapped_method(*args, **kwargs):
+                return attr(*args, **kwargs)
+
+            return _wrapped_method
+
+        return attr
 
 
 OpenMMForceWrapper.registerTag("!cvpack.OpenMMForceWrapper")
