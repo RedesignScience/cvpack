@@ -57,7 +57,7 @@ class Distance(openmm.CustomBondForce, CollectiveVariable):
         super().__init__("r")
         self.addBond(atom1, atom2, [])
         self.setUsesPeriodicBoundaryConditions(pbc)
-        self._registerCV(name, mmunit.nanometers, atom1, atom2, pbc)
+        self._registerCV(name, mmunit.nanometers, atom1=atom1, atom2=atom2, pbc=pbc)
 
 
 Distance.registerTag("!cvpack.Distance")

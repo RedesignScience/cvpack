@@ -93,7 +93,13 @@ class RMSD(openmm.RMSDForce, BaseRMSD):
         defined_coords = self._getDefinedCoords(referencePositions, group)
         all_coords = self._getAllCoords(defined_coords, num_atoms)
         super().__init__(all_coords, group)
-        self._registerCV(name, mmunit.nanometers, defined_coords, group, num_atoms)
+        self._registerCV(
+            name,
+            mmunit.nanometers,
+            referencePositions=defined_coords,
+            group=group,
+            numAtoms=num_atoms,
+        )
 
     def getNullBondForce(self) -> openmm.HarmonicBondForce:
         """

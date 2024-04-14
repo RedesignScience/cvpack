@@ -146,13 +146,13 @@ class HelixTorsionContent(openmm.CustomTorsionForce, CollectiveVariable):
         self.setUsesPeriodicBoundaryConditions(pbc)
         self._registerCV(
             name,
-            None,
-            residues,
-            pbc,
-            phiReference,
-            psiReference,
-            tolerance,
-            halfExponent,
+            mmunit.dimensionless,
+            residues=residues,
+            pbc=pbc,
+            phiReference=phiReference,
+            psiReference=psiReference,
+            tolerance=tolerance,
+            halfExponent=halfExponent,
         )
 
 

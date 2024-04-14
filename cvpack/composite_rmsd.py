@@ -135,7 +135,13 @@ class CompositeRMSD(CompositeRMSDForce, BaseRMSD):
         super().__init__(all_coords)
         for group in groups:
             self.addGroup(group)
-        self._registerCV(name, mmunit.nanometers, defined_coords, groups, num_atoms)
+        self._registerCV(
+            name,
+            mmunit.nanometers,
+            referencePositions=defined_coords,
+            groups=groups,
+            numAtoms=num_atoms,
+        )
 
 
 CompositeRMSD.registerTag("!cvpack.CompositeRMSD")

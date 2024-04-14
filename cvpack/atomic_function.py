@@ -150,11 +150,11 @@ class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
         self._registerCV(
             name,
             unit,
-            function,
-            unit,
-            groups,
-            periodicBounds,
-            pbc,
+            function=function,
+            unit=unit,
+            groups=groups,
+            periodicBounds=periodicBounds,
+            pbc=pbc,
             **overalls,
             **perbonds,
         )

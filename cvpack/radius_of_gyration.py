@@ -90,7 +90,9 @@ class RadiusOfGyration(BaseRadiusOfGyration):
             num_groups, f"sqrt(({sum_dist_sq})/{num_atoms})", group, pbc, weighByMass
         )
         self.addBond(list(range(num_groups)))
-        self._registerCV(name, mmunit.nanometers, group, pbc, weighByMass)
+        self._registerCV(
+            name, mmunit.nanometers, group=group, pbc=pbc, weighByMass=weighByMass
+        )
 
 
 RadiusOfGyration.registerTag("!cvpack.RadiusOfGyration")
