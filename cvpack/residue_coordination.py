@@ -144,15 +144,15 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, CollectiveVariable):
                 self.addBond([idx1, idx2], [])
         self._registerCV(
             name,
-            None,
-            residueGroup1,
-            residueGroup2,
-            pbc,
-            stepFunction,
-            thresholdDistance,
-            normalize,
-            weighByMass,
-            includeHydrogens,
+            mmunit.dimensionless,
+            residueGroup1=residueGroup1,
+            residueGroup2=residueGroup2,
+            pbc=pbc,
+            stepFunction=stepFunction,
+            thresholdDistance=thresholdDistance,
+            normalize=normalize,
+            weighByMass=weighByMass,
+            includeHydrogens=includeHydrogens,
         )
 
     def getReferenceValue(self) -> mmunit.Quantity:

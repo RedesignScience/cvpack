@@ -219,14 +219,14 @@ class SheetRMSDContent(BaseRMSDContent):
         )
         self._registerCV(
             name,
-            None,
-            residues,
-            numAtoms,
-            parallel,
-            blockSizes,
-            thresholdRMSD,
-            stepFunction,
-            normalize,
+            mmunit.dimensionless,
+            residues=residues,
+            numAtoms=numAtoms,
+            parallel=parallel,
+            blockSizes=blockSizes,
+            thresholdRMSD=thresholdRMSD,
+            stepFunction=stepFunction,
+            normalize=normalize,
         )
 
 

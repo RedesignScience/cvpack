@@ -72,7 +72,9 @@ class Angle(openmm.CustomAngleForce, CollectiveVariable):
         super().__init__("theta")
         self.addAngle(atom1, atom2, atom3, [])
         self.setUsesPeriodicBoundaryConditions(pbc)
-        self._registerCV(name, mmunit.radians, atom1, atom2, atom3, pbc)
+        self._registerCV(
+            name, mmunit.radians, atom1=atom1, atom2=atom2, atom3=atom3, pbc=pbc
+        )
         self._registerPeriodicBounds(-np.pi, np.pi)
 
 

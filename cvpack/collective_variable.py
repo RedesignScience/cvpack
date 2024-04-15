@@ -7,9 +7,7 @@
 
 """
 
-import inspect
 import typing as t
-from collections import OrderedDict
 
 import openmm
 import yaml
@@ -46,8 +44,7 @@ class CollectiveVariable(openmm.Force, Serializable):
     def _registerCV(
         self,
         name: str,
-        unit: t.Optional[mmunit.Unit],
-        *args: t.Any,
+        cvUnit: Unit,
         **kwargs: t.Any,
     ) -> None:
         """
@@ -63,18 +60,13 @@ class CollectiveVariable(openmm.Force, Serializable):
             The unit of measurement of this collective variable. It must be a unit
             in the MD unit system (mass in Da, distance in nm, time in ps,
             temperature in K, energy in kJ/mol, angle in rad).
-        args
-            The arguments needed to construct this collective variable
         kwargs
             The keyword arguments needed to construct this collective variable
         """
         self.setName(name)
-        self._unit = Unit("dimensionless") if unit is None else unit
+        self._unit = cvUnit
         self._mass_unit = Unit(mmunit.dalton * (mmunit.nanometers / self._unit) ** 2)
-        arguments, _ = self._getArguments()
-        arguments.pop("name")
-        self._args = dict(zip(arguments, args))
-        self._args["name"] = name
+        self._args = {"name": name}
         self._args.update(kwargs)
 
     def _registerPeriodicBounds(
@@ -98,40 +90,6 @@ class CollectiveVariable(openmm.Force, Serializable):
         if mmunit.is_quantity(upper):
             upper = upper.value_in_unit(self.getUnit())
         self._periodic_bounds = Quantity((lower, upper), self.getUnit())
-
-    @classmethod
-    def _getArguments(cls) -> t.Tuple[OrderedDict, OrderedDict]:
-        """
-        Inspect the arguments needed for constructing an instance of this collective
-        variable.
-
-        Returns
-        -------
-        OrderedDict
-            A dictionary with the type annotations of all arguments
-        OrderedDict
-            A dictionary with the default values of optional arguments
-
-        Example
-        -------
-        >>> import cvpack
-        >>> args, defaults = cvpack.RadiusOfGyration._getArguments()
-        >>> for name, annotation in args.items():
-        ...     print(f"{name}: {annotation}")
-        group: typing.Iterable[int]
-        pbc: <class 'bool'>
-        weighByMass: <class 'bool'>
-        name: <class 'str'>
-        >>> print(*defaults.items())
-        ('pbc', False) ('weighByMass', False) ('name', 'radius_of_gyration')
-        """
-        arguments = OrderedDict()
-        defaults = OrderedDict()
-        for name, parameter in inspect.signature(cls).parameters.items():
-            arguments[name] = parameter.annotation
-            if parameter.default is not inspect.Parameter.empty:
-                defaults[name] = parameter.default
-        return arguments, defaults
 
     def _setUnusedForceGroup(self, system: openmm.System) -> None:
         """

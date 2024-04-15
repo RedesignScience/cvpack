@@ -77,7 +77,13 @@ class OpenMMForceWrapper(CollectiveVariable):
         unit = Unit(unit)
         self._wrapped_force = openmm.XmlSerializer.deserialize(openmmForce)
         self.this = self._wrapped_force.this
-        self._registerCV(name, unit, openmmForce, unit, periodicBounds)
+        self._registerCV(
+            name,
+            unit,
+            openmmForce=openmmForce,
+            unit=unit,
+            periodicBounds=periodicBounds,
+        )
         if periodicBounds is not None:
             self._registerPeriodicBounds(*periodicBounds)
 

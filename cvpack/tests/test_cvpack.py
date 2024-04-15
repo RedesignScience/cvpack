@@ -47,26 +47,6 @@ def test_effective_mass():
     assert effective_mass / effective_mass.unit == pytest.approx(30.946932)
 
 
-def test_argument_inspection():
-    """
-    Test argument inspection of a arbitrary CollectiveVariable subclass
-
-    """
-
-    # pylint: disable=missing-class-docstring, unused-argument
-    class Test(cvpack.CollectiveVariable):
-        def __init__(self, first: int, second: float, third: str = "3"):
-            super().__init__(self)
-
-    # pylint: enable=missing-class-docstring, unused-argument
-
-    args, defaults = Test._getArguments()  # pylint: disable=protected-access
-    assert args["first"] is int
-    assert args["second"] is float
-    assert args["third"] is str
-    assert defaults["third"] == "3"
-
-
 def perform_common_tests(
     collectiveVariable: cvpack.CollectiveVariable,
     context: openmm.Context,
@@ -80,7 +60,8 @@ def perform_common_tests(
     assert unity.value_in_unit_system(unit.md_unit_system) == 1
 
     # Class must have full type annotation (except for argument `self`)
-    args, _ = collectiveVariable._getArguments()  # pylint: disable=protected-access
+    signature = inspect.signature(collectiveVariable.__init__).parameters.items()
+    args = {name: annotation.annotation for name, annotation in signature}
     for _, annotation in args.items():
         assert annotation is not inspect.Parameter.empty
 

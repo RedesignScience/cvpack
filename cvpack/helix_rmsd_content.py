@@ -150,7 +150,13 @@ class HelixRMSDContent(BaseRMSDContent):
             normalize,
         )
         self._registerCV(
-            name, None, residues, numAtoms, thresholdRMSD, stepFunction, normalize
+            name,
+            mmunit.dimensionless,
+            residues=residues,
+            numAtoms=numAtoms,
+            thresholdRMSD=thresholdRMSD,
+            stepFunction=stepFunction,
+            normalize=normalize,
         )
 
 

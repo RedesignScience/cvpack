@@ -10,6 +10,7 @@
 import numpy as np
 import openmm
 from numpy.typing import ArrayLike
+from openmm import unit as mmunit
 
 from .collective_variable import CollectiveVariable
 
@@ -90,7 +91,12 @@ class TorsionSimilarity(openmm.CustomCompoundBondForce, CollectiveVariable):
         for first, second in zip(firstList, secondList):
             self.addBond([*first, *second], [])
         self.setUsesPeriodicBoundaryConditions(pbc)
-        self._registerCV(name, None, firstList, secondList)
+        self._registerCV(
+            name,
+            mmunit.dimensionless,
+            firstList=firstList,
+            secondList=secondList,
+        )
 
 
 TorsionSimilarity.registerTag("!cvpack.TorsionSimilarity")

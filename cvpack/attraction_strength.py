@@ -230,13 +230,13 @@ class AttractionStrength(openmm.CustomNonbondedForce, CollectiveVariable):
 
         self._registerCV(
             name,
-            None,
-            group1,
-            group2,
-            nonbondedForce,
-            contrastGroup,
-            reference,
-            contrastScaling,
+            mmunit.dimensionless,
+            group1=group1,
+            group2=group2,
+            nonbondedForce=nonbondedForce,
+            contrastGroup=contrastGroup,
+            reference=reference,
+            contrastScaling=contrastScaling,
         )
 
 

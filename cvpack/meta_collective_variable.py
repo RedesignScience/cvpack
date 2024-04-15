@@ -131,10 +131,10 @@ class MetaCollectiveVariable(openmm.CustomCVForce, CollectiveVariable):
         self._registerCV(
             name,
             unit,
-            function,
-            variables,
-            unit,
-            periodicBounds,
+            function=function,
+            variables=variables,
+            unit=unit,
+            periodicBounds=periodicBounds,
             **self._parameters,
         )
         if periodicBounds is not None:

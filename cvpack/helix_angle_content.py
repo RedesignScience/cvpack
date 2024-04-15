@@ -129,13 +129,13 @@ class HelixAngleContent(openmm.CustomAngleForce, CollectiveVariable):
         self.setUsesPeriodicBoundaryConditions(pbc)
         self._registerCV(
             name,
-            None,
-            residues,
-            pbc,
-            thetaReference,
-            tolerance,
-            halfExponent,
-            normalize,
+            mmunit.dimensionless,
+            residues=residues,
+            pbc=pbc,
+            thetaReference=thetaReference,
+            tolerance=tolerance,
+            halfExponent=halfExponent,
+            normalize=normalize,
         )
 
 

@@ -87,7 +87,9 @@ class RadiusOfGyrationSq(BaseRadiusOfGyration):
         super().__init__(2, f"distance(g1, g2)^2/{num_atoms}", group, pbc, weighByMass)
         for atom in group:
             self.addBond([atom, num_atoms])
-        self._registerCV(name, mmunit.nanometers**2, group, pbc, weighByMass)
+        self._registerCV(
+            name, mmunit.nanometers**2, group=group, pbc=pbc, weighByMass=weighByMass
+        )
 
 
 RadiusOfGyrationSq.registerTag("!cvpack.RadiusOfGyrationSq")

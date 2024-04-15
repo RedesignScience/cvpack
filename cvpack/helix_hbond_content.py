@@ -113,7 +113,13 @@ class HelixHBondContent(openmm.CustomBondForce, CollectiveVariable):
             )
         self.setUsesPeriodicBoundaryConditions(pbc)
         self._registerCV(
-            name, None, residues, pbc, thresholdDistance, halfExponent, normalize
+            name,
+            mmunit.dimensionless,
+            residues=residues,
+            pbc=pbc,
+            thresholdDistance=thresholdDistance,
+            halfExponent=halfExponent,
+            normalize=normalize,
         )
 
 

@@ -162,15 +162,15 @@ class NumberOfContacts(openmm.CustomNonbondedForce, CollectiveVariable):
         self.setEnergyFunction(expression.replace("/1;", f"/{reference};"))
         self._registerCV(
             name,
-            None,
-            group1,
-            group2,
-            nonbondedForce,
-            reference,
-            stepFunction,
-            thresholdDistance,
-            cutoffFactor,
-            switchFactor,
+            mmunit.dimensionless,
+            group1=group1,
+            group2=group2,
+            nonbondedForce=nonbondedForce,
+            reference=reference,
+            stepFunction=stepFunction,
+            thresholdDistance=thresholdDistance,
+            cutoffFactor=cutoffFactor,
+            switchFactor=switchFactor,
         )
 
 

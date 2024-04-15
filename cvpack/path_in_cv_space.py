@@ -12,6 +12,7 @@ from collections import OrderedDict
 from copy import deepcopy
 
 import openmm
+from openmm import unit as mmunit
 
 from .collective_variable import CollectiveVariable
 from .path import Metric, deviation, progress
@@ -173,12 +174,12 @@ class PathInCVSpace(openmm.CustomCVForce, CollectiveVariable):
             self.addCollectiveVariable(f"cv{i}", deepcopy(variable))
         self._registerCV(
             name,
-            None,
-            metric,
-            variables,
-            milestones.tolist(),
-            sigma,
-            scales,
+            mmunit.dimensionless,
+            metric=metric,
+            variables=variables,
+            milestones=milestones.tolist(),
+            sigma=sigma,
+            scales=scales,
         )
 
 
