@@ -115,7 +115,13 @@
         <span class="n">unit</span> <span class="o">=</span> <span class="n">Unit</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped_force</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">XmlSerializer</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">openmmForce</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">this</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped_force</span><span class="o">.</span><span class="n">this</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">openmmForce</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">periodicBounds</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="n">unit</span><span class="p">,</span>
+            <span class="n">openmmForce</span><span class="o">=</span><span class="n">openmmForce</span><span class="p">,</span>
+            <span class="n">unit</span><span class="o">=</span><span class="n">unit</span><span class="p">,</span>
+            <span class="n">periodicBounds</span><span class="o">=</span><span class="n">periodicBounds</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="n">periodicBounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_registerPeriodicBounds</span><span class="p">(</span><span class="o">*</span><span class="n">periodicBounds</span><span class="p">)</span>
 

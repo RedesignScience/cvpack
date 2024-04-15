@@ -48,6 +48,7 @@
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 
 <span class="kn">import</span> <span class="nn">openmm</span>
+<span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
 <span class="kn">from</span> <span class="nn">.collective_variable</span> <span class="kn">import</span> <span class="n">CollectiveVariable</span>
 <span class="kn">from</span> <span class="nn">.path</span> <span class="kn">import</span> <span class="n">Metric</span><span class="p">,</span> <span class="n">deviation</span><span class="p">,</span> <span class="n">progress</span>
@@ -211,12 +212,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">addCollectiveVariable</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;cv</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">variable</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span>
             <span class="n">name</span><span class="p">,</span>
-            <span class="kc">None</span><span class="p">,</span>
-            <span class="n">metric</span><span class="p">,</span>
-            <span class="n">variables</span><span class="p">,</span>
-            <span class="n">milestones</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
-            <span class="n">sigma</span><span class="p">,</span>
-            <span class="n">scales</span><span class="p">,</span>
+            <span class="n">mmunit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">,</span>
+            <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+            <span class="n">variables</span><span class="o">=</span><span class="n">variables</span><span class="p">,</span>
+            <span class="n">milestones</span><span class="o">=</span><span class="n">milestones</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+            <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span>
+            <span class="n">scales</span><span class="o">=</span><span class="n">scales</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 

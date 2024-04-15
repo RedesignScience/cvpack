@@ -46,6 +46,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">openmm</span>
 <span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">ArrayLike</span>
+<span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
 <span class="kn">from</span> <span class="nn">.collective_variable</span> <span class="kn">import</span> <span class="n">CollectiveVariable</span>
 
@@ -128,7 +129,12 @@
         <span class="k">for</span> <span class="n">first</span><span class="p">,</span> <span class="n">second</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">firstList</span><span class="p">,</span> <span class="n">secondList</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">addBond</span><span class="p">([</span><span class="o">*</span><span class="n">first</span><span class="p">,</span> <span class="o">*</span><span class="n">second</span><span class="p">],</span> <span class="p">[])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setUsesPeriodicBoundaryConditions</span><span class="p">(</span><span class="n">pbc</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">firstList</span><span class="p">,</span> <span class="n">secondList</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_registerCV</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="n">mmunit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">,</span>
+            <span class="n">firstList</span><span class="o">=</span><span class="n">firstList</span><span class="p">,</span>
+            <span class="n">secondList</span><span class="o">=</span><span class="n">secondList</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 
 
