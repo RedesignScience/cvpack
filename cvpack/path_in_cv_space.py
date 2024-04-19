@@ -8,19 +8,18 @@
 """
 
 import typing as t
-from collections import OrderedDict
 from copy import deepcopy
 
-import openmm
 from openmm import unit as mmunit
 
+from .base_path_cv import BasePathCV
 from .collective_variable import CollectiveVariable
-from .path import Metric, deviation, progress
+from .path import Metric
 from .units.units import MatrixQuantity, ScalarQuantity, value_in_md_units
 from .utils import convert_to_matrix
 
 
-class PathInCVSpace(openmm.CustomCVForce, CollectiveVariable):
+class PathInCVSpace(BasePathCV):
     r"""
     A metric of the system's progress (:math:`s`) or deviation (:math:`z`) with
     respect to a path defined by a sequence of :math:`n` milestones positioned in a
@@ -130,12 +129,7 @@ class PathInCVSpace(openmm.CustomCVForce, CollectiveVariable):
         scales: t.Optional[t.Iterable[ScalarQuantity]] = None,
         name: t.Optional[str] = None,
     ) -> None:
-        if metric not in (progress, deviation):
-            raise ValueError(
-                "Invalid metric. Use 'cvpack.path.progress' or 'cvpack.path.deviation'."
-            )
-        if name is None:
-            name = f"path_{metric.name}_in_cv_space"
+        name = self._generateName(metric, name)
         variables = list(variables)
         cv_scales = [1.0] * len(variables) if scales is None else list(scales)
         milestones, n, numvars = convert_to_matrix(milestones)
@@ -143,7 +137,7 @@ class PathInCVSpace(openmm.CustomCVForce, CollectiveVariable):
             raise ValueError("Wrong number of columns in the milestones matrix.")
         if n < 2:
             raise ValueError("At least two rows are required in the milestones matrix.")
-        definitions = OrderedDict({"lambda": 1 / (2 * sigma**2)})
+        distances = []
         periods = {}
         for i, variable in enumerate(variables):
             values = variable.getPeriodicBounds()
@@ -153,25 +147,14 @@ class PathInCVSpace(openmm.CustomCVForce, CollectiveVariable):
             deltas = [f"({value}-cv{j})" for j, value in enumerate(values)]
             for j, period in periods.items():
                 deltas[j] = f"min(abs{deltas[j]},{period}-abs{deltas[j]})"
-            definitions[f"x{i}"] = "+".join(
-                f"{delta}^2" if scale == 1.0 else f"({delta}/{scale})^2"
-                for delta, scale in zip(deltas, cv_scales)
+            distances.append(
+                "+".join(
+                    f"{delta}^2" if scale == 1.0 else f"({delta}/{scale})^2"
+                    for delta, scale in zip(deltas, cv_scales)
+                )
             )
-        definitions["xmin0"] = "min(x0,x1)"
-        for i in range(n - 2):
-            definitions[f"xmin{i+1}"] = f"min(xmin{i},x{i+2})"
-        for i in range(n):
-            definitions[f"w{i}"] = f"exp(lambda*(xmin{n - 2}-x{i}))"
-        definitions["wsum"] = "+".join(f"w{i}" for i in range(n))
-        expressions = [f"{key}={value}" for key, value in definitions.items()]
-        if metric == progress:
-            numerator = "+".join(f"{i}*w{i}" for i in range(1, n))
-            expressions.append(f"({numerator})/({n - 1}*wsum)")
-        else:
-            expressions.append(f"xmin{n - 2}-log(wsum)/lambda")
-        super().__init__("; ".join(reversed(expressions)))
-        for i, variable in enumerate(variables):
-            self.addCollectiveVariable(f"cv{i}", deepcopy(variable))
+        cvs = {f"cv{i}": deepcopy(variable) for i, variable in enumerate(variables)}
+        super().__init__(metric, sigma, distances, cvs)
         self._registerCV(
             name,
             mmunit.dimensionless,
