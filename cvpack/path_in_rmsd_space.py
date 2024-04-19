@@ -74,6 +74,47 @@ class PathInRMSDSpace(BasePathCV):
         The number of milestones is less than 2
     ValueError
         If the metric is not `cvpack.path.progress` or `cvpack.path.deviation`
+
+    Examples
+    --------
+    >>> import cvpack
+    >>> from copy import copy
+    >>> import networkx as nx
+    >>> import numpy as np
+    >>> import openmm
+    >>> from openmm import unit
+    >>> from openmmtools import testsystems
+    >>> from scipy.spatial.transform import Rotation
+    >>> model = testsystems.AlanineDipeptideVacuum()
+    >>> coords = model.positions / model.positions.unit
+    >>> atom1, atom2 = 8, 14
+    >>> graph = model.mdtraj_topology.to_bondgraph()
+    >>> nodes = list(graph.nodes)
+    >>> graph.remove_edge(nodes[atom1], nodes[atom2])
+    >>> components = list(nx.connected_components(graph))
+    >>> indices = [nodes.index(atom) for atom in components[1]]
+    >>> origin = coords[atom1, :]
+    >>> vector = coords[atom2, :] - origin
+    >>> vector /= np.linalg.norm(vector) * np.pi / 6
+    >>> rotation = Rotation.from_rotvec(vector)
+    >>> milestones = [{i: copy(pos) for i, pos in enumerate(coords)}]
+    >>> for _ in range(5):
+    ...     for atom in indices:
+    ...         coords[atom, :] = rotation.apply(coords[atom, :] - origin) + origin
+    ...     milestones.append({i: copy(pos) for i, pos in enumerate(coords)})
+    >>> path_vars = []
+    >>> for metric in (cvpack.path.progress, cvpack.path.deviation):
+    ...     var = cvpack.PathInRMSDSpace(
+    ...         metric, milestones, len(coords), 1 * unit.angstrom
+    ...     )
+    ...     var.addToSystem(model.system)
+    ...     path_vars.append(var)
+    >>> context = openmm.Context(model.system, openmm.VerletIntegrator(1.0))
+    >>> context.setPositions(model.positions)
+    >>> path_vars[0].getValue(context)
+    0.0982... dimensionless
+    >>> path_vars[1].getValue(context)
+    -0.003458... nm**2
     """
 
     def __init__(  # pylint: disable=too-many-branches
@@ -99,7 +140,7 @@ class PathInRMSDSpace(BasePathCV):
             name,
             mmunit.dimensionless if metric == progress else mmunit.nanometers**2,
             metric=metric,
-            milestones=milestones.tolist(),
+            milestones=milestones,
             numAtoms=numAtoms,
             sigma=sigma,
         )
