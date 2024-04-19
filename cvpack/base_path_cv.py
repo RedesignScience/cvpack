@@ -61,11 +61,11 @@ class BasePathCV(openmm.CustomCVForce, CollectiveVariable):
         for name, variable in variables.items():
             self.addCollectiveVariable(name, variable)
 
-    def _generateName(self, metric: Metric, name: str) -> str:
+    def _generateName(self, metric: Metric, name: str, kind: str) -> str:
         if metric not in (progress, deviation):
             raise ValueError(
                 "Invalid metric. Use 'cvpack.path.progress' or 'cvpack.path.deviation'."
             )
         if name is None:
-            return f"path_{metric.name}_in_cv_space"
+            return f"path_{metric.name}_in_{kind}_space"
         return name

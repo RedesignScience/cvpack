@@ -130,7 +130,7 @@ class PathInCVSpace(BasePathCV):
         scales: t.Optional[t.Iterable[ScalarQuantity]] = None,
         name: t.Optional[str] = None,
     ) -> None:
-        name = self._generateName(metric, name)
+        name = self._generateName(metric, name, "cv")
         variables = list(variables)
         cv_scales = [1.0] * len(variables) if scales is None else list(scales)
         milestones, n, numvars = convert_to_matrix(milestones)
