@@ -1,7 +1,7 @@
 """
-.. class:: PathCV
+.. class:: PathInRMSDSpace
    :platform: Linux, MacOS, Windows
-   :synopsis:
+   :synopsis: A metric of progress or deviation with respect to a path in RMSD space
 
 .. classauthor:: Charlles Abreu <craabreu@gmail.com>
 
@@ -78,7 +78,6 @@ class PathInRMSDSpace(BasePathCV):
     Examples
     --------
     >>> import cvpack
-    >>> from copy import copy
     >>> import networkx as nx
     >>> import numpy as np
     >>> import openmm
@@ -97,23 +96,24 @@ class PathInRMSDSpace(BasePathCV):
     >>> vector = coords[atom2, :] - origin
     >>> vector /= np.linalg.norm(vector) * np.pi / 6
     >>> rotation = Rotation.from_rotvec(vector)
-    >>> milestones = [{i: copy(pos) for i, pos in enumerate(coords)}]
+    >>> milestones = [{i: pos.copy() for i, pos in enumerate(coords)}]
     >>> for _ in range(5):
     ...     for atom in indices:
     ...         coords[atom, :] = rotation.apply(coords[atom, :] - origin) + origin
-    ...     milestones.append({i: copy(pos) for i, pos in enumerate(coords)})
-    >>> path_vars = []
-    >>> for metric in (cvpack.path.progress, cvpack.path.deviation):
-    ...     var = cvpack.PathInRMSDSpace(
-    ...         metric, milestones, len(coords), 1 * unit.angstrom
-    ...     )
-    ...     var.addToSystem(model.system)
-    ...     path_vars.append(var)
-    >>> context = openmm.Context(model.system, openmm.VerletIntegrator(1.0))
+    ...     milestones.append({i: pos.copy() for i, pos in enumerate(coords)})
+    >>> s = cvpack.PathInRMSDSpace(
+    ...    cvpack.path.progress, milestones, len(coords), 1 * unit.angstrom
+    ... )
+    >>> s.addToSystem(model.system)
+    >>> z = cvpack.PathInRMSDSpace(
+    ...    cvpack.path.deviation, milestones, len(coords), 1 * unit.angstrom
+    ... )
+    >>> z.addToSystem(model.system)
+    >>> context = openmm.Context(model.system, openmm.VerletIntegrator(0.001))
     >>> context.setPositions(model.positions)
-    >>> path_vars[0].getValue(context)
+    >>> s.getValue(context)
     0.0982... dimensionless
-    >>> path_vars[1].getValue(context)
+    >>> z.getValue(context)
     -0.003458... nm**2
     """
 
