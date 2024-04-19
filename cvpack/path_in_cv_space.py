@@ -96,6 +96,7 @@ class PathInCVSpace(BasePathCV):
     Examples
     --------
     >>> import cvpack
+    >>> import openmm
     >>> from openmmtools import testsystems
     >>> import numpy as np
     >>> model = testsystems.AlanineDipeptideVacuum()
