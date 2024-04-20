@@ -15,7 +15,7 @@ from openmm import app as mmapp
 from openmm import unit as mmunit
 
 from .collective_variable import CollectiveVariable
-from .units import ScalarQuantity
+from .units import Quantity, ScalarQuantity
 
 
 class HelixHBondContent(openmm.CustomBondForce, CollectiveVariable):
@@ -83,7 +83,7 @@ class HelixHBondContent(openmm.CustomBondForce, CollectiveVariable):
         self,
         residues: t.Sequence[mmapp.topology.Residue],
         pbc: bool = False,
-        thresholdDistance: ScalarQuantity = 0.33 * mmunit.nanometers,
+        thresholdDistance: ScalarQuantity = Quantity(0.33 * mmunit.nanometers),
         halfExponent: int = 3,
         normalize: bool = False,
         name: str = "helix_hbond_content",

@@ -13,7 +13,7 @@ from openmm import app as mmapp
 from openmm import unit as mmunit
 
 from .base_rmsd_content import BaseRMSDContent
-from .units import ScalarQuantity
+from .units import Quantity, ScalarQuantity
 
 # pylint: disable=protected-access
 ALPHA_POSITIONS = BaseRMSDContent._loadPositions("ideal_alpha_helix.csv")
@@ -131,7 +131,7 @@ class HelixRMSDContent(BaseRMSDContent):
         self,
         residues: t.Sequence[mmapp.topology.Residue],
         numAtoms: int,
-        thresholdRMSD: ScalarQuantity = 0.08 * mmunit.nanometers,
+        thresholdRMSD: ScalarQuantity = Quantity(0.08 * mmunit.nanometers),
         stepFunction: str = "(1+x^4)/(1+x^4+x^8)",
         normalize: bool = False,
         name: str = "helix_rmsd_content",

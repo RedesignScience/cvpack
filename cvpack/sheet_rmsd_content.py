@@ -14,7 +14,7 @@ from openmm import app as mmapp
 from openmm import unit as mmunit
 
 from .base_rmsd_content import BaseRMSDContent
-from .units import ScalarQuantity
+from .units import Quantity, ScalarQuantity
 
 # pylint: disable=protected-access
 PARABETA_POSITIONS = BaseRMSDContent._loadPositions("ideal_parallel_beta_sheet.csv")
@@ -182,7 +182,7 @@ class SheetRMSDContent(BaseRMSDContent):
         numAtoms: int,
         parallel: bool = False,
         blockSizes: t.Optional[t.Sequence[int]] = None,
-        thresholdRMSD: ScalarQuantity = 0.08 * mmunit.nanometers,
+        thresholdRMSD: ScalarQuantity = Quantity(0.08 * mmunit.nanometers),
         stepFunction: str = "(1+x^4)/(1+x^4+x^8)",
         normalize: bool = False,
         name: str = "sheet_rmsd_content",

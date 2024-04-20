@@ -14,7 +14,7 @@ from openmm import app as mmapp
 from openmm import unit as mmunit
 
 from .collective_variable import CollectiveVariable
-from .units import ScalarQuantity
+from .units import Quantity, ScalarQuantity
 
 
 class HelixTorsionContent(openmm.CustomTorsionForce, CollectiveVariable):
@@ -105,9 +105,9 @@ class HelixTorsionContent(openmm.CustomTorsionForce, CollectiveVariable):
         self,
         residues: t.Sequence[mmapp.topology.Residue],
         pbc: bool = False,
-        phiReference: ScalarQuantity = -63.8 * mmunit.degrees,
-        psiReference: ScalarQuantity = -41.1 * mmunit.degrees,
-        tolerance: ScalarQuantity = 25 * mmunit.degrees,
+        phiReference: ScalarQuantity = Quantity(-63.8 * mmunit.degrees),
+        psiReference: ScalarQuantity = Quantity(-41.1 * mmunit.degrees),
+        tolerance: ScalarQuantity = Quantity(25 * mmunit.degrees),
         halfExponent: int = 3,
         normalize: bool = False,
         name: str = "helix_torsion_content",

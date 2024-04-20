@@ -14,7 +14,7 @@ import openmm
 from openmm import unit as mmunit
 
 from .collective_variable import CollectiveVariable
-from .units import ScalarQuantity
+from .units import Quantity, ScalarQuantity
 from .utils import evaluate_in_context
 
 
@@ -130,7 +130,7 @@ class NumberOfContacts(openmm.CustomNonbondedForce, CollectiveVariable):
         nonbondedForce: openmm.NonbondedForce,
         reference: t.Union[Real, openmm.Context] = 1.0,
         stepFunction: str = "1/(1+x^6)",
-        thresholdDistance: ScalarQuantity = 0.3 * mmunit.nanometers,
+        thresholdDistance: ScalarQuantity = Quantity(0.3 * mmunit.nanometers),
         cutoffFactor: float = 2.0,
         switchFactor: t.Optional[float] = 1.5,
         name: str = "number_of_contacts",
