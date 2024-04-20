@@ -1,0 +1,7 @@
+Reporters
+=========
+
+.. currentmodule:: cvpack.reporters
+.. autoclass:: serialize
+
+.. autofunction:: deserialize

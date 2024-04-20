@@ -1,0 +1,21 @@
+CollectiveVariable
+==================
+
+.. currentmodule:: cvpack
+.. autoclass:: CollectiveVariable
+    :member-order: alphabetical
+
+    .. rubric:: Methods
+
+    .. automethod:: addToSystem
+    .. automethod:: addToSystem
+    .. automethod:: getEffectiveMass
+    .. automethod:: getEffectiveMass
+    .. automethod:: getMassUnit
+    .. automethod:: getMassUnit
+    .. automethod:: getPeriodicBounds
+    .. automethod:: getPeriodicBounds
+    .. automethod:: getUnit
+    .. automethod:: getUnit
+    .. automethod:: getValue
+    .. automethod:: getValue

@@ -1,0 +1,11 @@
+GlobalParameter
+===============
+
+.. currentmodule:: cvpack
+.. autoclass:: GlobalParameter
+    :member-order: alphabetical
+
+    .. rubric:: Methods
+
+    .. automethod:: getValue
+    .. automethod:: setValue
