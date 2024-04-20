@@ -24,6 +24,7 @@ Collective Variables
     ResidueCoordination
     RMSD
     SheetRMSDContent
+    ShortestDistance
     Torsion
     TorsionSimilarity
 

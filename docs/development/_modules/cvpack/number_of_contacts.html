@@ -173,7 +173,6 @@
         <span class="n">switchFactor</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;number_of_contacts&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="c1"># nonbondedForce = NonbondedForceSurrogate(nonbondedForce)</span>
         <span class="n">num_atoms</span> <span class="o">=</span> <span class="n">nonbondedForce</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()</span>
         <span class="n">pbc</span> <span class="o">=</span> <span class="n">nonbondedForce</span><span class="o">.</span><span class="n">usesPeriodicBoundaryConditions</span><span class="p">()</span>
         <span class="n">threshold</span> <span class="o">=</span> <span class="n">thresholdDistance</span>
