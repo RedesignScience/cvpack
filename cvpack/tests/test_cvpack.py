@@ -10,6 +10,7 @@ import sys
 import typing as t
 
 import mdtraj
+import networkx as nx
 import numpy as np
 import openmm
 import pytest
@@ -17,6 +18,7 @@ from openmm import app, unit
 from openmmtools import testsystems
 from openmmtools.constants import ONE_4PI_EPS0
 from scipy.spatial.transform import Rotation
+from scipy.special import logsumexp
 
 import cvpack
 from cvpack import serialization
@@ -790,22 +792,71 @@ def test_path_in_cv_space(metric: cvpack.path.Metric):
     context.setPositions(model.positions)
     cv_value = var.getValue(context)
 
-    def logsumexp(x, a=None):
-        xmax = np.max(x)
-        if a is None:
-            return xmax + np.log(np.sum(np.exp(x - xmax)))
-        return xmax + np.log(np.sum(a * np.exp(x - xmax)))
-
     angles = np.array(var.getCollectiveVariableValues(context))
     deltas = np.abs(milestones - angles)
     x = -0.5 * np.sum(np.minimum(deltas, 2 * np.pi - deltas) ** 2, axis=1) / sigma**2
     if metric is cvpack.path.progress:
         n = len(x)
-        computed_value = np.exp(logsumexp(x, np.arange(n)) - logsumexp(x)) / (n - 1)
+        computed_value = np.exp(logsumexp(x, b=np.arange(n)) - logsumexp(x)) / (n - 1)
     else:
         computed_value = -2 * sigma**2 * logsumexp(x)
     assert cv_value / cv_value.unit == pytest.approx(computed_value)
     perform_common_tests(var, context)
+
+
+@pytest.mark.parametrize("metric", [cvpack.path.progress, cvpack.path.deviation])
+def test_path_in_rmsd_space(metric: cvpack.path.Metric):
+    """
+    Test whether a path in RMSD space is computed correctly.
+
+    """
+
+    def get_movable_atoms(model, atom1, atom2):
+        graph = model.mdtraj_topology.to_bondgraph()
+        nodes = list(graph.nodes)
+        graph.remove_edge(nodes[atom1], nodes[atom2])
+        movable = list(nx.connected_components(graph))[1]
+        return [nodes.index(atom) for atom in movable]
+
+    model = testsystems.AlanineDipeptideVacuum()
+    atoms = get_movable_atoms(model, 8, 14)
+    x = model.positions / model.positions.unit
+    vector = (x[14, :] - x[8, :]) / np.linalg.norm(x[14, :] - x[8, :])
+    rotation = Rotation.from_rotvec((np.pi / 6) * vector)
+    frames = [x.copy()]
+    for _ in range(6):
+        x[atoms, :] = x[8, :] + rotation.apply(x[atoms, :] - x[8, :])
+        frames.append(x.copy())
+    milestones = [dict(enumerate(frame)) for frame in frames]
+    sigma = 0.1
+    path_cv = cvpack.PathInRMSDSpace(metric, milestones, len(x), sigma)
+    path_cv.addToSystem(model.system)
+    integrator = openmm.LangevinMiddleIntegrator(
+        300 * unit.kelvin, 1 / unit.picosecond, 0.004 * unit.picoseconds
+    )
+    platform = openmm.Platform.getPlatformByName("Reference")
+    context = openmm.Context(model.system, integrator, platform)
+    context.setPositions(model.positions)
+
+    traj = mdtraj.Trajectory(frames, model.mdtraj_topology)
+    for _ in range(10):
+        integrator.step(1000)
+        frame = mdtraj.Trajectory(
+            context.getState(  # pylint: disable=unexpected-keyword-arg
+                getPositions=True
+            )
+            .getPositions(asNumpy=True)
+            .value_in_unit(unit.nanometer),
+            model.mdtraj_topology,
+        )
+        exponents = -0.5 * (mdtraj.rmsd(traj, frame) / sigma) ** 2
+        s = np.exp(logsumexp(exponents, b=np.arange(7)) - logsumexp(exponents)) / 6
+        z = -2 * sigma**2 * logsumexp(exponents)
+        if metric is cvpack.path.progress:
+            assert path_cv.getValue(context) / unit.dimensionless == pytest.approx(s)
+        else:
+            assert path_cv.getValue(context) / unit.nanometer**2 == pytest.approx(z)
+    perform_common_tests(path_cv, context)
 
 
 def test_openmm_force_wrapper():

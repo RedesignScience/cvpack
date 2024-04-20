@@ -144,7 +144,7 @@ class PathInRMSDSpace(BasePathCV):
             name,
             mmunit.dimensionless if metric == progress else mmunit.nanometers**2,
             metric=metric,
-            milestones=milestones,
+            milestones=[{k: list(v) for k, v in m.items()} for m in milestones],
             numAtoms=numAtoms,
             sigma=sigma,
         )
