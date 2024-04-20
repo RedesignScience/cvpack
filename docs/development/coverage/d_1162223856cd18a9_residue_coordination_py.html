@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_1162223856cd18a9_rmsd_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.4">coverage.py v7.4.4</a>,
-            created at 2024-04-20 23:08 +0000
+            created at 2024-04-20 23:11 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -97,7 +97,7 @@
     <p class="run"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t"><span class="key">from</span> <span class="nam">openmm</span><span class="op">.</span><span class="nam">app</span><span class="op">.</span><span class="nam">topology</span> <span class="key">import</span> <span class="nam">Residue</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t"><span class="key">from</span> <span class="op">.</span><span class="nam">collective_variable</span> <span class="key">import</span> <span class="nam">CollectiveVariable</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t18" href="#t18">18</a></span><span class="t"><span class="key">from</span> <span class="op">.</span><span class="nam">units</span> <span class="key">import</span> <span class="nam">ScalarQuantity</span><span class="op">,</span> <span class="nam">value_in_md_units</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t18" href="#t18">18</a></span><span class="t"><span class="key">from</span> <span class="op">.</span><span class="nam">units</span> <span class="key">import</span> <span class="nam">Quantity</span><span class="op">,</span> <span class="nam">ScalarQuantity</span><span class="op">,</span> <span class="nam">value_in_md_units</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t19" href="#t19">19</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t20" href="#t20">20</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t21" href="#t21">21</a></span><span class="t"><span class="key">class</span> <span class="nam">ResidueCoordination</span><span class="op">(</span><span class="nam">openmm</span><span class="op">.</span><span class="nam">CustomCentroidBondForce</span><span class="op">,</span> <span class="nam">CollectiveVariable</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -193,7 +193,7 @@
     <p class="pln"><span class="n"><a id="t111" href="#t111">111</a></span><span class="t">        <span class="nam">residueGroup2</span><span class="op">:</span> <span class="nam">t</span><span class="op">.</span><span class="nam">Iterable</span><span class="op">[</span><span class="nam">Residue</span><span class="op">]</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t112" href="#t112">112</a></span><span class="t">        <span class="nam">pbc</span><span class="op">:</span> <span class="nam">bool</span> <span class="op">=</span> <span class="key">True</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t113" href="#t113">113</a></span><span class="t">        <span class="nam">stepFunction</span><span class="op">:</span> <span class="nam">str</span> <span class="op">=</span> <span class="str">"1/(1+x^6)"</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t114" href="#t114">114</a></span><span class="t">        <span class="nam">thresholdDistance</span><span class="op">:</span> <span class="nam">ScalarQuantity</span> <span class="op">=</span> <span class="num">1.0</span> <span class="op">*</span> <span class="nam">mmunit</span><span class="op">.</span><span class="nam">nanometers</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t114" href="#t114">114</a></span><span class="t">        <span class="nam">thresholdDistance</span><span class="op">:</span> <span class="nam">ScalarQuantity</span> <span class="op">=</span> <span class="nam">Quantity</span><span class="op">(</span><span class="num">1.0</span> <span class="op">*</span> <span class="nam">mmunit</span><span class="op">.</span><span class="nam">nanometers</span><span class="op">)</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t115" href="#t115">115</a></span><span class="t">        <span class="nam">normalize</span><span class="op">:</span> <span class="nam">bool</span> <span class="op">=</span> <span class="key">False</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t116" href="#t116">116</a></span><span class="t">        <span class="nam">weighByMass</span><span class="op">:</span> <span class="nam">bool</span> <span class="op">=</span> <span class="key">True</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t117" href="#t117">117</a></span><span class="t">        <span class="nam">includeHydrogens</span><span class="op">:</span> <span class="nam">bool</span> <span class="op">=</span> <span class="key">True</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
@@ -275,7 +275,7 @@
             <a id="nextFileLink" class="nav" href="d_1162223856cd18a9_rmsd_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.4">coverage.py v7.4.4</a>,
-            created at 2024-04-20 23:08 +0000
+            created at 2024-04-20 23:11 +0000
         </p>
     </div>
 </footer>

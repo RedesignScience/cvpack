@@ -50,7 +50,7 @@
 <span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
 <span class="kn">from</span> <span class="nn">.collective_variable</span> <span class="kn">import</span> <span class="n">CollectiveVariable</span>
-<span class="kn">from</span> <span class="nn">.units</span> <span class="kn">import</span> <span class="n">ScalarQuantity</span>
+<span class="kn">from</span> <span class="nn">.units</span> <span class="kn">import</span> <span class="n">Quantity</span><span class="p">,</span> <span class="n">ScalarQuantity</span>
 
 
 <div class="viewcode-block" id="HelixTorsionContent">
@@ -143,9 +143,9 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">residues</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">mmapp</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">Residue</span><span class="p">],</span>
         <span class="n">pbc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">phiReference</span><span class="p">:</span> <span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="o">-</span><span class="mf">63.8</span> <span class="o">*</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span>
-        <span class="n">psiReference</span><span class="p">:</span> <span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="o">-</span><span class="mf">41.1</span> <span class="o">*</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span>
-        <span class="n">tolerance</span><span class="p">:</span> <span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="mi">25</span> <span class="o">*</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span>
+        <span class="n">phiReference</span><span class="p">:</span> <span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="o">-</span><span class="mf">63.8</span> <span class="o">*</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">degrees</span><span class="p">),</span>
+        <span class="n">psiReference</span><span class="p">:</span> <span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="o">-</span><span class="mf">41.1</span> <span class="o">*</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">degrees</span><span class="p">),</span>
+        <span class="n">tolerance</span><span class="p">:</span> <span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="mi">25</span> <span class="o">*</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">degrees</span><span class="p">),</span>
         <span class="n">halfExponent</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
         <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;helix_torsion_content&quot;</span><span class="p">,</span>

@@ -49,7 +49,7 @@
 <span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
 <span class="kn">from</span> <span class="nn">.base_rmsd_content</span> <span class="kn">import</span> <span class="n">BaseRMSDContent</span>
-<span class="kn">from</span> <span class="nn">.units</span> <span class="kn">import</span> <span class="n">ScalarQuantity</span>
+<span class="kn">from</span> <span class="nn">.units</span> <span class="kn">import</span> <span class="n">Quantity</span><span class="p">,</span> <span class="n">ScalarQuantity</span>
 
 <span class="c1"># pylint: disable=protected-access</span>
 <span class="n">ALPHA_POSITIONS</span> <span class="o">=</span> <span class="n">BaseRMSDContent</span><span class="o">.</span><span class="n">_loadPositions</span><span class="p">(</span><span class="s2">&quot;ideal_alpha_helix.csv&quot;</span><span class="p">)</span>
@@ -169,7 +169,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">residues</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">mmapp</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">Residue</span><span class="p">],</span>
         <span class="n">numAtoms</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">thresholdRMSD</span><span class="p">:</span> <span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="mf">0.08</span> <span class="o">*</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span><span class="p">,</span>
+        <span class="n">thresholdRMSD</span><span class="p">:</span> <span class="n">ScalarQuantity</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="mf">0.08</span> <span class="o">*</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span><span class="p">),</span>
         <span class="n">stepFunction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;(1+x^4)/(1+x^4+x^8)&quot;</span><span class="p">,</span>
         <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;helix_rmsd_content&quot;</span><span class="p">,</span>
