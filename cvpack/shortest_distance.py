@@ -73,12 +73,11 @@ class ShortestDistance(openmm.CustomCVForce, CollectiveVariable):
     >>> import numpy as np
     >>> from openmm import unit
     >>> from openmmtools import testsystems
-    >>> model = testsystems.HostGuestExplicit()
+    >>> model = testsystems.HostGuestVacuum()
     >>> group1, group2 = [], []
     >>> for residue in model.topology.residues():
-    ...     if residue.name != "HOH":
-    ...         group = group1 if residue.name == "B2" else group2
-    ...         group.extend(atom.index for atom in residue.atoms())
+    ...     group = group1 if residue.name == "B2" else group2
+    ...     group.extend(atom.index for atom in residue.atoms())
     >>> coords = model.positions.value_in_unit(mmunit.nanometers)
     >>> np.linalg.norm(
     ...     coords[group1, None, :] - coords[None, group2, :],
@@ -137,6 +136,7 @@ class ShortestDistance(openmm.CustomCVForce, CollectiveVariable):
             mmunit.nanometers,
             group1=group1,
             group2=group2,
+            numAtoms=numAtoms,
             sigma=sigma,
             magnitude=magnitude,
             cutoffDistance=cutoffDistance,

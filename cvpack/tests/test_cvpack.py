@@ -885,3 +885,40 @@ def test_openmm_force_wrapper():
     angle_value = state.getPotentialEnergy().value_in_unit(unit.kilojoule_per_mole)
     assert cv.getValue(context) / unit.radians == pytest.approx(angle_value)
     perform_common_tests(cv, context)
+
+
+def test_shortest_distance():
+    """
+    Test whether a shortest distance CV is computed correctly.
+
+    """
+    model = testsystems.HostGuestVacuum()
+    group1, group2 = [], []
+    for residue in model.topology.residues():
+        group = group1 if residue.name == "B2" else group2
+        group.extend(atom.index for atom in residue.atoms())
+    coords = model.positions.value_in_unit(unit.nanometers)
+    num_atoms = model.system.getNumParticles()
+    min_dist = cvpack.ShortestDistance(group1, group2, num_atoms)
+    min_dist.addToSystem(model.system)
+    platform = openmm.Platform.getPlatformByName("Reference")
+    integrator = openmm.LangevinMiddleIntegrator(
+        300 * unit.kelvin, 1 / unit.picosecond, 0.004 * unit.picoseconds
+    )
+    context = openmm.Context(model.system, integrator, platform)
+    context.setPositions(model.positions)
+    for _ in range(10):
+        integrator.step(100)
+        coords = (
+            context.getState(  # pylint: disable=unexpected-keyword-arg
+                getPositions=True
+            )
+            .getPositions(asNumpy=True)
+            .value_in_unit(unit.nanometers)
+        )
+        cv_value = min_dist.getValue(context) / unit.nanometer
+        compute_value = np.min(
+            np.linalg.norm(coords[group1][:, None, :] - coords[group2], axis=2)
+        )
+        assert cv_value == pytest.approx(compute_value, abs=1e-2)
+    perform_common_tests(min_dist, context)
