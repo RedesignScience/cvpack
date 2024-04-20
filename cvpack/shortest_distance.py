@@ -13,11 +13,12 @@ import openmm
 from openmm import unit as mmunit
 
 from .collective_variable import CollectiveVariable
+from .units import Quantity
 
 
 class ShortestDistance(openmm.CustomCVForce, CollectiveVariable):
     r"""
-    A smooth approximation of the shortest distance between two disjoint atom groups:
+    A smooth approximation of the shortest distance between two atom groups:
 
     .. math::
         r_{\rm min}({\bf r}) = \frac{
@@ -37,6 +38,11 @@ class ShortestDistance(openmm.CustomCVForce, CollectiveVariable):
     the collective variable is computed only for pairs of atoms separated by a distance
     less than :math:`r_c`. A switching function is also applied to smoothly turn off
     the collective variable starting from a distance :math:`r_s < r_c`.
+
+    .. note::
+
+        Atoms are allowed to be in both groups. In this case, terms for which
+        :math:`i = j` are ignored.
 
     Parameters
     ----------
@@ -61,11 +67,6 @@ class ShortestDistance(openmm.CustomCVForce, CollectiveVariable):
         Whether to consider periodic boundary conditions in distance calculations.
     name
         The name of the collective variable.
-
-    Raises
-    ------
-    ValueError
-        If the atom groups are not disjoint.
 
     Example
     -------
@@ -100,10 +101,10 @@ class ShortestDistance(openmm.CustomCVForce, CollectiveVariable):
         group1: t.Sequence[int],
         group2: t.Sequence[int],
         numAtoms: int,
-        sigma: mmunit.Quantity = 0.01 * mmunit.nanometers,
-        magnitude: mmunit.Quantity = 0.2 * mmunit.nanometers,
-        cutoffDistance: mmunit.Quantity = 0.5 * mmunit.nanometers,
-        switchDistance: mmunit.Quantity = 0.4 * mmunit.nanometers,
+        sigma: mmunit.Quantity = Quantity(0.01 * mmunit.nanometers),
+        magnitude: mmunit.Quantity = Quantity(0.2 * mmunit.nanometers),
+        cutoffDistance: mmunit.Quantity = Quantity(0.5 * mmunit.nanometers),
+        switchDistance: mmunit.Quantity = Quantity(0.4 * mmunit.nanometers),
         pbc: bool = True,
         name: str = "shortest_distance",
     ) -> None:
@@ -111,8 +112,6 @@ class ShortestDistance(openmm.CustomCVForce, CollectiveVariable):
             sigma = sigma.value_in_unit(mmunit.nanometers)
         if mmunit.is_quantity(magnitude):
             magnitude = magnitude.value_in_unit(mmunit.nanometers)
-        if set(group1) & set(group2):
-            raise ValueError("The atom groups must be disjoint")
         weight = f"exp(-0.5*(r^2 - {magnitude**2})/{sigma**2})"
         forces = {
             "numerator": openmm.CustomNonbondedForce(f"r*{weight}"),
