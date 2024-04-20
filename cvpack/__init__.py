@@ -26,6 +26,7 @@ from .radius_of_gyration_sq import RadiusOfGyrationSq  # noqa: F401
 from .residue_coordination import ResidueCoordination  # noqa: F401
 from .rmsd import RMSD  # noqa: F401
 from .sheet_rmsd_content import SheetRMSDContent  # noqa: F401
+from .shortest_distance import ShortestDistance  # noqa: F401
 from .torsion import Torsion  # noqa: F401
 from .torsion_similarity import TorsionSimilarity  # noqa: F401
 
@@ -51,6 +52,7 @@ __all__ = [
     "ResidueCoordination",
     "RMSD",
     "SheetRMSDContent",
+    "ShortestDistance",
     "Torsion",
     "TorsionSimilarity",
 ]

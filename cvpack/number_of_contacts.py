@@ -135,7 +135,6 @@ class NumberOfContacts(openmm.CustomNonbondedForce, CollectiveVariable):
         switchFactor: t.Optional[float] = 1.5,
         name: str = "number_of_contacts",
     ) -> None:
-        # nonbondedForce = NonbondedForceSurrogate(nonbondedForce)
         num_atoms = nonbondedForce.getNumParticles()
         pbc = nonbondedForce.usesPeriodicBoundaryConditions()
         threshold = thresholdDistance
