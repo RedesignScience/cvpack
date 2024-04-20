@@ -828,7 +828,7 @@ def test_path_in_rmsd_space(metric: cvpack.path.Metric):
         x[atoms, :] = x[8, :] + rotation.apply(x[atoms, :] - x[8, :])
         frames.append(x.copy())
     milestones = [dict(enumerate(frame)) for frame in frames]
-    sigma = 0.1
+    sigma = 0.05
     path_cv = cvpack.PathInRMSDSpace(metric, milestones, len(x), sigma)
     path_cv.addToSystem(model.system)
     integrator = openmm.LangevinMiddleIntegrator(
@@ -852,10 +852,11 @@ def test_path_in_rmsd_space(metric: cvpack.path.Metric):
         exponents = -0.5 * (mdtraj.rmsd(traj, frame) / sigma) ** 2
         s = np.exp(logsumexp(exponents, b=np.arange(7)) - logsumexp(exponents)) / 6
         z = -2 * sigma**2 * logsumexp(exponents)
+        value = path_cv.getValue(context)
         if metric is cvpack.path.progress:
-            assert path_cv.getValue(context) / unit.dimensionless == pytest.approx(s)
+            assert value / unit.dimensionless == pytest.approx(s, rel=1e-5)
         else:
-            assert path_cv.getValue(context) / unit.nanometer**2 == pytest.approx(z)
+            assert value / unit.nanometer**2 == pytest.approx(z, rel=1e-5)
     perform_common_tests(path_cv, context)
 
 

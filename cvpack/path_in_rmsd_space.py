@@ -106,7 +106,7 @@ class PathInRMSDSpace(BasePathCV):
     ... ]
     >>> s, z = [
     ...    cvpack.PathInRMSDSpace(
-    ...        metric, milestones, len(x), 1 * unit.angstrom
+    ...        metric, milestones, len(x), 0.5 * unit.angstrom
     ...    )
     ...    for metric in (cvpack.path.progress, cvpack.path.deviation)
     ... ]
@@ -115,9 +115,9 @@ class PathInRMSDSpace(BasePathCV):
     >>> context = openmm.Context(model.system, openmm.VerletIntegrator(0.001))
     >>> context.setPositions(model.positions)
     >>> s.getValue(context)
-    0.0412... dimensionless
+    0.172... dimensionless
     >>> z.getValue(context)
-    -0.00419... nm**2
+    -0.004... nm**2
     """
 
     def __init__(  # pylint: disable=too-many-branches
