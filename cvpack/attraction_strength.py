@@ -13,7 +13,7 @@ import openmm
 from openmm import unit as mmunit
 
 from .collective_variable import CollectiveVariable
-from .units import ScalarQuantity
+from .units import Quantity, ScalarQuantity
 from .utils import evaluate_in_context
 
 ONE_4PI_EPS0 = 138.93545764438198
@@ -173,7 +173,7 @@ class AttractionStrength(openmm.CustomNonbondedForce, CollectiveVariable):
         group2: t.Iterable[int],
         nonbondedForce: openmm.NonbondedForce,
         contrastGroup: t.Optional[t.Iterable[int]] = None,
-        reference: t.Union[ScalarQuantity, openmm.Context] = (
+        reference: t.Union[ScalarQuantity, openmm.Context] = Quantity(
             1.0 * mmunit.kilojoule_per_mole
         ),
         contrastScaling: float = 1.0,

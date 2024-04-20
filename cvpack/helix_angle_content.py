@@ -14,7 +14,7 @@ from openmm import app as mmapp
 from openmm import unit as mmunit
 
 from .collective_variable import CollectiveVariable
-from .units import ScalarQuantity
+from .units import Quantity, ScalarQuantity
 
 
 class HelixAngleContent(openmm.CustomAngleForce, CollectiveVariable):
@@ -95,8 +95,8 @@ class HelixAngleContent(openmm.CustomAngleForce, CollectiveVariable):
         self,
         residues: t.Sequence[mmapp.topology.Residue],
         pbc: bool = False,
-        thetaReference: ScalarQuantity = 88 * mmunit.degrees,
-        tolerance: ScalarQuantity = 15 * mmunit.degrees,
+        thetaReference: ScalarQuantity = Quantity(88 * mmunit.degrees),
+        tolerance: ScalarQuantity = Quantity(15 * mmunit.degrees),
         halfExponent: int = 3,
         normalize: bool = False,
         name: str = "helix_angle_content",

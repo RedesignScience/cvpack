@@ -15,7 +15,7 @@ from openmm.app.element import hydrogen
 from openmm.app.topology import Residue
 
 from .collective_variable import CollectiveVariable
-from .units import ScalarQuantity, value_in_md_units
+from .units import Quantity, ScalarQuantity, value_in_md_units
 
 
 class ResidueCoordination(openmm.CustomCentroidBondForce, CollectiveVariable):
@@ -111,7 +111,7 @@ class ResidueCoordination(openmm.CustomCentroidBondForce, CollectiveVariable):
         residueGroup2: t.Iterable[Residue],
         pbc: bool = True,
         stepFunction: str = "1/(1+x^6)",
-        thresholdDistance: ScalarQuantity = 1.0 * mmunit.nanometers,
+        thresholdDistance: ScalarQuantity = Quantity(1.0 * mmunit.nanometers),
         normalize: bool = False,
         weighByMass: bool = True,
         includeHydrogens: bool = True,
