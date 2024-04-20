@@ -854,9 +854,9 @@ def test_path_in_rmsd_space(metric: cvpack.path.Metric):
         z = -2 * sigma**2 * logsumexp(exponents)
         value = path_cv.getValue(context)
         if metric is cvpack.path.progress:
-            assert value / unit.dimensionless == pytest.approx(s, rel=1e-5)
+            assert value / unit.dimensionless == pytest.approx(s, abs=1e-6)
         else:
-            assert value / unit.nanometer**2 == pytest.approx(z, rel=1e-5)
+            assert value / unit.nanometer**2 == pytest.approx(z, abs=1e-6)
     perform_common_tests(path_cv, context)
 
 
