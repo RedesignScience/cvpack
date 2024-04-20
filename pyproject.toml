@@ -24,7 +24,6 @@ dependencies = [
     "numpy",
     "openmm",
     "pyyaml",
-    "xmltodict",
 ]
 
 # Update the urls once the hosting is set up.

@@ -8,7 +8,6 @@ dependencies:
   - numpy
   - openmm
   - pyyaml
-  - xmltodict
 
   # Conda build
   - anaconda-client

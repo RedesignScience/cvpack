@@ -8,7 +8,6 @@ dependencies:
   - openmm
   - numpy
   - pyyaml
-  - xmltodict
 
     # Testing
   - scipy
