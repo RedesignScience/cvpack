@@ -18,6 +18,7 @@ Collective Variables
     NumberOfContacts
     OpenMMForceWrapper
     PathInCVSpace
+    PathInRMSDSpace
     RadiusOfGyration
     RadiusOfGyrationSq
     ResidueCoordination
