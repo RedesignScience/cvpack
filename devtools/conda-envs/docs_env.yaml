@@ -8,12 +8,12 @@ dependencies:
   - openmm
   - numpy
   - pyyaml
-  - xmltodict
 
     # Testing
   - scipy
   - openmmtools
   - mdtraj
+  - networkx
   - pytest
   - pytest-cov
   - codecov

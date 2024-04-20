@@ -5,12 +5,14 @@ dependencies:
     # Base depends
   - python
   - openmm>=7.6
+  - numpy
+
+    # Testing
+  - scipy
   - openmmtools
   - mdtraj
-  - numpy
-  - scipy
+  - networkx
   - pytest
-  - xmltodict
 
     # Linting
   - flake8

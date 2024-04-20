@@ -20,6 +20,7 @@ from .meta_collective_variable import MetaCollectiveVariable  # noqa: F401
 from .number_of_contacts import NumberOfContacts  # noqa: F401
 from .openmm_force_wrapper import OpenMMForceWrapper  # noqa: F401
 from .path_in_cv_space import PathInCVSpace  # noqa: F401
+from .path_in_rmsd_space import PathInRMSDSpace  # noqa: F401
 from .radius_of_gyration import RadiusOfGyration  # noqa: F401
 from .radius_of_gyration_sq import RadiusOfGyrationSq  # noqa: F401
 from .residue_coordination import ResidueCoordination  # noqa: F401
@@ -44,6 +45,7 @@ __all__ = [
     "NumberOfContacts",
     "OpenMMForceWrapper",
     "PathInCVSpace",
+    "PathInRMSDSpace",
     "RadiusOfGyration",
     "RadiusOfGyrationSq",
     "ResidueCoordination",
