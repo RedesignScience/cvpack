@@ -26,23 +26,23 @@ class BasePathCV(openmm.CustomCVForce, CollectiveVariable):
         A measure of progress or deviation with respect to a path in CV space
     sigma
         The width of the Gaussian kernels
-    distances
-        Expressions for the distances between the current system state and each
-        milestone
+    squared_distances
+        Expressions for the squared distance to each milestone
     variables
-        A dictionary of collective variables used in the expressions for the distances
+        A dictionary of collective variables used in the expressions for the squared
+        distances
     """
 
     def __init__(
         self,
         metric: Metric,
         sigma: float,
-        distances: t.Sequence[str],
+        squared_distances: t.Sequence[str],
         variables: t.Dict[str, CollectiveVariable],
     ) -> None:
-        n = len(distances)
+        n = len(squared_distances)
         definitions = OrderedDict(
-            {f"x{i}": distance for i, distance in enumerate(distances)}
+            {f"x{i}": sqdist for i, sqdist in enumerate(squared_distances)}
         )
         definitions["lambda"] = 1 / (2 * sigma**2)
         definitions["xmin0"] = "min(x0,x1)"

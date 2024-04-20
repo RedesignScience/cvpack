@@ -104,7 +104,7 @@ class PathInCVSpace(BasePathCV):
     >>> psi_atoms = ["ALA-N", "ALA-CA", "ALA-C", "NME-N"]
     >>> atoms = [f"{a.residue.name}-{a.name}" for a in model.topology.atoms()]
     >>> milestones = np.array(
-    ...     [[1.3, -0.2], [1.2, 3.1], [-2.7, 2.9], [-1.3, 2.7], [-1.3, -0.4]]
+    ...     [[1.3, -0.2], [1.2, 3.1], [-2.7, 2.9], [-1.3, 2.7]]
     ... )
     >>> phi = cvpack.Torsion(*[atoms.index(atom) for atom in phi_atoms])
     >>> psi = cvpack.Torsion(*[atoms.index(atom) for atom in psi_atoms])
@@ -116,9 +116,9 @@ class PathInCVSpace(BasePathCV):
     >>> context = openmm.Context(model.system, openmm.VerletIntegrator(1.0))
     >>> context.setPositions(model.positions)
     >>> path_vars[0].getValue(context)
-    0.50... dimensionless
+    0.6... dimensionless
     >>> path_vars[1].getValue(context)
-    0.25... dimensionless
+    0.2... dimensionless
     """
 
     def __init__(  # pylint: disable=too-many-branches
@@ -138,7 +138,7 @@ class PathInCVSpace(BasePathCV):
             raise ValueError("Wrong number of columns in the milestones matrix.")
         if n < 2:
             raise ValueError("At least two rows are required in the milestones matrix.")
-        distances = []
+        squared_distances = []
         periods = {}
         for i, variable in enumerate(variables):
             values = variable.getPeriodicBounds()
@@ -148,14 +148,16 @@ class PathInCVSpace(BasePathCV):
             deltas = [f"({value}-cv{j})" for j, value in enumerate(values)]
             for j, period in periods.items():
                 deltas[j] = f"min(abs{deltas[j]},{period}-abs{deltas[j]})"
-            distances.append(
+            squared_distances.append(
                 "+".join(
                     f"{delta}^2" if scale == 1.0 else f"({delta}/{scale})^2"
                     for delta, scale in zip(deltas, cv_scales)
                 )
             )
-        cvs = {f"cv{i}": deepcopy(variable) for i, variable in enumerate(variables)}
-        super().__init__(metric, sigma, distances, cvs)
+        collective_variables = {
+            f"cv{i}": deepcopy(variable) for i, variable in enumerate(variables)
+        }
+        super().__init__(metric, sigma, squared_distances, collective_variables)
         self._registerCV(
             name,
             mmunit.dimensionless,

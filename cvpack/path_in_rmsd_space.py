@@ -85,36 +85,39 @@ class PathInRMSDSpace(BasePathCV):
     >>> from openmmtools import testsystems
     >>> from scipy.spatial.transform import Rotation
     >>> model = testsystems.AlanineDipeptideVacuum()
-    >>> coords = model.positions / model.positions.unit
     >>> atom1, atom2 = 8, 14
     >>> graph = model.mdtraj_topology.to_bondgraph()
     >>> nodes = list(graph.nodes)
     >>> graph.remove_edge(nodes[atom1], nodes[atom2])
-    >>> components = list(nx.connected_components(graph))
-    >>> indices = [nodes.index(atom) for atom in components[1]]
-    >>> origin = coords[atom1, :]
-    >>> vector = coords[atom2, :] - origin
-    >>> vector /= np.linalg.norm(vector) * np.pi / 6
-    >>> rotation = Rotation.from_rotvec(vector)
-    >>> milestones = [{i: pos.copy() for i, pos in enumerate(coords)}]
-    >>> for _ in range(5):
-    ...     for atom in indices:
-    ...         coords[atom, :] = rotation.apply(coords[atom, :] - origin) + origin
-    ...     milestones.append({i: pos.copy() for i, pos in enumerate(coords)})
-    >>> s = cvpack.PathInRMSDSpace(
-    ...    cvpack.path.progress, milestones, len(coords), 1 * unit.angstrom
-    ... )
+    >>> movable = list(nx.connected_components(graph))[1]
+    >>> x = model.positions / model.positions.unit
+    >>> x0 = x[atom1, :]
+    >>> vector = x[atom2, :] - x0
+    >>> vector /= np.linalg.norm(vector)
+    >>> rotation = Rotation.from_rotvec((np.pi / 6) * vector)
+    >>> atoms = [nodes.index(atom) for atom in movable]
+    >>> frames = [x.copy()]
+    >>> for _ in range(6):
+    ...     x[atoms, :] = x0 + rotation.apply(x[atoms, :] - x0)
+    ...     frames.append(x.copy())
+    >>> milestones = [
+    ...     {i: row for i, row in enumerate(frame)}
+    ...     for frame in frames
+    ... ]
+    >>> s, z = [
+    ...    cvpack.PathInRMSDSpace(
+    ...        metric, milestones, len(x), 1 * unit.angstrom
+    ...    )
+    ...    for metric in (cvpack.path.progress, cvpack.path.deviation)
+    ... ]
     >>> s.addToSystem(model.system)
-    >>> z = cvpack.PathInRMSDSpace(
-    ...    cvpack.path.deviation, milestones, len(coords), 1 * unit.angstrom
-    ... )
     >>> z.addToSystem(model.system)
     >>> context = openmm.Context(model.system, openmm.VerletIntegrator(0.001))
     >>> context.setPositions(model.positions)
     >>> s.getValue(context)
-    0.0982... dimensionless
+    0.0412... dimensionless
     >>> z.getValue(context)
-    -0.003458... nm**2
+    -0.00419... nm**2
     """
 
     def __init__(  # pylint: disable=too-many-branches
@@ -131,11 +134,12 @@ class PathInRMSDSpace(BasePathCV):
         n = len(milestones)
         if n < 2:
             raise ValueError("At least two reference structures are required.")
-        cvs = {
+        collective_variables = {
             f"rmsd{i}": RMSD(reference, reference.keys(), numAtoms, name=f"rmsd{i}")
             for i, reference in enumerate(milestones)
         }
-        super().__init__(metric, sigma, cvs.keys(), cvs)
+        squared_distances = [f"rmsd{i}^2" for i in range(n)]
+        super().__init__(metric, sigma, squared_distances, collective_variables)
         self._registerCV(
             name,
             mmunit.dimensionless if metric == progress else mmunit.nanometers**2,
