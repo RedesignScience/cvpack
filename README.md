@@ -51,7 +51,8 @@ The CVs implemented in CVPack are listed in the table below.
 | [Meta CV]               | a function of other collective variables                         |
 | [Number of contacts]    | number of contacts between two groups of atoms                   |
 | [OpenMM Force wrapper]  | converts an OpenMM Force object into a CVPack CV                 |
-| [Path in CV space]      | progress along (or deviation from) a predefined path in CV space |
+| [Path in CV space]      | progress along (or deviation from) a path in CV space            |
+| [Path in RMSD space]    | progress along (or deviation from) a path in RMSD space          |
 | [Radius of gyration]    | radius of gyration of a group of atoms                           |
 | [(Radius of gyration)^2]| square of the radius of gyration of a group of atoms             |
 | [Residue coordination]  | number of contacts between two disjoint groups of residues       |
@@ -117,6 +118,7 @@ Initial project based on the [CMS Cookiecutter] version 1.1.
 [Number of contacts]:     https://redesignscience.github.io/cvpack/latest/api/NumberOfContacts.html
 [OpenMM Force wrapper]:   https://redesignscience.github.io/cvpack/latest/api/OpenMMForceWrapper.html
 [Path in CV space]:       https://redesignscience.github.io/cvpack/latest/api/PathInCVSpace.html
+[Path in RMSD space]:     https://redesignscience.github.io/cvpack/latest/api/PathInRMSDSpace.html
 [Radius of gyration]:     https://redesignscience.github.io/cvpack/latest/api/RadiusOfGyration.html
 [(Radius of gyration)^2]: https://redesignscience.github.io/cvpack/latest/api/RadiusOfGyrationSq.html
 [Residue coordination]:   https://redesignscience.github.io/cvpack/latest/api/ResidueCoordination.html
