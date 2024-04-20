@@ -909,13 +909,10 @@ def test_shortest_distance():
     context.setPositions(model.positions)
     for _ in range(10):
         integrator.step(100)
-        coords = (
-            context.getState(  # pylint: disable=unexpected-keyword-arg
-                getPositions=True
-            )
-            .getPositions(asNumpy=True)
-            .value_in_unit(unit.nanometers)
+        state = context.getState(  # pylint: disable=unexpected-keyword-arg
+            getPositions=True
         )
+        coords = state.getPositions(asNumpy=True).value_in_unit(unit.nanometers)
         cv_value = min_dist.getValue(context) / unit.nanometer
         compute_value = np.min(
             np.linalg.norm(coords[group1][:, None, :] - coords[group2], axis=2)
