@@ -58,6 +58,7 @@ The CVs implemented in CVPack are listed in the table below.
 | [Residue coordination]  | number of contacts between two disjoint groups of residues       |
 | [RMSD]                  | root-mean-square deviation with respect to a reference structure |
 | [Sheet RMSD content]    | beta-sheet RMSD content of a sequence of residues                |
+| [Shortest Distance]     | shortest distance between two groups of atoms                    |
 | [Torsion]               | torsion angle formed by four atoms                               |
 | [Torsion similarity]    | degree of similarity between pairs of torsion angles             |
 
@@ -124,5 +125,6 @@ Initial project based on the [CMS Cookiecutter] version 1.1.
 [Residue coordination]:   https://redesignscience.github.io/cvpack/latest/api/ResidueCoordination.html
 [RMSD]:                   https://redesignscience.github.io/cvpack/latest/api/RMSD.html
 [Sheet RMSD content]:     https://redesignscience.github.io/cvpack/latest/api/SheetRMSDContent.html
+[Shortest Distance]:      https://redesignscience.github.io/cvpack/latest/api/ShortestDistance.html
 [Torsion]:                https://redesignscience.github.io/cvpack/latest/api/Torsion.html
 [Torsion similarity]:     https://redesignscience.github.io/cvpack/latest/api/TorsionSimilarity.html
