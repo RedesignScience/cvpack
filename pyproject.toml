@@ -27,9 +27,9 @@ dependencies = [
 ]
 
 # Update the urls once the hosting is set up.
-#[project.urls]
-#"Source" = "https://github.com/<username>/cvpack/"
-#"Documentation" = "https://cvpack.readthedocs.io/"
+[project.urls]
+"Source" = "https://github.com/RedesignScience/cvpack/"
+"Documentation" = "https://redesignscience.github.io/cvpack/latest"
 
 [project.optional-dependencies]
 test = [

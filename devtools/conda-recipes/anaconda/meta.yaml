@@ -34,7 +34,7 @@ about:
   license: MIT
   license_family: MIT
   license_file: LICENSE
-  doc_url: https://cvpack.readthedocs.io/en/stable
+  doc_url: https://redesignscience.github.io/cvpack/latest
   dev_url: https://github.com/RedesignScience/cvpack
 
 extra:

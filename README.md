@@ -19,7 +19,8 @@ Collective Variable Package
 [![License](https://img.shields.io/badge/License-MIT-yellowgreen.svg?style=flat)](https://github.com/RedesignScience/cvpack/blob/main/LICENSE.md)
 [![Twitter](https://badgen.net/badge/About/RedesignScience)](https://www.redesignscience.com)
 
-### Overview
+Overview
+--------
 
 Collective variables (CVs) are functions of the coordinates of a molecular system and provide a
 means to project its conformational state onto a lower-dimensional space. By stimulating the
@@ -32,7 +33,8 @@ CVPack is a Python package that provides pre-defined CVs for the powerful molecu
 [OpenMM]. All these CVs are subclasses of OpenMM's [Force] class and, as such, can be directly added
 to a [CustomCVForce] or used to define a [BiasVariable] for [Metadynamics], for instance.
 
-### Collective Variables
+Collective Variables
+--------------------
 
 The CVs implemented in CVPack are listed in the table below.
 
@@ -62,7 +64,8 @@ The CVs implemented in CVPack are listed in the table below.
 | [Torsion]               | torsion angle formed by four atoms                               |
 | [Torsion similarity]    | degree of similarity between pairs of torsion angles             |
 
-### Installation and Usage
+Installation and Usage
+----------------------
 
 CVPack is available as a conda package on the
 [mdtools](https://anaconda.org/mdtools/cvpack) channel. To install it, run:
@@ -83,27 +86,29 @@ To use CVPack in your own Python script or Jupyter notebook, simply import it as
     import cvpack
 ```
 
-### Documentation
+Documentation
+-------------
 
 Documentation for the latest CVPack version is available on [Github Pages](https://redesignscience.github.io/cvpack/latest).
 
-### Copyright
+Copyright
+---------
+
 
 Copyright (c) 2023-2024 [C. Abreu](https://github.com/craabreu) & [Redesign Science](https://www.redesignscience.com)
 
 
-#### Acknowledgements
+Acknowledgements
+----------------
 
 Initial project based on the [CMS Cookiecutter] version 1.1.
 
 [BiasVariable]:       https://docs.openmm.org/latest/api-python/generated/openmm.app.metadynamics.BiasVariable.html
 [CMS Cookiecutter]:   https://github.com/molssi/cookiecutter-cms
-[CollectiveVariable]: https://ufedmm.readthedocs.io/en/latest/pythonapi/ufedmm.html#ufedmm.ufedmm.CollectiveVariable
 [CustomCVForce]:      https://docs.openmm.org/latest/api-python/generated/openmm.openmm.CustomCVForce.html
 [Force]:              https://docs.openmm.org/latest/api-python/generated/openmm.openmm.Force.html
 [Metadynamics]:       https://docs.openmm.org/latest/api-python/generated/openmm.app.metadynamics.Metadynamics.html
 [OpenMM]:             https://openmm.org
-[UFED]:               https://ufedmm.readthedocs.io/en/latest/index.html
 
 [Angle]:                  https://redesignscience.github.io/cvpack/latest/api/Angle.html
 [Atomic Function]:        https://redesignscience.github.io/cvpack/latest/api/AtomicFunction.html
