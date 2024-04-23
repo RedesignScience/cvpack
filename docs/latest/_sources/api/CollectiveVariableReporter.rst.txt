@@ -1,9 +1,0 @@
-CollectiveVariableReporter
-==========================
-
-.. currentmodule:: cvpack.reporters
-.. autoclass:: CollectiveVariableReporter
-    :member-order: alphabetical
-
-    .. rubric:: Methods
-

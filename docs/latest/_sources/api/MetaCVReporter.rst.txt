@@ -1,7 +1,0 @@
-MetaCVReporter
-==============
-
-.. currentmodule:: cvpack.reporters
-.. autoclass:: MetaCVReporter
-    :member-order: alphabetical
-

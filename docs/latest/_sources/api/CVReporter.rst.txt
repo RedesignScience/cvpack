@@ -1,7 +1,0 @@
-CVReporter
-==========
-
-.. currentmodule:: cvpack.reporters
-.. autoclass:: CVReporter
-    :member-order: alphabetical
-

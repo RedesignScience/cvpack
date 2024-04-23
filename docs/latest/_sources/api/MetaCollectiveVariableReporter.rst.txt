@@ -1,9 +1,0 @@
-MetaCollectiveVariableReporter
-==============================
-
-.. currentmodule:: cvpack.reporters
-.. autoclass:: MetaCollectiveVariableReporter
-    :member-order: alphabetical
-
-    .. rubric:: Methods
-
