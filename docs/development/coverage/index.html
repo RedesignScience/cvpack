@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Coverage report</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
-    <script type="text/javascript" src="coverage_html.js" defer></script>
+    <script src="coverage_html.js" defer></script>
 </head>
 <body class="indexfile">
 <header>
@@ -16,13 +16,13 @@
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
             <label for="help_panel_state">
-                <img id="keyboard_icon" src="keybd_closed.png" alt="Show/hide keyboard shortcuts" />
+                <img id="keyboard_icon" src="keybd_closed.png" alt="Show/hide keyboard shortcuts">
             </label>
             <div id="help_panel">
                 <p class="legend">Shortcuts on this page</p>
                 <div class="keyhelp">
                     <p>
-                        <kbd>n</kbd>
+                        <kbd>f</kbd>
                         <kbd>s</kbd>
                         <kbd>m</kbd>
                         <kbd>x</kbd>
@@ -41,11 +41,20 @@
             </div>
         </aside>
         <form id="filter_container">
-            <input id="filter" type="text" value="" placeholder="filter..." />
+            <input id="filter" type="text" value="" placeholder="filter...">
+            <div>
+                <input id="hide100" type="checkbox" >
+                <label for="hide100">hide covered</label>
+            </div>
         </form>
+        <h2>
+                <a class="button current">Files</a>
+                <a class="button" href="function_index.html">Functions</a>
+                <a class="button" href="class_index.html">Classes</a>
+        </h2>
         <p class="text">
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.4.4">coverage.py v7.4.4</a>,
-            created at 2024-04-21 19:25 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.5.0">coverage.py v7.5.0</a>,
+            created at 2024-04-23 23:09 +0000
         </p>
     </div>
 </header>
@@ -53,296 +62,303 @@
     <table class="index" data-sortable>
         <thead>
             <tr class="tablehead" title="Click to sort">
-                <th class="name left" aria-sort="none" data-shortcut="n">Module</th>
-                <th aria-sort="none" data-default-sort-order="descending" data-shortcut="s">statements</th>
-                <th aria-sort="none" data-default-sort-order="descending" data-shortcut="m">missing</th>
-                <th aria-sort="none" data-default-sort-order="descending" data-shortcut="x">excluded</th>
-                <th class="right" aria-sort="none" data-shortcut="c">coverage</th>
+                <th class="name left" aria-sort="none" data-shortcut="f">File<span class="arrows"></span></th>
+                <th aria-sort="none" data-default-sort-order="descending" data-shortcut="s">statements<span class="arrows"></span></th>
+                <th aria-sort="none" data-default-sort-order="descending" data-shortcut="m">missing<span class="arrows"></span></th>
+                <th aria-sort="none" data-default-sort-order="descending" data-shortcut="x">excluded<span class="arrows"></span></th>
+                <th class="right" aria-sort="none" data-shortcut="c">coverage<span class="arrows"></span></th>
             </tr>
         </thead>
         <tbody>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9___init___py.html">cvpack/__init__.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9___init___py.html">cvpack/__init__.py</a></td>
                 <td>26</td>
                 <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="26 26">100%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_angle_py.html">cvpack/angle.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_angle_py.html">cvpack/angle.py</a></td>
                 <td>12</td>
                 <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="12 12">100%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_atomic_function_py.html">cvpack/atomic_function.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_atomic_function_py.html">cvpack/atomic_function.py</a></td>
                 <td>97</td>
                 <td>7</td>
                 <td>0</td>
                 <td class="right" data-ratio="90 97">93%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_attraction_strength_py.html">cvpack/attraction_strength.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_attraction_strength_py.html">cvpack/attraction_strength.py</a></td>
                 <td>44</td>
                 <td>1</td>
                 <td>0</td>
                 <td class="right" data-ratio="43 44">98%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_base_custom_function_py.html">cvpack/base_custom_function.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_base_custom_function_py.html">cvpack/base_custom_function.py</a></td>
                 <td>24</td>
                 <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="24 24">100%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_base_path_cv_py.html">cvpack/base_path_cv.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_base_path_cv_py.html">cvpack/base_path_cv.py</a></td>
                 <td>30</td>
                 <td>1</td>
                 <td>0</td>
                 <td class="right" data-ratio="29 30">97%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_base_radius_of_gyration_py.html">cvpack/base_radius_of_gyration.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_base_radius_of_gyration_py.html">cvpack/base_radius_of_gyration.py</a></td>
                 <td>12</td>
                 <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="12 12">100%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_base_rmsd_py.html">cvpack/base_rmsd.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_base_rmsd_py.html">cvpack/base_rmsd.py</a></td>
                 <td>15</td>
                 <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="15 15">100%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_base_rmsd_content_py.html">cvpack/base_rmsd_content.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_base_rmsd_content_py.html">cvpack/base_rmsd_content.py</a></td>
                 <td>53</td>
                 <td>4</td>
                 <td>0</td>
                 <td class="right" data-ratio="49 53">92%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_centroid_function_py.html">cvpack/centroid_function.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_centroid_function_py.html">cvpack/centroid_function.py</a></td>
                 <td>27</td>
                 <td>3</td>
                 <td>0</td>
                 <td class="right" data-ratio="24 27">89%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_collective_variable_py.html">cvpack/collective_variable.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_collective_variable_py.html">cvpack/collective_variable.py</a></td>
                 <td>57</td>
                 <td>1</td>
                 <td>0</td>
                 <td class="right" data-ratio="56 57">98%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_composite_rmsd_py.html">cvpack/composite_rmsd.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_composite_rmsd_py.html">cvpack/composite_rmsd.py</a></td>
                 <td>22</td>
                 <td>3</td>
                 <td>0</td>
                 <td class="right" data-ratio="19 22">86%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_distance_py.html">cvpack/distance.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_distance_py.html">cvpack/distance.py</a></td>
                 <td>10</td>
                 <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="10 10">100%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_helix_angle_content_py.html">cvpack/helix_angle_content.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_helix_angle_content_py.html">cvpack/helix_angle_content.py</a></td>
                 <td>26</td>
                 <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="26 26">100%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_helix_hbond_content_py.html">cvpack/helix_hbond_content.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_helix_hbond_content_py.html">cvpack/helix_hbond_content.py</a></td>
                 <td>26</td>
                 <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="26 26">100%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_helix_rmsd_content_py.html">cvpack/helix_rmsd_content.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_helix_rmsd_content_py.html">cvpack/helix_rmsd_content.py</a></td>
                 <td>12</td>
                 <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="12 12">100%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_helix_torsion_content_py.html">cvpack/helix_torsion_content.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_helix_torsion_content_py.html">cvpack/helix_torsion_content.py</a></td>
                 <td>25</td>
                 <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="25 25">100%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_meta_collective_variable_py.html">cvpack/meta_collective_variable.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_meta_collective_variable_py.html">cvpack/meta_collective_variable.py</a></td>
                 <td>39</td>
                 <td>1</td>
                 <td>0</td>
                 <td class="right" data-ratio="38 39">97%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_number_of_contacts_py.html">cvpack/number_of_contacts.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_number_of_contacts_py.html">cvpack/number_of_contacts.py</a></td>
                 <td>35</td>
                 <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="35 35">100%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_openmm_force_wrapper_py.html">cvpack/openmm_force_wrapper.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_openmm_force_wrapper_py.html">cvpack/openmm_force_wrapper.py</a></td>
                 <td>23</td>
                 <td>6</td>
                 <td>0</td>
                 <td class="right" data-ratio="17 23">74%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_path_py.html">cvpack/path.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_15b8cde88f7277b9___init___py.html">cvpack/path/__init__.py</a></td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="right" data-ratio="1 1">100%</td>
+            </tr>
+            <tr class="region">
+                <td class="name left"><a href="z_15b8cde88f7277b9_path_py.html">cvpack/path/path.py</a></td>
                 <td>16</td>
                 <td>1</td>
                 <td>0</td>
                 <td class="right" data-ratio="15 16">94%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_path_in_cv_space_py.html">cvpack/path_in_cv_space.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_path_in_cv_space_py.html">cvpack/path_in_cv_space.py</a></td>
                 <td>33</td>
                 <td>2</td>
                 <td>0</td>
                 <td class="right" data-ratio="31 33">94%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_path_in_rmsd_space_py.html">cvpack/path_in_rmsd_space.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_path_in_rmsd_space_py.html">cvpack/path_in_rmsd_space.py</a></td>
                 <td>19</td>
                 <td>1</td>
                 <td>0</td>
                 <td class="right" data-ratio="18 19">95%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_radius_of_gyration_py.html">cvpack/radius_of_gyration.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_radius_of_gyration_py.html">cvpack/radius_of_gyration.py</a></td>
                 <td>13</td>
                 <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="13 13">100%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_radius_of_gyration_sq_py.html">cvpack/radius_of_gyration_sq.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_radius_of_gyration_sq_py.html">cvpack/radius_of_gyration_sq.py</a></td>
                 <td>12</td>
                 <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="12 12">100%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_dcee313e4441e2be___init___py.html">cvpack/reporting/__init__.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_dcee313e4441e2be___init___py.html">cvpack/reporting/__init__.py</a></td>
                 <td>3</td>
                 <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="3 3">100%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_dcee313e4441e2be_custom_writer_py.html">cvpack/reporting/custom_writer.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_dcee313e4441e2be_custom_writer_py.html">cvpack/reporting/custom_writer.py</a></td>
                 <td>9</td>
                 <td>2</td>
                 <td>0</td>
                 <td class="right" data-ratio="7 9">78%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_dcee313e4441e2be_cv_writer_py.html">cvpack/reporting/cv_writer.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_dcee313e4441e2be_cv_writer_py.html">cvpack/reporting/cv_writer.py</a></td>
                 <td>28</td>
                 <td>2</td>
                 <td>0</td>
                 <td class="right" data-ratio="26 28">93%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_dcee313e4441e2be_meta_cv_writer_py.html">cvpack/reporting/meta_cv_writer.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_dcee313e4441e2be_meta_cv_writer_py.html">cvpack/reporting/meta_cv_writer.py</a></td>
                 <td>47</td>
                 <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="47 47">100%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_dcee313e4441e2be_state_data_reporter_py.html">cvpack/reporting/state_data_reporter.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_dcee313e4441e2be_state_data_reporter_py.html">cvpack/reporting/state_data_reporter.py</a></td>
                 <td>24</td>
                 <td>1</td>
                 <td>0</td>
                 <td class="right" data-ratio="23 24">96%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_residue_coordination_py.html">cvpack/residue_coordination.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_residue_coordination_py.html">cvpack/residue_coordination.py</a></td>
                 <td>35</td>
                 <td>1</td>
                 <td>0</td>
                 <td class="right" data-ratio="34 35">97%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_rmsd_py.html">cvpack/rmsd.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_rmsd_py.html">cvpack/rmsd.py</a></td>
                 <td>20</td>
                 <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="20 20">100%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_d396f2976b75b698___init___py.html">cvpack/serialization/__init__.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_d396f2976b75b698___init___py.html">cvpack/serialization/__init__.py</a></td>
                 <td>1</td>
                 <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="1 1">100%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_d396f2976b75b698_serialization_py.html">cvpack/serialization/serialization.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_d396f2976b75b698_serialization_py.html">cvpack/serialization/serialization.py</a></td>
                 <td>61</td>
                 <td>4</td>
                 <td>0</td>
                 <td class="right" data-ratio="57 61">93%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_sheet_rmsd_content_py.html">cvpack/sheet_rmsd_content.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_sheet_rmsd_content_py.html">cvpack/sheet_rmsd_content.py</a></td>
                 <td>20</td>
                 <td>1</td>
                 <td>0</td>
                 <td class="right" data-ratio="19 20">95%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_shortest_distance_py.html">cvpack/shortest_distance.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_shortest_distance_py.html">cvpack/shortest_distance.py</a></td>
                 <td>26</td>
                 <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="26 26">100%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_torsion_py.html">cvpack/torsion.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_torsion_py.html">cvpack/torsion.py</a></td>
                 <td>12</td>
                 <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="12 12">100%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_torsion_similarity_py.html">cvpack/torsion_similarity.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_torsion_similarity_py.html">cvpack/torsion_similarity.py</a></td>
                 <td>17</td>
                 <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="17 17">100%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_8f1fcb7ae5fd8b5b___init___py.html">cvpack/units/__init__.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_8f1fcb7ae5fd8b5b___init___py.html">cvpack/units/__init__.py</a></td>
                 <td>1</td>
                 <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="1 1">100%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_8f1fcb7ae5fd8b5b_units_py.html">cvpack/units/units.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_8f1fcb7ae5fd8b5b_units_py.html">cvpack/units/units.py</a></td>
                 <td>56</td>
                 <td>3</td>
                 <td>0</td>
                 <td class="right" data-ratio="53 56">95%</td>
             </tr>
-            <tr class="file">
-                <td class="name left"><a href="d_1162223856cd18a9_utils_py.html">cvpack/utils.py</a></td>
+            <tr class="region">
+                <td class="name left"><a href="z_1162223856cd18a9_utils_py.html">cvpack/utils.py</a></td>
                 <td>92</td>
                 <td>10</td>
                 <td>0</td>
@@ -352,10 +368,10 @@
         <tfoot>
             <tr class="total">
                 <td class="name left">Total</td>
-                <td>1160</td>
+                <td>1161</td>
                 <td>55</td>
                 <td>0</td>
-                <td class="right" data-ratio="1105 1160">95%</td>
+                <td class="right" data-ratio="1106 1161">95%</td>
             </tr>
         </tfoot>
     </table>
@@ -366,16 +382,16 @@
 <footer>
     <div class="content">
         <p>
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.4.4">coverage.py v7.4.4</a>,
-            created at 2024-04-21 19:25 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.5.0">coverage.py v7.5.0</a>,
+            created at 2024-04-23 23:09 +0000
         </p>
     </div>
     <aside class="hidden">
-        <a id="prevFileLink" class="nav" href="d_1162223856cd18a9_utils_py.html"/>
-        <a id="nextFileLink" class="nav" href="d_1162223856cd18a9___init___py.html"/>
-        <button type="button" class="button_prev_file" data-shortcut="["/>
-        <button type="button" class="button_next_file" data-shortcut="]"/>
-        <button type="button" class="button_show_hide_help" data-shortcut="?"/>
+        <a id="prevFileLink" class="nav" href="z_1162223856cd18a9_utils_py.html"></a>
+        <a id="nextFileLink" class="nav" href="z_1162223856cd18a9___init___py.html"></a>
+        <button type="button" class="button_prev_file" data-shortcut="["></button>
+        <button type="button" class="button_next_file" data-shortcut="]"></button>
+        <button type="button" class="button_show_hide_help" data-shortcut="?"></button>
     </aside>
 </footer>
 </body>
