@@ -7,7 +7,7 @@
 
 """
 
-from .serialization import Serializable
+from ..serialization import Serializable
 
 
 class Metric(Serializable):
