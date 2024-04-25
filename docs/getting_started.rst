@@ -73,12 +73,12 @@ The output should be::
 The output shows that the normalized helix content of residues LYS60-ARG80 of the T4 lysozyme L99A
 molecule is close to one, as expected, no matter which measure is used.
 
-.. _BiasVariable:       https://docs.openmm.org/latest/api-python/generated/openmm.app.metadynamics.BiasVariable.html
-.. _CollectiveVariable: https://ufedmm.readthedocs.io/en/latest/pythonapi/ufedmm.html#ufedmm.ufedmm.CollectiveVariable
-.. _Context:            https://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html
-.. _CustomCVForce:      https://docs.openmm.org/latest/api-python/generated/openmm.openmm.CustomCVForce.html
-.. _Force:              https://docs.openmm.org/latest/api-python/generated/openmm.openmm.Force.html
-.. _Metadynamics:       https://docs.openmm.org/latest/api-python/generated/openmm.app.metadynamics.Metadynamics.html
-.. _OpenMM:             https://openmm.org
+.. _BiasVariable:       http://docs.openmm.org/latest/api-python/generated/openmm.app.metadynamics.BiasVariable.html
+.. _CollectiveVariable: https://craabreu.github.io/ufedmm/pythonapi/ufedmm.html#ufedmm.ufedmm.CollectiveVariable
+.. _Context:            http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Context.html
+.. _CustomCVForce:      http://docs.openmm.org/latest/api-python/generated/openmm.openmm.CustomCVForce.html
+.. _Force:              http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Force.html
+.. _Metadynamics:       http://docs.openmm.org/latest/api-python/generated/openmm.app.metadynamics.Metadynamics.html
+.. _OpenMM:             http://openmm.org
 .. _OpenMMTools:        https://openmmtools.readthedocs.io/en/stable
-.. _UFED:               https://ufedmm.readthedocs.io/en/latest/index.html
+.. _UFED:               https://craabreu.github.io/ufedmm/
