@@ -31,12 +31,12 @@ test:
 about:
   home: https://github.com/RedesignScience/cvpack
   summary: Useful Collective Variables for OpenMM
+  description: Useful Collective Variables for OpenMM
   license: MIT
   license_family: MIT
   license_file: LICENSE
   doc_url: https://redesignscience.github.io/cvpack/latest
   dev_url: https://github.com/RedesignScience/cvpack
-
 extra:
   recipe-maintainers:
     - craabreu
