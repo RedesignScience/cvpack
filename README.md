@@ -31,7 +31,7 @@ different states and to identify pathways connecting them.
 
 CVPack is a Python package that provides pre-defined CVs for the powerful molecular dynamics engine
 [OpenMM]. All these CVs are subclasses of OpenMM's [Force] class and, as such, can be directly added
-to a [CustomCVForce] or used to define a [BiasVariable] for [Metadynamics], for instance.
+to a [CustomCVForce] or used to define a [BiasVariable] for [Metadynamics].
 
 Collective Variables
 --------------------
@@ -98,17 +98,17 @@ Copyright
 Copyright (c) 2023-2024 [C. Abreu](https://github.com/craabreu) & [Redesign Science](https://www.redesignscience.com)
 
 
-Acknowledgements
-----------------
+Acknowledgments
+---------------
 
 Initial project based on the [CMS Cookiecutter] version 1.1.
 
-[BiasVariable]:       https://docs.openmm.org/latest/api-python/generated/openmm.app.metadynamics.BiasVariable.html
+[BiasVariable]:       http://docs.openmm.org/latest/api-python/generated/openmm.app.metadynamics.BiasVariable.html
 [CMS Cookiecutter]:   https://github.com/molssi/cookiecutter-cms
-[CustomCVForce]:      https://docs.openmm.org/latest/api-python/generated/openmm.openmm.CustomCVForce.html
-[Force]:              https://docs.openmm.org/latest/api-python/generated/openmm.openmm.Force.html
-[Metadynamics]:       https://docs.openmm.org/latest/api-python/generated/openmm.app.metadynamics.Metadynamics.html
-[OpenMM]:             https://openmm.org
+[CustomCVForce]:      http://docs.openmm.org/latest/api-python/generated/openmm.openmm.CustomCVForce.html
+[Force]:              http://docs.openmm.org/latest/api-python/generated/openmm.openmm.Force.html
+[Metadynamics]:       http://docs.openmm.org/latest/api-python/generated/openmm.app.metadynamics.Metadynamics.html
+[OpenMM]:             http://openmm.org
 
 [Angle]:                  https://redesignscience.github.io/cvpack/latest/api/Angle.html
 [Atomic Function]:        https://redesignscience.github.io/cvpack/latest/api/AtomicFunction.html
