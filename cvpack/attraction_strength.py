@@ -9,6 +9,7 @@
 
 import typing as t
 
+import numpy as np
 import openmm
 from openmm import unit as mmunit
 
@@ -205,11 +206,14 @@ class AttractionStrength(openmm.CustomNonbondedForce, CollectiveVariable):
         self.setCutoffDistance(cutoff)
         for parameter in ("charge", "sigma", "epsilon") + ("sign",) * contrasting:
             self.addPerParticleParameter(parameter)
-        for atom in range(nonbondedForce.getNumParticles()):
+        contrast_atoms = np.zeros(nonbondedForce.getNumParticles(), dtype=bool)
+        if contrasting:
+            contrast_atoms[contrastGroup] = True
+        for atom, in_group in enumerate(contrast_atoms):
             charge, sigma, epsilon = nonbondedForce.getParticleParameters(atom)
             if contrasting:
-                sign = -1 if atom in contrastGroup else 1
-                scale = contrastScaling if atom in contrastGroup else 1
+                sign = -1 if in_group else 1
+                scale = contrastScaling if in_group else 1
                 self.addParticle([charge * scale, sigma, epsilon * scale**2, sign])
             else:
                 self.addParticle([charge, sigma, epsilon])
