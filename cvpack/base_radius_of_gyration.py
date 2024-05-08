@@ -14,7 +14,7 @@ import openmm
 from .collective_variable import CollectiveVariable
 
 
-class BaseRadiusOfGyration(openmm.CustomCentroidBondForce, CollectiveVariable):
+class BaseRadiusOfGyration(CollectiveVariable, openmm.CustomCentroidBondForce):
     """
     Abstract class for the radius of gyration of a group of `n` atoms.
     """

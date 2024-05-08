@@ -20,7 +20,7 @@ from .base_custom_function import BaseCustomFunction
 from .units import ScalarQuantity, VectorQuantity
 
 
-class AtomicFunction(openmm.CustomCompoundBondForce, BaseCustomFunction):
+class AtomicFunction(BaseCustomFunction, openmm.CustomCompoundBondForce):
     r"""
     A generic function of the coordinates of :math:`m` groups of :math:`n` atoms:
 

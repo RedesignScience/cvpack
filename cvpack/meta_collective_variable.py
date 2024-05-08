@@ -20,7 +20,7 @@ from .units import Quantity, ScalarQuantity, VectorQuantity, in_md_units
 from .utils import compute_effective_mass, get_single_force_state
 
 
-class MetaCollectiveVariable(openmm.CustomCVForce, CollectiveVariable):
+class MetaCollectiveVariable(CollectiveVariable, openmm.CustomCVForce):
     r"""
     A collective variable that is a function of other collective variables:
 

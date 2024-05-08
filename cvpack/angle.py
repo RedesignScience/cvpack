@@ -14,7 +14,7 @@ from openmm import unit as mmunit
 from .collective_variable import CollectiveVariable
 
 
-class Angle(openmm.CustomAngleForce, CollectiveVariable):
+class Angle(CollectiveVariable, openmm.CustomAngleForce):
     r"""
     The angle formed by three atoms:
 

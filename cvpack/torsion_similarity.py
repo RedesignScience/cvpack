@@ -15,7 +15,7 @@ from openmm import unit as mmunit
 from .collective_variable import CollectiveVariable
 
 
-class TorsionSimilarity(openmm.CustomCompoundBondForce, CollectiveVariable):
+class TorsionSimilarity(CollectiveVariable, openmm.CustomCompoundBondForce):
     r"""
     The degree of similarity between `n` pairs of torsion angles:
 

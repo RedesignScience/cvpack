@@ -19,7 +19,7 @@ from .rmsd import RMSD
 from .units import ScalarQuantity, value_in_md_units
 
 
-class BaseRMSDContent(openmm.CustomCVForce, CollectiveVariable):
+class BaseRMSDContent(CollectiveVariable, openmm.CustomCVForce):
     """
     Abstract class for secondary-structure RMSD content of a sequence of `n` residues.
     """

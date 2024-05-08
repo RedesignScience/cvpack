@@ -13,7 +13,7 @@ from openmm import unit as mmunit
 from .collective_variable import CollectiveVariable
 
 
-class Distance(openmm.CustomBondForce, CollectiveVariable):
+class Distance(CollectiveVariable, openmm.CustomBondForce):
     r"""
     The distance between two atoms:
 

@@ -28,7 +28,7 @@ except ImportError:
     CompositeRMSDForce = _Stub
 
 
-class CompositeRMSD(CompositeRMSDForce, BaseRMSD):
+class CompositeRMSD(BaseRMSD, CompositeRMSDForce):
     r"""
     The composite root-mean-square deviation (RMSD) between the current and reference
     coordinates of :math:`m` groups of atoms:

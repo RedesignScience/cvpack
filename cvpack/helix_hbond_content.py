@@ -18,7 +18,7 @@ from .collective_variable import CollectiveVariable
 from .units import Quantity, ScalarQuantity
 
 
-class HelixHBondContent(openmm.CustomBondForce, CollectiveVariable):
+class HelixHBondContent(CollectiveVariable, openmm.CustomBondForce):
     r"""
     The alpha-helix hydrogen-bond content of a sequence of `n` residues:
 
