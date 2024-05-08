@@ -2,7 +2,7 @@
 
 ignored-modules=openmm.unit
 ignore=_version.py
-extension-pkg-whitelist=openmm.app.internal.compiled
+extension-pkg-whitelist=openmm.app.internal.compiled,openmm._openmm
 
 [DESIGN]
 

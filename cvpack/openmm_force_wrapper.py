@@ -16,7 +16,7 @@ from .collective_variable import CollectiveVariable
 from .units import Unit, VectorQuantity
 
 
-class OpenMMForceWrapper(CollectiveVariable):
+class OpenMMForceWrapper(CollectiveVariable, openmm.Force):
     r"""
     A collective variable whose numerical value is computed from the potential energy,
     in kJ/mol, of an OpenMM force object.
