@@ -17,7 +17,7 @@ from .collective_variable import CollectiveVariable
 from .units import Quantity, ScalarQuantity
 
 
-class HelixAngleContent(openmm.CustomAngleForce, CollectiveVariable):
+class HelixAngleContent(CollectiveVariable, openmm.CustomAngleForce):
     r"""
     The alpha-helix angle content of a sequence of `n` residues:
 

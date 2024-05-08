@@ -16,7 +16,7 @@ from .collective_variable import CollectiveVariable
 from .units import Quantity
 
 
-class ShortestDistance(openmm.CustomCVForce, CollectiveVariable):
+class ShortestDistance(CollectiveVariable, openmm.CustomCVForce):
     r"""
     A smooth approximation of the shortest distance between two atom groups:
 

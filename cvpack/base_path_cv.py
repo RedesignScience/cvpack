@@ -16,7 +16,7 @@ from .collective_variable import CollectiveVariable
 from .path import Metric, deviation, progress
 
 
-class BasePathCV(openmm.CustomCVForce, CollectiveVariable):
+class BasePathCV(CollectiveVariable, openmm.CustomCVForce):
     """
     A base class for path-related collective variables
 

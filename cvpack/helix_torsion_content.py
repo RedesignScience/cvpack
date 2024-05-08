@@ -17,7 +17,7 @@ from .collective_variable import CollectiveVariable
 from .units import Quantity, ScalarQuantity
 
 
-class HelixTorsionContent(openmm.CustomTorsionForce, CollectiveVariable):
+class HelixTorsionContent(CollectiveVariable, openmm.CustomTorsionForce):
     r"""
     The alpha-helix Ramachandran content of a sequence of `n` residues:
 

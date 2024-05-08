@@ -18,7 +18,7 @@ from .collective_variable import CollectiveVariable
 from .units import Quantity, ScalarQuantity, value_in_md_units
 
 
-class ResidueCoordination(openmm.CustomCentroidBondForce, CollectiveVariable):
+class ResidueCoordination(CollectiveVariable, openmm.CustomCentroidBondForce):
     r"""
     The number of contacts between two disjoint groups of residues:
 

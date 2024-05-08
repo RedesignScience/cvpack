@@ -18,7 +18,7 @@ from .units import Quantity, ScalarQuantity
 from .utils import evaluate_in_context
 
 
-class NumberOfContacts(openmm.CustomNonbondedForce, CollectiveVariable):
+class NumberOfContacts(CollectiveVariable, openmm.CustomNonbondedForce):
     r"""
     The number of contacts between two atom groups:
 

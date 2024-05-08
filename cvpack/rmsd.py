@@ -16,7 +16,7 @@ from .base_rmsd import BaseRMSD
 from .units import MatrixQuantity, VectorQuantity
 
 
-class RMSD(openmm.RMSDForce, BaseRMSD):
+class RMSD(BaseRMSD, openmm.RMSDForce):
     r"""
     The root-mean-square deviation (RMSD) between the current and reference
     coordinates of a group of `n` atoms:

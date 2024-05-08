@@ -18,7 +18,7 @@ from .base_custom_function import BaseCustomFunction
 from .units import ScalarQuantity, VectorQuantity
 
 
-class CentroidFunction(openmm.CustomCentroidBondForce, BaseCustomFunction):
+class CentroidFunction(BaseCustomFunction, openmm.CustomCentroidBondForce):
     r"""
     A generic function of the centroids of :math:`m \times n` atoms groups split
     into `m` collections of `n` groups:

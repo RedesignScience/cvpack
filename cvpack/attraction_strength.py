@@ -20,7 +20,7 @@ from .utils import evaluate_in_context
 ONE_4PI_EPS0 = 138.93545764438198
 
 
-class AttractionStrength(openmm.CustomNonbondedForce, CollectiveVariable):
+class AttractionStrength(CollectiveVariable, openmm.CustomNonbondedForce):
     r"""
     The strength of the attraction between two atom groups:
 

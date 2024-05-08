@@ -14,7 +14,7 @@ from openmm import unit as mmunit
 from .collective_variable import CollectiveVariable
 
 
-class Torsion(openmm.CustomTorsionForce, CollectiveVariable):
+class Torsion(CollectiveVariable, openmm.CustomTorsionForce):
     r"""
     The torsion angle formed by four atoms:
 

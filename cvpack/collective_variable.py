@@ -11,6 +11,7 @@ import typing as t
 
 import openmm
 import yaml
+from openmm import _openmm as mmswig
 from openmm import unit as mmunit
 
 from .serialization import Serializable
@@ -18,7 +19,7 @@ from .units import Quantity, ScalarQuantity, Unit
 from .utils import compute_effective_mass, get_single_force_state, preprocess_args
 
 
-class CollectiveVariable(openmm.Force, Serializable):
+class CollectiveVariable(Serializable):
     r"""
     An abstract class with common attributes and method for all CVs.
     """
@@ -63,7 +64,7 @@ class CollectiveVariable(openmm.Force, Serializable):
         kwargs
             The keyword arguments needed to construct this collective variable
         """
-        self.setName(name)
+        mmswig.Force_setName(self, name)
         self._unit = cvUnit
         self._mass_unit = Unit(mmunit.dalton * (mmunit.nanometers / self._unit) ** 2)
         self._args = {"name": name}
@@ -116,13 +117,13 @@ class CollectiveVariable(openmm.Force, Serializable):
         new_group = next(filter(lambda i: i not in used_groups, range(32)), None)
         if new_group is None:
             raise RuntimeError("All force groups are already in use.")
-        self.setForceGroup(new_group)
+        mmswig.Force_setForceGroup(self, new_group)
 
     def getName(self) -> str:  # pylint: disable=useless-parent-delegation
         """
         Get the name of this collective variable.
         """
-        return super().getName()
+        return mmswig.Force_getName(self)
 
     def getUnit(self) -> Unit:
         """
