@@ -41,24 +41,31 @@
 <h1>ShortestDistance<a class="headerlink" href="#shortestdistance" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="cvpack.ShortestDistance">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">ShortestDistance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numAtoms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma=0.01</span> <span class="pre">nm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">magnitude=0.2</span> <span class="pre">nm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoffDistance=0.5</span> <span class="pre">nm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">switchDistance=0.4</span> <span class="pre">nm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name='shortest_distance'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/shortest_distance.html#ShortestDistance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.ShortestDistance" title="Link to this definition">¶</a></dt>
-<dd><p>A smooth approximation of the shortest distance between two atom groups:</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cvpack.</span></span><span class="sig-name descname"><span class="pre">ShortestDistance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numAtoms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta=100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoffDistance=1</span> <span class="pre">nm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name='shortest_distance'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cvpack/shortest_distance.html#ShortestDistance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cvpack.ShortestDistance" title="Link to this definition">¶</a></dt>
+<dd><p>A smooth approximation for the shortest distance between two atom groups:</p>
 <div class="math notranslate nohighlight">
-\[r_{\rm min}({\bf r}) = \frac{
-    \sum_{i \in {\bf g}_1} \sum_{j \in {\bf g}_2}
-        r_{ij} e^{-\frac{r_{ij}^2}{2 \sigma^2}}
-}{
-    \sum_{i \in {\bf g}_1} \sum_{j \in {\bf g}_2}
-        e^{-\frac{r_{ij}^2}{2 \sigma^2}}
-}\]</div>
+\[r_{\rm min}({\bf r}) = \frac{S_{rw}({\bf r})}{S_w({\bf r})}\]</div>
+<p>with</p>
+<div class="math notranslate nohighlight">
+\[S_{rw}({\bf r}) = r_c e^{-\beta} +
+    \sum_{i \in {\bf g}_1} \sum_{j \in {\bf g}_2 \atop r_{ij} &lt; r_c}
+        r_{ij} e^{-\beta \frac{r_{ij}}{r_c}}\]</div>
+<p>and</p>
+<div class="math notranslate nohighlight">
+\[S_w({\bf r}) = e^{-\beta} +
+    \sum_{i \in {\bf g}_1} \sum_{j \in {\bf g}_2 \atop r_{ij} &lt; r_c}
+        r_{ij} e^{-\beta \frac{r_{ij}}{r_c}}\]</div>
 <p>where <span class="math notranslate nohighlight">\(r_{ij} = \|{\bf r}_j - {\bf r}_i\|\)</span> is the distance between atoms
-<span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> and <span class="math notranslate nohighlight">\(\sigma\)</span> is a parameter that controls the
-degree of approximation. The smaller the value of <span class="math notranslate nohighlight">\(\sigma\)</span>, the closer the
-approximation to the true shortest distance.</p>
-<p>In practice, a cutoff distance <span class="math notranslate nohighlight">\(r_c\)</span> is applied to the atom pairs so that
-the collective variable is computed only for pairs of atoms separated by a distance
-less than <span class="math notranslate nohighlight">\(r_c\)</span>. A switching function is also applied to smoothly turn off
-the collective variable starting from a distance <span class="math notranslate nohighlight">\(r_s &lt; r_c\)</span>.</p>
+<span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>, <span class="math notranslate nohighlight">\({\bf g}_1\)</span> and <span class="math notranslate nohighlight">\({\bf g}_2\)</span> are the sets of
+indices of the atoms in the first and second groups, respectively, <span class="math notranslate nohighlight">\(r_c\)</span> is
+the cutoff distance, and <span class="math notranslate nohighlight">\(\beta\)</span> is a parameter that controls the degree of
+approximation.</p>
+<p>The larger the value of <span class="math notranslate nohighlight">\(\beta\)</span>, the closer the approximation to the true
+shortest distance. However, an excessively large value may lead to numerical
+instability.</p>
+<p>The terms outside the summations guarantee that shortest distance is well-defined
+even when there are no atom pairs within the cutoff distance. In this case, the
+collective variable evaluates to the cutoff distance.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Atoms are allowed to be in both groups. In this case, terms for which
@@ -70,13 +77,10 @@ the collective variable starting from a distance <span class="math notranslate n
 <li><p><strong>group1</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em>) – The indices of the atoms in the first group.</p></li>
 <li><p><strong>group2</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em>) – The indices of the atoms in the second group.</p></li>
 <li><p><strong>numAtoms</strong> (<em>int</em>) – The total number of atoms in the system, including those that are not in any
-of the groups.</p></li>
-<li><p><strong>sigma</strong> (<em>Quantity</em>) – The parameter that controls the degree of approximation.</p></li>
-<li><p><strong>magnitude</strong> (<em>Quantity</em>) – The expected order of magnitude of the shortest distance. This parameter does
-not affect the value of the collective variable, but a good estimate can
-improve numerical stability.</p></li>
+of the groups. This is necessary for the correct initialization of the
+collective variable.</p></li>
+<li><p><strong>beta</strong> (<em>float</em>) – The parameter that controls the degree of approximation.</p></li>
 <li><p><strong>cutoffDistance</strong> (<em>Quantity</em>) – The cutoff distance for evaluating atom pairs.</p></li>
-<li><p><strong>switchDistance</strong> (<em>Quantity</em>) – The distance at which the switching function starts to be applied.</p></li>
 <li><p><strong>pbc</strong> (<em>bool</em>) – Whether to consider periodic boundary conditions in distance calculations.</p></li>
 <li><p><strong>name</strong> (<em>str</em>) – The name of the collective variable.</p></li>
 </ul>
@@ -97,7 +101,7 @@ improve numerical stability.</p></li>
 <span class="gp">... </span>    <span class="n">coords</span><span class="p">[</span><span class="n">group1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">coords</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">group2</span><span class="p">,</span> <span class="p">:],</span>
 <span class="gp">... </span>    <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
-<span class="go">0.17573...</span>
+<span class="go">0.1757...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">num_atoms</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">min_dist</span> <span class="o">=</span> <span class="n">cvpack</span><span class="o">.</span><span class="n">ShortestDistance</span><span class="p">(</span><span class="n">group1</span><span class="p">,</span> <span class="n">group2</span><span class="p">,</span> <span class="n">num_atoms</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">min_dist</span><span class="o">.</span><span class="n">addToSystem</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">)</span>
@@ -106,7 +110,7 @@ improve numerical stability.</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="n">integrator</span><span class="p">,</span> <span class="n">platform</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">min_dist</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-<span class="go">0.17573... nm</span>
+<span class="go">0.1785... nm</span>
 </pre></div>
 </div>
 <p class="rubric">Methods</p>

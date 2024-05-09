@@ -45,6 +45,7 @@
 
 <span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">t</span>
 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">openmm</span>
 <span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">mmunit</span>
 
@@ -56,26 +57,40 @@
 <a class="viewcode-back" href="../../api/ShortestDistance.html#cvpack.ShortestDistance">[docs]</a>
 <span class="k">class</span> <span class="nc">ShortestDistance</span><span class="p">(</span><span class="n">CollectiveVariable</span><span class="p">,</span> <span class="n">openmm</span><span class="o">.</span><span class="n">CustomCVForce</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A smooth approximation of the shortest distance between two atom groups:</span>
+<span class="sd">    A smooth approximation for the shortest distance between two atom groups:</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        r_{\rm min}({\bf r}) = \frac{</span>
-<span class="sd">            \sum_{i \in {\bf g}_1} \sum_{j \in {\bf g}_2}</span>
-<span class="sd">                r_{ij} e^{-\frac{r_{ij}^2}{2 \sigma^2}}</span>
-<span class="sd">        }{</span>
-<span class="sd">            \sum_{i \in {\bf g}_1} \sum_{j \in {\bf g}_2}</span>
-<span class="sd">                e^{-\frac{r_{ij}^2}{2 \sigma^2}}</span>
-<span class="sd">        }</span>
+<span class="sd">        r_{\rm min}({\bf r}) = \frac{S_{rw}({\bf r})}{S_w({\bf r})}</span>
+
+<span class="sd">    with</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        S_{rw}({\bf r}) = r_c e^{-\beta} +</span>
+<span class="sd">            \sum_{i \in {\bf g}_1} \sum_{j \in {\bf g}_2 \atop r_{ij} &lt; r_c}</span>
+<span class="sd">                r_{ij} e^{-\beta \frac{r_{ij}}{r_c}}</span>
+
+<span class="sd">    and</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        S_w({\bf r}) = e^{-\beta} +</span>
+<span class="sd">            \sum_{i \in {\bf g}_1} \sum_{j \in {\bf g}_2 \atop r_{ij} &lt; r_c}</span>
+<span class="sd">                r_{ij} e^{-\beta \frac{r_{ij}}{r_c}}</span>
 
 <span class="sd">    where :math:`r_{ij} = \|{\bf r}_j - {\bf r}_i\|` is the distance between atoms</span>
-<span class="sd">    :math:`i` and :math:`j` and :math:`\sigma` is a parameter that controls the</span>
-<span class="sd">    degree of approximation. The smaller the value of :math:`\sigma`, the closer the</span>
-<span class="sd">    approximation to the true shortest distance.</span>
+<span class="sd">    :math:`i` and :math:`j`, :math:`{\bf g}_1` and :math:`{\bf g}_2` are the sets of</span>
+<span class="sd">    indices of the atoms in the first and second groups, respectively, :math:`r_c` is</span>
+<span class="sd">    the cutoff distance, and :math:`\beta` is a parameter that controls the degree of</span>
+<span class="sd">    approximation.</span>
 
-<span class="sd">    In practice, a cutoff distance :math:`r_c` is applied to the atom pairs so that</span>
-<span class="sd">    the collective variable is computed only for pairs of atoms separated by a distance</span>
-<span class="sd">    less than :math:`r_c`. A switching function is also applied to smoothly turn off</span>
-<span class="sd">    the collective variable starting from a distance :math:`r_s &lt; r_c`.</span>
+<span class="sd">    The larger the value of :math:`\beta`, the closer the approximation to the true</span>
+<span class="sd">    shortest distance. However, an excessively large value may lead to numerical</span>
+<span class="sd">    instability.</span>
+
+<span class="sd">    The terms outside the summations guarantee that shortest distance is well-defined</span>
+<span class="sd">    even when there are no atom pairs within the cutoff distance. In this case, the</span>
+<span class="sd">    collective variable evaluates to the cutoff distance.</span>
 
 <span class="sd">    .. note::</span>
 
@@ -90,17 +105,12 @@
 <span class="sd">        The indices of the atoms in the second group.</span>
 <span class="sd">    numAtoms</span>
 <span class="sd">        The total number of atoms in the system, including those that are not in any</span>
-<span class="sd">        of the groups.</span>
-<span class="sd">    sigma</span>
+<span class="sd">        of the groups. This is necessary for the correct initialization of the</span>
+<span class="sd">        collective variable.</span>
+<span class="sd">    beta</span>
 <span class="sd">        The parameter that controls the degree of approximation.</span>
-<span class="sd">    magnitude</span>
-<span class="sd">        The expected order of magnitude of the shortest distance. This parameter does</span>
-<span class="sd">        not affect the value of the collective variable, but a good estimate can</span>
-<span class="sd">        improve numerical stability.</span>
 <span class="sd">    cutoffDistance</span>
 <span class="sd">        The cutoff distance for evaluating atom pairs.</span>
-<span class="sd">    switchDistance</span>
-<span class="sd">        The distance at which the switching function starts to be applied.</span>
 <span class="sd">    pbc</span>
 <span class="sd">        Whether to consider periodic boundary conditions in distance calculations.</span>
 <span class="sd">    name</span>
@@ -122,7 +132,7 @@
 <span class="sd">    ...     coords[group1, None, :] - coords[None, group2, :],</span>
 <span class="sd">    ...     axis=-1,</span>
 <span class="sd">    ... ).min()</span>
-<span class="sd">    0.17573...</span>
+<span class="sd">    0.1757...</span>
 <span class="sd">    &gt;&gt;&gt; num_atoms = model.system.getNumParticles()</span>
 <span class="sd">    &gt;&gt;&gt; min_dist = cvpack.ShortestDistance(group1, group2, num_atoms)</span>
 <span class="sd">    &gt;&gt;&gt; min_dist.addToSystem(model.system)</span>
@@ -131,7 +141,7 @@
 <span class="sd">    &gt;&gt;&gt; context = openmm.Context(model.system, integrator, platform)</span>
 <span class="sd">    &gt;&gt;&gt; context.setPositions(model.positions)</span>
 <span class="sd">    &gt;&gt;&gt; min_dist.getValue(context)</span>
-<span class="sd">    0.17573... nm</span>
+<span class="sd">    0.1785... nm</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -139,30 +149,26 @@
         <span class="n">group1</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
         <span class="n">group2</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
         <span class="n">numAtoms</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">sigma</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="mf">0.01</span> <span class="o">*</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span><span class="p">),</span>
-        <span class="n">magnitude</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="mf">0.2</span> <span class="o">*</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span><span class="p">),</span>
-        <span class="n">cutoffDistance</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span><span class="p">),</span>
-        <span class="n">switchDistance</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="mf">0.4</span> <span class="o">*</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span><span class="p">),</span>
+        <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="n">cutoffDistance</span><span class="p">:</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">Quantity</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="mi">1</span> <span class="o">*</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span><span class="p">),</span>
         <span class="n">pbc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;shortest_distance&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">is_quantity</span><span class="p">(</span><span class="n">sigma</span><span class="p">):</span>
-            <span class="n">sigma</span> <span class="o">=</span> <span class="n">sigma</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">is_quantity</span><span class="p">(</span><span class="n">magnitude</span><span class="p">):</span>
-            <span class="n">magnitude</span> <span class="o">=</span> <span class="n">magnitude</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span><span class="p">)</span>
-        <span class="n">weight</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;exp(-0.5*(r^2 - </span><span class="si">{</span><span class="n">magnitude</span><span class="o">**</span><span class="mi">2</span><span class="si">}</span><span class="s2">)/</span><span class="si">{</span><span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="n">rc</span> <span class="o">=</span> <span class="n">cutoffDistance</span>
+        <span class="k">if</span> <span class="n">mmunit</span><span class="o">.</span><span class="n">is_quantity</span><span class="p">(</span><span class="n">rc</span><span class="p">):</span>
+            <span class="n">rc</span> <span class="o">=</span> <span class="n">rc</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">mmunit</span><span class="o">.</span><span class="n">nanometers</span><span class="p">)</span>
+        <span class="n">weight</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;exp(-</span><span class="si">{</span><span class="n">beta</span><span class="o">/</span><span class="n">rc</span><span class="si">}</span><span class="s2">*r)&quot;</span>
         <span class="n">forces</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;numerator&quot;</span><span class="p">:</span> <span class="n">openmm</span><span class="o">.</span><span class="n">CustomNonbondedForce</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;r*</span><span class="si">{</span><span class="n">weight</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span>
-            <span class="s2">&quot;denominator&quot;</span><span class="p">:</span> <span class="n">openmm</span><span class="o">.</span><span class="n">CustomNonbondedForce</span><span class="p">(</span><span class="n">weight</span><span class="p">),</span>
+            <span class="s2">&quot;wrsum&quot;</span><span class="p">:</span> <span class="n">openmm</span><span class="o">.</span><span class="n">CustomNonbondedForce</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">weight</span><span class="si">}</span><span class="s2">*r&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;wsum&quot;</span><span class="p">:</span> <span class="n">openmm</span><span class="o">.</span><span class="n">CustomNonbondedForce</span><span class="p">(</span><span class="n">weight</span><span class="p">),</span>
         <span class="p">}</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;numerator/denominator&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">rc</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">beta</span><span class="p">)</span><span class="si">}</span><span class="s2">+wrsum)/(</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">beta</span><span class="p">)</span><span class="si">}</span><span class="s2">+wsum)&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">cv</span><span class="p">,</span> <span class="n">force</span> <span class="ow">in</span> <span class="n">forces</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">force</span><span class="o">.</span><span class="n">setNonbondedMethod</span><span class="p">(</span>
                 <span class="n">force</span><span class="o">.</span><span class="n">CutoffPeriodic</span> <span class="k">if</span> <span class="n">pbc</span> <span class="k">else</span> <span class="n">force</span><span class="o">.</span><span class="n">CutoffNonPeriodic</span>
             <span class="p">)</span>
             <span class="n">force</span><span class="o">.</span><span class="n">setCutoffDistance</span><span class="p">(</span><span class="n">cutoffDistance</span><span class="p">)</span>
-            <span class="n">force</span><span class="o">.</span><span class="n">setUseSwitchingFunction</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">force</span><span class="o">.</span><span class="n">setSwitchingDistance</span><span class="p">(</span><span class="n">switchDistance</span><span class="p">)</span>
+            <span class="n">force</span><span class="o">.</span><span class="n">setUseSwitchingFunction</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
             <span class="n">force</span><span class="o">.</span><span class="n">setUseLongRangeCorrection</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numAtoms</span><span class="p">):</span>
                 <span class="n">force</span><span class="o">.</span><span class="n">addParticle</span><span class="p">([])</span>
@@ -174,10 +180,8 @@
             <span class="n">group1</span><span class="o">=</span><span class="n">group1</span><span class="p">,</span>
             <span class="n">group2</span><span class="o">=</span><span class="n">group2</span><span class="p">,</span>
             <span class="n">numAtoms</span><span class="o">=</span><span class="n">numAtoms</span><span class="p">,</span>
-            <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span>
-            <span class="n">magnitude</span><span class="o">=</span><span class="n">magnitude</span><span class="p">,</span>
-            <span class="n">cutoffDistance</span><span class="o">=</span><span class="n">cutoffDistance</span><span class="p">,</span>
-            <span class="n">switchDistance</span><span class="o">=</span><span class="n">switchDistance</span><span class="p">,</span>
+            <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span>
+            <span class="n">cutoffDistance</span><span class="o">=</span><span class="n">rc</span><span class="p">,</span>
             <span class="n">pbc</span><span class="o">=</span><span class="n">pbc</span><span class="p">,</span>
         <span class="p">)</span></div>
 
