@@ -18,26 +18,40 @@ from .units import Quantity
 
 class ShortestDistance(CollectiveVariable, openmm.CustomCVForce):
     r"""
-    A smooth approximation of the shortest distance between two atom groups:
+    A smooth approximation for the shortest distance between two atom groups:
 
     .. math::
-        r_{\rm min}({\bf r}) = \frac{
-            \sum_{i \in {\bf g}_1} \sum_{j \in {\bf g}_2}
-                r_{ij} e^{-\frac{r_{ij}^2}{2 \sigma^2}}
-        }{
-            \sum_{i \in {\bf g}_1} \sum_{j \in {\bf g}_2}
-                e^{-\frac{r_{ij}^2}{2 \sigma^2}}
-        }
+        r_{\rm min}({\bf r}) = \frac{S_{rw}({\bf r})}{S_w({\bf r})}
+
+    with
+
+    .. math::
+
+        S_{rw}({\bf r}) = r_c +
+            \sum_{i \in {\bf g}_1} \sum_{j \in {\bf g}_2 \atop r_{ij} < r_c}
+                r_{ij} e^{\beta \left(1-\frac{r_{ij}}{r_c}\right)}
+
+    and
+
+    .. math::
+
+        S_w({\bf r}) = 1 +
+            \sum_{i \in {\bf g}_1} \sum_{j \in {\bf g}_2 \atop r_{ij} < r_c}
+                e^{\beta \left(1-\frac{r_{ij}}{r_c}\right)}
 
     where :math:`r_{ij} = \|{\bf r}_j - {\bf r}_i\|` is the distance between atoms
-    :math:`i` and :math:`j` and :math:`\sigma` is a parameter that controls the
-    degree of approximation. The smaller the value of :math:`\sigma`, the closer the
-    approximation to the true shortest distance.
+    :math:`i` and :math:`j`, :math:`{\bf g}_1` and :math:`{\bf g}_2` are the sets of
+    indices of the atoms in the first and second groups, respectively, :math:`r_c` is
+    the cutoff distance, and :math:`\beta` is a parameter that controls the degree of
+    approximation.
 
-    In practice, a cutoff distance :math:`r_c` is applied to the atom pairs so that
-    the collective variable is computed only for pairs of atoms separated by a distance
-    less than :math:`r_c`. A switching function is also applied to smoothly turn off
-    the collective variable starting from a distance :math:`r_s < r_c`.
+    The larger the value of :math:`\beta`, the closer the approximation to the true
+    shortest distance. However, an excessively large value may lead to numerical
+    instability.
+
+    The terms outside the summations guarantee that shortest distance is well-defined
+    even when there are no atom pairs within the cutoff distance. In this case, the
+    collective variable evaluates to the cutoff distance.
 
     .. note::
 
@@ -52,17 +66,12 @@ class ShortestDistance(CollectiveVariable, openmm.CustomCVForce):
         The indices of the atoms in the second group.
     numAtoms
         The total number of atoms in the system, including those that are not in any
-        of the groups.
-    sigma
+        of the groups. This is necessary for the correct initialization of the
+        collective variable.
+    beta
         The parameter that controls the degree of approximation.
-    magnitude
-        The expected order of magnitude of the shortest distance. This parameter does
-        not affect the value of the collective variable, but a good estimate can
-        improve numerical stability.
     cutoffDistance
         The cutoff distance for evaluating atom pairs.
-    switchDistance
-        The distance at which the switching function starts to be applied.
     pbc
         Whether to consider periodic boundary conditions in distance calculations.
     name
@@ -84,7 +93,7 @@ class ShortestDistance(CollectiveVariable, openmm.CustomCVForce):
     ...     coords[group1, None, :] - coords[None, group2, :],
     ...     axis=-1,
     ... ).min()
-    0.17573...
+    0.1757...
     >>> num_atoms = model.system.getNumParticles()
     >>> min_dist = cvpack.ShortestDistance(group1, group2, num_atoms)
     >>> min_dist.addToSystem(model.system)
@@ -93,7 +102,7 @@ class ShortestDistance(CollectiveVariable, openmm.CustomCVForce):
     >>> context = openmm.Context(model.system, integrator, platform)
     >>> context.setPositions(model.positions)
     >>> min_dist.getValue(context)
-    0.17573... nm
+    0.1785... nm
     """
 
     def __init__(
@@ -101,30 +110,26 @@ class ShortestDistance(CollectiveVariable, openmm.CustomCVForce):
         group1: t.Sequence[int],
         group2: t.Sequence[int],
         numAtoms: int,
-        sigma: mmunit.Quantity = Quantity(0.01 * mmunit.nanometers),
-        magnitude: mmunit.Quantity = Quantity(0.2 * mmunit.nanometers),
-        cutoffDistance: mmunit.Quantity = Quantity(0.5 * mmunit.nanometers),
-        switchDistance: mmunit.Quantity = Quantity(0.4 * mmunit.nanometers),
+        beta: float = 100,
+        cutoffDistance: mmunit.Quantity = Quantity(1 * mmunit.nanometers),
         pbc: bool = True,
         name: str = "shortest_distance",
     ) -> None:
-        if mmunit.is_quantity(sigma):
-            sigma = sigma.value_in_unit(mmunit.nanometers)
-        if mmunit.is_quantity(magnitude):
-            magnitude = magnitude.value_in_unit(mmunit.nanometers)
-        weight = f"exp(-0.5*(r^2 - {magnitude**2})/{sigma**2})"
+        rc = cutoffDistance
+        if mmunit.is_quantity(rc):
+            rc = rc.value_in_unit(mmunit.nanometers)
+        weight = f"exp({beta}*(1-r/{rc}))"
         forces = {
-            "numerator": openmm.CustomNonbondedForce(f"r*{weight}"),
-            "denominator": openmm.CustomNonbondedForce(weight),
+            "wrsum": openmm.CustomNonbondedForce(f"{weight}*r"),
+            "wsum": openmm.CustomNonbondedForce(weight),
         }
-        super().__init__("numerator/denominator")
+        super().__init__(f"({rc}+wrsum)/(1+wsum)")
         for cv, force in forces.items():
             force.setNonbondedMethod(
                 force.CutoffPeriodic if pbc else force.CutoffNonPeriodic
             )
             force.setCutoffDistance(cutoffDistance)
-            force.setUseSwitchingFunction(True)
-            force.setSwitchingDistance(switchDistance)
+            force.setUseSwitchingFunction(False)
             force.setUseLongRangeCorrection(False)
             for _ in range(numAtoms):
                 force.addParticle([])
@@ -136,10 +141,8 @@ class ShortestDistance(CollectiveVariable, openmm.CustomCVForce):
             group1=group1,
             group2=group2,
             numAtoms=numAtoms,
-            sigma=sigma,
-            magnitude=magnitude,
-            cutoffDistance=cutoffDistance,
-            switchDistance=switchDistance,
+            beta=beta,
+            cutoffDistance=rc,
             pbc=pbc,
         )
 
