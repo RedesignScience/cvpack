@@ -9,6 +9,7 @@
 
 import typing as t
 
+import numpy as np
 import openmm
 from openmm import unit as mmunit
 
@@ -27,17 +28,17 @@ class ShortestDistance(CollectiveVariable, openmm.CustomCVForce):
 
     .. math::
 
-        S_{rw}({\bf r}) = r_c +
+        S_{rw}({\bf r}) = r_c e^{-\beta} +
             \sum_{i \in {\bf g}_1} \sum_{j \in {\bf g}_2 \atop r_{ij} < r_c}
-                r_{ij} e^{\beta \left(1-\frac{r_{ij}}{r_c}\right)}
+                r_{ij} e^{-\beta \frac{r_{ij}}{r_c}}
 
     and
 
     .. math::
 
-        S_w({\bf r}) = 1 +
+        S_w({\bf r}) = e^{-\beta} +
             \sum_{i \in {\bf g}_1} \sum_{j \in {\bf g}_2 \atop r_{ij} < r_c}
-                e^{\beta \left(1-\frac{r_{ij}}{r_c}\right)}
+                r_{ij} e^{-\beta \frac{r_{ij}}{r_c}}
 
     where :math:`r_{ij} = \|{\bf r}_j - {\bf r}_i\|` is the distance between atoms
     :math:`i` and :math:`j`, :math:`{\bf g}_1` and :math:`{\bf g}_2` are the sets of
@@ -118,12 +119,12 @@ class ShortestDistance(CollectiveVariable, openmm.CustomCVForce):
         rc = cutoffDistance
         if mmunit.is_quantity(rc):
             rc = rc.value_in_unit(mmunit.nanometers)
-        weight = f"exp({beta}*(1-r/{rc}))"
+        weight = f"exp(-{beta/rc}*r)"
         forces = {
             "wrsum": openmm.CustomNonbondedForce(f"{weight}*r"),
             "wsum": openmm.CustomNonbondedForce(weight),
         }
-        super().__init__(f"({rc}+wrsum)/(1+wsum)")
+        super().__init__(f"({rc*np.exp(-beta)}+wrsum)/({np.exp(-beta)}+wsum)")
         for cv, force in forces.items():
             force.setNonbondedMethod(
                 force.CutoffPeriodic if pbc else force.CutoffNonPeriodic
