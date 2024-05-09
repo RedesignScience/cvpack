@@ -899,7 +899,9 @@ def test_shortest_distance():
         group.extend(atom.index for atom in residue.atoms())
     coords = model.positions.value_in_unit(unit.nanometers)
     num_atoms = model.system.getNumParticles()
-    min_dist = cvpack.ShortestDistance(group1, group2, num_atoms)
+    beta = 100
+    rc = 1
+    min_dist = cvpack.ShortestDistance(group1, group2, num_atoms, beta, rc)
     min_dist.addToSystem(model.system)
     platform = openmm.Platform.getPlatformByName("Reference")
     integrator = openmm.LangevinMiddleIntegrator(
@@ -914,8 +916,13 @@ def test_shortest_distance():
         )
         coords = state.getPositions(asNumpy=True).value_in_unit(unit.nanometers)
         cv_value = min_dist.getValue(context) / unit.nanometer
-        compute_value = np.min(
-            np.linalg.norm(coords[group1][:, None, :] - coords[group2], axis=2)
+        distances = np.linalg.norm(
+            coords[group1][:, None, :] - coords[group2], axis=2
+        ).flatten()
+        distances = np.append(distances, rc)
+        exponents = beta * (1 - distances / rc)
+        computed_value = np.exp(
+            logsumexp(exponents, b=distances) - logsumexp(exponents)
         )
-        assert cv_value == pytest.approx(compute_value, abs=1e-2)
+        assert cv_value == pytest.approx(computed_value)
     perform_common_tests(min_dist, context)
